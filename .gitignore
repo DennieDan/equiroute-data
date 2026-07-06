@@ -45,7 +45,6 @@ raw_data/
 *.zip
 
 # Generated outputs
-*.html
 *.png
 *.jpg
 *.jpeg
