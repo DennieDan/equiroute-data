@@ -32,6 +32,10 @@
         >
         |
         <span style="color: #ffff00; font-weight: bold">Yellow: Start / End</span>
+        |
+        <span style="color: #33aaff; font-weight: bold">Blue: Kerb Ramp</span> 
+        |
+        <span style="color: #ff8800; font-weight: bold">Orange: Barrier/Stair</span>
       </p>
       <p id="status" style="color: #ffaa00"></p>
     </div>
@@ -98,6 +102,26 @@
         camera.updateProjectionMatrix();
       }
 
+      function addKerbMarker(lon, lat, offsetX, offsetZ, size, kerbType, box) {
+        const colorMap = {
+          ramp: 0x33aaff,     // blue = confirmed accessible kerb ramp
+          barrier: 0xff8800,  // orange = stair/barrier, not accessible
+          unknown: 0xaaaaaa,  // grey = unclassified, needs manual check
+        };
+        const color = colorMap[kerbType] || colorMap.unknown;
+
+        const geometry = new THREE.CircleGeometry(size, 12);
+        const material = new THREE.MeshBasicMaterial({
+          color,
+          side: THREE.DoubleSide,
+        });
+        const disc = new THREE.Mesh(geometry, material);
+        disc.rotation.x = -Math.PI / 2;
+        disc.position.set(lon - offsetX, size * 0.1, lat - offsetZ);
+        scene.add(disc);
+        box.expandByObject(disc);
+      }
+
       // 2. Fetch and Render the Graph Payload
       fetch("sim_output.json")
         .then((response) => {
@@ -148,6 +172,8 @@
           const sceneSize = box.getSize(new THREE.Vector3());
           const starSize =
             Math.max(sceneSize.x, sceneSize.z, 0.0001) * 0.035;
+
+          
           addStarMarker(
             startCoord[0],
             startCoord[1],
@@ -165,8 +191,21 @@
             box,
           );
 
+          const kerbs = data.kerbs || [];
+          const kerbSize = starSize * 0.5; // slightly smaller than start/end stars
+          kerbs.forEach((k) => {
+            addKerbMarker(
+              k.coord[0],
+              k.coord[1],
+              offsetX,
+              offsetZ,
+              kerbSize,
+              k.kerbType,
+              box
+            );
+          });
           fitCameraToBox(box);
-          statusEl.textContent = `Loaded ${edges.length} edges`;
+          statusEl.textContent = `Loaded ${edges.length} edges, ${kerbs.length} kerb points`;
         })
         .catch((err) => {
           statusEl.textContent = `Failed to load data: ${err.message}. Run: python3 -m http.server 8000`;
