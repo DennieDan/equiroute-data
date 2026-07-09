@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EquiRoute 3D - Singapore Clementi Digital Twin</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background-color: #0b0f19;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+      #canvas-container {
+        width: 100vw;
+        height: 100vh;
+      }
+      #control-panel {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background: rgba(15, 23, 42, 0.85);
+        border: 1px solid #1e293b;
+        padding: 20px;
+        border-radius: 8px;
+        color: #fff;
+        width: 280px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(10px);
+      }
+      h3 {
+        margin-top: 0;
+        color: #38bdf8;
+        letter-spacing: 0.5px;
+      }
+      .legend-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+        font-size: 13px;
+      }
+      .box {
+        width: 14px;
+        height: 14px;
+        margin-right: 10px;
+        border-radius: 3px;
+      }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  </head>
+  <body>
+    <div id="control-panel">
+      <h3>SimAccess SG</h3>
+      <p style="font-size: 11px; color: #94a3b8; margin-bottom: 15px">
+        Interactive Accessibility World Model
+      </p>
+
+      <div class="legend-item">
+        <div class="box" style="background: #10b981"></div>
+        LTA Footpath Edge (Green)
+      </div>
+      <div class="legend-item">
+        <div class="box" style="background: #2563eb"></div>
+        Vehicular Road Edge (Blue)
+      </div>
+      <div class="legend-item">
+        <div class="box" style="background: #ef4444"></div>
+        MRT Station Exit (Red Core)
+      </div>
+      <div class="legend-item">
+        <div class="box" style="background: #f59e0b"></div>
+        LTA Bus Stop (Orange Box)
+      </div>
+      <div class="legend-item">
+        <div class="box" style="background: #06b6d4"></div>
+        Passenger Pickup Bay (Cyan Curb)
+      </div>
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <script>
+      // --- 1. Global Three.js Setup ---
+      const container = document.getElementById("canvas-container");
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x0b0f19);
+      scene.fog = new THREE.FogExp2(0x0b0f19, 0.005);
+
+      const camera = new THREE.PerspectiveCamera(
+        45,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000,
+      );
+      camera.position.set(0, 80, 100);
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      container.appendChild(renderer.domElement);
+
+      const controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      controls.maxPolarAngle = Math.PI / 2.1; // Prevent going underneath ground
+
+      // --- 2. Lighting Setup ---
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+      scene.add(ambientLight);
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      directionalLight.position.set(50, 200, 50);
+      scene.add(directionalLight);
+
+      // Grid Baseplate
+      const gridHelper = new THREE.GridHelper(500, 100, 0x1e293b, 0x0f172a);
+      gridHelper.position.y = -0.1;
+      scene.add(gridHelper);
+
+      // --- 3. Geometric Anchor Reference Scales ---
+      // Mercator center calibration parameters to handle flat mapping calculations
+      let centerLng = null;
+      let centerLat = null;
+      const LAT_SCALE = 111320; // Meters per degree lat
+      const LNG_SCALE = (40075000 * Math.cos((1.315 * Math.PI) / 180)) / 360; // Meters per degree lng at Singapore lat
+
+      function projectCoordinates(lng, lat) {
+        const x = (lng - centerLng) * LNG_SCALE;
+        const z = -(lat - centerLat) * LAT_SCALE; // Invert latitude to match WebGL screen matrix coordinates
+        return { x, z };
+      }
+
+      // --- 4. Custom Architectural Object Building Functions ---
+
+      // 3D Bus Stop: Compact shelter structure
+      function drawBusStop(x, z) {
+        const busStopGroup = new THREE.Group();
+
+        // Foundation pad
+        const padGeom = new THREE.BoxGeometry(3, 0.2, 1.5);
+        const padMat = new THREE.MeshStandardMaterial({ color: 0x4b5563 });
+        const pad = new THREE.Mesh(padGeom, padMat);
+        busStopGroup.add(pad);
+
+        // Orange Shelter Roof structure
+        const roofGeom = new THREE.BoxGeometry(3.2, 0.15, 1.6);
+        const roofMat = new THREE.MeshStandardMaterial({
+          color: 0xf59e0b,
+          roughness: 0.3,
+        });
+        const roof = new THREE.Mesh(roofGeom, roofMat);
+        roof.position.set(0, 2.2, 0);
+        busStopGroup.add(roof);
+
+        // Metal supporting pillars
+        const pillarGeom = new THREE.CylinderGeometry(0.05, 0.05, 2.2);
+        const pillarMat = new THREE.MeshStandardMaterial({ color: 0x9ca3af });
+        const p1 = new THREE.Mesh(pillarGeom, pillarMat);
+        p1.position.set(-1.4, 1.1, -0.6);
+        const p2 = new THREE.Mesh(pillarGeom, pillarMat);
+        p2.position.set(1.4, 1.1, -0.6);
+        busStopGroup.add(p1, p2);
+
+        busStopGroup.position.set(x, 0, z);
+        scene.add(busStopGroup);
+      }
+
+      // 3D MRT Exit: Futuristic glass/metal shell canopy structure
+      function drawMRTExit(x, z) {
+        const exitGroup = new THREE.Group();
+
+        // Base portal bounds
+        const baseGeom = new THREE.BoxGeometry(5, 0.3, 3);
+        const baseMat = new THREE.MeshStandardMaterial({ color: 0x1e293b });
+        const base = new THREE.Mesh(baseGeom, baseMat);
+        exitGroup.add(base);
+
+        // Translucent Glass Canopy dome structure
+        const domeGeom = new THREE.CylinderGeometry(
+          1.5,
+          1.5,
+          5,
+          16,
+          1,
+          true,
+          0,
+          Math.PI,
+        );
+        const domeMat = new THREE.MeshStandardMaterial({
+          color: 0x38bdf8,
+          transparent: true,
+          opacity: 0.6,
+          roughness: 0.1,
+          side: THREE.DoubleSide,
+        });
+        const dome = new THREE.Mesh(domeGeom, domeMat);
+        dome.rotation.set(0, 0, Math.PI / 2);
+        dome.position.set(0, 1.5, 0);
+        exitGroup.add(dome);
+
+        // Inner glowing terminal red indicator light
+        const lightGeom = new THREE.SphereGeometry(0.4, 8, 8);
+        const lightMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
+        const lightMesh = new THREE.Mesh(lightGeom, lightMat);
+        lightMesh.position.set(0, 0.8, 0);
+        exitGroup.add(lightMesh);
+
+        exitGroup.position.set(x, 0, z);
+        scene.add(exitGroup);
+      }
+
+      // 3D Passenger Pickup Bay: Dynamic layout representation mimicking real Singaporean bay strips [cite: 559]
+      function drawPickupBay(points) {
+        if (points.length < 2) return;
+
+        const shapePoints = [];
+        // Create a small polygon offset frame representing vehicle bay footprints
+        points.forEach((pt) => {
+          const coord = projectCoordinates(pt[0], pt[1]);
+          shapePoints.push(new THREE.Vector2(coord.x, coord.z));
+        });
+
+        // Create buffer width for the bay extrusion geometry
+        const spline = new THREE.CatmullRomCurve3(
+          points.map((pt) => {
+            const c = projectCoordinates(pt[0], pt[1]);
+            return new THREE.Vector3(c.x, 0.05, c.z);
+          }),
+        );
+
+        const tubeGeom = new THREE.TubeGeometry(spline, 20, 1.2, 4, false); // Flat ribbon box style
+        const tubeMat = new THREE.MeshStandardMaterial({
+          color: 0x06b6d4,
+          transparent: true,
+          opacity: 0.7,
+          roughness: 0.5,
+        });
+        const bayMesh = new THREE.Mesh(tubeGeom, tubeMat);
+        scene.add(bayMesh);
+      }
+
+      // --- 5. Data Loading & Parsing Pipeline ---
+      fetch("singapore_3d_sim.geojson")
+        .then((res) => res.json())
+        .then((geojson) => {
+          // Initialize spatial bounding box coordinates map centers on initial parse loop
+          const firstPoint = geojson.features.find(
+            (f) => f.geometry.type === "Point",
+          );
+          if (firstPoint) {
+            centerLng = firstPoint.geometry.coordinates[0];
+            centerLat = firstPoint.geometry.coordinates[1];
+          }
+
+          geojson.features.forEach((feature) => {
+            const geom = feature.geometry;
+            const props = feature.properties;
+
+            // Parse Point Infrastructure Features [cite: 483, 484]
+            if (geom.type === "Point") {
+              const coord = projectCoordinates(
+                geom.coordinates[0],
+                geom.coordinates[1],
+              );
+
+              if (props.node_type === "mrt_exit") {
+                drawMRTExit(coord.x, coord.z);
+              } else if (props.is_bus_stop || props.node_type === "bus_stop") {
+                drawBusStop(coord.x, coord.z);
+              }
+            }
+
+            // Parse Line Path/Edge Corridors [cite: 482]
+            else if (geom.type === "LineString") {
+              const points = geom.coordinates;
+
+              // Handle standard paths / footpaths conditional checks
+              if (props.is_footpath === true || props.is_footpath === "True") {
+                // Render LTA Verified Footpaths in Green
+                const pathPoints = points.map((pt) => {
+                  const c = projectCoordinates(pt[0], pt[1]);
+                  return new THREE.Vector3(c.x, 0.1, c.z);
+                });
+                const curve = new THREE.CatmullRomCurve3(pathPoints);
+                const geomTube = new THREE.TubeGeometry(
+                  curve,
+                  16,
+                  0.3,
+                  6,
+                  false,
+                );
+                const matTube = new THREE.MeshStandardMaterial({
+                  color: 0x10b981,
+                  roughness: 0.6,
+                });
+                scene.add(new THREE.Mesh(geomTube, matTube));
+              } else if (
+                props.node_type === "passenger_pickup" ||
+                (points.length === 2 && feature.properties.source === undefined)
+              ) {
+                // Target special LineString array configurations matching physical Pickup Bays [cite: 559, 562]
+                drawPickupBay(points);
+              } else {
+                // Render standard vehicle road corridors in Blue [cite: 588]
+                const roadPoints = points.map((pt) => {
+                  const c = projectCoordinates(pt[0], pt[1]);
+                  return new THREE.Vector3(c.x, 0.02, c.z);
+                });
+                const curve = new THREE.CatmullRomCurve3(roadPoints);
+                const geomTube = new THREE.TubeGeometry(
+                  curve,
+                  16,
+                  0.4,
+                  4,
+                  false,
+                );
+                const matTube = new THREE.MeshStandardMaterial({
+                  color: 0x2563eb,
+                  roughness: 0.8,
+                });
+                scene.add(new THREE.Mesh(geomTube, matTube));
+              }
+            }
+          });
+        });
+
+      // --- 6. Frame Animation Render Loop ---
+      function animate() {
+        requestAnimationFrame(animate);
+        controls.update();
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      // Handle window boundaries shifting dynamically
+      window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+    </script>
+  </body>
+</html>

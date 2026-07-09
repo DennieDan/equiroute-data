@@ -2,186 +2,194 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>EquiRoute 3D - 5-Hour MVP</title>
+    <title>3D Volumetric Infrastructure Dashboard</title>
     <style>
       body {
         margin: 0;
         overflow: hidden;
-        background-color: #111;
-        color: white;
-        font-family: sans-serif;
+        background-color: #ffffff;
       }
-      #info {
+      #legend {
         position: absolute;
-        top: 10px;
-        left: 10px;
-        z-index: 100;
-        background: rgba(0, 0, 0, 0.7);
-        padding: 10px;
+        top: 15px;
+        left: 15px;
+        background: rgba(237, 240, 70, 0.864);
+        color: #000000;
+        padding: 15px;
+        font-family: monospace;
+        border-radius: 6px;
+        border: 1px solid #ddd57e;
+        pointer-events: none;
+      }
+      .color-box {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        margin-right: 8px;
+        border-radius: 2px;
       }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
   </head>
   <body>
-    <div id="info">
-      <h2>EquiRoute 3D: Local MVP</h2>
-      <p>
-        Green: Accessible |
-        <span style="color: #ff3333; font-weight: bold"
-          >Red: Faked Step-Drop Bottleneck</span
-        >
-        |
-        <span style="color: #ffff00; font-weight: bold">Yellow: Start / End</span>
-      </p>
-      <p id="status" style="color: #ffaa00"></p>
+    <div id="legend">
+      <h3>Singapore Infrastructure Layers</h3>
+      <div>
+        <span class="color-box" style="background: #222222"></span>Primary
+        Highways
+      </div>
+      <div>
+        <span class="color-box" style="background: #333333"></span>Residential
+        Streets
+      </div>
+      <div>
+        <span class="color-box" style="background: #444444"></span>HDB Service
+        Ways
+      </div>
+      <div>
+        <span class="color-box" style="background: #33ff33"></span>LTA Footpaths
+      </div>
+      <div>
+        <span class="color-box" style="background: #00ffff"></span>Mobility
+        Cycleways
+      </div>
     </div>
 
     <script>
-      // 1. Setup Scene, Camera, and Renderer
+      // --- 1. SCENE SEEDING & VIEWPORT SETUP ---
       const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0xffffff);
+
       const camera = new THREE.PerspectiveCamera(
-        75,
+        60,
         window.innerWidth / window.innerHeight,
         0.1,
-        100000,
+        5000,
       );
       const renderer = new THREE.WebGLRenderer({ antialias: true });
       renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.shadowMap.enabled = true; // Enable shadows for physical realism
       document.body.appendChild(renderer.domElement);
 
-      const statusEl = document.getElementById("status");
+      // Add interactive mouse tracking, panning, and zooming controls
+      const controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.maxPolarAngle = Math.PI / 2 - 0.05; // Prevent camera from passing below ground plane
 
-      const FALLBACK_START = [103.77270416701658, 1.30098333297992];
-      const FALLBACK_END = [103.77165274445558, 1.30783047048090];
+      // --- 2. TROPICAL LIGHTING CONFIGURATION ---
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+      scene.add(ambientLight);
 
-      function addStarMarker(lon, lat, offsetX, offsetZ, size, box) {
-        const outer = size;
-        const inner = size * 0.4;
-        const points = 5;
-        const shape = new THREE.Shape();
-        for (let i = 0; i < points * 2; i++) {
-          const r = i % 2 === 0 ? outer : inner;
-          const a = (i / (points * 2)) * Math.PI * 2 - Math.PI / 2;
-          const x = Math.cos(a) * r;
-          const y = Math.sin(a) * r;
-          if (i === 0) shape.moveTo(x, y);
-          else shape.lineTo(x, y);
-        }
-        shape.closePath();
+      const sunLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      sunLight.position.set(200, 400, 150);
+      sunLight.castShadow = true;
+      scene.add(sunLight);
 
-        const geometry = new THREE.ShapeGeometry(shape);
-        const material = new THREE.MeshBasicMaterial({
-          color: 0xffff00,
-          side: THREE.DoubleSide,
-        });
-        const star = new THREE.Mesh(geometry, material);
-        star.rotation.x = -Math.PI / 2;
-        star.position.set(lon - offsetX, size * 0.15, lat - offsetZ);
-        scene.add(star);
-        box.expandByObject(star);
-      }
+      camera.position.set(0, 150, 250);
+      controls.target.set(0, 0, 0);
 
-      function fitCameraToBox(box) {
-        const center = box.getCenter(new THREE.Vector3());
-        const size = box.getSize(new THREE.Vector3());
-        const maxDim = Math.max(size.x, size.y, size.z, 0.001);
-        const fov = camera.fov * (Math.PI / 180);
-        const dist = maxDim / (2 * Math.tan(fov / 2));
-        camera.position.set(
-          center.x,
-          center.y + dist * 0.8,
-          center.z + dist * 1.2,
-        );
-        camera.lookAt(center);
-        camera.near = dist / 100;
-        camera.far = dist * 100;
-        camera.updateProjectionMatrix();
-      }
+      // --- UPDATED FETCH LAYER WITH AUTO-CENTERING ---
+      fetch("threejs_3d_roads.json")
+        .then((response) => response.json())
+        .then((payload) => {
+          // 1. Render all the physical 3D roads
+          generateVolumetricRoads(payload.mesh_roads);
 
-      // 2. Fetch and Render the Graph Payload
-      fetch("sim_output.json")
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-          }
-          return response.json();
+          // 2. Compute the bounding box of the entire generated scene
+          const boundingBox = new THREE.Box3().setFromObject(scene);
+          const center = new THREE.Vector3();
+          boundingBox.getCenter(center);
+          const size = new THREE.Vector3();
+          boundingBox.getSize(size);
+
+          // 3. Force camera controls to lock onto the exact center of your coordinates
+          controls.target.copy(center);
+
+          // 4. Position the camera safely above and back from the map size dynamically
+          const maxDim = Math.max(size.x, size.y, size.z);
+          camera.position.set(center.x, maxDim * 1.2, center.z + maxDim * 1.2);
+
+          // 5. Update projection matrix and refresh controls
+          camera.lookAt(center);
+          camera.updateProjectionMatrix();
+          controls.update();
+
+          print(
+            `🗺️ Scene centered at: X:${center.x.toFixed(2)}, Z:${center.z.toFixed(2)}. Camera moved safely to capture map.`,
+          );
         })
-        .then((data) => {
-          const edges = Array.isArray(data) ? data : data.edges;
-          const startCoord = Array.isArray(data) ? FALLBACK_START : data.start;
-          const endCoord = Array.isArray(data) ? FALLBACK_END : data.end;
+        .catch((err) => console.error("❌ Data loading failed: ", err));
 
-          if (!edges || !edges.length) {
-            throw new Error("sim_output.json is empty");
-          }
+      // --- 4. VOLUMETRIC ROAD GENERATION ENGINE ---
+      function generateVolumetricRoads(meshRoads) {
+        meshRoads.forEach((road) => {
+          if (road.coordinates.length < 2) return;
 
-          const box = new THREE.Box3();
-          const firstCoord = edges[0].coords[0];
-          const offsetX = firstCoord[0];
-          const offsetZ = firstCoord[1];
+          // Convert coordinates into a mathematical Three.js spatial track curve
+          const curvePoints = road.coordinates.map(
+            (pt) => new THREE.Vector3(pt[0], pt[1], pt[2]),
+          );
+          const roadPathCurve = new THREE.CatmullRomCurve3(curvePoints);
 
-          edges.forEach((edge) => {
-            const points = [];
-            points.push(
-              new THREE.Vector3(
-                edge.coords[0][0] - offsetX,
-                0,
-                edge.coords[0][1] - offsetZ,
-              ),
-            );
-            points.push(
-              new THREE.Vector3(
-                edge.coords[1][0] - offsetX,
-                0,
-                edge.coords[1][1] - offsetZ,
-              ),
-            );
+          // Define a 2D rectangular profile shape for extrusion based on the road's true width
+          const halfWidth = road.width / 2;
+          const thickness = road.thickness;
 
-            const geometry = new THREE.BufferGeometry().setFromPoints(points);
-            const color = edge.isHighCost ? 0xff3333 : 0x33ff33;
-            const material = new THREE.LineBasicMaterial({ color });
-            const line = new THREE.Line(geometry, material);
-            scene.add(line);
-            box.expandByObject(line);
+          const roadProfileShape = new THREE.Shape();
+          roadProfileShape.moveTo(-halfWidth, 0);
+          roadProfileShape.lineTo(halfWidth, 0);
+          roadProfileShape.lineTo(halfWidth, thickness);
+          roadProfileShape.lineTo(-halfWidth, thickness);
+          roadProfileShape.lineTo(-halfWidth, 0);
+
+          // Configure the extrusion parameters matching the linear track curve
+          const extrusionSettings = {
+            steps: road.coordinates.length * 3, // Dense segments for smooth curves
+            bevelEnabled: false,
+            extrudePath: roadPathCurve,
+          };
+
+          // Extrude the 2D cross-section into a physical solid 3D ribbon geometry
+          const geometry = new THREE.ExtrudeGeometry(
+            roadProfileShape,
+            extrusionSettings,
+          );
+
+          // Setup materials. If it's a bridge, give it structural shadows. If a tunnel, make it semi-transparent[cite: 81, 85].
+          const material = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(road.color_hex),
+            roughness: 0.8,
+            metalness: 0.1,
+            transparent: road.is_tunnel,
+            opacity: road.is_tunnel ? 0.3 : 1.0,
           });
 
-          const sceneSize = box.getSize(new THREE.Vector3());
-          const starSize =
-            Math.max(sceneSize.x, sceneSize.z, 0.0001) * 0.035;
-          addStarMarker(
-            startCoord[0],
-            startCoord[1],
-            offsetX,
-            offsetZ,
-            starSize,
-            box,
-          );
-          addStarMarker(
-            endCoord[0],
-            endCoord[1],
-            offsetX,
-            offsetZ,
-            starSize,
-            box,
-          );
+          const roadMesh = new THREE.Mesh(geometry, material);
+          roadMesh.castShadow = true;
+          roadMesh.receiveShadow = true;
 
-          fitCameraToBox(box);
-          statusEl.textContent = `Loaded ${edges.length} edges`;
-        })
-        .catch((err) => {
-          statusEl.textContent = `Failed to load data: ${err.message}. Run: python3 -m http.server 8000`;
+          // Optional: Attach metadata attributes straight onto the mesh for later interactive features
+          roadMesh.userData = {
+            id: road.id,
+            name: road.name,
+            fclass: road.fclass,
+            direction: road.direction_mode,
+          };
+
+          scene.add(roadMesh);
         });
+      }
 
-      // 3. Simple Animation Loop
-      function animate() {
-        requestAnimationFrame(animate);
-        // Slowly rotate scene for showcase effect
-        scene.rotation.y += 0.002;
+      // --- 5. VISUALIZATION ANIMATION ENGINE LOOP ---
+      function renderLoop() {
+        requestAnimationFrame(renderLoop);
+        controls.update(); // Smooth camera movements
         renderer.render(scene, camera);
       }
-      animate();
+      renderLoop();
 
-      // Handle window resizing seamlessly
+      // Handle responsive window scaling dynamically
       window.addEventListener("resize", () => {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
