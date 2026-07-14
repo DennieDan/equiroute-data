@@ -29,7 +29,29 @@ In JupyterLab, select **Python (equiroute)** as the kernel when opening `persona
 
 1. **Filter geospatial layers** — run `filter_estate.py` to crop LTA shapefiles to the Clementi bounding box and write outputs to `CLEMENTI/`.
 2. **Explore & simulate** — open `persona_agent.ipynb` and run cells to load filtered layers and build route simulations.
-3. **View the 3D MVP** — from the project root, start a local server:
+3. **Generate persona before/after simulation output** — after placing `sim_output.json` and `threejs_3d_roads.json` in the project root, run:
+
+```bash
+python persona_simulation.py
+```
+
+This writes `sim_persona_before_after.json`, which contains persona-specific scores, bottlenecks, and the simulated impact of an accessibility intervention.
+
+4. **Apply PERS-inspired scoring** — our benchmark basis is PERS (Pedestrian Environment Review System), the TRL/TfL pedestrian-audit framework. The prototype is not a certified PERS audit, but it maps available OSM/LTA proxy risks onto PERS-style weighted link/crossing criteria and a 0–100 RAG score:
+
+```bash
+python accessibility_scoring.py
+```
+
+5. **Generate OSM building footprints for 3D context** — fetch buildings from Overpass, save the response to `/tmp/overpass_buildings.json`, then run:
+
+```bash
+python buildings_from_overpass.py
+```
+
+This writes `buildings_clementi.geojson`, used by `maptalks_three.html` to show building context behind obstacles and improvements.
+
+6. **View the 3D MVP** — from the project root, start a local server:
 
 ```bash
 python -m http.server 8000
@@ -45,4 +67,8 @@ Open [http://localhost:8000](http://localhost:8000) in your browser.
 | `CLEMENTI/`           | Filtered shapefiles for the estate        |
 | `filter_estate.py`    | Crops layers to the Clementi bounding box |
 | `persona_agent.ipynb` | Route graph and persona simulation        |
+| `persona_simulation.py` | Generates persona before/after payloads |
+| `accessibility_scoring.py` | Applies PERS-inspired scoring to the payload |
+| `buildings_clementi.geojson` | OSM building footprints for map context |
+| `maptalks_three.html` | MapTalks + Three.js prototype with before/after toggle, buildings, and obstacle/improvement markers |
 | `index.html`          | Three.js 3D route viewer                  |

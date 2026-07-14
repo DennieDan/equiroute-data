@@ -91,7 +91,7 @@
       }
       .stats {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(4, 1fr);
         gap: 8px;
         margin: 12px 0;
       }
@@ -136,6 +136,16 @@
       }
       .summary strong {
         color: white;
+      }
+      .methodology {
+        margin-top: 10px;
+        padding: 10px;
+        border-radius: 12px;
+        background: rgba(14, 116, 144, 0.18);
+        border: 1px solid rgba(125, 211, 252, 0.22);
+        color: #cffafe;
+        font-size: 11px;
+        line-height: 1.35;
       }
       #status {
         position: absolute;
@@ -187,7 +197,8 @@
       <div class="stats">
         <div class="stat"><b id="totalEdges">–</b><span>edges</span></div>
         <div class="stat"><b id="bottlenecks">–</b><span>bottlenecks</span></div>
-        <div class="stat"><b id="score">–</b><span>score</span></div>
+        <div class="stat"><b id="score">–</b><span>PERS score</span></div>
+        <div class="stat"><b id="buildingCount">–</b><span>buildings</span></div>
       </div>
 
       <div class="legend">
@@ -195,10 +206,14 @@
         <div><span class="dot" style="color: var(--red); background: var(--red)"></span>bottleneck / barrier</div>
         <div><span class="dot" style="color: var(--yellow); background: var(--yellow)"></span>start / end marker</div>
         <div><span class="dot" style="color: var(--blue); background: var(--blue)"></span>after intervention</div>
+        <div><span class="dot" style="color: #94a3b8; background: #94a3b8"></span>OSM buildings</div>
       </div>
 
       <div class="summary" id="interventionSummary">
         Loading persona before/after simulation…
+      </div>
+      <div class="methodology" id="scoringMethodology">
+        Scoring: loading PERS-inspired methodology…
       </div>
     </section>
 
@@ -226,6 +241,7 @@
         payload: null,
         edgeLayer: null,
         markerLayer: null,
+        buildingLayer: null,
         threeLayer: null,
         threeOverlay: null,
         threeObjects: [],
@@ -262,9 +278,14 @@
         enableSimplify: true,
         drawImmediate: true,
       }).addTo(equiMap);
+      const buildingLayer = new maptalks.VectorLayer("osm-buildings", [], {
+        enableSimplify: true,
+        drawImmediate: true,
+      }).addTo(equiMap);
       const markerLayer = new maptalks.VectorLayer("fallback-markers").addTo(equiMap);
       state.edgeLayer = edgeLayer;
       state.markerLayer = markerLayer;
+      state.buildingLayer = buildingLayer;
 
       function setStatus(message) {
         statusEl.textContent = message;
@@ -626,17 +647,25 @@
         document.getElementById("bottlenecks").textContent =
           count.toLocaleString();
         document.getElementById("score").textContent = score ?? "–";
+        document.getElementById("buildingCount").textContent =
+          state.buildingCount ? state.buildingCount.toLocaleString() : "–";
 
         const summary = document.getElementById("interventionSummary");
         const modeLabel = state.mode === "before" ? "before intervention" : "after intervention";
         summary.innerHTML = `
           <strong>${persona.name}</strong> · ${modeLabel}<br />
           ${state.payload.intervention.description}<br />
+          <strong>Scoring:</strong> PERS-inspired weighted pedestrian audit, adapted from -3..+3 criteria to 0..100.<br />
           <strong>Impact:</strong> score ${persona.before_score} → ${persona.after_score}
           (${delta >= 0 ? "+" : ""}${delta}), bottlenecks ${beforeCount} → ${afterCount}.
           <br /><strong>3D layer:</strong>
           ${state.mode === "before" ? "red Three.js barrier blocks show top risk edges." : "blue Three.js intervention blocks show upgraded segments."}
         `;
+
+        const methodology = state.payload.scoring_methodology;
+        document.getElementById("scoringMethodology").innerHTML = methodology
+          ? `<strong>${methodology.name}</strong><br />Benchmark basis: ${methodology.benchmark_basis}<br />RAG: red ${methodology.rag_thresholds.red}, amber ${methodology.rag_thresholds.amber}, green ${methodology.rag_thresholds.green}.`
+          : "Scoring uses persona-weighted risk proxies.";
       }
 
       function setMode(mode) {
@@ -670,6 +699,63 @@
         setMode(state.mode);
       });
 
+
+
+      function polygonFromFeature(feature) {
+        const geom = feature.geometry || {};
+        if (geom.type !== "Polygon" || !geom.coordinates?.[0]?.length) return null;
+        const height = Number(feature.properties?.height_m || 18);
+        const shade = height > 35 ? "#64748b" : height > 20 ? "#78909c" : "#94a3b8";
+        return new maptalks.Polygon(geom.coordinates, {
+          properties: feature.properties,
+          symbol: {
+            polygonFill: shade,
+            polygonOpacity: 0.42,
+            lineColor: "rgba(226,232,240,0.32)",
+            lineWidth: 0.6,
+          },
+        });
+      }
+
+      async function loadBuildings() {
+        try {
+          const response = await fetch("buildings_clementi.geojson");
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const geojson = await response.json();
+          const features = Array.isArray(geojson.features) ? geojson.features : [];
+          state.buildingCount = features.length;
+          document.getElementById("buildingCount").textContent = features.length.toLocaleString();
+
+          if (maptalks.ExtrudePolygonLayer) {
+            const extrusion = new maptalks.ExtrudePolygonLayer("osm-building-extrusions", features, {
+              forceRenderOnMoving: true,
+              forceRenderOnRotating: true,
+              altitudeProperty: "height_m",
+            }).setStyle([
+              {
+                filter: true,
+                symbol: {
+                  polygonFill: "#8fa3b8",
+                  polygonOpacity: 0.58,
+                  lineColor: "rgba(255,255,255,0.22)",
+                  lineWidth: 0.4,
+                },
+              },
+            ]);
+            extrusion.addTo(equiMap);
+            state.buildingLayer = extrusion;
+            return;
+          }
+
+          const polygons = features.map(polygonFromFeature).filter(Boolean);
+          buildingLayer.clear();
+          buildingLayer.addGeometry(polygons);
+        } catch (err) {
+          console.warn("Could not load buildings_clementi.geojson", err);
+          document.getElementById("buildingCount").textContent = "0";
+        }
+      }
+
       async function loadPayload() {
         const response = await fetch("sim_persona_before_after.json");
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -689,6 +775,7 @@
             : Object.keys(payload.personas)[0];
 
           initializeThreeLayer();
+          loadBuildings();
           populatePersonas();
           buildEdgeGeometries(payload.edges);
 
@@ -720,7 +807,7 @@
 
           setMode("before");
           setStatus(
-            `Loaded ${payload.edges.length.toLocaleString()} edges from sim_persona_before_after.json`,
+            `Loaded ${payload.edges.length.toLocaleString()} edges + OSM buildings; PERS-inspired scoring active`,
           );
         })
         .catch((err) => {
