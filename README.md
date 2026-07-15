@@ -59,6 +59,8 @@ This writes `buildings_clementi.geojson`, used by `maptalks_three.html` and `ear
 
 This writes `accessibility_world.geojson` for the Google Earth-style street inspection UI.
 
+Mapillary is wired as the primary real-life street-view provider in `earth_accessibility.html`, with KartaView as no-token fallback. Mapillary requires a free client token from the Mapillary developer dashboard; enter it in the in-browser token field only. The token is stored in that browser's `localStorage` and is not committed to the repo.
+
 7. **View the 3D MVP** — from the project root, start a local server:
 
 ```bash
