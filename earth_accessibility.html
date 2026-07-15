@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EquiRoute Earth Accessibility Street View</title>
+    <link rel="stylesheet" href="https://unpkg.com/maptalks/dist/maptalks.css" />
+    <style>
+      :root { color-scheme: dark; --bg: rgba(3, 7, 18, .86); --line: rgba(125, 211, 252, .32); --txt:#eef9ff; --muted:#a7c7d8; --green:#2df46f; --amber:#ffd166; --red:#ff3b52; --blue:#38bdf8; }
+      html, body, #map { width:100%; height:100%; margin:0; overflow:hidden; background:#07111f; font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      .panel { position:absolute; z-index:20; color:var(--txt); background:var(--bg); border:1px solid var(--line); border-radius:18px; box-shadow:0 20px 70px rgba(0,0,0,.42); backdrop-filter:blur(16px); }
+      #left { top:16px; left:16px; width:min(430px, calc(100vw - 32px)); padding:16px; }
+      #right { top:16px; right:16px; width:min(360px, calc(100vw - 32px)); padding:14px; max-height:calc(100vh - 32px); overflow:auto; }
+      h1 { margin:4px 0 8px; font-size:22px; line-height:1.08; }
+      h2 { margin:6px 0 8px; font-size:15px; }
+      .eyebrow { color:#7dd3fc; font-size:11px; letter-spacing:.14em; text-transform:uppercase; font-weight:850; }
+      p { color:var(--muted); font-size:12px; line-height:1.42; margin:7px 0; }
+      .controls { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px; }
+      select, button { border:1px solid rgba(125,211,252,.35); background:rgba(15,23,42,.88); color:var(--txt); border-radius:12px; padding:9px 10px; font-weight:750; }
+      select { grid-column:1 / -1; width:100%; }
+      button { cursor:pointer; }
+      button.active, button:hover { background:linear-gradient(135deg,#075985,#0e7490); border-color:#bae6fd; }
+      .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin:12px 0; }
+      .stat { background:rgba(15,23,42,.7); border:1px solid rgba(148,163,184,.18); border-radius:13px; padding:9px; }
+      .stat b { display:block; font-size:18px; }
+      .stat span { display:block; color:var(--muted); font-size:9px; text-transform:uppercase; letter-spacing:.08em; }
+      .legend { display:grid; grid-template-columns:1fr 1fr; gap:8px 12px; font-size:12px; margin-top:10px; }
+      .dot { display:inline-block; width:10px; height:10px; border-radius:999px; margin-right:7px; box-shadow:0 0 14px currentColor; }
+      #streetCard { position:absolute; left:50%; transform:translateX(-50%); bottom:16px; z-index:22; width:min(680px, calc(100vw - 32px)); padding:13px 16px; }
+      .metric { display:grid; grid-template-columns: 1.1fr .8fr 1fr; gap:8px; padding:7px 0; border-bottom:1px solid rgba(148,163,184,.16); font-size:12px; }
+      .metric small { color:var(--muted); }
+      .pill { display:inline-flex; align-items:center; gap:6px; border:1px solid rgba(148,163,184,.25); background:rgba(15,23,42,.75); border-radius:999px; padding:4px 8px; margin:3px 4px 3px 0; font-size:11px; }
+      .agent { display:grid; grid-template-columns:1fr auto; gap:8px; padding:8px; margin:7px 0; border-radius:12px; background:rgba(15,23,42,.6); border:1px solid rgba(148,163,184,.18); font-size:12px; }
+      .pass { color:#86efac; } .fail { color:#fca5a5; }
+      .status { position:absolute; left:16px; bottom:16px; z-index:21; color:#dff7ff; background:rgba(2,6,23,.82); border:1px solid rgba(125,211,252,.28); border-radius:999px; padding:9px 14px; font-size:12px; max-width:42vw; }
+      @media (max-width: 900px) { #right { display:none; } #streetCard { bottom:70px; } .stats { grid-template-columns:1fr 1fr; } }
+    </style>
+    <script src="https://unpkg.com/maptalks/dist/maptalks.min.js"></script>
+  </head>
+  <body>
+    <div id="map"></div>
+    <section id="left" class="panel">
+      <div class="eyebrow">EquiRoute Earth Mode</div>
+      <h1>Clementi Mall Accessible Digital Twin</h1>
+      <p>Google Earth-style view with selectable street segments, buildings, LTA/OSM features, persona passability, and segment-level accessibility metrics.</p>
+      <div class="controls">
+        <select id="segmentSelect"></select>
+        <button id="earthBtn" class="active">Earth View</button>
+        <button id="streetBtn">Street View</button>
+        <button id="prevBtn">← Previous street</button>
+        <button id="nextBtn">Next street →</button>
+      </div>
+      <div class="stats">
+        <div class="stat"><b id="segCount">–</b><span>segments</span></div>
+        <div class="stat"><b id="featureCount">–</b><span>features</span></div>
+        <div class="stat"><b id="buildingCount">–</b><span>buildings</span></div>
+        <div class="stat"><b id="activeScore">–</b><span>score</span></div>
+      </div>
+      <div class="legend">
+        <div><span class="dot" style="color:var(--green);background:var(--green)"></span>good / passable</div>
+        <div><span class="dot" style="color:var(--amber);background:var(--amber)"></span>needs review</div>
+        <div><span class="dot" style="color:var(--red);background:var(--red)"></span>barrier / poor</div>
+        <div><span class="dot" style="color:var(--blue);background:var(--blue)"></span>selected street</div>
+        <div><span class="dot" style="color:#f97316;background:#f97316"></span>bus stop / MRT / POI</div>
+        <div><span class="dot" style="color:#94a3b8;background:#94a3b8"></span>buildings</div>
+      </div>
+    </section>
+
+    <aside id="right" class="panel">
+      <h2>Standards basis</h2>
+      <p id="standardsText">Loading standards…</p>
+      <h2>Visible features</h2>
+      <div id="featureSummary"></div>
+      <h2>Persona agents</h2>
+      <div id="agentList"></div>
+    </aside>
+
+    <section id="streetCard" class="panel">
+      <div class="eyebrow" id="selectedType">street segment</div>
+      <h2 id="selectedName">Loading street selector…</h2>
+      <p id="selectedDesc">Choose any segment around Clementi Mall. The camera will pitch down into a street-view-like inspection angle.</p>
+      <div id="metricList"></div>
+    </section>
+
+    <div class="status" id="status">Loading accessibility world…</div>
+
+    <script>
+      const COLORS = { green: '#2df46f', amber: '#ffd166', red: '#ff3b52', blue: '#38bdf8', poi: '#f97316' };
+      const state = { world:null, buildings:null, segments:[], selectedIndex:0, layers:{}, mode:'earth' };
+      window.__EARTH_ACCESSIBILITY_STATE = state;
+
+      const map = new maptalks.Map('map', {
+        center: [103.7716, 1.3062], zoom: 17, pitch: 58, bearing: -20,
+        baseLayer: new maptalks.TileLayer('base', {
+          urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', renderer: 'canvas', attribution: '© OpenStreetMap contributors'
+        })
+      });
+
+      const routeLayer = new maptalks.VectorLayer('accessibility-route-segments').addTo(map);
+      const poiLayer = new maptalks.VectorLayer('lta-osm-features').addTo(map);
+      const buildingLayer = new maptalks.VectorLayer('building-context').addTo(map);
+      const selectedLayer = new maptalks.VectorLayer('selected-street').addTo(map);
+      state.layers = { routeLayer, poiLayer, buildingLayer, selectedLayer };
+
+      function setStatus(text){ document.getElementById('status').textContent = text; state.status = text; }
+      function colorForScore(score){ return score >= 67 ? COLORS.green : score >= 45 ? COLORS.amber : COLORS.red; }
+      function middleCoord(line){ const c=line.geometry.coordinates; return c[Math.floor(c.length/2)]; }
+      function bearing(a,b){ const y=Math.sin((b[0]-a[0])*Math.PI/180)*Math.cos(b[1]*Math.PI/180); const x=Math.cos(a[1]*Math.PI/180)*Math.sin(b[1]*Math.PI/180)-Math.sin(a[1]*Math.PI/180)*Math.cos(b[1]*Math.PI/180)*Math.cos((b[0]-a[0])*Math.PI/180); return Math.atan2(y,x)*180/Math.PI; }
+
+      function renderBuildings(geojson){
+        const polygons = geojson.features.map(f => {
+          if (f.geometry?.type !== 'Polygon') return null;
+          const h = Number(f.properties?.height_m || 18);
+          return new maptalks.Polygon(f.geometry.coordinates, { symbol: { polygonFill: h > 35 ? '#64748b' : h > 20 ? '#78909c' : '#94a3b8', polygonOpacity: .38, lineColor: 'rgba(226,232,240,.26)', lineWidth:.5 } });
+        }).filter(Boolean);
+        buildingLayer.addGeometry(polygons);
+        document.getElementById('buildingCount').textContent = polygons.length.toLocaleString();
+      }
+
+      function renderWorld(world){
+        const routeGeoms = [], poiGeoms = [];
+        const counts = {};
+        state.segments = world.features.filter(f => f.properties.kind === 'route_segment');
+        world.features.forEach(f => {
+          const p = f.properties; const kind = p.feature_type || p.kind; counts[kind] = (counts[kind] || 0) + 1;
+          if (p.kind === 'route_segment') {
+            routeGeoms.push(new maptalks.LineString(f.geometry.coordinates, { properties:p, symbol:{ lineColor:colorForScore(p.overall_accessibility_score), lineWidth:p.feature_type === 'kerb_line' ? 2 : 4, lineOpacity:p.feature_type === 'kerb_line' ? .42 : .86 } }));
+          } else {
+            const coord = f.geometry.type === 'Point' ? f.geometry.coordinates : centroid(f.geometry.coordinates[0]);
+            poiGeoms.push(new maptalks.Marker(coord, { properties:p, symbol:[{ markerType:'ellipse', markerFill: p.kind === 'bollard' ? COLORS.red : COLORS.poi, markerLineColor:'#fff', markerLineWidth:1.2, markerWidth:p.kind === 'mrt_station' ? 22 : 14, markerHeight:p.kind === 'mrt_station' ? 22 : 14 }, { textName: labelForPOI(p), textSize:10, textFill:'#fff', textHaloFill:'#020617', textHaloRadius:2, textDy:-19 }] }));
+          }
+        });
+        routeLayer.addGeometry(routeGeoms); poiLayer.addGeometry(poiGeoms);
+        document.getElementById('segCount').textContent = state.segments.length.toLocaleString();
+        document.getElementById('featureCount').textContent = world.features.length.toLocaleString();
+        document.getElementById('featureSummary').innerHTML = Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([k,v]) => `<span class="pill">${k.replaceAll('_',' ')}: ${v}</span>`).join('');
+        document.getElementById('standardsText').innerHTML = `<strong>${world.standards.name}</strong><br>${world.standards.basis.join('<br>')}<br><br><strong>Note:</strong> ${world.standards.prototype_note}`;
+        populateSegmentSelect();
+        selectSegment(0, false);
+      }
+
+      function centroid(ring){ let x=0,y=0,n=ring.length||1; ring.forEach(c=>{x+=c[0]; y+=c[1];}); return [x/n,y/n]; }
+      function labelForPOI(p){ if(p.kind==='bus_stop') return 'BUS'; if(p.kind==='mrt_station') return 'MRT'; if(p.kind==='bollard') return 'bollard'; if(p.kind==='covered_linkway') return 'shelter'; if(p.kind==='pedestrian_overhead_bridge') return 'bridge'; return p.kind.replaceAll('_',' '); }
+      function populateSegmentSelect(){ const sel=document.getElementById('segmentSelect'); sel.innerHTML = state.segments.map((f,i)=>`<option value="${i}">${f.properties.id} · ${f.properties.feature_type.replaceAll('_',' ')} · score ${f.properties.overall_accessibility_score}</option>`).join(''); }
+
+      function selectSegment(index, streetMode = state.mode === 'street'){
+        if(!state.segments.length) return;
+        state.selectedIndex = (index + state.segments.length) % state.segments.length;
+        const f = state.segments[state.selectedIndex]; const p=f.properties; const coords=f.geometry.coordinates;
+        document.getElementById('segmentSelect').value = state.selectedIndex;
+        document.getElementById('activeScore').textContent = p.overall_accessibility_score;
+        selectedLayer.clear();
+        selectedLayer.addGeometry(new maptalks.LineString(coords, { symbol:{ lineColor:COLORS.blue, lineWidth:9, lineOpacity:.98 } }));
+        document.getElementById('selectedType').textContent = `${p.feature_type.replaceAll('_',' ')} · ${p.rag}`;
+        document.getElementById('selectedName').textContent = `${p.name} · score ${p.overall_accessibility_score}/100`;
+        document.getElementById('selectedDesc').innerHTML = `Persona agents can traverse this segment if their passability is true. Metrics are proxy values based on ISO 21542 + ADA/PROWAG-style accessibility criteria.`;
+        renderMetrics(p); renderAgents(p);
+        const mid = middleCoord(f); const brg = coords.length > 1 ? bearing(coords[0], coords[coords.length-1]) : -20;
+        if(streetMode) map.animateTo({ center: mid, zoom: 20, pitch: 78, bearing: brg }, { duration: 700 });
+        else map.animateTo({ center: mid, zoom: 18, pitch: 58, bearing: -20 }, { duration: 500 });
+      }
+
+      function renderMetrics(p){
+        const m=p.metrics, c=p.component_scores;
+        const rows = [
+          ['Clear width', `${m.clear_width_m} m`, c.clear_width, 'target ≥ 1.2 m'],
+          ['Running slope', `${m.running_slope_pct}%`, c.running_slope, 'ADA walking surface ≤ 5%, ramp max 8.3%'],
+          ['Cross slope', `${m.cross_slope_pct}%`, c.cross_slope, 'ADA/PROWAG target ≤ 2.1%'],
+          ['Roughness', `${m.roughness_mm} mm`, c.surface_roughness, 'stable, firm, slip-resistant surface proxy'],
+          ['Vertical change', `${m.vertical_change_mm} mm`, c.vertical_change, '≤6 mm good, ≤13 mm beveled limit'],
+          ['Obstructions', `${m.obstruction_count}`, c.obstructions, 'bollards / kerb / bus stop conflicts'],
+          ['Shelter', m.covered ? 'covered' : 'open', c.shelter, 'comfort / weather exposure'],
+          ['Tactile guidance', m.tactile_guidance ? 'likely' : 'unknown', c.tactile_guidance, 'ISO 23599 / tactile wayfinding proxy'],
+        ];
+        document.getElementById('metricList').innerHTML = rows.map(r=>`<div class="metric"><div>${r[0]}<br><small>${r[3]}</small></div><div>${r[1]}</div><div style="color:${colorForScore(r[2])}">${r[2]}/100</div></div>`).join('');
+      }
+      function renderAgents(p){
+        document.getElementById('agentList').innerHTML = Object.entries(p.personas).map(([id,val]) => `<div class="agent"><div><strong>${id.replaceAll('_',' ')}</strong><br><span class="${val.passable?'pass':'fail'}">${val.passable?'passable':'blocked / needs intervention'}</span>${val.blockers?.length?`<br><small>blockers: ${val.blockers.join(', ')}</small>`:''}</div><b style="color:${colorForScore(val.score)}">${val.score}</b></div>`).join('');
+      }
+
+      document.getElementById('segmentSelect').addEventListener('change', e => selectSegment(Number(e.target.value)));
+      document.getElementById('prevBtn').addEventListener('click', () => selectSegment(state.selectedIndex - 1));
+      document.getElementById('nextBtn').addEventListener('click', () => selectSegment(state.selectedIndex + 1));
+      document.getElementById('earthBtn').addEventListener('click', () => { state.mode='earth'; document.getElementById('earthBtn').classList.add('active'); document.getElementById('streetBtn').classList.remove('active'); selectSegment(state.selectedIndex, false); });
+      document.getElementById('streetBtn').addEventListener('click', () => { state.mode='street'; document.getElementById('streetBtn').classList.add('active'); document.getElementById('earthBtn').classList.remove('active'); selectSegment(state.selectedIndex, true); });
+
+      Promise.all([fetch('accessibility_world.geojson').then(r=>{ if(!r.ok) throw new Error('accessibility_world.geojson '+r.status); return r.json(); }), fetch('buildings_clementi.geojson').then(r=>{ if(!r.ok) throw new Error('buildings_clementi.geojson '+r.status); return r.json(); })])
+        .then(([world, buildings]) => { state.world=world; state.buildings=buildings; renderBuildings(buildings); renderWorld(world); const extent = routeLayer.getExtent(); if(extent) map.fitExtent(extent, 0, { animation:false }); setStatus(`Loaded ${state.segments.length.toLocaleString()} traversable segments, ${world.features.length.toLocaleString()} LTA/OSM features, ${buildings.features.length.toLocaleString()} buildings`); })
+        .catch(err => { console.error(err); setStatus(`Failed to load Earth accessibility view: ${err.message}`); });
+    </script>
+  </body>
+</html>

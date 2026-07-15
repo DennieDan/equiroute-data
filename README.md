@@ -49,9 +49,17 @@ python accessibility_scoring.py
 python buildings_from_overpass.py
 ```
 
-This writes `buildings_clementi.geojson`, used by `maptalks_three.html` to show building context behind obstacles and improvements.
+This writes `buildings_clementi.geojson`, used by `maptalks_three.html` and `earth_accessibility.html` to show building context behind obstacles and improvements.
 
-6. **View the 3D MVP** — from the project root, start a local server:
+6. **Generate the Earth/street accessibility layer** — fuses LTA footpaths, kerblines, crossings, bus stops, MRT, bollards, covered linkways and overhead bridges into selectable traversable segments with ISO 21542 + ADA/PROWAG-inspired metrics:
+
+```bash
+.venv/bin/python generate_accessibility_world.py
+```
+
+This writes `accessibility_world.geojson` for the Google Earth-style street inspection UI.
+
+7. **View the 3D MVP** — from the project root, start a local server:
 
 ```bash
 python -m http.server 8000
@@ -70,5 +78,8 @@ Open [http://localhost:8000](http://localhost:8000) in your browser.
 | `persona_simulation.py` | Generates persona before/after payloads |
 | `accessibility_scoring.py` | Applies PERS-inspired scoring to the payload |
 | `buildings_clementi.geojson` | OSM building footprints for map context |
+| `generate_accessibility_world.py` | Creates selectable street/feature accessibility world layer |
+| `accessibility_world.geojson` | Segment-level Earth/street-view accessibility metrics and POIs |
+| `earth_accessibility.html` | Google Earth-style street inspection UI with selectable streets, buildings, feature layers, persona passability, and standards-based metrics |
 | `maptalks_three.html` | MapTalks + Three.js prototype with before/after toggle, buildings, and obstacle/improvement markers |
 | `index.html`          | Three.js 3D route viewer                  |
