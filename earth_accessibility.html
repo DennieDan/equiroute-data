@@ -5,12 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EquiRoute Earth Accessibility Street View</title>
     <link rel="stylesheet" href="https://unpkg.com/maptalks/dist/maptalks.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css" />
     <style>
       :root { color-scheme: dark; --bg: rgba(3, 7, 18, .86); --line: rgba(125, 211, 252, .32); --txt:#eef9ff; --muted:#a7c7d8; --green:#2df46f; --amber:#ffd166; --red:#ff3b52; --blue:#38bdf8; }
       html, body, #map { width:100%; height:100%; margin:0; overflow:hidden; background:#07111f; font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
       .panel { position:absolute; z-index:20; color:var(--txt); background:var(--bg); border:1px solid var(--line); border-radius:18px; box-shadow:0 20px 70px rgba(0,0,0,.42); backdrop-filter:blur(16px); }
+      .panel.closed { display:none; }
+      .close-btn { position:absolute; top:10px; right:10px; width:28px; height:28px; border-radius:999px; border:1px solid rgba(148,163,184,.28); background:rgba(15,23,42,.9); color:#e0f2fe; font-weight:900; cursor:pointer; padding:0; }
+      .close-btn:hover { background:#0e7490; }
       #left { top:16px; left:16px; width:min(430px, calc(100vw - 32px)); padding:16px; }
       #right { top:16px; right:16px; width:min(360px, calc(100vw - 32px)); padding:14px; max-height:calc(100vh - 32px); overflow:auto; }
+      #streetViewPanel { right:16px; bottom:16px; width:min(460px, calc(100vw - 32px)); padding:12px; z-index:24; }
+      #kvViewer { width:100%; height:260px; border-radius:14px; overflow:hidden; background:#020617; border:1px solid rgba(125,211,252,.28); }
+      #kvViewer img { width:100%; height:100%; object-fit:cover; display:block; }
+      #reopenDock { position:absolute; top:16px; left:50%; transform:translateX(-50%); z-index:30; display:flex; gap:8px; flex-wrap:wrap; justify-content:center; pointer-events:none; }
+      #reopenDock button { pointer-events:auto; padding:8px 10px; font-size:12px; background:rgba(2,6,23,.88); }
       h1 { margin:4px 0 8px; font-size:22px; line-height:1.08; }
       h2 { margin:6px 0 8px; font-size:15px; }
       .eyebrow { color:#7dd3fc; font-size:11px; letter-spacing:.14em; text-transform:uppercase; font-weight:850; }
@@ -31,15 +40,20 @@
       .metric small { color:var(--muted); }
       .pill { display:inline-flex; align-items:center; gap:6px; border:1px solid rgba(148,163,184,.25); background:rgba(15,23,42,.75); border-radius:999px; padding:4px 8px; margin:3px 4px 3px 0; font-size:11px; }
       .agent { display:grid; grid-template-columns:1fr auto; gap:8px; padding:8px; margin:7px 0; border-radius:12px; background:rgba(15,23,42,.6); border:1px solid rgba(148,163,184,.18); font-size:12px; }
+      .photo-meta { display:flex; justify-content:space-between; gap:8px; align-items:center; margin-top:8px; color:var(--muted); font-size:11px; }
+      .photo-tools { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px; }
       .pass { color:#86efac; } .fail { color:#fca5a5; }
       .status { position:absolute; left:16px; bottom:16px; z-index:21; color:#dff7ff; background:rgba(2,6,23,.82); border:1px solid rgba(125,211,252,.28); border-radius:999px; padding:9px 14px; font-size:12px; max-width:42vw; }
       @media (max-width: 900px) { #right { display:none; } #streetCard { bottom:70px; } .stats { grid-template-columns:1fr 1fr; } }
     </style>
     <script src="https://unpkg.com/maptalks/dist/maptalks.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
   </head>
   <body>
     <div id="map"></div>
-    <section id="left" class="panel">
+    <div id="reopenDock"></div>
+    <section id="left" class="panel" data-panel-title="Controls">
+      <button class="close-btn" data-close="left" title="Close controls">×</button>
       <div class="eyebrow">EquiRoute Earth Mode</div>
       <h1>Clementi Mall Accessible Digital Twin</h1>
       <p>Google Earth-style view with selectable street segments, buildings, LTA/OSM features, persona passability, and segment-level accessibility metrics.</p>
@@ -66,7 +80,8 @@
       </div>
     </section>
 
-    <aside id="right" class="panel">
+    <aside id="right" class="panel" data-panel-title="Standards + agents">
+      <button class="close-btn" data-close="right" title="Close standards panel">×</button>
       <h2>Standards basis</h2>
       <p id="standardsText">Loading standards…</p>
       <h2>Visible features</h2>
@@ -75,18 +90,29 @@
       <div id="agentList"></div>
     </aside>
 
-    <section id="streetCard" class="panel">
+    <section id="streetCard" class="panel" data-panel-title="Segment details">
+      <button class="close-btn" data-close="streetCard" title="Close segment details">×</button>
       <div class="eyebrow" id="selectedType">street segment</div>
       <h2 id="selectedName">Loading street selector…</h2>
       <p id="selectedDesc">Choose any segment around Clementi Mall. The camera will pitch down into a street-view-like inspection angle.</p>
       <div id="metricList"></div>
     </section>
 
+
+    <section id="streetViewPanel" class="panel closed" data-panel-title="Real street view">
+      <button class="close-btn" data-close="streetViewPanel" title="Close street view">×</button>
+      <div class="eyebrow">Real-life street view · KartaView</div>
+      <h2 id="kvTitle">Searching nearby imagery…</h2>
+      <div id="kvViewer"><p style="padding:16px">Choose Street View or a segment to load free KartaView street-level imagery.</p></div>
+      <div class="photo-meta"><span id="kvMeta">Open/free street-level imagery, not Google proprietary imagery.</span><span id="kvCount"></span></div>
+      <div class="photo-tools"><button id="prevPhotoBtn">← Prev photo</button><button id="nextPhotoBtn">Next photo →</button></div>
+    </section>
+
     <div class="status" id="status">Loading accessibility world…</div>
 
     <script>
       const COLORS = { green: '#2df46f', amber: '#ffd166', red: '#ff3b52', blue: '#38bdf8', poi: '#f97316' };
-      const state = { world:null, buildings:null, segments:[], selectedIndex:0, layers:{}, mode:'earth' };
+      const state = { world:null, buildings:null, segments:[], selectedIndex:0, layers:{}, mode:'earth', kvPhotos:[], kvIndex:0, kvViewer:null, closedPanels:{} };
       window.__EARTH_ACCESSIBILITY_STATE = state;
 
       const map = new maptalks.Map('map', {
@@ -156,8 +182,11 @@
         document.getElementById('selectedDesc').innerHTML = `Persona agents can traverse this segment if their passability is true. Metrics are proxy values based on ISO 21542 + ADA/PROWAG-style accessibility criteria.`;
         renderMetrics(p); renderAgents(p);
         const mid = middleCoord(f); const brg = coords.length > 1 ? bearing(coords[0], coords[coords.length-1]) : -20;
-        if(streetMode) map.animateTo({ center: mid, zoom: 20, pitch: 78, bearing: brg }, { duration: 700 });
-        else map.animateTo({ center: mid, zoom: 18, pitch: 58, bearing: -20 }, { duration: 500 });
+        if(streetMode) {
+          map.animateTo({ center: mid, zoom: 20, pitch: 78, bearing: brg }, { duration: 700 });
+          openPanel('streetViewPanel');
+          loadKartaViewForSegment(f);
+        } else map.animateTo({ center: mid, zoom: 18, pitch: 58, bearing: -20 }, { duration: 500 });
       }
 
       function renderMetrics(p){
@@ -178,11 +207,84 @@
         document.getElementById('agentList').innerHTML = Object.entries(p.personas).map(([id,val]) => `<div class="agent"><div><strong>${id.replaceAll('_',' ')}</strong><br><span class="${val.passable?'pass':'fail'}">${val.passable?'passable':'blocked / needs intervention'}</span>${val.blockers?.length?`<br><small>blockers: ${val.blockers.join(', ')}</small>`:''}</div><b style="color:${colorForScore(val.score)}">${val.score}</b></div>`).join('');
       }
 
+
+      function closePanel(id){
+        const panel = document.getElementById(id); if(!panel) return;
+        panel.classList.add('closed'); state.closedPanels[id] = true; renderReopenDock();
+      }
+      function openPanel(id){
+        const panel = document.getElementById(id); if(!panel) return;
+        panel.classList.remove('closed'); delete state.closedPanels[id]; renderReopenDock();
+        if(id === 'streetViewPanel' && state.kvPhotos.length) renderKartaViewPhoto(state.kvIndex);
+      }
+      function renderReopenDock(){
+        const dock = document.getElementById('reopenDock');
+        dock.innerHTML = Object.keys(state.closedPanels).map(id => {
+          const title = document.getElementById(id)?.dataset?.panelTitle || id;
+          return `<button data-open="${id}">Show ${title}</button>`;
+        }).join('');
+        dock.querySelectorAll('button[data-open]').forEach(btn => btn.addEventListener('click', () => openPanel(btn.dataset.open)));
+      }
+      document.querySelectorAll('[data-close]').forEach(btn => btn.addEventListener('click', () => closePanel(btn.dataset.close)));
+
+      function photoUrl(photo){
+        // Prefer KartaView's CDN URLs. The raw storage URLs in the API often 404
+        // directly, while imageProcUrl / imageLthUrl are the supported public image links.
+        const raw = photo.imageProcUrl || photo.imageLthUrl || photo.imageThUrl || photo.fileurlProc || photo.fileurl || photo.fileurlLTh || photo.fileurlTh;
+        if(!raw) return null;
+        return raw.replace('{{sizeprefix}}', 'lth');
+      }
+      async function loadKartaViewForSegment(f){
+        const coord = middleCoord(f);
+        const url = `https://api.openstreetcam.org/2.0/photo/?lat=${coord[1]}&lng=${coord[0]}&zoomLevel=18&join=sequence&orderBy=distance&orderDirection=asc`;
+        openPanel('streetViewPanel');
+        document.getElementById('kvTitle').textContent = 'Searching KartaView imagery near selected street…';
+        document.getElementById('kvMeta').textContent = 'Querying free/open KartaView API near this segment.';
+        try {
+          const data = await fetch(url).then(r => { if(!r.ok) throw new Error(`KartaView HTTP ${r.status}`); return r.json(); });
+          const photos = (data.result?.data || []).filter(p => photoUrl(p));
+          state.kvPhotos = photos; state.kvIndex = 0;
+          renderKartaViewPhoto(0);
+        } catch(err) {
+          console.warn('KartaView failed', err);
+          state.kvPhotos = [];
+          document.getElementById('kvTitle').textContent = 'No live street imagery loaded';
+          document.getElementById('kvViewer').innerHTML = `<p style="padding:16px">KartaView request failed: ${err.message}. The map still works; this is the free/open alternative to Google Street View.</p>`;
+          document.getElementById('kvMeta').textContent = 'KartaView API failure or no coverage for this exact street.';
+          document.getElementById('kvCount').textContent = '';
+        }
+      }
+      function renderKartaViewPhoto(index){
+        const photos = state.kvPhotos || [];
+        if(!photos.length){
+          document.getElementById('kvTitle').textContent = 'No KartaView imagery found here';
+          document.getElementById('kvViewer').innerHTML = '<p style="padding:16px">No free street-level photo found for this exact selected segment. Try Next street, or move to Earth View and choose another road.</p>';
+          document.getElementById('kvMeta').textContent = 'Coverage depends on community-contributed KartaView imagery.';
+          document.getElementById('kvCount').textContent = '';
+          return;
+        }
+        state.kvIndex = (index + photos.length) % photos.length;
+        const p = photos[state.kvIndex]; const url = photoUrl(p);
+        const viewer = document.getElementById('kvViewer');
+        if(state.kvViewer){ try { state.kvViewer.destroy(); } catch(e){} state.kvViewer = null; }
+        viewer.innerHTML = '';
+        // KartaView's storage images are viewable directly in <img>. Pannellum
+        // needs permissive CORS headers for WebGL panoramas, which the photo CDN
+        // does not always expose, so we use a reliable real-life street photo
+        // viewer instead of a broken panorama canvas.
+        viewer.innerHTML = `<img alt="KartaView real street-level imagery" src="${url}" />`;
+        document.getElementById('kvTitle').textContent = `Real street view near selected segment`;
+        document.getElementById('kvMeta').innerHTML = `KartaView photo ${p.id || ''} · ${p.fieldOfView || 'photo'}° · heading ${p.heading || 'n/a'} · ${p.dateAdded || ''}`;
+        document.getElementById('kvCount').textContent = `${state.kvIndex + 1}/${photos.length}`;
+      }
+
       document.getElementById('segmentSelect').addEventListener('change', e => selectSegment(Number(e.target.value)));
       document.getElementById('prevBtn').addEventListener('click', () => selectSegment(state.selectedIndex - 1));
       document.getElementById('nextBtn').addEventListener('click', () => selectSegment(state.selectedIndex + 1));
+      document.getElementById('prevPhotoBtn').addEventListener('click', () => renderKartaViewPhoto(state.kvIndex - 1));
+      document.getElementById('nextPhotoBtn').addEventListener('click', () => renderKartaViewPhoto(state.kvIndex + 1));
       document.getElementById('earthBtn').addEventListener('click', () => { state.mode='earth'; document.getElementById('earthBtn').classList.add('active'); document.getElementById('streetBtn').classList.remove('active'); selectSegment(state.selectedIndex, false); });
-      document.getElementById('streetBtn').addEventListener('click', () => { state.mode='street'; document.getElementById('streetBtn').classList.add('active'); document.getElementById('earthBtn').classList.remove('active'); selectSegment(state.selectedIndex, true); });
+      document.getElementById('streetBtn').addEventListener('click', () => { state.mode='street'; document.getElementById('streetBtn').classList.add('active'); document.getElementById('earthBtn').classList.remove('active'); openPanel('streetViewPanel'); selectSegment(state.selectedIndex, true); });
 
       Promise.all([fetch('accessibility_world.geojson').then(r=>{ if(!r.ok) throw new Error('accessibility_world.geojson '+r.status); return r.json(); }), fetch('buildings_clementi.geojson').then(r=>{ if(!r.ok) throw new Error('buildings_clementi.geojson '+r.status); return r.json(); })])
         .then(([world, buildings]) => { state.world=world; state.buildings=buildings; renderBuildings(buildings); renderWorld(world); const extent = routeLayer.getExtent(); if(extent) map.fitExtent(extent, 0, { animation:false }); setStatus(`Loaded ${state.segments.length.toLocaleString()} traversable segments, ${world.features.length.toLocaleString()} LTA/OSM features, ${buildings.features.length.toLocaleString()} buildings`); })
