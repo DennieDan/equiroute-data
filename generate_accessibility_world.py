@@ -131,14 +131,32 @@ def geom_parts(geom: Any) -> list[LineString]:
     return []
 
 
-def split_line(line: LineString, max_points: int = 2) -> list[LineString]:
-    coords = list(line.coords)
+SEGMENT_LENGTH_M = 5.0
+
+
+def split_line(line: LineString, segment_length_m: float = SEGMENT_LENGTH_M) -> list[LineString]:
+    """Split each source path into approximately 5 m clickable segments.
+
+    The source is EPSG:4326. We interpolate lon/lat linearly within each short
+    source edge and use haversine distance to choose the number of pieces. This
+    is sufficient around Clementi and keeps the frontend payload simple.
+    """
+    coords = [(float(x), float(y)) for x, y, *_ in line.coords]
     if len(coords) < 2:
         return []
-    out = []
+    out: list[LineString] = []
     for a, b in zip(coords, coords[1:]):
-        if a != b:
-            out.append(LineString([a, b]))
+        if a == b:
+            continue
+        dist = haversine_m(a, b)
+        parts = max(1, math.ceil(dist / segment_length_m))
+        for i in range(parts):
+            t0 = i / parts
+            t1 = (i + 1) / parts
+            p0 = (a[0] + (b[0] - a[0]) * t0, a[1] + (b[1] - a[1]) * t0)
+            p1 = (a[0] + (b[0] - a[0]) * t1, a[1] + (b[1] - a[1]) * t1)
+            if p0 != p1:
+                out.append(LineString([p0, p1]))
     return out
 
 
@@ -286,6 +304,7 @@ def build_world() -> dict[str, Any]:
                                 "feature_type": segment_type,
                                 "layer": layer_name,
                                 "name": f"{segment_type.replace('_', ' ').title()} {segment_id}",
+                                "segment_length_target_m": SEGMENT_LENGTH_M,
                                 "overall_accessibility_score": overall,
                                 "rag": "green" if overall >= 67 else "amber" if overall >= 45 else "red",
                                 "metrics": metrics,

@@ -3,371 +3,80 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EquiRoute Earth Accessibility Street View</title>
+    <title>EquiRoute Earth Accessibility</title>
     <link rel="stylesheet" href="https://unpkg.com/maptalks/dist/maptalks.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css" />
     <link href="https://unpkg.com/mapillary-js@4.1.2/dist/mapillary.css" rel="stylesheet" />
     <style>
-      :root { color-scheme: dark; --bg: rgba(3, 7, 18, .86); --line: rgba(125, 211, 252, .32); --txt:#eef9ff; --muted:#a7c7d8; --green:#2df46f; --amber:#ffd166; --red:#ff3b52; --blue:#38bdf8; }
-      html, body, #map { width:100%; height:100%; margin:0; overflow:hidden; background:#07111f; font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-      .panel { position:absolute; z-index:20; color:var(--txt); background:var(--bg); border:1px solid var(--line); border-radius:18px; box-shadow:0 20px 70px rgba(0,0,0,.42); backdrop-filter:blur(16px); }
-      .panel.closed { display:none; }
-      .close-btn { position:absolute; top:10px; right:10px; width:28px; height:28px; border-radius:999px; border:1px solid rgba(148,163,184,.28); background:rgba(15,23,42,.9); color:#e0f2fe; font-weight:900; cursor:pointer; padding:0; }
-      .close-btn:hover { background:#0e7490; }
-      #left { top:16px; left:16px; width:min(430px, calc(100vw - 32px)); padding:16px; }
-      #right { top:16px; right:16px; width:min(360px, calc(100vw - 32px)); padding:14px; max-height:calc(100vh - 32px); overflow:auto; }
-      #streetViewPanel { right:16px; bottom:16px; width:min(460px, calc(100vw - 32px)); padding:12px; z-index:24; }
-      #kvViewer { width:100%; height:260px; border-radius:14px; overflow:hidden; background:#020617; border:1px solid rgba(125,211,252,.28); }
-      #kvViewer img { width:100%; height:100%; object-fit:cover; display:block; }
-      #reopenDock { position:absolute; top:16px; left:50%; transform:translateX(-50%); z-index:30; display:flex; gap:8px; flex-wrap:wrap; justify-content:center; pointer-events:none; }
-      #reopenDock button { pointer-events:auto; padding:8px 10px; font-size:12px; background:rgba(2,6,23,.88); }
-      h1 { margin:4px 0 8px; font-size:22px; line-height:1.08; }
-      h2 { margin:6px 0 8px; font-size:15px; }
-      .eyebrow { color:#7dd3fc; font-size:11px; letter-spacing:.14em; text-transform:uppercase; font-weight:850; }
-      p { color:var(--muted); font-size:12px; line-height:1.42; margin:7px 0; }
-      .controls { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px; }
-      select, button { border:1px solid rgba(125,211,252,.35); background:rgba(15,23,42,.88); color:var(--txt); border-radius:12px; padding:9px 10px; font-weight:750; }
-      select { grid-column:1 / -1; width:100%; }
-      button { cursor:pointer; }
-      button.active, button:hover { background:linear-gradient(135deg,#075985,#0e7490); border-color:#bae6fd; }
-      .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin:12px 0; }
-      .stat { background:rgba(15,23,42,.7); border:1px solid rgba(148,163,184,.18); border-radius:13px; padding:9px; }
-      .stat b { display:block; font-size:18px; }
-      .stat span { display:block; color:var(--muted); font-size:9px; text-transform:uppercase; letter-spacing:.08em; }
-      .legend { display:grid; grid-template-columns:1fr 1fr; gap:8px 12px; font-size:12px; margin-top:10px; }
-      .dot { display:inline-block; width:10px; height:10px; border-radius:999px; margin-right:7px; box-shadow:0 0 14px currentColor; }
-      #streetCard { position:absolute; left:50%; transform:translateX(-50%); bottom:16px; z-index:22; width:min(680px, calc(100vw - 32px)); padding:13px 16px; }
-      .metric { display:grid; grid-template-columns: 1.1fr .8fr 1fr; gap:8px; padding:7px 0; border-bottom:1px solid rgba(148,163,184,.16); font-size:12px; }
-      .metric small { color:var(--muted); }
-      .pill { display:inline-flex; align-items:center; gap:6px; border:1px solid rgba(148,163,184,.25); background:rgba(15,23,42,.75); border-radius:999px; padding:4px 8px; margin:3px 4px 3px 0; font-size:11px; }
-      .agent { display:grid; grid-template-columns:1fr auto; gap:8px; padding:8px; margin:7px 0; border-radius:12px; background:rgba(15,23,42,.6); border:1px solid rgba(148,163,184,.18); font-size:12px; }
-      .photo-meta { display:flex; justify-content:space-between; gap:8px; align-items:center; margin-top:8px; color:var(--muted); font-size:11px; }
-      .photo-tools { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px; }
-      .token-row { display:grid; grid-template-columns:1fr auto auto; gap:6px; margin:8px 0; }
-      .token-row input { min-width:0; border:1px solid rgba(125,211,252,.35); background:rgba(15,23,42,.88); color:var(--txt); border-radius:10px; padding:8px; }
-      .provider-badge { display:inline-block; padding:3px 7px; border-radius:999px; background:rgba(56,189,248,.16); border:1px solid rgba(56,189,248,.35); color:#bae6fd; font-size:10px; font-weight:800; }
-      .pass { color:#86efac; } .fail { color:#fca5a5; }
-      .status { position:absolute; left:16px; bottom:16px; z-index:21; color:#dff7ff; background:rgba(2,6,23,.82); border:1px solid rgba(125,211,252,.28); border-radius:999px; padding:9px 14px; font-size:12px; max-width:42vw; }
-      @media (max-width: 900px) { #right { display:none; } #streetCard { bottom:70px; } .stats { grid-template-columns:1fr 1fr; } }
+      :root{--bg:rgba(2,6,23,.86);--line:rgba(125,211,252,.34);--txt:#eef9ff;--muted:#a7c7d8;--green:#22f36e;--amber:#ffd166;--red:#ff3b52;--blue:#38bdf8;--orange:#fb923c}
+      html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#06101d;color:var(--txt);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+      #map,#mapillaryView{position:absolute;inset:0;width:100%;height:100%;background:#07111f}
+      #map{z-index:1} #mapillaryView{z-index:5;display:none}.street-mode #mapillaryView{display:block}.street-mode #map{opacity:0;pointer-events:none}
+      .hud{position:absolute;z-index:20;border:1px solid var(--line);background:var(--bg);box-shadow:0 18px 60px rgba(0,0,0,.38);backdrop-filter:blur(14px);border-radius:18px;color:var(--txt)}
+      #topbar{top:14px;left:14px;right:14px;display:flex;gap:10px;align-items:center;padding:10px 12px;z-index:30}.brand{font-weight:900;letter-spacing:.01em}.pill{border:1px solid rgba(148,163,184,.26);background:rgba(15,23,42,.78);border-radius:999px;padding:7px 10px;font-size:12px}.spacer{flex:1}
+      button,select,input{border:1px solid rgba(125,211,252,.35);background:rgba(15,23,42,.88);color:var(--txt);border-radius:12px;padding:8px 10px;font-weight:750}button{cursor:pointer}button:hover,button.active{background:linear-gradient(135deg,#075985,#0e7490);border-color:#bae6fd}select{max-width:360px}
+      #miniMap{position:absolute;right:14px;bottom:14px;width:240px;height:150px;border-radius:18px;overflow:hidden;z-index:22;border:1px solid rgba(125,211,252,.38);box-shadow:0 20px 60px rgba(0,0,0,.45);display:none}.street-mode #miniMap{display:block}#miniMap .label{position:absolute;left:8px;top:8px;background:rgba(2,6,23,.78);border-radius:999px;padding:4px 8px;font-size:11px;color:#bae6fd;z-index:2}
+      #detailCard{left:50%;bottom:16px;transform:translateX(-50%);width:min(760px,calc(100vw - 32px));padding:12px 14px;z-index:26;display:none}#detailCard.visible{display:block}.street-mode #detailCard{bottom:18px}.detail-head{display:flex;gap:10px;align-items:center}.score{font-size:28px;font-weight:950}.title{font-weight:900}.sub{font-size:12px;color:var(--muted)}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}.metric{background:rgba(15,23,42,.72);border:1px solid rgba(148,163,184,.18);border-radius:12px;padding:8px}.metric b{display:block}.metric span{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}.close{margin-left:auto;border-radius:999px;width:30px;height:30px;padding:0}
+      #segmentButtons{position:absolute;inset:0;z-index:25;pointer-events:none}.seg-btn{position:absolute;pointer-events:auto;width:24px;height:24px;border-radius:999px;border:2px solid white;background:var(--blue);box-shadow:0 0 0 5px rgba(56,189,248,.24),0 8px 22px rgba(0,0,0,.45);color:#00111d;font-size:10px;font-weight:950;padding:0}.seg-btn.bad{background:var(--red)}.seg-btn.warn{background:var(--amber)}.seg-btn.addon::after{content:attr(data-addon);position:absolute;left:18px;top:-16px;background:rgba(2,6,23,.82);color:white;border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:2px 6px;font-size:9px;white-space:nowrap}
+      #settings{right:14px;top:70px;width:min(390px,calc(100vw - 28px));padding:14px;z-index:35;display:none}#settings.visible{display:block}#settings textarea{width:100%;height:70px;border-radius:12px;background:#020617;color:#e0f2fe;border:1px solid rgba(125,211,252,.28)}#settings p{font-size:12px;color:var(--muted);line-height:1.35}.settings-grid{display:grid;grid-template-columns:1fr auto;gap:8px}.status{position:absolute;left:14px;bottom:14px;z-index:21;background:rgba(2,6,23,.82);border:1px solid rgba(125,211,252,.28);border-radius:999px;padding:8px 12px;font-size:12px;color:#dff7ff}.street-mode .status{display:none}
+      @media(max-width:800px){#topbar{flex-wrap:wrap}select{max-width:100%;width:100%}.metrics{grid-template-columns:repeat(2,1fr)}#miniMap{display:none!important}}
     </style>
     <script src="https://unpkg.com/maptalks/dist/maptalks.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
     <script src="https://unpkg.com/mapillary-js@4.1.2/dist/mapillary.js"></script>
   </head>
   <body>
     <div id="map"></div>
-    <div id="reopenDock"></div>
-    <section id="left" class="panel" data-panel-title="Controls">
-      <button class="close-btn" data-close="left" title="Close controls">×</button>
-      <div class="eyebrow">EquiRoute Earth Mode</div>
-      <h1>Clementi Mall Accessible Digital Twin</h1>
-      <p>Google Earth-style view with selectable street segments, buildings, LTA/OSM features, persona passability, and segment-level accessibility metrics.</p>
-      <div class="controls">
-        <select id="segmentSelect"></select>
-        <button id="earthBtn" class="active">Earth View</button>
-        <button id="streetBtn">Street View</button>
-        <button id="prevBtn">← Previous street</button>
-        <button id="nextBtn">Next street →</button>
-      </div>
-      <div class="stats">
-        <div class="stat"><b id="segCount">–</b><span>segments</span></div>
-        <div class="stat"><b id="featureCount">–</b><span>features</span></div>
-        <div class="stat"><b id="buildingCount">–</b><span>buildings</span></div>
-        <div class="stat"><b id="activeScore">–</b><span>score</span></div>
-      </div>
-      <div class="legend">
-        <div><span class="dot" style="color:var(--green);background:var(--green)"></span>good / passable</div>
-        <div><span class="dot" style="color:var(--amber);background:var(--amber)"></span>needs review</div>
-        <div><span class="dot" style="color:var(--red);background:var(--red)"></span>barrier / poor</div>
-        <div><span class="dot" style="color:var(--blue);background:var(--blue)"></span>selected street</div>
-        <div><span class="dot" style="color:#f97316;background:#f97316"></span>bus stop / MRT / POI</div>
-        <div><span class="dot" style="color:#94a3b8;background:#94a3b8"></span>buildings</div>
-      </div>
+    <div id="mapillaryView"></div>
+    <div id="segmentButtons"></div>
+    <div id="topbar" class="hud">
+      <div class="brand">EquiRoute Earth</div>
+      <span class="pill" id="modeLabel">3D world view</span>
+      <select id="segmentSelect" title="Choose a 5 m segment"></select>
+      <button id="earthBtn" class="active">Earth</button>
+      <button id="streetBtn">Street View</button>
+      <button id="prevBtn">←</button><button id="nextBtn">→</button>
+      <div class="spacer"></div>
+      <span class="pill"><b id="segCount">–</b> segments</span>
+      <span class="pill"><b id="buildingCount">–</b> buildings</span>
+      <button id="settingsBtn">⚙</button>
+    </div>
+    <div id="settings" class="hud">
+      <button class="close" id="closeSettings">×</button>
+      <h3>Settings</h3>
+      <p>Mapillary token, data-source notes, and standards references live here so the main demo stays clean.</p>
+      <div class="settings-grid"><input id="mapillaryTokenInput" type="password" placeholder="Mapillary client token"/><button id="saveMapillaryTokenBtn">Save</button></div>
+      <p id="tokenStatus"></p>
+      <h4>References hidden from demo</h4>
+      <p id="standardsText"></p>
+    </div>
+    <div id="miniMap"><div class="label">Earth context</div></div>
+    <section id="detailCard" class="hud">
+      <div class="detail-head"><div><div class="title" id="selectedName">Select a segment</div><div class="sub" id="selectedDesc"></div></div><div class="spacer"></div><div class="score" id="activeScore">–</div><button class="close" id="closeDetail">×</button></div>
+      <div class="metrics" id="metricList"></div>
     </section>
-
-    <aside id="right" class="panel" data-panel-title="Standards + agents">
-      <button class="close-btn" data-close="right" title="Close standards panel">×</button>
-      <h2>Standards basis</h2>
-      <p id="standardsText">Loading standards…</p>
-      <h2>Visible features</h2>
-      <div id="featureSummary"></div>
-      <h2>Persona agents</h2>
-      <div id="agentList"></div>
-    </aside>
-
-    <section id="streetCard" class="panel" data-panel-title="Segment details">
-      <button class="close-btn" data-close="streetCard" title="Close segment details">×</button>
-      <div class="eyebrow" id="selectedType">street segment</div>
-      <h2 id="selectedName">Loading street selector…</h2>
-      <p id="selectedDesc">Choose any segment around Clementi Mall. The camera will pitch down into a street-view-like inspection angle.</p>
-      <div id="metricList"></div>
-    </section>
-
-
-    <section id="streetViewPanel" class="panel closed" data-panel-title="Real street view">
-      <button class="close-btn" data-close="streetViewPanel" title="Close street view">×</button>
-      <div class="eyebrow">Real-life street view · <span id="streetProvider">Mapillary primary / KartaView fallback</span></div>
-      <h2 id="kvTitle">Street imagery ready</h2>
-      <div class="token-row" id="mapillaryTokenRow">
-        <input id="mapillaryTokenInput" type="password" placeholder="Mapillary client token, stored only in this browser" autocomplete="off" />
-        <button id="saveMapillaryTokenBtn">Use Mapillary</button>
-        <button id="openMapillaryDevBtn">Get token</button>
-      </div>
-      <p id="mapillaryTokenNote">Mapillary is better, but requires a free developer client token. Don’t paste passwords here. Token is saved to localStorage only, not committed.</p>
-      <div id="kvViewer"><p style="padding:16px">Choose Street View or a segment to load Mapillary street view. If no token is saved, KartaView loads as fallback.</p></div>
-      <div class="photo-meta"><span id="kvMeta">Open/free street-level imagery, not Google proprietary imagery.</span><span id="kvCount"></span></div>
-      <div class="photo-tools"><button id="prevPhotoBtn">← Prev photo</button><button id="nextPhotoBtn">Next photo →</button></div>
-    </section>
-
-    <div class="status" id="status">Loading accessibility world…</div>
-
+    <div class="status" id="status">Loading Clementi digital twin…</div>
     <script>
-      const COLORS = { green: '#2df46f', amber: '#ffd166', red: '#ff3b52', blue: '#38bdf8', poi: '#f97316' };
-      const state = { world:null, buildings:null, segments:[], selectedIndex:0, layers:{}, mode:'earth', kvPhotos:[], kvIndex:0, kvViewer:null, mapillaryViewer:null, mapillaryImageId:null, closedPanels:{} };
-      window.__EARTH_ACCESSIBILITY_STATE = state;
-
-      const map = new maptalks.Map('map', {
-        center: [103.7716, 1.3062], zoom: 17, pitch: 58, bearing: -20,
-        baseLayer: new maptalks.TileLayer('base', {
-          urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', renderer: 'canvas', attribution: '© OpenStreetMap contributors'
-        })
-      });
-
-      const routeLayer = new maptalks.VectorLayer('accessibility-route-segments').addTo(map);
-      const poiLayer = new maptalks.VectorLayer('lta-osm-features').addTo(map);
-      const buildingLayer = new maptalks.VectorLayer('building-context').addTo(map);
-      const selectedLayer = new maptalks.VectorLayer('selected-street').addTo(map);
-      state.layers = { routeLayer, poiLayer, buildingLayer, selectedLayer };
-
-      function setStatus(text){ document.getElementById('status').textContent = text; state.status = text; }
-      function colorForScore(score){ return score >= 67 ? COLORS.green : score >= 45 ? COLORS.amber : COLORS.red; }
-      function middleCoord(line){ const c=line.geometry.coordinates; return c[Math.floor(c.length/2)]; }
-      function bearing(a,b){ const y=Math.sin((b[0]-a[0])*Math.PI/180)*Math.cos(b[1]*Math.PI/180); const x=Math.cos(a[1]*Math.PI/180)*Math.sin(b[1]*Math.PI/180)-Math.sin(a[1]*Math.PI/180)*Math.cos(b[1]*Math.PI/180)*Math.cos((b[0]-a[0])*Math.PI/180); return Math.atan2(y,x)*180/Math.PI; }
-
-      function renderBuildings(geojson){
-        const polygons = geojson.features.map(f => {
-          if (f.geometry?.type !== 'Polygon') return null;
-          const h = Number(f.properties?.height_m || 18);
-          return new maptalks.Polygon(f.geometry.coordinates, { symbol: { polygonFill: h > 35 ? '#64748b' : h > 20 ? '#78909c' : '#94a3b8', polygonOpacity: .38, lineColor: 'rgba(226,232,240,.26)', lineWidth:.5 } });
-        }).filter(Boolean);
-        buildingLayer.addGeometry(polygons);
-        document.getElementById('buildingCount').textContent = polygons.length.toLocaleString();
-      }
-
-      function renderWorld(world){
-        const routeGeoms = [], poiGeoms = [];
-        const counts = {};
-        state.segments = world.features.filter(f => f.properties.kind === 'route_segment');
-        world.features.forEach(f => {
-          const p = f.properties; const kind = p.feature_type || p.kind; counts[kind] = (counts[kind] || 0) + 1;
-          if (p.kind === 'route_segment') {
-            routeGeoms.push(new maptalks.LineString(f.geometry.coordinates, { properties:p, symbol:{ lineColor:colorForScore(p.overall_accessibility_score), lineWidth:p.feature_type === 'kerb_line' ? 2 : 4, lineOpacity:p.feature_type === 'kerb_line' ? .42 : .86 } }));
-          } else {
-            const coord = f.geometry.type === 'Point' ? f.geometry.coordinates : centroid(f.geometry.coordinates[0]);
-            poiGeoms.push(new maptalks.Marker(coord, { properties:p, symbol:[{ markerType:'ellipse', markerFill: p.kind === 'bollard' ? COLORS.red : COLORS.poi, markerLineColor:'#fff', markerLineWidth:1.2, markerWidth:p.kind === 'mrt_station' ? 22 : 14, markerHeight:p.kind === 'mrt_station' ? 22 : 14 }, { textName: labelForPOI(p), textSize:10, textFill:'#fff', textHaloFill:'#020617', textHaloRadius:2, textDy:-19 }] }));
-          }
-        });
-        routeLayer.addGeometry(routeGeoms); poiLayer.addGeometry(poiGeoms);
-        document.getElementById('segCount').textContent = state.segments.length.toLocaleString();
-        document.getElementById('featureCount').textContent = world.features.length.toLocaleString();
-        document.getElementById('featureSummary').innerHTML = Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([k,v]) => `<span class="pill">${k.replaceAll('_',' ')}: ${v}</span>`).join('');
-        document.getElementById('standardsText').innerHTML = `<strong>${world.standards.name}</strong><br>${world.standards.basis.join('<br>')}<br><br><strong>Note:</strong> ${world.standards.prototype_note}`;
-        populateSegmentSelect();
-        selectSegment(0, false);
-      }
-
-      function centroid(ring){ let x=0,y=0,n=ring.length||1; ring.forEach(c=>{x+=c[0]; y+=c[1];}); return [x/n,y/n]; }
-      function labelForPOI(p){ if(p.kind==='bus_stop') return 'BUS'; if(p.kind==='mrt_station') return 'MRT'; if(p.kind==='bollard') return 'bollard'; if(p.kind==='covered_linkway') return 'shelter'; if(p.kind==='pedestrian_overhead_bridge') return 'bridge'; return p.kind.replaceAll('_',' '); }
-      function populateSegmentSelect(){ const sel=document.getElementById('segmentSelect'); sel.innerHTML = state.segments.map((f,i)=>`<option value="${i}">${f.properties.id} · ${f.properties.feature_type.replaceAll('_',' ')} · score ${f.properties.overall_accessibility_score}</option>`).join(''); }
-
-      function selectSegment(index, streetMode = state.mode === 'street'){
-        if(!state.segments.length) return;
-        state.selectedIndex = (index + state.segments.length) % state.segments.length;
-        const f = state.segments[state.selectedIndex]; const p=f.properties; const coords=f.geometry.coordinates;
-        document.getElementById('segmentSelect').value = state.selectedIndex;
-        document.getElementById('activeScore').textContent = p.overall_accessibility_score;
-        selectedLayer.clear();
-        selectedLayer.addGeometry(new maptalks.LineString(coords, { symbol:{ lineColor:COLORS.blue, lineWidth:9, lineOpacity:.98 } }));
-        document.getElementById('selectedType').textContent = `${p.feature_type.replaceAll('_',' ')} · ${p.rag}`;
-        document.getElementById('selectedName').textContent = `${p.name} · score ${p.overall_accessibility_score}/100`;
-        document.getElementById('selectedDesc').innerHTML = `Persona agents can traverse this segment if their passability is true. Metrics are proxy values based on ISO 21542 + ADA/PROWAG-style accessibility criteria.`;
-        renderMetrics(p); renderAgents(p);
-        const mid = middleCoord(f); const brg = coords.length > 1 ? bearing(coords[0], coords[coords.length-1]) : -20;
-        if(streetMode) {
-          map.animateTo({ center: mid, zoom: 20, pitch: 78, bearing: brg }, { duration: 700 });
-          openPanel('streetViewPanel');
-          loadStreetImageryForSegment(f);
-        } else map.animateTo({ center: mid, zoom: 18, pitch: 58, bearing: -20 }, { duration: 500 });
-      }
-
-      function renderMetrics(p){
-        const m=p.metrics, c=p.component_scores;
-        const rows = [
-          ['Clear width', `${m.clear_width_m} m`, c.clear_width, 'target ≥ 1.2 m'],
-          ['Running slope', `${m.running_slope_pct}%`, c.running_slope, 'ADA walking surface ≤ 5%, ramp max 8.3%'],
-          ['Cross slope', `${m.cross_slope_pct}%`, c.cross_slope, 'ADA/PROWAG target ≤ 2.1%'],
-          ['Roughness', `${m.roughness_mm} mm`, c.surface_roughness, 'stable, firm, slip-resistant surface proxy'],
-          ['Vertical change', `${m.vertical_change_mm} mm`, c.vertical_change, '≤6 mm good, ≤13 mm beveled limit'],
-          ['Obstructions', `${m.obstruction_count}`, c.obstructions, 'bollards / kerb / bus stop conflicts'],
-          ['Shelter', m.covered ? 'covered' : 'open', c.shelter, 'comfort / weather exposure'],
-          ['Tactile guidance', m.tactile_guidance ? 'likely' : 'unknown', c.tactile_guidance, 'ISO 23599 / tactile wayfinding proxy'],
-        ];
-        document.getElementById('metricList').innerHTML = rows.map(r=>`<div class="metric"><div>${r[0]}<br><small>${r[3]}</small></div><div>${r[1]}</div><div style="color:${colorForScore(r[2])}">${r[2]}/100</div></div>`).join('');
-      }
-      function renderAgents(p){
-        document.getElementById('agentList').innerHTML = Object.entries(p.personas).map(([id,val]) => `<div class="agent"><div><strong>${id.replaceAll('_',' ')}</strong><br><span class="${val.passable?'pass':'fail'}">${val.passable?'passable':'blocked / needs intervention'}</span>${val.blockers?.length?`<br><small>blockers: ${val.blockers.join(', ')}</small>`:''}</div><b style="color:${colorForScore(val.score)}">${val.score}</b></div>`).join('');
-      }
-
-
-      function closePanel(id){
-        const panel = document.getElementById(id); if(!panel) return;
-        panel.classList.add('closed'); state.closedPanels[id] = true; renderReopenDock();
-      }
-      function openPanel(id){
-        const panel = document.getElementById(id); if(!panel) return;
-        panel.classList.remove('closed'); delete state.closedPanels[id]; renderReopenDock();
-        if(id === 'streetViewPanel' && state.kvPhotos.length) renderKartaViewPhoto(state.kvIndex);
-      }
-      function renderReopenDock(){
-        const dock = document.getElementById('reopenDock');
-        dock.innerHTML = Object.keys(state.closedPanels).map(id => {
-          const title = document.getElementById(id)?.dataset?.panelTitle || id;
-          return `<button data-open="${id}">Show ${title}</button>`;
-        }).join('');
-        dock.querySelectorAll('button[data-open]').forEach(btn => btn.addEventListener('click', () => openPanel(btn.dataset.open)));
-      }
-      document.querySelectorAll('[data-close]').forEach(btn => btn.addEventListener('click', () => closePanel(btn.dataset.close)));
-
-      function photoUrl(photo){
-        // Prefer KartaView's CDN URLs. The raw storage URLs in the API often 404
-        // directly, while imageProcUrl / imageLthUrl are the supported public image links.
-        const raw = photo.imageProcUrl || photo.imageLthUrl || photo.imageThUrl || photo.fileurlProc || photo.fileurl || photo.fileurlLTh || photo.fileurlTh;
-        if(!raw) return null;
-        return raw.replace('{{sizeprefix}}', 'lth');
-      }
-
-      function getMapillaryToken(){
-        return localStorage.getItem('equiroute_mapillary_token') || '';
-      }
-      function setMapillaryToken(token){
-        const cleaned = (token || '').trim();
-        if(cleaned) localStorage.setItem('equiroute_mapillary_token', cleaned);
-        else localStorage.removeItem('equiroute_mapillary_token');
-        updateMapillaryTokenUI();
-      }
-      function updateMapillaryTokenUI(){
-        const has = !!getMapillaryToken();
-        document.getElementById('mapillaryTokenNote').innerHTML = has
-          ? '<span class="provider-badge">Mapillary token saved locally</span> Mapillary will be tried first; KartaView remains fallback.'
-          : 'Mapillary is better, but requires a free developer client token. Don’t paste passwords here. Token is saved to localStorage only, not committed.';
-      }
-      async function findMapillaryImage(coord, token){
-        const url = `https://graph.mapillary.com/images?fields=id,is_pano,computed_geometry,captured_at,creator,sequence,thumb_1024_url&lat=${coord[1]}&lng=${coord[0]}&radius=50&limit=1&access_token=${encodeURIComponent(token)}`;
-        const data = await fetch(url).then(r => { if(!r.ok) throw new Error(`Mapillary HTTP ${r.status}`); return r.json(); });
-        return data.data?.[0] || null;
-      }
-      async function loadMapillaryForSegment(f){
-        const token = getMapillaryToken();
-        if(!token) return false;
-        const coord = middleCoord(f);
-        document.getElementById('streetProvider').textContent = 'Mapillary';
-        document.getElementById('kvTitle').textContent = 'Searching Mapillary near selected street…';
-        document.getElementById('kvMeta').textContent = 'Using your browser-local Mapillary client token.';
-        const image = await findMapillaryImage(coord, token);
-        if(!image?.id) throw new Error('No Mapillary imagery found near this segment');
-        state.mapillaryImageId = image.id;
-        if(state.kvViewer){ try { state.kvViewer.destroy(); } catch(e){} state.kvViewer = null; }
-        if(state.mapillaryViewer){ try { state.mapillaryViewer.remove(); } catch(e){} state.mapillaryViewer = null; }
-        const viewer = document.getElementById('kvViewer');
-        viewer.innerHTML = '';
-        const { Viewer } = mapillary;
-        state.mapillaryViewer = new Viewer({
-          accessToken: token,
-          container: 'kvViewer',
-          imageId: String(image.id),
-          component: { cover: false, sequence: { visible: true } },
-        });
-        state.mapillaryViewer.on('image', event => {
-          state.mapillaryImageId = event.image?.id || state.mapillaryImageId;
-          document.getElementById('kvTitle').textContent = 'Mapillary street view near selected segment';
-          document.getElementById('kvMeta').innerHTML = `Mapillary image ${state.mapillaryImageId} · ${event.image?.isPano ? '360 panorama' : 'street-level image'} · navigate with viewer arrows`;
-          document.getElementById('kvCount').textContent = 'Mapillary';
-        });
-        document.getElementById('kvTitle').textContent = 'Mapillary street view near selected segment';
-        document.getElementById('kvMeta').innerHTML = `Mapillary image ${image.id} · ${image.is_pano ? '360 panorama' : 'street-level image'}`;
-        document.getElementById('kvCount').textContent = 'Mapillary';
-        return true;
-      }
-      async function loadStreetImageryForSegment(f){
-        openPanel('streetViewPanel');
-        updateMapillaryTokenUI();
-        if(getMapillaryToken()){
-          try { if(await loadMapillaryForSegment(f)) return; }
-          catch(err){ console.warn('Mapillary failed, falling back to KartaView', err); document.getElementById('kvMeta').textContent = `Mapillary unavailable: ${err.message}. Falling back to KartaView.`; }
-        }
-        document.getElementById('streetProvider').textContent = 'KartaView fallback';
-        return loadKartaViewForSegment(f);
-      }
-
-      async function loadKartaViewForSegment(f){
-        const coord = middleCoord(f);
-        const url = `https://api.openstreetcam.org/2.0/photo/?lat=${coord[1]}&lng=${coord[0]}&zoomLevel=18&join=sequence&orderBy=distance&orderDirection=asc`;
-        openPanel('streetViewPanel');
-        document.getElementById('kvTitle').textContent = 'Searching KartaView imagery near selected street…';
-        document.getElementById('kvMeta').textContent = 'Querying free/open KartaView API near this segment.';
-        try {
-          const data = await fetch(url).then(r => { if(!r.ok) throw new Error(`KartaView HTTP ${r.status}`); return r.json(); });
-          const photos = (data.result?.data || []).filter(p => photoUrl(p));
-          state.kvPhotos = photos; state.kvIndex = 0;
-          renderKartaViewPhoto(0);
-        } catch(err) {
-          console.warn('KartaView failed', err);
-          state.kvPhotos = [];
-          document.getElementById('kvTitle').textContent = 'No live street imagery loaded';
-          document.getElementById('kvViewer').innerHTML = `<p style="padding:16px">KartaView request failed: ${err.message}. The map still works; this is the free/open alternative to Google Street View.</p>`;
-          document.getElementById('kvMeta').textContent = 'KartaView API failure or no coverage for this exact street.';
-          document.getElementById('kvCount').textContent = '';
-        }
-      }
-      function renderKartaViewPhoto(index){
-        const photos = state.kvPhotos || [];
-        if(!photos.length){
-          document.getElementById('kvTitle').textContent = 'No KartaView imagery found here';
-          document.getElementById('kvViewer').innerHTML = '<p style="padding:16px">No free street-level photo found for this exact selected segment. Try Next street, or move to Earth View and choose another road.</p>';
-          document.getElementById('kvMeta').textContent = 'Coverage depends on community-contributed KartaView imagery.';
-          document.getElementById('kvCount').textContent = '';
-          return;
-        }
-        state.kvIndex = (index + photos.length) % photos.length;
-        const p = photos[state.kvIndex]; const url = photoUrl(p);
-        const viewer = document.getElementById('kvViewer');
-        if(state.kvViewer){ try { state.kvViewer.destroy(); } catch(e){} state.kvViewer = null; }
-        if(state.mapillaryViewer){ try { state.mapillaryViewer.remove(); } catch(e){} state.mapillaryViewer = null; }
-        viewer.innerHTML = '';
-        // KartaView's storage images are viewable directly in <img>. Pannellum
-        // needs permissive CORS headers for WebGL panoramas, which the photo CDN
-        // does not always expose, so we use a reliable real-life street photo
-        // viewer instead of a broken panorama canvas.
-        viewer.innerHTML = `<img alt="KartaView real street-level imagery" src="${url}" />`;
-        document.getElementById('kvTitle').textContent = `Real street view near selected segment`;
-        document.getElementById('kvMeta').innerHTML = `KartaView photo ${p.id || ''} · ${p.fieldOfView || 'photo'}° · heading ${p.heading || 'n/a'} · ${p.dateAdded || ''}`;
-        document.getElementById('kvCount').textContent = `${state.kvIndex + 1}/${photos.length}`;
-      }
-
-      document.getElementById('segmentSelect').addEventListener('change', e => selectSegment(Number(e.target.value)));
-      document.getElementById('prevBtn').addEventListener('click', () => selectSegment(state.selectedIndex - 1));
-      document.getElementById('nextBtn').addEventListener('click', () => selectSegment(state.selectedIndex + 1));
-      document.getElementById('prevPhotoBtn').addEventListener('click', () => renderKartaViewPhoto(state.kvIndex - 1));
-      document.getElementById('nextPhotoBtn').addEventListener('click', () => renderKartaViewPhoto(state.kvIndex + 1));
-      document.getElementById('saveMapillaryTokenBtn').addEventListener('click', () => { setMapillaryToken(document.getElementById('mapillaryTokenInput').value); if(state.segments[state.selectedIndex]) loadStreetImageryForSegment(state.segments[state.selectedIndex]); });
-      document.getElementById('openMapillaryDevBtn').addEventListener('click', () => window.open('https://www.mapillary.com/dashboard/developers', '_blank'));
-      updateMapillaryTokenUI();
-      document.getElementById('earthBtn').addEventListener('click', () => { state.mode='earth'; document.getElementById('earthBtn').classList.add('active'); document.getElementById('streetBtn').classList.remove('active'); selectSegment(state.selectedIndex, false); });
-      document.getElementById('streetBtn').addEventListener('click', () => { state.mode='street'; document.getElementById('streetBtn').classList.add('active'); document.getElementById('earthBtn').classList.remove('active'); openPanel('streetViewPanel'); selectSegment(state.selectedIndex, true); });
-
-      Promise.all([fetch('accessibility_world.geojson').then(r=>{ if(!r.ok) throw new Error('accessibility_world.geojson '+r.status); return r.json(); }), fetch('buildings_clementi.geojson').then(r=>{ if(!r.ok) throw new Error('buildings_clementi.geojson '+r.status); return r.json(); })])
-        .then(([world, buildings]) => { state.world=world; state.buildings=buildings; renderBuildings(buildings); renderWorld(world); const extent = routeLayer.getExtent(); if(extent) map.fitExtent(extent, 0, { animation:false }); setStatus(`Loaded ${state.segments.length.toLocaleString()} traversable segments, ${world.features.length.toLocaleString()} LTA/OSM features, ${buildings.features.length.toLocaleString()} buildings`); })
-        .catch(err => { console.error(err); setStatus(`Failed to load Earth accessibility view: ${err.message}`); });
+      const COLORS={green:'#22f36e',amber:'#ffd166',red:'#ff3b52',blue:'#38bdf8',orange:'#fb923c'};
+      const state={world:null,buildings:null,segments:[],features:[],selectedIndex:0,mode:'earth',mapillaryViewer:null,miniMap:null,layers:{},token:null};
+      window.__EARTH_ACCESSIBILITY_STATE=state;
+      const map=new maptalks.Map('map',{center:[103.7716,1.3062],zoom:17,pitch:62,bearing:-24,baseLayer:new maptalks.TileLayer('base',{urlTemplate:'https://tile.openstreetmap.org/{z}/{x}/{y}.png',renderer:'canvas',attribution:'© OpenStreetMap'})});
+      const routeLayer=new maptalks.VectorLayer('5m-accessibility-segments').addTo(map), poiLayer=new maptalks.VectorLayer('features').addTo(map), buildingLayer=new maptalks.VectorLayer('buildings').addTo(map), selectedLayer=new maptalks.VectorLayer('selected').addTo(map);state.layers={routeLayer,poiLayer,buildingLayer,selectedLayer};
+      function getToken(){return localStorage.getItem('equiroute_mapillary_token')||''}function setToken(t){if((t||'').trim())localStorage.setItem('equiroute_mapillary_token',t.trim());updateSettings()}function setStatus(t){document.getElementById('status').textContent=t}function scoreColor(s){return s>=67?COLORS.green:s>=45?COLORS.amber:COLORS.red}function middle(f){const c=f.geometry.coordinates;return[(c[0][0]+c[c.length-1][0])/2,(c[0][1]+c[c.length-1][1])/2]}function bearing(a,b){const y=Math.sin((b[0]-a[0])*Math.PI/180)*Math.cos(b[1]*Math.PI/180);const x=Math.cos(a[1]*Math.PI/180)*Math.sin(b[1]*Math.PI/180)-Math.sin(a[1]*Math.PI/180)*Math.cos(b[1]*Math.PI/180)*Math.cos((b[0]-a[0])*Math.PI/180);return Math.atan2(y,x)*180/Math.PI}function centroid(r){let x=0,y=0,n=r.length||1;r.forEach(c=>{x+=c[0];y+=c[1]});return[x/n,y/n]}
+      function addonFor(p){const m=p.metrics||{};if(m.near_bus_stop_m!=null&&m.near_bus_stop_m<18)return'bus stop';if(m.kerb_ramp_present)return'ramp';if(m.covered)return'shelter';if(m.tactile_guidance)return'tactile';return''}
+      function renderBuildings(g){const geoms=g.features.map(f=>f.geometry?.type==='Polygon'?new maptalks.Polygon(f.geometry.coordinates,{symbol:{polygonFill:Number(f.properties?.height_m||18)>30?'#64748b':'#94a3b8',polygonOpacity:.5,lineColor:'rgba(226,232,240,.3)',lineWidth:.5}}):null).filter(Boolean);buildingLayer.addGeometry(geoms);document.getElementById('buildingCount').textContent=geoms.length.toLocaleString()}
+      function renderWorld(world){state.segments=world.features.filter(f=>f.properties.kind==='route_segment');state.features=world.features.filter(f=>f.properties.kind!=='route_segment');const routeGeoms=state.segments.map((f,i)=>new maptalks.LineString(f.geometry.coordinates,{properties:{...f.properties,index:i},symbol:{lineColor:scoreColor(f.properties.overall_accessibility_score),lineWidth:f.properties.feature_type==='kerb_line'?2:4,lineOpacity:f.properties.feature_type==='kerb_line'?.42:.88}}).on('click',()=>{state.mode='street';selectSegment(i,true)}));routeLayer.addGeometry(routeGeoms);const poi=state.features.map(f=>{const p=f.properties;const coord=f.geometry.type==='Point'?f.geometry.coordinates:centroid(f.geometry.coordinates[0]);const label=p.kind==='bus_stop'?'BUS':p.kind==='mrt_station'?'MRT':p.kind==='covered_linkway'?'shelter':p.kind==='pedestrian_overhead_bridge'?'bridge':p.kind==='bollard'?'bollard':'';return new maptalks.Marker(coord,{symbol:[{markerType:'ellipse',markerFill:p.kind==='bollard'?COLORS.red:COLORS.orange,markerLineColor:'#fff',markerLineWidth:1,markerWidth:p.kind==='mrt_station'?22:14,markerHeight:p.kind==='mrt_station'?22:14},{textName:label,textSize:10,textFill:'#fff',textHaloFill:'#020617',textHaloRadius:2,textDy:-18}]})});poiLayer.addGeometry(poi);document.getElementById('segCount').textContent=state.segments.length.toLocaleString();document.getElementById('standardsText').textContent=[world.standards?.name,...(world.standards?.basis||[])].join(' · ');populateSelect();selectSegment(0,false)}
+      function populateSelect(){segmentSelect.innerHTML=state.segments.map((f,i)=>`<option value="${i}">${f.properties.name} · ${Math.round(f.properties.metrics.length_m)}m · ${f.properties.overall_accessibility_score}</option>`).join('')} 
+      function showDetail(p){detailCard.classList.add('visible');selectedName.textContent=`${p.name} · ${p.feature_type.replaceAll('_',' ')}`;selectedDesc.textContent=`${Math.round(p.metrics.length_m*10)/10} m segment${addonFor(p)?' · '+addonFor(p):''}`;activeScore.textContent=p.overall_accessibility_score;const m=p.metrics,c=p.component_scores;metricList.innerHTML=[['Width',m.clear_width_m+' m',c.clear_width],['Slope',m.running_slope_pct+'%',c.running_slope],['Cross slope',m.cross_slope_pct+'%',c.cross_slope],['Roughness',m.roughness_mm+' mm',c.surface_roughness],['Level change',m.vertical_change_mm+' mm',c.vertical_change],['Obstructions',m.obstruction_count,c.obstructions],['Shelter',m.covered?'yes':'no',c.shelter],['Tactile',m.tactile_guidance?'yes':'unknown',c.tactile_guidance]].map(x=>`<div class="metric"><span>${x[0]}</span><b style="color:${scoreColor(x[2])}">${x[1]}</b><small>${x[2]}/100</small></div>`).join('')}
+      function selectSegment(index,street=false){if(!state.segments.length)return;state.selectedIndex=(index+state.segments.length)%state.segments.length;const f=state.segments[state.selectedIndex],p=f.properties,coords=f.geometry.coordinates;segmentSelect.value=state.selectedIndex;selectedLayer.clear();selectedLayer.addGeometry(new maptalks.LineString(coords,{symbol:{lineColor:COLORS.blue,lineWidth:10,lineOpacity:.98}}));showDetail(p);const mid=middle(f),brg=bearing(coords[0],coords[coords.length-1]);if(street){enterStreet(f,mid,brg)}else{enterEarth();map.animateTo({center:mid,zoom:18,pitch:62,bearing:-24},{duration:500});renderSegmentButtons()}}
+      async function findMapillaryImage(coord){const token=getToken();if(!token)throw new Error('no token');const url=`https://graph.mapillary.com/images?fields=id,is_pano&lat=${coord[1]}&lng=${coord[0]}&radius=50&limit=1&access_token=${encodeURIComponent(token)}`;const data=await fetch(url).then(r=>{if(!r.ok)throw new Error('Mapillary '+r.status);return r.json()});return data.data?.[0]}
+      async function enterStreet(f,coord,brg){state.mode='street';document.body.classList.add('street-mode');earthBtn.classList.remove('active');streetBtn.classList.add('active');modeLabel.textContent='street view';map.animateTo({center:coord,zoom:20,pitch:78,bearing:brg},{duration:350});setupMiniMap();try{const img=await findMapillaryImage(coord);if(!img)throw new Error('no image');if(state.mapillaryViewer){try{state.mapillaryViewer.remove()}catch(e){}}mapillaryView.innerHTML='';state.mapillaryViewer=new mapillary.Viewer({accessToken:getToken(),container:'mapillaryView',imageId:String(img.id),component:{cover:false,sequence:{visible:true}}});}catch(e){mapillaryView.innerHTML='<div style="height:100%;display:grid;place-items:center;background:#020617;color:white"><div>Mapillary unavailable for this exact street, use Earth view or another segment.</div></div>'}renderSegmentButtons(true)}
+      function enterEarth(){state.mode='earth';document.body.classList.remove('street-mode');earthBtn.classList.add('active');streetBtn.classList.remove('active');modeLabel.textContent='3D world view';if(state.mapillaryViewer){try{state.mapillaryViewer.remove()}catch(e){}state.mapillaryViewer=null}renderSegmentButtons(false)}
+      function setupMiniMap(){if(state.miniMap)return;state.miniMap=new maptalks.Map('miniMap',{center:map.getCenter(),zoom:18,pitch:0,bearing:0,baseLayer:new maptalks.TileLayer('miniBase',{urlTemplate:'https://tile.openstreetmap.org/{z}/{x}/{y}.png',renderer:'canvas'})});new maptalks.VectorLayer('mini-segments',routeLayer.getGeometries().map(g=>g.copy())).addTo(state.miniMap)}
+      function renderSegmentButtons(street=false){segmentButtons.innerHTML='';const selected=state.segments[state.selectedIndex];if(!selected)return;let candidates=street?nearbySegments(selected,18):state.segments.filter((_,i)=>i%12===0).slice(0,180);candidates.forEach(f=>{const idx=state.segments.indexOf(f),p=f.properties,pt=street?streetButtonPoint(idx,candidates.length):map.coordinateToContainerPoint(new maptalks.Coordinate(...middle(f)));const b=document.createElement('button');b.className='seg-btn '+(p.overall_accessibility_score<45?'bad':p.overall_accessibility_score<67?'warn':'');const add=addonFor(p);if(add){b.classList.add('addon');b.dataset.addon=add}b.style.left=(pt.x-12)+'px';b.style.top=(pt.y-12)+'px';b.textContent=idx===state.selectedIndex?'●':'';b.title=`${p.name} ${p.overall_accessibility_score}/100`;b.onclick=()=>selectSegment(idx,state.mode==='street');segmentButtons.appendChild(b)})}
+      function nearbySegments(base,n){const c=middle(base);return state.segments.map(f=>({f,d:Math.hypot((middle(f)[0]-c[0])*111320,(middle(f)[1]-c[1])*111320)})).sort((a,b)=>a.d-b.d).slice(0,n).map(x=>x.f)}
+      function streetButtonPoint(i,total){const col=i%6,row=Math.floor(i/6);return{x:window.innerWidth*.24+col*86,y:window.innerHeight*.42+row*62}}
+      function updateSettings(){tokenStatus.textContent=getToken()?'Mapillary token saved in this browser.':'No Mapillary token saved; street view may be unavailable.'}
+      segmentSelect.onchange=e=>selectSegment(Number(e.target.value),state.mode==='street');prevBtn.onclick=()=>selectSegment(state.selectedIndex-1,state.mode==='street');nextBtn.onclick=()=>selectSegment(state.selectedIndex+1,state.mode==='street');earthBtn.onclick=()=>selectSegment(state.selectedIndex,false);streetBtn.onclick=()=>selectSegment(state.selectedIndex,true);settingsBtn.onclick=()=>settings.classList.toggle('visible');closeSettings.onclick=()=>settings.classList.remove('visible');closeDetail.onclick=()=>detailCard.classList.remove('visible');saveMapillaryTokenBtn.onclick=()=>setToken(mapillaryTokenInput.value);map.on('moving zooming resize viewchange',()=>{if(state.mode==='earth')renderSegmentButtons(false)});window.addEventListener('resize',()=>renderSegmentButtons(state.mode==='street'));
+      Promise.all([fetch('accessibility_world.geojson').then(r=>r.json()),fetch('buildings_clementi.geojson').then(r=>r.json())]).then(([world,buildings])=>{state.world=world;state.buildings=buildings;renderBuildings(buildings);renderWorld(world);const ext=routeLayer.getExtent();if(ext)map.fitExtent(ext,0,{animation:false});setStatus(`Loaded ${state.segments.length.toLocaleString()} 5 m segments, ${buildings.features.length.toLocaleString()} buildings`);updateSettings()}).catch(e=>setStatus('Failed to load: '+e.message));
     </script>
   </body>
 </html>
