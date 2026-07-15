@@ -262,7 +262,7 @@
           : 'Mapillary is better, but requires a free developer client token. Don’t paste passwords here. Token is saved to localStorage only, not committed.';
       }
       async function findMapillaryImage(coord, token){
-        const url = `https://graph.mapillary.com/images?fields=id,is_pano,computed_geometry,captured_at,creator,sequence,thumb_1024_url&lat=${coord[1]}&lng=${coord[0]}&radius=80&limit=1&access_token=${encodeURIComponent(token)}`;
+        const url = `https://graph.mapillary.com/images?fields=id,is_pano,computed_geometry,captured_at,creator,sequence,thumb_1024_url&lat=${coord[1]}&lng=${coord[0]}&radius=50&limit=1&access_token=${encodeURIComponent(token)}`;
         const data = await fetch(url).then(r => { if(!r.ok) throw new Error(`Mapillary HTTP ${r.status}`); return r.json(); });
         return data.data?.[0] || null;
       }
