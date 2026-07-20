@@ -133,6 +133,55 @@ def group_segments_into_street_parts(
     return parts
 
 
+def build_streets(street_parts: list[dict[str, Any]], turn_threshold_deg: float = 55.0) -> list[dict[str, Any]]:
+    """Assign each street part to a parent street.
+
+    A street is a contiguous run of street parts with broadly consistent bearing.
+    This is intentionally simple for the hack MVP; later we can replace it with
+    OSM road names/way IDs once we ingest full road-centerline data.
+    """
+    streets: list[dict[str, Any]] = []
+    current: dict[str, Any] | None = None
+    previous_part: dict[str, Any] | None = None
+
+    def new_street(part: dict[str, Any]) -> dict[str, Any]:
+        street = {
+            "id": f"street_{len(streets):04d}",
+            "name": f"Demo Street {len(streets) + 1}",
+            "source": "generated_bearing_runs",
+            "desired_orientation": part.get("desired_orientation", "road_right"),
+            "street_part_ids": [],
+            "geometry": {"type": "LineString", "coordinates": []},
+            "metrics": {},
+        }
+        streets.append(street)
+        return street
+
+    for part in street_parts:
+        if current is None:
+            current = new_street(part)
+        elif previous_part is not None and abs(angle_diff(part["direction_bearing_deg"], previous_part["direction_bearing_deg"])) > turn_threshold_deg:
+            current = new_street(part)
+
+        part["street_id"] = current["id"]
+        current["street_part_ids"].append(part["id"])
+        coords = part.get("geometry", {}).get("coordinates", [])
+        if not current["geometry"]["coordinates"]:
+            current["geometry"]["coordinates"].extend(coords)
+        else:
+            current["geometry"]["coordinates"].extend(coords[1:] if coords and current["geometry"]["coordinates"][-1] == coords[0] else coords)
+        previous_part = part
+
+    for street in streets:
+        coords = street["geometry"]["coordinates"]
+        if coords:
+            street["midpoint"] = midpoint(coords)
+            street["direction_bearing_deg"] = round(bearing_deg(coords[0], coords[-1]), 2)
+            street["length_m"] = round(sum(haversine_m(a, b) for a, b in zip(coords, coords[1:])), 2)
+            street["metrics"] = {"street_part_count": len(street["street_part_ids"])}
+    return streets
+
+
 def candidate_coord(candidate: dict[str, Any]) -> list[float] | None:
     geom = candidate.get("computed_geometry") or candidate.get("geometry") or {}
     coords = geom.get("coordinates")
@@ -208,6 +257,7 @@ def build_street_view_nodes(street_parts: list[dict[str, Any]], photos_by_part: 
             {
                 "id": node_id,
                 "street_part_id": part["id"],
+                "street_id": part.get("street_id"),
                 "active_photo_id": active.get("id") if active else None,
                 "sequence_id": active.get("metadata", {}).get("sequence") if active else None,
                 "sequence_index": i,
@@ -215,8 +265,8 @@ def build_street_view_nodes(street_parts: list[dict[str, Any]], photos_by_part: 
                 "lat": part["midpoint"][1],
                 "canonical_heading_deg": part["direction_bearing_deg"],
                 "desired_orientation": part.get("desired_orientation", "road_right"),
-                "prev_node_id": f"street_view_node_{i-1:04d}" if i else None,
-                "next_node_id": f"street_view_node_{i+1:04d}" if i < len(street_parts) - 1 else None,
+                "prev_node_id": f"street_view_node_{i-1:04d}" if i and street_parts[i - 1].get("street_id") == part.get("street_id") else None,
+                "next_node_id": f"street_view_node_{i+1:04d}" if i < len(street_parts) - 1 and street_parts[i + 1].get("street_id") == part.get("street_id") else None,
                 "left_node_id": None,
                 "right_node_id": None,
                 "coverage_status": "active" if active else "missing",
@@ -241,32 +291,46 @@ def registry_to_supabase_seed_sql(registry: dict[str, Any]) -> str:
         "-- Generated AccessTwin demo-corridor seed data.",
         "begin;",
     ]
+    for street in registry.get("streets", []):
+        mid = street.get("midpoint", [None, None])
+        lines.append(
+            "insert into public.streets "
+            "(external_id, name, geometry, midpoint_lng, midpoint_lat, direction_bearing_deg, desired_orientation, length_m, metrics) values ("
+            f"{sql_literal(street['id'])}, {sql_literal(street.get('name'))}, {jsonb_literal(street['geometry'])}, "
+            f"{mid[0]}, {mid[1]}, {street.get('direction_bearing_deg', 0)}, {sql_literal(street.get('desired_orientation', 'road_right'))}, "
+            f"{street.get('length_m', 0)}, {jsonb_literal(street.get('metrics', {}))}) "
+            "on conflict (external_id) do update set "
+            "name=excluded.name, geometry=excluded.geometry, midpoint_lng=excluded.midpoint_lng, midpoint_lat=excluded.midpoint_lat, "
+            "direction_bearing_deg=excluded.direction_bearing_deg, desired_orientation=excluded.desired_orientation, "
+            "length_m=excluded.length_m, metrics=excluded.metrics, updated_at=now();"
+        )
     for part in registry.get("street_parts", []):
         mid = part["midpoint"]
         route_ids = ",".join(sql_literal(x) for x in part.get("route_segment_ids", []))
         lines.append(
             "insert into public.street_parts "
-            "(external_id, route_segment_ids, geometry, midpoint_lng, midpoint_lat, direction_bearing_deg, desired_orientation, length_m, metrics) values ("
-            f"{sql_literal(part['id'])}, array[{route_ids}]::text[], {jsonb_literal(part['geometry'])}, "
+            "(external_id, street_id, route_segment_ids, geometry, midpoint_lng, midpoint_lat, direction_bearing_deg, desired_orientation, length_m, metrics) values ("
+            f"{sql_literal(part['id'])}, (select id from public.streets where external_id={sql_literal(part.get('street_id'))}), array[{route_ids}]::text[], {jsonb_literal(part['geometry'])}, "
             f"{mid[0]}, {mid[1]}, {part['direction_bearing_deg']}, {sql_literal(part.get('desired_orientation', 'road_right'))}, "
             f"{part['length_m']}, {jsonb_literal(part.get('metrics', {}))}) "
             "on conflict (external_id) do update set "
-            "route_segment_ids=excluded.route_segment_ids, geometry=excluded.geometry, midpoint_lng=excluded.midpoint_lng, "
+            "street_id=excluded.street_id, route_segment_ids=excluded.route_segment_ids, geometry=excluded.geometry, midpoint_lng=excluded.midpoint_lng, "
             "midpoint_lat=excluded.midpoint_lat, direction_bearing_deg=excluded.direction_bearing_deg, "
             "desired_orientation=excluded.desired_orientation, length_m=excluded.length_m, metrics=excluded.metrics, updated_at=now();"
         )
     for node in registry.get("street_view_nodes", []):
         lines.append(
             "insert into public.street_view_nodes "
-            "(external_id, street_part_id, sequence_id, sequence_index, lng, lat, canonical_heading_deg, desired_orientation, "
+            "(external_id, street_part_id, street_id, sequence_id, sequence_index, lng, lat, canonical_heading_deg, desired_orientation, "
             "prev_node_external_id, next_node_external_id, left_node_external_id, right_node_external_id, coverage_status) values ("
             f"{sql_literal(node['id'])}, (select id from public.street_parts where external_id={sql_literal(node['street_part_id'])}), "
+            f"(select id from public.streets where external_id={sql_literal(node.get('street_id'))}), "
             f"{sql_literal(node.get('sequence_id'))}, {node.get('sequence_index') if node.get('sequence_index') is not None else 'null'}, "
             f"{node['lng']}, {node['lat']}, {node['canonical_heading_deg']}, {sql_literal(node.get('desired_orientation', 'road_right'))}, "
             f"{sql_literal(node.get('prev_node_id'))}, {sql_literal(node.get('next_node_id'))}, "
             f"{sql_literal(node.get('left_node_id'))}, {sql_literal(node.get('right_node_id'))}, {sql_literal(node.get('coverage_status', 'missing'))}) "
             "on conflict (external_id) do update set "
-            "street_part_id=excluded.street_part_id, sequence_id=excluded.sequence_id, sequence_index=excluded.sequence_index, "
+            "street_part_id=excluded.street_part_id, street_id=excluded.street_id, sequence_id=excluded.sequence_id, sequence_index=excluded.sequence_index, "
             "lng=excluded.lng, lat=excluded.lat, canonical_heading_deg=excluded.canonical_heading_deg, "
             "desired_orientation=excluded.desired_orientation, prev_node_external_id=excluded.prev_node_external_id, "
             "next_node_external_id=excluded.next_node_external_id, left_node_external_id=excluded.left_node_external_id, "
@@ -279,11 +343,13 @@ def registry_to_supabase_seed_sql(registry: dict[str, Any]) -> str:
 def build_registry(world: dict[str, Any], target_length_m: float = 10.0, max_parts: int | None = 30) -> dict[str, Any]:
     features = world.get("features", [])
     street_parts = group_segments_into_street_parts(features, target_length_m=target_length_m, max_parts=max_parts)
+    streets = build_streets(street_parts)
     nodes = build_street_view_nodes(street_parts)
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "generated_at": datetime.now(timezone.utc).isoformat(),
-        "coverage_note": "Initial curated corridor graph. Photos are attached by Mapillary/crowd registry in the browser or Supabase layer.",
+        "coverage_note": "Initial curated corridor graph. Streets contain street parts; photos attach to street parts/nodes through Mapillary/crowd registry.",
+        "streets": streets,
         "street_parts": street_parts,
         "street_photos": [],
         "street_view_nodes": nodes,

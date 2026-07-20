@@ -12,6 +12,9 @@ Track every judge-visible claim with evidence before pitch polish.
 | Supabase project created and schema applied | Project `AccessTwin Tech4City` / `https://fhsnfvhydwtmdlrxokur.supabase.co`, SQL editor query `90536509-d594-4e6c-a718-ec54e27581b7` | Supabase SQL Editor showed `Success. No rows returned`; verification query returned `10 rows` for expected public tables | 10 tables | "AccessTwin now has a real free-tier Supabase backend for photos, feedback, upvotes, and authority recommendations." | built |
 | Curated corridor seeded into Supabase | `supabase/seed_street_view_registry.sql` | Supabase SQL Editor seed run showed `Success. No rows returned`; follow-up count query returned `1 row` | 30 street parts + 30 street-view nodes expected from seed SQL | "The demo corridor already has a backend street-view graph that can power stable navigation." | built |
 
+| Street hierarchy supports many streets, each with many street parts | `scripts/street_view_registry.py`, `supabase/schema.sql`, `data/street_view_registry.json` | `python3 -m unittest tests.test_street_view_registry -v`; REST smoke showed `streets 0-5/6`, `street_parts 0-29/30`, `street_view_nodes 0-29/30` | 6 streets, 30 parts, 30 nodes | "AccessTwin models the city as streets made of granular street parts, not one flat route." | built |
+| Frontend reads registry from Supabase with local fallback | `earth_accessibility.html` | Headless Chrome smoke on local server showed `Loaded 576 5 m segments, 6 streets, 30 street-view nodes from Supabase` | Supabase source active | "The demo is now backed by the live Supabase street registry while still demo-safe offline." | built |
+
 ## Next proof targets
 
 - Direction-consistent Mapillary/crowd photo corridor: 15–30 active photos, road-on-right.

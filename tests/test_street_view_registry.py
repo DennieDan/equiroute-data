@@ -4,6 +4,7 @@ import unittest
 from scripts.street_view_registry import (
     angle_diff,
     build_street_view_nodes,
+    build_streets,
     choose_best_photo,
     group_segments_into_street_parts,
     registry_to_supabase_seed_sql,
@@ -90,16 +91,49 @@ class StreetViewRegistryTest(unittest.TestCase):
         self.assertEqual(nodes[1]["prev_node_id"], nodes[0]["id"])
         self.assertIsNone(nodes[1]["next_node_id"])
         self.assertEqual(nodes[0]["desired_orientation"], "road_right")
-    def test_registry_exports_supabase_seed_sql_for_parts_and_nodes(self):
+
+    def test_street_parts_belong_to_streets_and_turns_start_new_streets(self):
+        segments = [
+            seg("seg_0", [[103.0, 1.0], [103.000045, 1.0]]),
+            seg("seg_1", [[103.000045, 1.0], [103.00009, 1.0]]),
+            seg("seg_2", [[103.00009, 1.0], [103.00009, 1.000045]]),
+            seg("seg_3", [[103.00009, 1.000045], [103.00009, 1.00009]]),
+        ]
+        parts = group_segments_into_street_parts(segments, target_length_m=10)
+        streets = build_streets(parts, turn_threshold_deg=45)
+
+        self.assertEqual(len(streets), 2)
+        self.assertEqual(parts[0]["street_id"], "street_0000")
+        self.assertEqual(parts[1]["street_id"], "street_0001")
+        self.assertEqual(streets[0]["street_part_ids"], [parts[0]["id"]])
+        self.assertEqual(streets[1]["street_part_ids"], [parts[1]["id"]])
+
+    def test_nodes_do_not_link_prev_next_across_different_streets(self):
+        parts = [
+            {"id": "street_part_0000", "street_id": "street_0000", "midpoint": [103.0, 1.0], "direction_bearing_deg": 90, "desired_orientation": "road_right"},
+            {"id": "street_part_0001", "street_id": "street_0001", "midpoint": [103.001, 1.0], "direction_bearing_deg": 0, "desired_orientation": "road_right"},
+        ]
+        nodes = build_street_view_nodes(parts)
+
+        self.assertIsNone(nodes[0]["next_node_id"])
+        self.assertIsNone(nodes[1]["prev_node_id"])
+        self.assertEqual(nodes[0]["street_id"], "street_0000")
+        self.assertEqual(nodes[1]["street_id"], "street_0001")
+
+    def test_registry_exports_supabase_seed_sql_for_streets_parts_and_nodes(self):
         segments = [
             seg("seg_0", [[103.0, 1.0], [103.000045, 1.0]]),
             seg("seg_1", [[103.000045, 1.0], [103.00009, 1.0]]),
         ]
         parts = group_segments_into_street_parts(segments, target_length_m=10)
+        streets = build_streets(parts)
         nodes = build_street_view_nodes(parts)
-        sql = registry_to_supabase_seed_sql({"street_parts": parts, "street_view_nodes": nodes})
+        sql = registry_to_supabase_seed_sql({"streets": streets, "street_parts": parts, "street_view_nodes": nodes})
 
+        self.assertIn("insert into public.streets", sql)
+        self.assertIn("street_0000", sql)
         self.assertIn("insert into public.street_parts", sql)
+        self.assertIn("street_id", sql)
         self.assertIn("street_part_0000", sql)
         self.assertIn("insert into public.street_view_nodes", sql)
         self.assertIn("street_view_node_0000", sql)

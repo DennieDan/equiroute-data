@@ -1,7 +1,607 @@
 {
-  "schema_version": 1,
-  "generated_at": "2026-07-20T21:46:44.890981+00:00",
-  "coverage_note": "Initial curated corridor graph. Photos are attached by Mapillary/crowd registry in the browser or Supabase layer.",
+  "schema_version": 2,
+  "generated_at": "2026-07-20T23:24:43.366634+00:00",
+  "coverage_note": "Initial curated corridor graph. Streets contain street parts; photos attach to street parts/nodes through Mapillary/crowd registry.",
+  "streets": [
+    {
+      "id": "street_0000",
+      "name": "Demo Street 1",
+      "source": "generated_bearing_runs",
+      "desired_orientation": "road_right",
+      "street_part_ids": [
+        "street_part_0000",
+        "street_part_0001",
+        "street_part_0002",
+        "street_part_0003",
+        "street_part_0004",
+        "street_part_0005",
+        "street_part_0006",
+        "street_part_0007",
+        "street_part_0008",
+        "street_part_0009",
+        "street_part_0010"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            103.76416254974349,
+            1.31546885692855
+          ],
+          [
+            103.76413060619561,
+            1.3154446174006678
+          ],
+          [
+            103.76409866264771,
+            1.3154203778727858
+          ],
+          [
+            103.76406671909983,
+            1.3153961383449035
+          ],
+          [
+            103.76403477555195,
+            1.3153718988170213
+          ],
+          [
+            103.76400283200407,
+            1.315347659289139
+          ],
+          [
+            103.76397088845617,
+            1.315323419761257
+          ],
+          [
+            103.76393894490829,
+            1.3152991802333749
+          ],
+          [
+            103.76391028794177,
+            1.315268783032389
+          ],
+          [
+            103.76388163097523,
+            1.3152383858314034
+          ],
+          [
+            103.76385297400871,
+            1.3152079886304175
+          ],
+          [
+            103.76382431704218,
+            1.315177591429432
+          ],
+          [
+            103.76379566007566,
+            1.315147194228446
+          ],
+          [
+            103.76377251434087,
+            1.3151144673584347
+          ],
+          [
+            103.76374936860608,
+            1.3150817404884234
+          ],
+          [
+            103.76373133512105,
+            1.315047595537681
+          ],
+          [
+            103.76371330163603,
+            1.3150134505869386
+          ],
+          [
+            103.763695268151,
+            1.3149793056361962
+          ],
+          [
+            103.76367723466598,
+            1.3149451606854539
+          ],
+          [
+            103.76365920118094,
+            1.3149110157347115
+          ],
+          [
+            103.76364865247689,
+            1.3148851239486232
+          ],
+          [
+            103.76363810377283,
+            1.3148592321625352
+          ],
+          [
+            103.76362565058608,
+            1.3148228097574188
+          ],
+          [
+            103.76361319739934,
+            1.3147863873523022
+          ],
+          [
+            103.76360074421258,
+            1.3147499649471859
+          ],
+          [
+            103.76360071995374,
+            1.3147498935017499
+          ],
+          [
+            103.76359960137366,
+            1.314745778614008
+          ],
+          [
+            103.76359094158735,
+            1.3147139293828105
+          ],
+          [
+            103.76358228180106,
+            1.314682080151613
+          ],
+          [
+            103.76358034568732,
+            1.3146726909898983
+          ],
+          [
+            103.76357968534222,
+            1.314669490427054
+          ],
+          [
+            103.76357206127676,
+            1.314632520715829
+          ],
+          [
+            103.76357122843345,
+            1.3146284808983129
+          ],
+          [
+            103.76357058696745,
+            1.3146249366776797
+          ],
+          [
+            103.76356624853678,
+            1.3146009767874594
+          ],
+          [
+            103.7635619101061,
+            1.3145770168972393
+          ],
+          [
+            103.76355744140594,
+            1.314552335773027
+          ],
+          [
+            103.76355297270575,
+            1.3145276546488147
+          ],
+          [
+            103.76355235744927,
+            1.3144862826905388
+          ],
+          [
+            103.7635517897273,
+            1.3144481016313045
+          ],
+          [
+            103.76355122200532,
+            1.31440992057207
+          ]
+        ]
+      },
+      "metrics": {
+        "street_part_count": 11
+      },
+      "midpoint": [
+        103.7637301662234,
+        1.3149275716184172
+      ],
+      "direction_bearing_deg": 209.99,
+      "length_m": 142.26
+    },
+    {
+      "id": "street_0001",
+      "name": "Demo Street 2",
+      "source": "generated_bearing_runs",
+      "desired_orientation": "road_right",
+      "street_part_ids": [
+        "street_part_0011"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            103.76355122200532,
+            1.31440992057207
+          ],
+          [
+            103.76355065428335,
+            1.3143717395128358
+          ],
+          [
+            103.76486043643399,
+            1.3151360775648835
+          ],
+          [
+            103.76486773886039,
+            1.3151392855457378
+          ],
+          [
+            103.76489702853632,
+            1.3151521531933348
+          ],
+          [
+            103.76492631821225,
+            1.3151650208409316
+          ]
+        ]
+      },
+      "metrics": {
+        "street_part_count": 1
+      },
+      "midpoint": [
+        103.76444223305528,
+        1.314895699538299
+      ],
+      "direction_bearing_deg": 61.22,
+      "length_m": 180.84
+    },
+    {
+      "id": "street_0002",
+      "name": "Demo Street 3",
+      "source": "generated_bearing_runs",
+      "desired_orientation": "road_right",
+      "street_part_ids": [
+        "street_part_0012",
+        "street_part_0013",
+        "street_part_0014",
+        "street_part_0015",
+        "street_part_0016",
+        "street_part_0017",
+        "street_part_0018",
+        "street_part_0019",
+        "street_part_0020",
+        "street_part_0021",
+        "street_part_0022"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            103.7655038433242,
+            1.313858165520325
+          ],
+          [
+            103.76552641098033,
+            1.313819592748331
+          ],
+          [
+            103.76554897863646,
+            1.3137810199763367
+          ],
+          [
+            103.7655692512251,
+            1.3137463702074432
+          ],
+          [
+            103.76558952381374,
+            1.3137117204385498
+          ],
+          [
+            103.76560979640239,
+            1.3136770706696563
+          ],
+          [
+            103.76563006899102,
+            1.3136424209007629
+          ],
+          [
+            103.76565034157966,
+            1.3136077711318694
+          ],
+          [
+            103.7656706141683,
+            1.313573121362976
+          ],
+          [
+            103.76569088675694,
+            1.3135384715940825
+          ],
+          [
+            103.76571436845839,
+            1.3135081496292256
+          ],
+          [
+            103.76573785015985,
+            1.3134778276643688
+          ],
+          [
+            103.7657613318613,
+            1.3134475056995119
+          ],
+          [
+            103.76578481356276,
+            1.313417183734655
+          ],
+          [
+            103.76580829526421,
+            1.3133868617697981
+          ],
+          [
+            103.76583488155838,
+            1.3133525310233019
+          ],
+          [
+            103.76586146785255,
+            1.3133182002768053
+          ],
+          [
+            103.76588525314095,
+            1.3132874865216742
+          ],
+          [
+            103.76590903842936,
+            1.313256772766543
+          ],
+          [
+            103.76593282371776,
+            1.3132260590114118
+          ],
+          [
+            103.76595660900618,
+            1.3131953452562806
+          ],
+          [
+            103.76598039429459,
+            1.3131646315011494
+          ],
+          [
+            103.76600417958299,
+            1.3131339177460182
+          ],
+          [
+            103.7660279648714,
+            1.313103203990887
+          ],
+          [
+            103.76605240543783,
+            1.313075065364017
+          ],
+          [
+            103.76607684600425,
+            1.313046926737147
+          ],
+          [
+            103.76610128657069,
+            1.313018788110277
+          ],
+          [
+            103.76612572713711,
+            1.312990649483407
+          ],
+          [
+            103.76615016770354,
+            1.312962510856537
+          ],
+          [
+            103.76617727094717,
+            1.3129340372337532
+          ],
+          [
+            103.76620437419079,
+            1.3129055636109697
+          ],
+          [
+            103.76619947376979,
+            1.312861936955076
+          ],
+          [
+            103.7661961634031,
+            1.3128324631878994
+          ],
+          [
+            103.76619285303639,
+            1.3128029894207225
+          ]
+        ]
+      },
+      "metrics": {
+        "street_part_count": 11
+      },
+      "midpoint": [
+        103.76587251634818,
+        1.313313598002993
+      ],
+      "direction_bearing_deg": 146.86,
+      "length_m": 143.33
+    },
+    {
+      "id": "street_0003",
+      "name": "Demo Street 4",
+      "source": "generated_bearing_runs",
+      "desired_orientation": "road_right",
+      "street_part_ids": [
+        "street_part_0023"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            103.76619285303639,
+            1.3128029894207225
+          ],
+          [
+            103.76618916267388,
+            1.3127701301563004
+          ],
+          [
+            103.76334856492231,
+            1.314314311228772
+          ],
+          [
+            103.76334848390907,
+            1.314287197488781
+          ],
+          [
+            103.76334836359392,
+            1.314247052120477
+          ]
+        ]
+      },
+      "metrics": {
+        "street_part_count": 1
+      },
+      "midpoint": [
+        103.76448548562709,
+        1.3136843360830106
+      ],
+      "direction_bearing_deg": 296.92,
+      "length_m": 370.6
+    },
+    {
+      "id": "street_0004",
+      "name": "Demo Street 5",
+      "source": "generated_bearing_runs",
+      "desired_orientation": "road_right",
+      "street_part_ids": [
+        "street_part_0024",
+        "street_part_0025",
+        "street_part_0026"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            103.76334836359392,
+            1.314247052120477
+          ],
+          [
+            103.76334824327877,
+            1.3142069067521729
+          ],
+          [
+            103.76334812296362,
+            1.3141667613838688
+          ],
+          [
+            103.76334800264848,
+            1.3141266160155645
+          ],
+          [
+            103.76334788233333,
+            1.3140864706472604
+          ],
+          [
+            103.76334776201818,
+            1.3140463252789563
+          ],
+          [
+            103.76334764170304,
+            1.3140061799106522
+          ],
+          [
+            103.76335156061258,
+            1.313961818252691
+          ],
+          [
+            103.76335249809463,
+            1.3139512118978436
+          ],
+          [
+            103.76335523114417,
+            1.3139202797107121
+          ],
+          [
+            103.7633579641937,
+            1.3138893475235809
+          ]
+        ]
+      },
+      "metrics": {
+        "street_part_count": 3
+      },
+      "midpoint": [
+        103.7633502975077,
+        1.314055360863071
+      ],
+      "direction_bearing_deg": 178.46,
+      "length_m": 39.83
+    },
+    {
+      "id": "street_0005",
+      "name": "Demo Street 6",
+      "source": "generated_bearing_runs",
+      "desired_orientation": "road_right",
+      "street_part_ids": [
+        "street_part_0027",
+        "street_part_0028",
+        "street_part_0029"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            103.7633579641937,
+            1.3138893475235809
+          ],
+          [
+            103.76336069724324,
+            1.3138584153364494
+          ],
+          [
+            103.76359515355266,
+            1.3151990791976906
+          ],
+          [
+            103.76359698472535,
+            1.3152016621128093
+          ],
+          [
+            103.7636181218318,
+            1.3152314795886761
+          ],
+          [
+            103.76363925893824,
+            1.315261297064543
+          ],
+          [
+            103.76366624394778,
+            1.3152914761483347
+          ],
+          [
+            103.76369322895732,
+            1.3153216552321267
+          ],
+          [
+            103.76372021396686,
+            1.3153518343159185
+          ],
+          [
+            103.76374950847074,
+            1.3153849110459932
+          ],
+          [
+            103.76377880297463,
+            1.3154179877760677
+          ],
+          [
+            103.7638080974785,
+            1.3154510645061424
+          ]
+        ]
+      },
+      "metrics": {
+        "street_part_count": 3
+      },
+      "midpoint": [
+        103.76363202302339,
+        1.3150716841540278
+      ],
+      "direction_bearing_deg": 16.07,
+      "length_m": 191.51
+    }
+  ],
   "street_parts": [
     {
       "id": "street_part_0000",
@@ -41,7 +641,8 @@
       "metrics": {
         "source_segment_count": 3,
         "overall_accessibility_score": 82
-      }
+      },
+      "street_id": "street_0000"
     },
     {
       "id": "street_part_0001",
@@ -81,7 +682,8 @@
       "metrics": {
         "source_segment_count": 3,
         "overall_accessibility_score": 83
-      }
+      },
+      "street_id": "street_0000"
     },
     {
       "id": "street_part_0002",
@@ -121,7 +723,8 @@
       "metrics": {
         "source_segment_count": 3,
         "overall_accessibility_score": 84
-      }
+      },
+      "street_id": "street_0000"
     },
     {
       "id": "street_part_0003",
@@ -161,7 +764,8 @@
       "metrics": {
         "source_segment_count": 3,
         "overall_accessibility_score": 85
-      }
+      },
+      "street_id": "street_0000"
     },
     {
       "id": "street_part_0004",
@@ -201,7 +805,8 @@
       "metrics": {
         "source_segment_count": 3,
         "overall_accessibility_score": 82
-      }
+      },
+      "street_id": "street_0000"
     },
     {
       "id": "street_part_0005",
@@ -241,7 +846,8 @@
       "metrics": {
         "source_segment_count": 3,
         "overall_accessibility_score": 86
-      }
+      },
+      "street_id": "street_0000"
     },
     {
       "id": "street_part_0006",
@@ -281,7 +887,8 @@
       "metrics": {
         "source_segment_count": 3,
         "overall_accessibility_score": 80
-      }
+      },
+      "street_id": "street_0000"
     },
     {
       "id": "street_part_0007",
@@ -321,7 +928,8 @@
       "metrics": {
         "source_segment_count": 3,
         "overall_accessibility_score": 79
-      }
+      },
+      "street_id": "street_0000"
     },
     {
       "id": "street_part_0008",
@@ -376,7 +984,8 @@
       "metrics": {
         "source_segment_count": 6,
         "overall_accessibility_score": 87
-      }
+      },
+      "street_id": "street_0000"
     },
     {
       "id": "street_part_0009",
@@ -431,7 +1040,8 @@
       "metrics": {
         "source_segment_count": 6,
         "overall_accessibility_score": 84
-      }
+      },
+      "street_id": "street_0000"
     },
     {
       "id": "street_part_0010",
@@ -471,7 +1081,8 @@
       "metrics": {
         "source_segment_count": 3,
         "overall_accessibility_score": 82
-      }
+      },
+      "street_id": "street_0000"
     },
     {
       "id": "street_part_0011",
@@ -520,7 +1131,8 @@
       "metrics": {
         "source_segment_count": 4,
         "overall_accessibility_score": 92
-      }
+      },
+      "street_id": "street_0001"
     },
     {
       "id": "street_part_0012",
@@ -560,7 +1172,8 @@
       "metrics": {
         "source_segment_count": 3,
         "overall_accessibility_score": 81
-      }
+      },
+      "street_id": "street_0002"
     },
     {
       "id": "street_part_0013",
@@ -600,7 +1213,8 @@
       "metrics": {
         "source_segment_count": 3,
         "overall_accessibility_score": 83
-      }
+      },
+      "street_id": "street_0002"
     },
     {
       "id": "street_part_0014",
@@ -640,7 +1254,8 @@
       "metrics": {
         "source_segment_count": 3,
         "overall_accessibility_score": 84
-      }
+      },
+      "street_id": "street_0002"
     },
     {
       "id": "street_part_0015",
@@ -680,7 +1295,8 @@
       "metrics": {
         "source_segment_count": 3,
         "overall_accessibility_score": 83
-      }
+      },
+      "street_id": "street_0002"
     },
     {
       "id": "street_part_0016",
@@ -720,7 +1336,8 @@
       "metrics": {
         "source_segment_count": 3,
         "overall_accessibility_score": 80
-      }
+      },
+      "street_id": "street_0002"
     },
     {
       "id": "street_part_0017",
@@ -760,7 +1377,8 @@
       "metrics": {
         "source_segment_count": 3,
         "overall_accessibility_score": 83
-      }
+      },
+      "street_id": "street_0002"
     },
     {
       "id": "street_part_0018",
@@ -800,7 +1418,8 @@
       "metrics": {
         "source_segment_count": 3,
         "overall_accessibility_score": 84
-      }
+      },
+      "street_id": "street_0002"
     },
     {
       "id": "street_part_0019",
@@ -840,7 +1459,8 @@
       "metrics": {
         "source_segment_count": 3,
         "overall_accessibility_score": 82
-      }
+      },
+      "street_id": "street_0002"
     },
     {
       "id": "street_part_0020",
@@ -880,7 +1500,8 @@
       "metrics": {
         "source_segment_count": 3,
         "overall_accessibility_score": 89
-      }
+      },
+      "street_id": "street_0002"
     },
     {
       "id": "street_part_0021",
@@ -920,7 +1541,8 @@
       "metrics": {
         "source_segment_count": 3,
         "overall_accessibility_score": 85
-      }
+      },
+      "street_id": "street_0002"
     },
     {
       "id": "street_part_0022",
@@ -960,7 +1582,8 @@
       "metrics": {
         "source_segment_count": 3,
         "overall_accessibility_score": 87
-      }
+      },
+      "street_id": "street_0002"
     },
     {
       "id": "street_part_0023",
@@ -1004,7 +1627,8 @@
       "metrics": {
         "source_segment_count": 3,
         "overall_accessibility_score": 82
-      }
+      },
+      "street_id": "street_0003"
     },
     {
       "id": "street_part_0024",
@@ -1044,7 +1668,8 @@
       "metrics": {
         "source_segment_count": 3,
         "overall_accessibility_score": 88
-      }
+      },
+      "street_id": "street_0004"
     },
     {
       "id": "street_part_0025",
@@ -1084,7 +1709,8 @@
       "metrics": {
         "source_segment_count": 3,
         "overall_accessibility_score": 85
-      }
+      },
+      "street_id": "street_0004"
     },
     {
       "id": "street_part_0026",
@@ -1129,7 +1755,8 @@
       "metrics": {
         "source_segment_count": 4,
         "overall_accessibility_score": 84
-      }
+      },
+      "street_id": "street_0004"
     },
     {
       "id": "street_part_0027",
@@ -1178,7 +1805,8 @@
       "metrics": {
         "source_segment_count": 4,
         "overall_accessibility_score": 83
-      }
+      },
+      "street_id": "street_0005"
     },
     {
       "id": "street_part_0028",
@@ -1218,7 +1846,8 @@
       "metrics": {
         "source_segment_count": 3,
         "overall_accessibility_score": 83
-      }
+      },
+      "street_id": "street_0005"
     },
     {
       "id": "street_part_0029",
@@ -1258,7 +1887,8 @@
       "metrics": {
         "source_segment_count": 3,
         "overall_accessibility_score": 82
-      }
+      },
+      "street_id": "street_0005"
     }
   ],
   "street_photos": [],
@@ -1266,6 +1896,7 @@
     {
       "id": "street_view_node_0000",
       "street_part_id": "street_part_0000",
+      "street_id": "street_0000",
       "active_photo_id": null,
       "sequence_id": null,
       "sequence_index": 0,
@@ -1282,6 +1913,7 @@
     {
       "id": "street_view_node_0001",
       "street_part_id": "street_part_0001",
+      "street_id": "street_0000",
       "active_photo_id": null,
       "sequence_id": null,
       "sequence_index": 1,
@@ -1298,6 +1930,7 @@
     {
       "id": "street_view_node_0002",
       "street_part_id": "street_part_0002",
+      "street_id": "street_0000",
       "active_photo_id": null,
       "sequence_id": null,
       "sequence_index": 2,
@@ -1314,6 +1947,7 @@
     {
       "id": "street_view_node_0003",
       "street_part_id": "street_part_0003",
+      "street_id": "street_0000",
       "active_photo_id": null,
       "sequence_id": null,
       "sequence_index": 3,
@@ -1330,6 +1964,7 @@
     {
       "id": "street_view_node_0004",
       "street_part_id": "street_part_0004",
+      "street_id": "street_0000",
       "active_photo_id": null,
       "sequence_id": null,
       "sequence_index": 4,
@@ -1346,6 +1981,7 @@
     {
       "id": "street_view_node_0005",
       "street_part_id": "street_part_0005",
+      "street_id": "street_0000",
       "active_photo_id": null,
       "sequence_id": null,
       "sequence_index": 5,
@@ -1362,6 +1998,7 @@
     {
       "id": "street_view_node_0006",
       "street_part_id": "street_part_0006",
+      "street_id": "street_0000",
       "active_photo_id": null,
       "sequence_id": null,
       "sequence_index": 6,
@@ -1378,6 +2015,7 @@
     {
       "id": "street_view_node_0007",
       "street_part_id": "street_part_0007",
+      "street_id": "street_0000",
       "active_photo_id": null,
       "sequence_id": null,
       "sequence_index": 7,
@@ -1394,6 +2032,7 @@
     {
       "id": "street_view_node_0008",
       "street_part_id": "street_part_0008",
+      "street_id": "street_0000",
       "active_photo_id": null,
       "sequence_id": null,
       "sequence_index": 8,
@@ -1410,6 +2049,7 @@
     {
       "id": "street_view_node_0009",
       "street_part_id": "street_part_0009",
+      "street_id": "street_0000",
       "active_photo_id": null,
       "sequence_id": null,
       "sequence_index": 9,
@@ -1426,6 +2066,7 @@
     {
       "id": "street_view_node_0010",
       "street_part_id": "street_part_0010",
+      "street_id": "street_0000",
       "active_photo_id": null,
       "sequence_id": null,
       "sequence_index": 10,
@@ -1434,7 +2075,7 @@
       "canonical_heading_deg": 180.85,
       "desired_orientation": "road_right",
       "prev_node_id": "street_view_node_0009",
-      "next_node_id": "street_view_node_0011",
+      "next_node_id": null,
       "left_node_id": null,
       "right_node_id": null,
       "coverage_status": "missing"
@@ -1442,6 +2083,7 @@
     {
       "id": "street_view_node_0011",
       "street_part_id": "street_part_0011",
+      "street_id": "street_0001",
       "active_photo_id": null,
       "sequence_id": null,
       "sequence_index": 11,
@@ -1449,8 +2091,8 @@
       "lat": 1.314895699538299,
       "canonical_heading_deg": 61.22,
       "desired_orientation": "road_right",
-      "prev_node_id": "street_view_node_0010",
-      "next_node_id": "street_view_node_0012",
+      "prev_node_id": null,
+      "next_node_id": null,
       "left_node_id": null,
       "right_node_id": null,
       "coverage_status": "missing"
@@ -1458,6 +2100,7 @@
     {
       "id": "street_view_node_0012",
       "street_part_id": "street_part_0012",
+      "street_id": "street_0002",
       "active_photo_id": null,
       "sequence_id": null,
       "sequence_index": 12,
@@ -1465,7 +2108,7 @@
       "lat": 1.313801287113109,
       "canonical_heading_deg": 149.68,
       "desired_orientation": "road_right",
-      "prev_node_id": "street_view_node_0011",
+      "prev_node_id": null,
       "next_node_id": "street_view_node_0013",
       "left_node_id": null,
       "right_node_id": null,
@@ -1474,6 +2117,7 @@
     {
       "id": "street_view_node_0013",
       "street_part_id": "street_part_0013",
+      "street_id": "street_0002",
       "active_photo_id": null,
       "sequence_id": null,
       "sequence_index": 13,
@@ -1490,6 +2134,7 @@
     {
       "id": "street_view_node_0014",
       "street_part_id": "street_part_0014",
+      "street_id": "street_0002",
       "active_photo_id": null,
       "sequence_id": null,
       "sequence_index": 14,
@@ -1506,6 +2151,7 @@
     {
       "id": "street_view_node_0015",
       "street_part_id": "street_part_0015",
+      "street_id": "street_0002",
       "active_photo_id": null,
       "sequence_id": null,
       "sequence_index": 15,
@@ -1522,6 +2168,7 @@
     {
       "id": "street_view_node_0016",
       "street_part_id": "street_part_0016",
+      "street_id": "street_0002",
       "active_photo_id": null,
       "sequence_id": null,
       "sequence_index": 16,
@@ -1538,6 +2185,7 @@
     {
       "id": "street_view_node_0017",
       "street_part_id": "street_part_0017",
+      "street_id": "street_0002",
       "active_photo_id": null,
       "sequence_id": null,
       "sequence_index": 17,
@@ -1554,6 +2202,7 @@
     {
       "id": "street_view_node_0018",
       "street_part_id": "street_part_0018",
+      "street_id": "street_0002",
       "active_photo_id": null,
       "sequence_id": null,
       "sequence_index": 18,
@@ -1570,6 +2219,7 @@
     {
       "id": "street_view_node_0019",
       "street_part_id": "street_part_0019",
+      "street_id": "street_0002",
       "active_photo_id": null,
       "sequence_id": null,
       "sequence_index": 19,
@@ -1586,6 +2236,7 @@
     {
       "id": "street_view_node_0020",
       "street_part_id": "street_part_0020",
+      "street_id": "street_0002",
       "active_photo_id": null,
       "sequence_id": null,
       "sequence_index": 20,
@@ -1602,6 +2253,7 @@
     {
       "id": "street_view_node_0021",
       "street_part_id": "street_part_0021",
+      "street_id": "street_0002",
       "active_photo_id": null,
       "sequence_id": null,
       "sequence_index": 21,
@@ -1618,6 +2270,7 @@
     {
       "id": "street_view_node_0022",
       "street_part_id": "street_part_0022",
+      "street_id": "street_0002",
       "active_photo_id": null,
       "sequence_id": null,
       "sequence_index": 22,
@@ -1626,7 +2279,7 @@
       "canonical_heading_deg": 186.41,
       "desired_orientation": "road_right",
       "prev_node_id": "street_view_node_0021",
-      "next_node_id": "street_view_node_0023",
+      "next_node_id": null,
       "left_node_id": null,
       "right_node_id": null,
       "coverage_status": "missing"
@@ -1634,6 +2287,7 @@
     {
       "id": "street_view_node_0023",
       "street_part_id": "street_part_0023",
+      "street_id": "street_0003",
       "active_photo_id": null,
       "sequence_id": null,
       "sequence_index": 23,
@@ -1641,8 +2295,8 @@
       "lat": 1.3136843360830106,
       "canonical_heading_deg": 296.92,
       "desired_orientation": "road_right",
-      "prev_node_id": "street_view_node_0022",
-      "next_node_id": "street_view_node_0024",
+      "prev_node_id": null,
+      "next_node_id": null,
       "left_node_id": null,
       "right_node_id": null,
       "coverage_status": "missing"
@@ -1650,6 +2304,7 @@
     {
       "id": "street_view_node_0024",
       "street_part_id": "street_part_0024",
+      "street_id": "street_0004",
       "active_photo_id": null,
       "sequence_id": null,
       "sequence_index": 24,
@@ -1657,7 +2312,7 @@
       "lat": 1.314186834068021,
       "canonical_heading_deg": 180.17,
       "desired_orientation": "road_right",
-      "prev_node_id": "street_view_node_0023",
+      "prev_node_id": null,
       "next_node_id": "street_view_node_0025",
       "left_node_id": null,
       "right_node_id": null,
@@ -1666,6 +2321,7 @@
     {
       "id": "street_view_node_0025",
       "street_part_id": "street_part_0025",
+      "street_id": "street_0004",
       "active_photo_id": null,
       "sequence_id": null,
       "sequence_index": 25,
@@ -1682,6 +2338,7 @@
     {
       "id": "street_view_node_0026",
       "street_part_id": "street_part_0026",
+      "street_id": "street_0004",
       "active_photo_id": null,
       "sequence_id": null,
       "sequence_index": 26,
@@ -1690,7 +2347,7 @@
       "canonical_heading_deg": 174.95,
       "desired_orientation": "road_right",
       "prev_node_id": "street_view_node_0025",
-      "next_node_id": "street_view_node_0027",
+      "next_node_id": null,
       "left_node_id": null,
       "right_node_id": null,
       "coverage_status": "missing"
@@ -1698,6 +2355,7 @@
     {
       "id": "street_view_node_0027",
       "street_part_id": "street_part_0027",
+      "street_id": "street_0005",
       "active_photo_id": null,
       "sequence_id": null,
       "sequence_index": 27,
@@ -1705,7 +2363,7 @@
       "lat": 1.3147735468039583,
       "canonical_heading_deg": 11.58,
       "desired_orientation": "road_right",
-      "prev_node_id": "street_view_node_0026",
+      "prev_node_id": null,
       "next_node_id": "street_view_node_0028",
       "left_node_id": null,
       "right_node_id": null,
@@ -1714,6 +2372,7 @@
     {
       "id": "street_view_node_0028",
       "street_part_id": "street_part_0028",
+      "street_id": "street_0005",
       "active_photo_id": null,
       "sequence_id": null,
       "sequence_index": 28,
@@ -1730,6 +2389,7 @@
     {
       "id": "street_view_node_0029",
       "street_part_id": "street_part_0029",
+      "street_id": "street_0005",
       "active_photo_id": null,
       "sequence_id": null,
       "sequence_index": 29,

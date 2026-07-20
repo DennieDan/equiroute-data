@@ -3,9 +3,25 @@
 
 create extension if not exists pgcrypto;
 
+create table if not exists public.streets (
+  id uuid primary key default gen_random_uuid(),
+  external_id text unique not null,
+  name text not null,
+  geometry jsonb not null,
+  midpoint_lng double precision not null,
+  midpoint_lat double precision not null,
+  direction_bearing_deg double precision not null,
+  desired_orientation text not null default 'road_right',
+  length_m double precision not null,
+  metrics jsonb not null default '{}',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 create table if not exists public.street_parts (
   id uuid primary key default gen_random_uuid(),
   external_id text unique not null,
+  street_id uuid null references public.streets(id) on delete cascade,
   route_segment_ids text[] not null default '{}',
   geometry jsonb not null,
   midpoint_lng double precision not null,
@@ -18,6 +34,9 @@ create table if not exists public.street_parts (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.street_parts
+  add column if not exists street_id uuid null references public.streets(id) on delete cascade;
 
 create table if not exists public.street_photos (
   id uuid primary key default gen_random_uuid(),
@@ -53,6 +72,7 @@ create table if not exists public.street_view_nodes (
   id uuid primary key default gen_random_uuid(),
   external_id text unique not null,
   street_part_id uuid not null references public.street_parts(id) on delete cascade,
+  street_id uuid null references public.streets(id) on delete cascade,
   active_photo_id uuid null references public.street_photos(id),
   sequence_id text null,
   sequence_index integer null,
@@ -68,6 +88,9 @@ create table if not exists public.street_view_nodes (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.street_view_nodes
+  add column if not exists street_id uuid null references public.streets(id) on delete cascade;
 
 create table if not exists public.accessibility_features (
   id uuid primary key default gen_random_uuid(),
@@ -153,7 +176,10 @@ create table if not exists public.authority_recommendations (
   created_at timestamptz not null default now()
 );
 
+create index if not exists streets_midpoint_idx on public.streets (midpoint_lng, midpoint_lat);
+create index if not exists street_parts_street_idx on public.street_parts (street_id);
 create index if not exists street_parts_midpoint_idx on public.street_parts (midpoint_lng, midpoint_lat);
 create index if not exists street_photos_part_active_idx on public.street_photos (street_part_id, is_active);
+create index if not exists street_nodes_street_idx on public.street_view_nodes (street_id);
 create index if not exists street_nodes_part_idx on public.street_view_nodes (street_part_id);
 create index if not exists feedback_threads_part_idx on public.feedback_threads (street_part_id, status);

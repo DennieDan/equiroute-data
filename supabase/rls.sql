@@ -1,6 +1,7 @@
 -- AccessTwin Supabase RLS starter policies.
 -- Tighten roles once real authority accounts are created.
 
+alter table public.streets enable row level security;
 alter table public.street_parts enable row level security;
 alter table public.street_photos enable row level security;
 alter table public.street_view_nodes enable row level security;
@@ -13,6 +14,9 @@ alter table public.persona_journey_runs enable row level security;
 alter table public.authority_recommendations enable row level security;
 
 -- Public read for map/demo data.
+drop policy if exists "public read streets" on public.streets;
+create policy "public read streets" on public.streets for select using (true);
+
 drop policy if exists "public read street parts" on public.street_parts;
 create policy "public read street parts" on public.street_parts for select using (true);
 
