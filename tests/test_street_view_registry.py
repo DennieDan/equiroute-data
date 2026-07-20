@@ -3,6 +3,7 @@ import unittest
 
 from scripts.street_view_registry import (
     angle_diff,
+    attach_active_photos,
     build_street_view_nodes,
     build_streets,
     choose_best_photo,
@@ -120,15 +121,49 @@ class StreetViewRegistryTest(unittest.TestCase):
         self.assertEqual(nodes[0]["street_id"], "street_0000")
         self.assertEqual(nodes[1]["street_id"], "street_0001")
 
-    def test_registry_exports_supabase_seed_sql_for_streets_parts_and_nodes(self):
+    def test_active_photo_registry_attaches_photo_to_part_and_node(self):
+        segments = [
+            seg("seg_0", [[103.0, 1.0], [103.000045, 1.0]]),
+            seg("seg_1", [[103.000045, 1.0], [103.00009, 1.0]]),
+        ]
+        parts = group_segments_into_street_parts(segments, target_length_m=10)
+        build_streets(parts)
+        photos = attach_active_photos(
+            parts,
+            {
+                "street_part_0000": [
+                    {
+                        "id": "mly-good",
+                        "computed_compass_angle": parts[0]["direction_bearing_deg"],
+                        "computed_geometry": {"coordinates": parts[0]["midpoint"]},
+                        "captured_at": "2026-07-01T00:00:00Z",
+                        "thumb_2048_url": "https://example.com/mly-good.jpg",
+                        "is_pano": True,
+                    }
+                ]
+            },
+        )
+        nodes = build_street_view_nodes(parts, {p["street_part_id"]: p for p in photos})
+
+        self.assertEqual(len(photos), 1)
+        self.assertEqual(photos[0]["street_part_id"], "street_part_0000")
+        self.assertTrue(photos[0]["is_active"])
+        self.assertEqual(nodes[0]["active_photo_id"], photos[0]["id"])
+        self.assertEqual(nodes[0]["coverage_status"], "active")
+
+    def test_registry_exports_supabase_seed_sql_for_streets_parts_nodes_and_photos(self):
         segments = [
             seg("seg_0", [[103.0, 1.0], [103.000045, 1.0]]),
             seg("seg_1", [[103.000045, 1.0], [103.00009, 1.0]]),
         ]
         parts = group_segments_into_street_parts(segments, target_length_m=10)
         streets = build_streets(parts)
-        nodes = build_street_view_nodes(parts)
-        sql = registry_to_supabase_seed_sql({"streets": streets, "street_parts": parts, "street_view_nodes": nodes})
+        photos = attach_active_photos(
+            parts,
+            {"street_part_0000": [{"id": "mly-seed", "computed_compass_angle": parts[0]["direction_bearing_deg"], "computed_geometry": {"coordinates": parts[0]["midpoint"]}, "captured_at": "2026-07-01T00:00:00Z", "thumb_2048_url": "https://example.com/seed.jpg"}]},
+        )
+        nodes = build_street_view_nodes(parts, {p["street_part_id"]: p for p in photos})
+        sql = registry_to_supabase_seed_sql({"streets": streets, "street_parts": parts, "street_photos": photos, "street_view_nodes": nodes})
 
         self.assertIn("insert into public.streets", sql)
         self.assertIn("street_0000", sql)
@@ -137,6 +172,9 @@ class StreetViewRegistryTest(unittest.TestCase):
         self.assertIn("street_part_0000", sql)
         self.assertIn("insert into public.street_view_nodes", sql)
         self.assertIn("street_view_node_0000", sql)
+        self.assertIn("insert into public.street_photos", sql)
+        self.assertIn("photo_mapillary_mly-seed", sql)
+        self.assertIn("active_photo_id =", sql)
         self.assertIn("on conflict (external_id) do update", sql)
 
 

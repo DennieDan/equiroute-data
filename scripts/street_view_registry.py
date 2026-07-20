@@ -247,6 +247,48 @@ def choose_best_photo(
     }
 
 
+def photo_external_id(photo: dict[str, Any]) -> str:
+    if photo.get("external_id"):
+        return str(photo["external_id"])
+    source = photo.get("source", "photo")
+    raw = photo.get("source_image_id") or photo.get("id") or "unknown"
+    safe = "".join(ch if ch.isalnum() or ch in "_-" else "_" for ch in str(raw))
+    return f"photo_{source}_{safe}"
+
+
+def attach_active_photos(
+    street_parts: list[dict[str, Any]],
+    candidates_by_part: dict[str, list[dict[str, Any]]],
+    max_heading_delta: float = 35,
+) -> list[dict[str, Any]]:
+    """Choose one active photo per street part from Mapillary/crowd candidates.
+
+    Comments and feedback stay attached to street_part_id; photos can be replaced
+    over time while preserving discussion history.
+    """
+    photos: list[dict[str, Any]] = []
+    for part in street_parts:
+        candidates = candidates_by_part.get(part["id"], [])
+        chosen = choose_best_photo(
+            candidates,
+            midpoint=part["midpoint"],
+            desired_heading_deg=part["direction_bearing_deg"],
+            max_heading_delta=max_heading_delta,
+        )
+        if not chosen:
+            continue
+        chosen["external_id"] = photo_external_id(chosen)
+        chosen["id"] = chosen["external_id"]
+        chosen["street_part_id"] = part["id"]
+        chosen["street_id"] = part.get("street_id")
+        chosen["is_active"] = True
+        chosen["validation_status"] = "direction_valid" if chosen.get("direction_valid") else "needs_review"
+        chosen["selected_reason"] = "best_direction_distance_recency_candidate"
+        chosen["replaces_photo_id"] = None
+        photos.append(chosen)
+    return photos
+
+
 def build_street_view_nodes(street_parts: list[dict[str, Any]], photos_by_part: dict[str, dict[str, Any]] | None = None) -> list[dict[str, Any]]:
     photos_by_part = photos_by_part or {}
     nodes: list[dict[str, Any]] = []
@@ -318,6 +360,24 @@ def registry_to_supabase_seed_sql(registry: dict[str, Any]) -> str:
             "midpoint_lat=excluded.midpoint_lat, direction_bearing_deg=excluded.direction_bearing_deg, "
             "desired_orientation=excluded.desired_orientation, length_m=excluded.length_m, metrics=excluded.metrics, updated_at=now();"
         )
+    for photo in registry.get("street_photos", []):
+        lines.append(
+            "insert into public.street_photos "
+            "(external_id, street_part_id, source, source_image_id, image_url, captured_at, lng, lat, compass_angle_deg, "
+            "direction_valid, direction_confidence, is_pano, is_active, validation_status, selected_reason, metadata) values ("
+            f"{sql_literal(photo['external_id'])}, (select id from public.street_parts where external_id={sql_literal(photo['street_part_id'])}), "
+            f"{sql_literal(photo.get('source', 'mapillary'))}, {sql_literal(photo.get('source_image_id'))}, {sql_literal(photo.get('image_url'))}, "
+            f"{sql_literal(photo.get('captured_at'))}, {photo.get('lng')}, {photo.get('lat')}, {photo.get('compass_angle_deg')}, "
+            f"{str(bool(photo.get('direction_valid'))).lower()}, {photo.get('direction_confidence') if photo.get('direction_confidence') is not None else 'null'}, "
+            f"{str(bool(photo.get('is_pano'))).lower()}, {str(bool(photo.get('is_active'))).lower()}, "
+            f"{sql_literal(photo.get('validation_status', 'needs_review'))}, {sql_literal(photo.get('selected_reason'))}, {jsonb_literal(photo.get('metadata', {}))}) "
+            "on conflict (external_id) do update set "
+            "street_part_id=excluded.street_part_id, source=excluded.source, source_image_id=excluded.source_image_id, image_url=excluded.image_url, "
+            "captured_at=excluded.captured_at, lng=excluded.lng, lat=excluded.lat, compass_angle_deg=excluded.compass_angle_deg, "
+            "direction_valid=excluded.direction_valid, direction_confidence=excluded.direction_confidence, is_pano=excluded.is_pano, "
+            "is_active=excluded.is_active, validation_status=excluded.validation_status, selected_reason=excluded.selected_reason, "
+            "metadata=excluded.metadata;"
+        )
     for node in registry.get("street_view_nodes", []):
         lines.append(
             "insert into public.street_view_nodes "
@@ -336,22 +396,44 @@ def registry_to_supabase_seed_sql(registry: dict[str, Any]) -> str:
             "next_node_external_id=excluded.next_node_external_id, left_node_external_id=excluded.left_node_external_id, "
             "right_node_external_id=excluded.right_node_external_id, coverage_status=excluded.coverage_status, updated_at=now();"
         )
+    for photo in registry.get("street_photos", []):
+        lines.append(
+            "update public.street_photos set street_view_node_id = "
+            f"(select id from public.street_view_nodes where street_part_id=(select id from public.street_parts where external_id={sql_literal(photo['street_part_id'])}) limit 1) "
+            f"where external_id={sql_literal(photo['external_id'])};"
+        )
+        lines.append(
+            "update public.street_parts set active_photo_id = "
+            f"(select id from public.street_photos where external_id={sql_literal(photo['external_id'])}) "
+            f"where external_id={sql_literal(photo['street_part_id'])} and {str(bool(photo.get('is_active'))).lower()};"
+        )
+        lines.append(
+            "update public.street_view_nodes set active_photo_id = "
+            f"(select id from public.street_photos where external_id={sql_literal(photo['external_id'])}), coverage_status='active' "
+            f"where street_part_id=(select id from public.street_parts where external_id={sql_literal(photo['street_part_id'])}) and {str(bool(photo.get('is_active'))).lower()};"
+        )
     lines.append("commit;")
     return "\n".join(lines) + "\n"
 
 
-def build_registry(world: dict[str, Any], target_length_m: float = 10.0, max_parts: int | None = 30) -> dict[str, Any]:
+def build_registry(
+    world: dict[str, Any],
+    target_length_m: float = 10.0,
+    max_parts: int | None = 30,
+    photo_candidates_by_part: dict[str, list[dict[str, Any]]] | None = None,
+) -> dict[str, Any]:
     features = world.get("features", [])
     street_parts = group_segments_into_street_parts(features, target_length_m=target_length_m, max_parts=max_parts)
     streets = build_streets(street_parts)
-    nodes = build_street_view_nodes(street_parts)
+    street_photos = attach_active_photos(street_parts, photo_candidates_by_part or {})
+    nodes = build_street_view_nodes(street_parts, {p["street_part_id"]: p for p in street_photos})
     return {
         "schema_version": 2,
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "coverage_note": "Initial curated corridor graph. Streets contain street parts; photos attach to street parts/nodes through Mapillary/crowd registry.",
         "streets": streets,
         "street_parts": street_parts,
-        "street_photos": [],
+        "street_photos": street_photos,
         "street_view_nodes": nodes,
     }
 
@@ -362,11 +444,18 @@ def main() -> None:
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
     parser.add_argument("--target-length-m", type=float, default=10.0)
     parser.add_argument("--max-parts", type=int, default=30)
+    parser.add_argument("--photo-candidates", type=Path, default=None, help="Optional JSON mapping street_part_id -> Mapillary/crowd candidate photos")
     parser.add_argument("--seed-sql", type=Path, default=None, help="Optional Supabase seed SQL output path")
     args = parser.parse_args()
 
     world = json.loads(args.world.read_text())
-    registry = build_registry(world, target_length_m=args.target_length_m, max_parts=args.max_parts)
+    photo_candidates = json.loads(args.photo_candidates.read_text()) if args.photo_candidates else None
+    registry = build_registry(
+        world,
+        target_length_m=args.target_length_m,
+        max_parts=args.max_parts,
+        photo_candidates_by_part=photo_candidates,
+    )
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(registry, indent=2))
     if args.seed_sql:

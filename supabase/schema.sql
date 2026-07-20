@@ -40,7 +40,9 @@ alter table public.street_parts
 
 create table if not exists public.street_photos (
   id uuid primary key default gen_random_uuid(),
+  external_id text unique null,
   street_part_id uuid not null references public.street_parts(id) on delete cascade,
+  street_view_node_id uuid null,
   source text not null check (source in ('mapillary','crowd')),
   source_image_id text null,
   image_url text null,
@@ -57,9 +59,19 @@ create table if not exists public.street_photos (
   quality_score double precision null,
   is_pano boolean not null default false,
   is_active boolean not null default false,
+  validation_status text not null default 'needs_review',
+  selected_reason text null,
   superseded_by uuid null references public.street_photos(id),
+  replaces_photo_id uuid null references public.street_photos(id),
   metadata jsonb not null default '{}'
 );
+
+alter table public.street_photos
+  add column if not exists external_id text unique,
+  add column if not exists street_view_node_id uuid null,
+  add column if not exists validation_status text not null default 'needs_review',
+  add column if not exists selected_reason text null,
+  add column if not exists replaces_photo_id uuid null references public.street_photos(id);
 
 alter table public.street_parts
   drop constraint if exists street_parts_active_photo_id_fkey;
@@ -91,6 +103,13 @@ create table if not exists public.street_view_nodes (
 
 alter table public.street_view_nodes
   add column if not exists street_id uuid null references public.streets(id) on delete cascade;
+
+alter table public.street_photos
+  drop constraint if exists street_photos_street_view_node_id_fkey;
+
+alter table public.street_photos
+  add constraint street_photos_street_view_node_id_fkey
+  foreign key (street_view_node_id) references public.street_view_nodes(id) on delete set null;
 
 create table if not exists public.accessibility_features (
   id uuid primary key default gen_random_uuid(),

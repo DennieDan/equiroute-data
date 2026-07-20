@@ -67,7 +67,7 @@ The street-view navigation now uses a lightweight Google-Street-View-style node 
 python3 scripts/street_view_registry.py --max-parts 30 --target-length-m 10
 ```
 
-This writes `data/street_view_registry.json`, grouping the existing 5 m path metrics into 8–10 m street-view nodes with stable previous/next links, canonical headings, and road-on-right orientation metadata. The registry now has a hierarchy: **many streets → many street parts per street → one street-view node per street part**. Supabase schema/RLS/seed files live in `supabase/`; the frontend reads the Supabase street registry first and falls back to local JSON if the backend is unavailable.
+This writes `data/street_view_registry.json`, grouping the existing 5 m path metrics into 8–10 m street-view nodes with stable previous/next links, canonical headings, and road-on-right orientation metadata. The registry now has a hierarchy: **many streets → many street parts per street → one street-view node per street part**. Supabase schema/RLS/seed files live in `supabase/`; the frontend reads the Supabase street registry first and falls back to local JSON if the backend is unavailable. The active-photo layer is ready: each street part can own one active `street_photo`, keep photo history, and preserve comments/upvotes on the street part when newer photos replace older photos.
 
 7. **View the 3D MVP** — from the project root, start a local server:
 

@@ -15,6 +15,8 @@ Track every judge-visible claim with evidence before pitch polish.
 | Street hierarchy supports many streets, each with many street parts | `scripts/street_view_registry.py`, `supabase/schema.sql`, `data/street_view_registry.json` | `python3 -m unittest tests.test_street_view_registry -v`; REST smoke showed `streets 0-5/6`, `street_parts 0-29/30`, `street_view_nodes 0-29/30` | 6 streets, 30 parts, 30 nodes | "AccessTwin models the city as streets made of granular street parts, not one flat route." | built |
 | Frontend reads registry from Supabase with local fallback | `earth_accessibility.html` | Headless Chrome smoke on local server showed `Loaded 576 5 m segments, 6 streets, 30 street-view nodes from Supabase` | Supabase source active | "The demo is now backed by the live Supabase street registry while still demo-safe offline." | built |
 
+| Active photo registry schema/read path exists | `supabase/schema.sql`, `scripts/street_view_registry.py`, `earth_accessibility.html` | `python3 -m unittest tests.test_street_view_registry -v`; REST query `street_photos?select=external_id,street_view_node_id,validation_status,selected_reason,replaces_photo_id&limit=0` returned HTTP 200 | 8 tests pass, active photo columns readable | "Each street part can now own one active photo while preserving history/comments when photos are replaced." | built |
+
 ## Next proof targets
 
 - Direction-consistent Mapillary/crowd photo corridor: 15–30 active photos, road-on-right.

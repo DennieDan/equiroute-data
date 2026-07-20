@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-07-20T23:24:43.366634+00:00",
+  "generated_at": "2026-07-20T23:54:44.070131+00:00",
   "coverage_note": "Initial curated corridor graph. Streets contain street parts; photos attach to street parts/nodes through Mapillary/crowd registry.",
   "streets": [
     {
