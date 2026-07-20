@@ -6,6 +6,7 @@ from scripts.street_view_registry import (
     build_street_view_nodes,
     choose_best_photo,
     group_segments_into_street_parts,
+    registry_to_supabase_seed_sql,
 )
 
 
@@ -89,6 +90,20 @@ class StreetViewRegistryTest(unittest.TestCase):
         self.assertEqual(nodes[1]["prev_node_id"], nodes[0]["id"])
         self.assertIsNone(nodes[1]["next_node_id"])
         self.assertEqual(nodes[0]["desired_orientation"], "road_right")
+    def test_registry_exports_supabase_seed_sql_for_parts_and_nodes(self):
+        segments = [
+            seg("seg_0", [[103.0, 1.0], [103.000045, 1.0]]),
+            seg("seg_1", [[103.000045, 1.0], [103.00009, 1.0]]),
+        ]
+        parts = group_segments_into_street_parts(segments, target_length_m=10)
+        nodes = build_street_view_nodes(parts)
+        sql = registry_to_supabase_seed_sql({"street_parts": parts, "street_view_nodes": nodes})
+
+        self.assertIn("insert into public.street_parts", sql)
+        self.assertIn("street_part_0000", sql)
+        self.assertIn("insert into public.street_view_nodes", sql)
+        self.assertIn("street_view_node_0000", sql)
+        self.assertIn("on conflict (external_id) do update", sql)
 
 
 if __name__ == "__main__":

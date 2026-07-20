@@ -225,6 +225,57 @@ def build_street_view_nodes(street_parts: list[dict[str, Any]], photos_by_part: 
     return nodes
 
 
+def sql_literal(value: Any) -> str:
+    if value is None:
+        return "null"
+    return "'" + str(value).replace("'", "''") + "'"
+
+
+def jsonb_literal(value: Any) -> str:
+    return sql_literal(json.dumps(value, separators=(",", ":"))) + "::jsonb"
+
+
+def registry_to_supabase_seed_sql(registry: dict[str, Any]) -> str:
+    """Export a street-view registry as idempotent Supabase seed SQL."""
+    lines = [
+        "-- Generated AccessTwin demo-corridor seed data.",
+        "begin;",
+    ]
+    for part in registry.get("street_parts", []):
+        mid = part["midpoint"]
+        route_ids = ",".join(sql_literal(x) for x in part.get("route_segment_ids", []))
+        lines.append(
+            "insert into public.street_parts "
+            "(external_id, route_segment_ids, geometry, midpoint_lng, midpoint_lat, direction_bearing_deg, desired_orientation, length_m, metrics) values ("
+            f"{sql_literal(part['id'])}, array[{route_ids}]::text[], {jsonb_literal(part['geometry'])}, "
+            f"{mid[0]}, {mid[1]}, {part['direction_bearing_deg']}, {sql_literal(part.get('desired_orientation', 'road_right'))}, "
+            f"{part['length_m']}, {jsonb_literal(part.get('metrics', {}))}) "
+            "on conflict (external_id) do update set "
+            "route_segment_ids=excluded.route_segment_ids, geometry=excluded.geometry, midpoint_lng=excluded.midpoint_lng, "
+            "midpoint_lat=excluded.midpoint_lat, direction_bearing_deg=excluded.direction_bearing_deg, "
+            "desired_orientation=excluded.desired_orientation, length_m=excluded.length_m, metrics=excluded.metrics, updated_at=now();"
+        )
+    for node in registry.get("street_view_nodes", []):
+        lines.append(
+            "insert into public.street_view_nodes "
+            "(external_id, street_part_id, sequence_id, sequence_index, lng, lat, canonical_heading_deg, desired_orientation, "
+            "prev_node_external_id, next_node_external_id, left_node_external_id, right_node_external_id, coverage_status) values ("
+            f"{sql_literal(node['id'])}, (select id from public.street_parts where external_id={sql_literal(node['street_part_id'])}), "
+            f"{sql_literal(node.get('sequence_id'))}, {node.get('sequence_index') if node.get('sequence_index') is not None else 'null'}, "
+            f"{node['lng']}, {node['lat']}, {node['canonical_heading_deg']}, {sql_literal(node.get('desired_orientation', 'road_right'))}, "
+            f"{sql_literal(node.get('prev_node_id'))}, {sql_literal(node.get('next_node_id'))}, "
+            f"{sql_literal(node.get('left_node_id'))}, {sql_literal(node.get('right_node_id'))}, {sql_literal(node.get('coverage_status', 'missing'))}) "
+            "on conflict (external_id) do update set "
+            "street_part_id=excluded.street_part_id, sequence_id=excluded.sequence_id, sequence_index=excluded.sequence_index, "
+            "lng=excluded.lng, lat=excluded.lat, canonical_heading_deg=excluded.canonical_heading_deg, "
+            "desired_orientation=excluded.desired_orientation, prev_node_external_id=excluded.prev_node_external_id, "
+            "next_node_external_id=excluded.next_node_external_id, left_node_external_id=excluded.left_node_external_id, "
+            "right_node_external_id=excluded.right_node_external_id, coverage_status=excluded.coverage_status, updated_at=now();"
+        )
+    lines.append("commit;")
+    return "\n".join(lines) + "\n"
+
+
 def build_registry(world: dict[str, Any], target_length_m: float = 10.0, max_parts: int | None = 30) -> dict[str, Any]:
     features = world.get("features", [])
     street_parts = group_segments_into_street_parts(features, target_length_m=target_length_m, max_parts=max_parts)
@@ -245,12 +296,17 @@ def main() -> None:
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
     parser.add_argument("--target-length-m", type=float, default=10.0)
     parser.add_argument("--max-parts", type=int, default=30)
+    parser.add_argument("--seed-sql", type=Path, default=None, help="Optional Supabase seed SQL output path")
     args = parser.parse_args()
 
     world = json.loads(args.world.read_text())
     registry = build_registry(world, target_length_m=args.target_length_m, max_parts=args.max_parts)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(registry, indent=2))
+    if args.seed_sql:
+        args.seed_sql.parent.mkdir(parents=True, exist_ok=True)
+        args.seed_sql.write_text(registry_to_supabase_seed_sql(registry))
+        print(f"wrote {args.seed_sql} seed SQL")
     print(f"wrote {args.out} with {len(registry['street_view_nodes'])} street-view nodes")
 
 
