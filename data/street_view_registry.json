@@ -1,0 +1,1747 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-20T21:46:44.890981+00:00",
+  "coverage_note": "Initial curated corridor graph. Photos are attached by Mapillary/crowd registry in the browser or Supabase layer.",
+  "street_parts": [
+    {
+      "id": "street_part_0000",
+      "route_segment_ids": [
+        "seg_00000",
+        "seg_00001",
+        "seg_00002"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            103.76416254974349,
+            1.31546885692855
+          ],
+          [
+            103.76413060619561,
+            1.3154446174006678
+          ],
+          [
+            103.76409866264771,
+            1.3154203778727858
+          ],
+          [
+            103.76406671909983,
+            1.3153961383449035
+          ]
+        ]
+      },
+      "midpoint": [
+        103.76411463442166,
+        1.3154324976367266
+      ],
+      "length_m": 13.38,
+      "direction_bearing_deg": 232.8,
+      "desired_orientation": "road_right",
+      "metrics": {
+        "source_segment_count": 3,
+        "overall_accessibility_score": 82
+      }
+    },
+    {
+      "id": "street_part_0001",
+      "route_segment_ids": [
+        "seg_00003",
+        "seg_00004",
+        "seg_00005"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            103.76406671909983,
+            1.3153961383449035
+          ],
+          [
+            103.76403477555195,
+            1.3153718988170213
+          ],
+          [
+            103.76400283200407,
+            1.315347659289139
+          ],
+          [
+            103.76397088845617,
+            1.315323419761257
+          ]
+        ]
+      },
+      "midpoint": [
+        103.764018803778,
+        1.3153597790530802
+      ],
+      "length_m": 13.38,
+      "direction_bearing_deg": 232.8,
+      "desired_orientation": "road_right",
+      "metrics": {
+        "source_segment_count": 3,
+        "overall_accessibility_score": 83
+      }
+    },
+    {
+      "id": "street_part_0002",
+      "route_segment_ids": [
+        "seg_00006",
+        "seg_00007",
+        "seg_00008"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            103.76397088845617,
+            1.315323419761257
+          ],
+          [
+            103.76393894490829,
+            1.3152991802333749
+          ],
+          [
+            103.76391028794177,
+            1.315268783032389
+          ],
+          [
+            103.76388163097523,
+            1.3152383858314034
+          ]
+        ]
+      },
+      "midpoint": [
+        103.76392543807036,
+        1.315282442214606
+      ],
+      "length_m": 13.74,
+      "direction_bearing_deg": 226.38,
+      "desired_orientation": "road_right",
+      "metrics": {
+        "source_segment_count": 3,
+        "overall_accessibility_score": 84
+      }
+    },
+    {
+      "id": "street_part_0003",
+      "route_segment_ids": [
+        "seg_00009",
+        "seg_00010",
+        "seg_00011"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            103.76388163097523,
+            1.3152383858314034
+          ],
+          [
+            103.76385297400871,
+            1.3152079886304175
+          ],
+          [
+            103.76382431704218,
+            1.315177591429432
+          ],
+          [
+            103.76379566007566,
+            1.315147194228446
+          ]
+        ]
+      },
+      "midpoint": [
+        103.76383864552545,
+        1.3151927900299247
+      ],
+      "length_m": 13.92,
+      "direction_bearing_deg": 223.3,
+      "desired_orientation": "road_right",
+      "metrics": {
+        "source_segment_count": 3,
+        "overall_accessibility_score": 85
+      }
+    },
+    {
+      "id": "street_part_0004",
+      "route_segment_ids": [
+        "seg_00012",
+        "seg_00013",
+        "seg_00014"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            103.76379566007566,
+            1.315147194228446
+          ],
+          [
+            103.76377251434087,
+            1.3151144673584347
+          ],
+          [
+            103.76374936860608,
+            1.3150817404884234
+          ],
+          [
+            103.76373133512105,
+            1.315047595537681
+          ]
+        ]
+      },
+      "midpoint": [
+        103.76376221953592,
+        1.3150977494032463
+      ],
+      "length_m": 13.21,
+      "direction_bearing_deg": 212.85,
+      "desired_orientation": "road_right",
+      "metrics": {
+        "source_segment_count": 3,
+        "overall_accessibility_score": 82
+      }
+    },
+    {
+      "id": "street_part_0005",
+      "route_segment_ids": [
+        "seg_00015",
+        "seg_00016",
+        "seg_00017"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            103.76373133512105,
+            1.315047595537681
+          ],
+          [
+            103.76371330163603,
+            1.3150134505869386
+          ],
+          [
+            103.763695268151,
+            1.3149793056361962
+          ],
+          [
+            103.76367723466598,
+            1.3149451606854539
+          ]
+        ]
+      },
+      "midpoint": [
+        103.7637042848935,
+        1.3149963781115674
+      ],
+      "length_m": 12.87,
+      "direction_bearing_deg": 207.83,
+      "desired_orientation": "road_right",
+      "metrics": {
+        "source_segment_count": 3,
+        "overall_accessibility_score": 86
+      }
+    },
+    {
+      "id": "street_part_0006",
+      "route_segment_ids": [
+        "seg_00018",
+        "seg_00019",
+        "seg_00020"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            103.76367723466598,
+            1.3149451606854539
+          ],
+          [
+            103.76365920118094,
+            1.3149110157347115
+          ],
+          [
+            103.76364865247689,
+            1.3148851239486232
+          ],
+          [
+            103.76363810377283,
+            1.3148592321625352
+          ]
+        ]
+      },
+      "midpoint": [
+        103.76365579802416,
+        1.314900133132831
+      ],
+      "length_m": 10.51,
+      "direction_bearing_deg": 204.48,
+      "desired_orientation": "road_right",
+      "metrics": {
+        "source_segment_count": 3,
+        "overall_accessibility_score": 80
+      }
+    },
+    {
+      "id": "street_part_0007",
+      "route_segment_ids": [
+        "seg_00021",
+        "seg_00022",
+        "seg_00023"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            103.76363810377283,
+            1.3148592321625352
+          ],
+          [
+            103.76362565058608,
+            1.3148228097574188
+          ],
+          [
+            103.76361319739934,
+            1.3147863873523022
+          ],
+          [
+            103.76360074421258,
+            1.3147499649471859
+          ]
+        ]
+      },
+      "midpoint": [
+        103.76361942399271,
+        1.3148045985548606
+      ],
+      "length_m": 12.84,
+      "direction_bearing_deg": 198.87,
+      "desired_orientation": "road_right",
+      "metrics": {
+        "source_segment_count": 3,
+        "overall_accessibility_score": 79
+      }
+    },
+    {
+      "id": "street_part_0008",
+      "route_segment_ids": [
+        "seg_00024",
+        "seg_00025",
+        "seg_00026",
+        "seg_00027",
+        "seg_00028",
+        "seg_00029"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            103.76360071995374,
+            1.3147498935017499
+          ],
+          [
+            103.76359960137366,
+            1.314745778614008
+          ],
+          [
+            103.76359094158735,
+            1.3147139293828105
+          ],
+          [
+            103.76358228180106,
+            1.314682080151613
+          ],
+          [
+            103.76358034568732,
+            1.3146726909898983
+          ],
+          [
+            103.76357968534222,
+            1.314669490427054
+          ],
+          [
+            103.76357206127676,
+            1.314632520715829
+          ]
+        ]
+      },
+      "midpoint": [
+        103.7635865195746,
+        1.3146951976832804
+      ],
+      "length_m": 13.44,
+      "direction_bearing_deg": 193.72,
+      "desired_orientation": "road_right",
+      "metrics": {
+        "source_segment_count": 6,
+        "overall_accessibility_score": 87
+      }
+    },
+    {
+      "id": "street_part_0009",
+      "route_segment_ids": [
+        "seg_00030",
+        "seg_00031",
+        "seg_00032",
+        "seg_00033",
+        "seg_00034",
+        "seg_00035"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            103.76357206127676,
+            1.314632520715829
+          ],
+          [
+            103.76357122843345,
+            1.3146284808983129
+          ],
+          [
+            103.76357058696745,
+            1.3146249366776797
+          ],
+          [
+            103.76356624853678,
+            1.3146009767874594
+          ],
+          [
+            103.7635619101061,
+            1.3145770168972393
+          ],
+          [
+            103.76355744140594,
+            1.314552335773027
+          ],
+          [
+            103.76355297270575,
+            1.3145276546488147
+          ]
+        ]
+      },
+      "midpoint": [
+        103.76356463563319,
+        1.3145919889140516
+      ],
+      "length_m": 11.86,
+      "direction_bearing_deg": 190.31,
+      "desired_orientation": "road_right",
+      "metrics": {
+        "source_segment_count": 6,
+        "overall_accessibility_score": 84
+      }
+    },
+    {
+      "id": "street_part_0010",
+      "route_segment_ids": [
+        "seg_00036",
+        "seg_00037",
+        "seg_00038"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            103.76355297270575,
+            1.3145276546488147
+          ],
+          [
+            103.76355235744927,
+            1.3144862826905388
+          ],
+          [
+            103.7635517897273,
+            1.3144481016313045
+          ],
+          [
+            103.76355122200532,
+            1.31440992057207
+          ]
+        ]
+      },
+      "midpoint": [
+        103.76355208547191,
+        1.314467989885682
+      ],
+      "length_m": 13.1,
+      "direction_bearing_deg": 180.85,
+      "desired_orientation": "road_right",
+      "metrics": {
+        "source_segment_count": 3,
+        "overall_accessibility_score": 82
+      }
+    },
+    {
+      "id": "street_part_0011",
+      "route_segment_ids": [
+        "seg_00039",
+        "seg_00040",
+        "seg_00041",
+        "seg_00042"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            103.76355122200532,
+            1.31440992057207
+          ],
+          [
+            103.76355065428335,
+            1.3143717395128358
+          ],
+          [
+            103.76486043643399,
+            1.3151360775648835
+          ],
+          [
+            103.76486773886039,
+            1.3151392855457378
+          ],
+          [
+            103.76489702853632,
+            1.3151521531933348
+          ],
+          [
+            103.76492631821225,
+            1.3151650208409316
+          ]
+        ]
+      },
+      "midpoint": [
+        103.76444223305528,
+        1.314895699538299
+      ],
+      "length_m": 12.26,
+      "direction_bearing_deg": 61.22,
+      "desired_orientation": "road_right",
+      "metrics": {
+        "source_segment_count": 4,
+        "overall_accessibility_score": 92
+      }
+    },
+    {
+      "id": "street_part_0012",
+      "route_segment_ids": [
+        "seg_00043",
+        "seg_00044",
+        "seg_00045"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            103.7655038433242,
+            1.313858165520325
+          ],
+          [
+            103.76552641098033,
+            1.313819592748331
+          ],
+          [
+            103.76554897863646,
+            1.3137810199763367
+          ],
+          [
+            103.7655692512251,
+            1.3137463702074432
+          ]
+        ]
+      },
+      "midpoint": [
+        103.76553712104152,
+        1.313801287113109
+      ],
+      "length_m": 14.4,
+      "direction_bearing_deg": 149.68,
+      "desired_orientation": "road_right",
+      "metrics": {
+        "source_segment_count": 3,
+        "overall_accessibility_score": 81
+      }
+    },
+    {
+      "id": "street_part_0013",
+      "route_segment_ids": [
+        "seg_00046",
+        "seg_00047",
+        "seg_00048"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            103.7655692512251,
+            1.3137463702074432
+          ],
+          [
+            103.76558952381374,
+            1.3137117204385498
+          ],
+          [
+            103.76560979640239,
+            1.3136770706696563
+          ],
+          [
+            103.76563006899102,
+            1.3136424209007629
+          ]
+        ]
+      },
+      "midpoint": [
+        103.76559966010807,
+        1.313694395554103
+      ],
+      "length_m": 13.38,
+      "direction_bearing_deg": 149.68,
+      "desired_orientation": "road_right",
+      "metrics": {
+        "source_segment_count": 3,
+        "overall_accessibility_score": 83
+      }
+    },
+    {
+      "id": "street_part_0014",
+      "route_segment_ids": [
+        "seg_00049",
+        "seg_00050",
+        "seg_00051"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            103.76563006899102,
+            1.3136424209007629
+          ],
+          [
+            103.76565034157966,
+            1.3136077711318694
+          ],
+          [
+            103.7656706141683,
+            1.313573121362976
+          ],
+          [
+            103.76569088675694,
+            1.3135384715940825
+          ]
+        ]
+      },
+      "midpoint": [
+        103.76566047787398,
+        1.3135904462474228
+      ],
+      "length_m": 13.38,
+      "direction_bearing_deg": 149.68,
+      "desired_orientation": "road_right",
+      "metrics": {
+        "source_segment_count": 3,
+        "overall_accessibility_score": 84
+      }
+    },
+    {
+      "id": "street_part_0015",
+      "route_segment_ids": [
+        "seg_00052",
+        "seg_00053",
+        "seg_00054"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            103.76569088675694,
+            1.3135384715940825
+          ],
+          [
+            103.76571436845839,
+            1.3135081496292256
+          ],
+          [
+            103.76573785015985,
+            1.3134778276643688
+          ],
+          [
+            103.7657613318613,
+            1.3134475056995119
+          ]
+        ]
+      },
+      "midpoint": [
+        103.76572610930913,
+        1.3134929886467972
+      ],
+      "length_m": 12.78,
+      "direction_bearing_deg": 142.25,
+      "desired_orientation": "road_right",
+      "metrics": {
+        "source_segment_count": 3,
+        "overall_accessibility_score": 83
+      }
+    },
+    {
+      "id": "street_part_0016",
+      "route_segment_ids": [
+        "seg_00055",
+        "seg_00056",
+        "seg_00057"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            103.7657613318613,
+            1.3134475056995119
+          ],
+          [
+            103.76578481356276,
+            1.313417183734655
+          ],
+          [
+            103.76580829526421,
+            1.3133868617697981
+          ],
+          [
+            103.76583488155838,
+            1.3133525310233019
+          ]
+        ]
+      },
+      "midpoint": [
+        103.76579733056165,
+        1.3134010205568167
+      ],
+      "length_m": 13.35,
+      "direction_bearing_deg": 142.25,
+      "desired_orientation": "road_right",
+      "metrics": {
+        "source_segment_count": 3,
+        "overall_accessibility_score": 80
+      }
+    },
+    {
+      "id": "street_part_0017",
+      "route_segment_ids": [
+        "seg_00058",
+        "seg_00059",
+        "seg_00060"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            103.76583488155838,
+            1.3133525310233019
+          ],
+          [
+            103.76586146785255,
+            1.3133182002768053
+          ],
+          [
+            103.76588525314095,
+            1.3132874865216742
+          ],
+          [
+            103.76590903842936,
+            1.313256772766543
+          ]
+        ]
+      },
+      "midpoint": [
+        103.76587266024531,
+        1.3133037476470812
+      ],
+      "length_m": 13.47,
+      "direction_bearing_deg": 142.25,
+      "desired_orientation": "road_right",
+      "metrics": {
+        "source_segment_count": 3,
+        "overall_accessibility_score": 83
+      }
+    },
+    {
+      "id": "street_part_0018",
+      "route_segment_ids": [
+        "seg_00061",
+        "seg_00062",
+        "seg_00063"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            103.76590903842936,
+            1.313256772766543
+          ],
+          [
+            103.76593282371776,
+            1.3132260590114118
+          ],
+          [
+            103.76595660900618,
+            1.3131953452562806
+          ],
+          [
+            103.76598039429459,
+            1.3131646315011494
+          ]
+        ]
+      },
+      "midpoint": [
+        103.76594471636199,
+        1.3132107021338462
+      ],
+      "length_m": 12.96,
+      "direction_bearing_deg": 142.25,
+      "desired_orientation": "road_right",
+      "metrics": {
+        "source_segment_count": 3,
+        "overall_accessibility_score": 84
+      }
+    },
+    {
+      "id": "street_part_0019",
+      "route_segment_ids": [
+        "seg_00064",
+        "seg_00065",
+        "seg_00066"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            103.76598039429459,
+            1.3131646315011494
+          ],
+          [
+            103.76600417958299,
+            1.3131339177460182
+          ],
+          [
+            103.7660279648714,
+            1.313103203990887
+          ],
+          [
+            103.76605240543783,
+            1.313075065364017
+          ]
+        ]
+      },
+      "midpoint": [
+        103.76601623604671,
+        1.3131192046505178
+      ],
+      "length_m": 12.78,
+      "direction_bearing_deg": 141.21,
+      "desired_orientation": "road_right",
+      "metrics": {
+        "source_segment_count": 3,
+        "overall_accessibility_score": 82
+      }
+    },
+    {
+      "id": "street_part_0020",
+      "route_segment_ids": [
+        "seg_00067",
+        "seg_00068",
+        "seg_00069"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            103.76605240543783,
+            1.313075065364017
+          ],
+          [
+            103.76607684600425,
+            1.313046926737147
+          ],
+          [
+            103.76610128657069,
+            1.313018788110277
+          ],
+          [
+            103.76612572713711,
+            1.312990649483407
+          ]
+        ]
+      },
+      "midpoint": [
+        103.76608906628746,
+        1.313032857423712
+      ],
+      "length_m": 12.42,
+      "direction_bearing_deg": 139.03,
+      "desired_orientation": "road_right",
+      "metrics": {
+        "source_segment_count": 3,
+        "overall_accessibility_score": 89
+      }
+    },
+    {
+      "id": "street_part_0021",
+      "route_segment_ids": [
+        "seg_00070",
+        "seg_00071",
+        "seg_00072"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            103.76612572713711,
+            1.312990649483407
+          ],
+          [
+            103.76615016770354,
+            1.312962510856537
+          ],
+          [
+            103.76617727094717,
+            1.3129340372337532
+          ],
+          [
+            103.76620437419079,
+            1.3129055636109697
+          ]
+        ]
+      },
+      "midpoint": [
+        103.76616438499465,
+        1.3129481902961668
+      ],
+      "length_m": 12.88,
+      "direction_bearing_deg": 137.26,
+      "desired_orientation": "road_right",
+      "metrics": {
+        "source_segment_count": 3,
+        "overall_accessibility_score": 85
+      }
+    },
+    {
+      "id": "street_part_0022",
+      "route_segment_ids": [
+        "seg_00073",
+        "seg_00074",
+        "seg_00075"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            103.76620437419079,
+            1.3129055636109697
+          ],
+          [
+            103.76619947376979,
+            1.312861936955076
+          ],
+          [
+            103.7661961634031,
+            1.3128324631878994
+          ],
+          [
+            103.76619285303639,
+            1.3128029894207225
+          ]
+        ]
+      },
+      "midpoint": [
+        103.76619821610001,
+        1.312850738293667
+      ],
+      "length_m": 11.48,
+      "direction_bearing_deg": 186.41,
+      "desired_orientation": "road_right",
+      "metrics": {
+        "source_segment_count": 3,
+        "overall_accessibility_score": 87
+      }
+    },
+    {
+      "id": "street_part_0023",
+      "route_segment_ids": [
+        "seg_00076",
+        "seg_00077",
+        "seg_00078"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            103.76619285303639,
+            1.3128029894207225
+          ],
+          [
+            103.76618916267388,
+            1.3127701301563004
+          ],
+          [
+            103.76334856492231,
+            1.314314311228772
+          ],
+          [
+            103.76334848390907,
+            1.314287197488781
+          ],
+          [
+            103.76334836359392,
+            1.314247052120477
+          ]
+        ]
+      },
+      "midpoint": [
+        103.76448548562709,
+        1.3136843360830106
+      ],
+      "length_m": 11.15,
+      "direction_bearing_deg": 296.92,
+      "desired_orientation": "road_right",
+      "metrics": {
+        "source_segment_count": 3,
+        "overall_accessibility_score": 82
+      }
+    },
+    {
+      "id": "street_part_0024",
+      "route_segment_ids": [
+        "seg_00079",
+        "seg_00080",
+        "seg_00081"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            103.76334836359392,
+            1.314247052120477
+          ],
+          [
+            103.76334824327877,
+            1.3142069067521729
+          ],
+          [
+            103.76334812296362,
+            1.3141667613838688
+          ],
+          [
+            103.76334800264848,
+            1.3141266160155645
+          ]
+        ]
+      },
+      "midpoint": [
+        103.7633481831212,
+        1.314186834068021
+      ],
+      "length_m": 13.38,
+      "direction_bearing_deg": 180.17,
+      "desired_orientation": "road_right",
+      "metrics": {
+        "source_segment_count": 3,
+        "overall_accessibility_score": 88
+      }
+    },
+    {
+      "id": "street_part_0025",
+      "route_segment_ids": [
+        "seg_00082",
+        "seg_00083",
+        "seg_00084"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            103.76334800264848,
+            1.3141266160155645
+          ],
+          [
+            103.76334788233333,
+            1.3140864706472604
+          ],
+          [
+            103.76334776201818,
+            1.3140463252789563
+          ],
+          [
+            103.76334764170304,
+            1.3140061799106522
+          ]
+        ]
+      },
+      "midpoint": [
+        103.76334782217576,
+        1.3140663979631082
+      ],
+      "length_m": 13.38,
+      "direction_bearing_deg": 180.17,
+      "desired_orientation": "road_right",
+      "metrics": {
+        "source_segment_count": 3,
+        "overall_accessibility_score": 85
+      }
+    },
+    {
+      "id": "street_part_0026",
+      "route_segment_ids": [
+        "seg_00085",
+        "seg_00086",
+        "seg_00087",
+        "seg_00088"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            103.76334764170304,
+            1.3140061799106522
+          ],
+          [
+            103.76335156061258,
+            1.313961818252691
+          ],
+          [
+            103.76335249809463,
+            1.3139512118978436
+          ],
+          [
+            103.76335523114417,
+            1.3139202797107121
+          ],
+          [
+            103.7633579641937,
+            1.3138893475235809
+          ]
+        ]
+      },
+      "midpoint": [
+        103.76335297914962,
+        1.313945767459096
+      ],
+      "length_m": 13.03,
+      "direction_bearing_deg": 174.95,
+      "desired_orientation": "road_right",
+      "metrics": {
+        "source_segment_count": 4,
+        "overall_accessibility_score": 84
+      }
+    },
+    {
+      "id": "street_part_0027",
+      "route_segment_ids": [
+        "seg_00089",
+        "seg_00090",
+        "seg_00091",
+        "seg_00092"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            103.7633579641937,
+            1.3138893475235809
+          ],
+          [
+            103.76336069724324,
+            1.3138584153364494
+          ],
+          [
+            103.76359515355266,
+            1.3151990791976906
+          ],
+          [
+            103.76359698472535,
+            1.3152016621128093
+          ],
+          [
+            103.7636181218318,
+            1.3152314795886761
+          ],
+          [
+            103.76363925893824,
+            1.315261297064543
+          ]
+        ]
+      },
+      "midpoint": [
+        103.76352803008082,
+        1.3147735468039583
+      ],
+      "length_m": 11.92,
+      "direction_bearing_deg": 11.58,
+      "desired_orientation": "road_right",
+      "metrics": {
+        "source_segment_count": 4,
+        "overall_accessibility_score": 83
+      }
+    },
+    {
+      "id": "street_part_0028",
+      "route_segment_ids": [
+        "seg_00093",
+        "seg_00094",
+        "seg_00095"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            103.76363925893824,
+            1.315261297064543
+          ],
+          [
+            103.76366624394778,
+            1.3152914761483347
+          ],
+          [
+            103.76369322895732,
+            1.3153216552321267
+          ],
+          [
+            103.76372021396686,
+            1.3153518343159185
+          ]
+        ]
+      },
+      "midpoint": [
+        103.76367973645254,
+        1.3153065656902307
+      ],
+      "length_m": 13.5,
+      "direction_bearing_deg": 41.79,
+      "desired_orientation": "road_right",
+      "metrics": {
+        "source_segment_count": 3,
+        "overall_accessibility_score": 83
+      }
+    },
+    {
+      "id": "street_part_0029",
+      "route_segment_ids": [
+        "seg_00096",
+        "seg_00097",
+        "seg_00098"
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            103.76372021396686,
+            1.3153518343159185
+          ],
+          [
+            103.76374950847074,
+            1.3153849110459932
+          ],
+          [
+            103.76377880297463,
+            1.3154179877760677
+          ],
+          [
+            103.7638080974785,
+            1.3154510645061424
+          ]
+        ]
+      },
+      "midpoint": [
+        103.76376415572268,
+        1.3154014494110304
+      ],
+      "length_m": 14.73,
+      "direction_bearing_deg": 41.52,
+      "desired_orientation": "road_right",
+      "metrics": {
+        "source_segment_count": 3,
+        "overall_accessibility_score": 82
+      }
+    }
+  ],
+  "street_photos": [],
+  "street_view_nodes": [
+    {
+      "id": "street_view_node_0000",
+      "street_part_id": "street_part_0000",
+      "active_photo_id": null,
+      "sequence_id": null,
+      "sequence_index": 0,
+      "lng": 103.76411463442166,
+      "lat": 1.3154324976367266,
+      "canonical_heading_deg": 232.8,
+      "desired_orientation": "road_right",
+      "prev_node_id": null,
+      "next_node_id": "street_view_node_0001",
+      "left_node_id": null,
+      "right_node_id": null,
+      "coverage_status": "missing"
+    },
+    {
+      "id": "street_view_node_0001",
+      "street_part_id": "street_part_0001",
+      "active_photo_id": null,
+      "sequence_id": null,
+      "sequence_index": 1,
+      "lng": 103.764018803778,
+      "lat": 1.3153597790530802,
+      "canonical_heading_deg": 232.8,
+      "desired_orientation": "road_right",
+      "prev_node_id": "street_view_node_0000",
+      "next_node_id": "street_view_node_0002",
+      "left_node_id": null,
+      "right_node_id": null,
+      "coverage_status": "missing"
+    },
+    {
+      "id": "street_view_node_0002",
+      "street_part_id": "street_part_0002",
+      "active_photo_id": null,
+      "sequence_id": null,
+      "sequence_index": 2,
+      "lng": 103.76392543807036,
+      "lat": 1.315282442214606,
+      "canonical_heading_deg": 226.38,
+      "desired_orientation": "road_right",
+      "prev_node_id": "street_view_node_0001",
+      "next_node_id": "street_view_node_0003",
+      "left_node_id": null,
+      "right_node_id": null,
+      "coverage_status": "missing"
+    },
+    {
+      "id": "street_view_node_0003",
+      "street_part_id": "street_part_0003",
+      "active_photo_id": null,
+      "sequence_id": null,
+      "sequence_index": 3,
+      "lng": 103.76383864552545,
+      "lat": 1.3151927900299247,
+      "canonical_heading_deg": 223.3,
+      "desired_orientation": "road_right",
+      "prev_node_id": "street_view_node_0002",
+      "next_node_id": "street_view_node_0004",
+      "left_node_id": null,
+      "right_node_id": null,
+      "coverage_status": "missing"
+    },
+    {
+      "id": "street_view_node_0004",
+      "street_part_id": "street_part_0004",
+      "active_photo_id": null,
+      "sequence_id": null,
+      "sequence_index": 4,
+      "lng": 103.76376221953592,
+      "lat": 1.3150977494032463,
+      "canonical_heading_deg": 212.85,
+      "desired_orientation": "road_right",
+      "prev_node_id": "street_view_node_0003",
+      "next_node_id": "street_view_node_0005",
+      "left_node_id": null,
+      "right_node_id": null,
+      "coverage_status": "missing"
+    },
+    {
+      "id": "street_view_node_0005",
+      "street_part_id": "street_part_0005",
+      "active_photo_id": null,
+      "sequence_id": null,
+      "sequence_index": 5,
+      "lng": 103.7637042848935,
+      "lat": 1.3149963781115674,
+      "canonical_heading_deg": 207.83,
+      "desired_orientation": "road_right",
+      "prev_node_id": "street_view_node_0004",
+      "next_node_id": "street_view_node_0006",
+      "left_node_id": null,
+      "right_node_id": null,
+      "coverage_status": "missing"
+    },
+    {
+      "id": "street_view_node_0006",
+      "street_part_id": "street_part_0006",
+      "active_photo_id": null,
+      "sequence_id": null,
+      "sequence_index": 6,
+      "lng": 103.76365579802416,
+      "lat": 1.314900133132831,
+      "canonical_heading_deg": 204.48,
+      "desired_orientation": "road_right",
+      "prev_node_id": "street_view_node_0005",
+      "next_node_id": "street_view_node_0007",
+      "left_node_id": null,
+      "right_node_id": null,
+      "coverage_status": "missing"
+    },
+    {
+      "id": "street_view_node_0007",
+      "street_part_id": "street_part_0007",
+      "active_photo_id": null,
+      "sequence_id": null,
+      "sequence_index": 7,
+      "lng": 103.76361942399271,
+      "lat": 1.3148045985548606,
+      "canonical_heading_deg": 198.87,
+      "desired_orientation": "road_right",
+      "prev_node_id": "street_view_node_0006",
+      "next_node_id": "street_view_node_0008",
+      "left_node_id": null,
+      "right_node_id": null,
+      "coverage_status": "missing"
+    },
+    {
+      "id": "street_view_node_0008",
+      "street_part_id": "street_part_0008",
+      "active_photo_id": null,
+      "sequence_id": null,
+      "sequence_index": 8,
+      "lng": 103.7635865195746,
+      "lat": 1.3146951976832804,
+      "canonical_heading_deg": 193.72,
+      "desired_orientation": "road_right",
+      "prev_node_id": "street_view_node_0007",
+      "next_node_id": "street_view_node_0009",
+      "left_node_id": null,
+      "right_node_id": null,
+      "coverage_status": "missing"
+    },
+    {
+      "id": "street_view_node_0009",
+      "street_part_id": "street_part_0009",
+      "active_photo_id": null,
+      "sequence_id": null,
+      "sequence_index": 9,
+      "lng": 103.76356463563319,
+      "lat": 1.3145919889140516,
+      "canonical_heading_deg": 190.31,
+      "desired_orientation": "road_right",
+      "prev_node_id": "street_view_node_0008",
+      "next_node_id": "street_view_node_0010",
+      "left_node_id": null,
+      "right_node_id": null,
+      "coverage_status": "missing"
+    },
+    {
+      "id": "street_view_node_0010",
+      "street_part_id": "street_part_0010",
+      "active_photo_id": null,
+      "sequence_id": null,
+      "sequence_index": 10,
+      "lng": 103.76355208547191,
+      "lat": 1.314467989885682,
+      "canonical_heading_deg": 180.85,
+      "desired_orientation": "road_right",
+      "prev_node_id": "street_view_node_0009",
+      "next_node_id": "street_view_node_0011",
+      "left_node_id": null,
+      "right_node_id": null,
+      "coverage_status": "missing"
+    },
+    {
+      "id": "street_view_node_0011",
+      "street_part_id": "street_part_0011",
+      "active_photo_id": null,
+      "sequence_id": null,
+      "sequence_index": 11,
+      "lng": 103.76444223305528,
+      "lat": 1.314895699538299,
+      "canonical_heading_deg": 61.22,
+      "desired_orientation": "road_right",
+      "prev_node_id": "street_view_node_0010",
+      "next_node_id": "street_view_node_0012",
+      "left_node_id": null,
+      "right_node_id": null,
+      "coverage_status": "missing"
+    },
+    {
+      "id": "street_view_node_0012",
+      "street_part_id": "street_part_0012",
+      "active_photo_id": null,
+      "sequence_id": null,
+      "sequence_index": 12,
+      "lng": 103.76553712104152,
+      "lat": 1.313801287113109,
+      "canonical_heading_deg": 149.68,
+      "desired_orientation": "road_right",
+      "prev_node_id": "street_view_node_0011",
+      "next_node_id": "street_view_node_0013",
+      "left_node_id": null,
+      "right_node_id": null,
+      "coverage_status": "missing"
+    },
+    {
+      "id": "street_view_node_0013",
+      "street_part_id": "street_part_0013",
+      "active_photo_id": null,
+      "sequence_id": null,
+      "sequence_index": 13,
+      "lng": 103.76559966010807,
+      "lat": 1.313694395554103,
+      "canonical_heading_deg": 149.68,
+      "desired_orientation": "road_right",
+      "prev_node_id": "street_view_node_0012",
+      "next_node_id": "street_view_node_0014",
+      "left_node_id": null,
+      "right_node_id": null,
+      "coverage_status": "missing"
+    },
+    {
+      "id": "street_view_node_0014",
+      "street_part_id": "street_part_0014",
+      "active_photo_id": null,
+      "sequence_id": null,
+      "sequence_index": 14,
+      "lng": 103.76566047787398,
+      "lat": 1.3135904462474228,
+      "canonical_heading_deg": 149.68,
+      "desired_orientation": "road_right",
+      "prev_node_id": "street_view_node_0013",
+      "next_node_id": "street_view_node_0015",
+      "left_node_id": null,
+      "right_node_id": null,
+      "coverage_status": "missing"
+    },
+    {
+      "id": "street_view_node_0015",
+      "street_part_id": "street_part_0015",
+      "active_photo_id": null,
+      "sequence_id": null,
+      "sequence_index": 15,
+      "lng": 103.76572610930913,
+      "lat": 1.3134929886467972,
+      "canonical_heading_deg": 142.25,
+      "desired_orientation": "road_right",
+      "prev_node_id": "street_view_node_0014",
+      "next_node_id": "street_view_node_0016",
+      "left_node_id": null,
+      "right_node_id": null,
+      "coverage_status": "missing"
+    },
+    {
+      "id": "street_view_node_0016",
+      "street_part_id": "street_part_0016",
+      "active_photo_id": null,
+      "sequence_id": null,
+      "sequence_index": 16,
+      "lng": 103.76579733056165,
+      "lat": 1.3134010205568167,
+      "canonical_heading_deg": 142.25,
+      "desired_orientation": "road_right",
+      "prev_node_id": "street_view_node_0015",
+      "next_node_id": "street_view_node_0017",
+      "left_node_id": null,
+      "right_node_id": null,
+      "coverage_status": "missing"
+    },
+    {
+      "id": "street_view_node_0017",
+      "street_part_id": "street_part_0017",
+      "active_photo_id": null,
+      "sequence_id": null,
+      "sequence_index": 17,
+      "lng": 103.76587266024531,
+      "lat": 1.3133037476470812,
+      "canonical_heading_deg": 142.25,
+      "desired_orientation": "road_right",
+      "prev_node_id": "street_view_node_0016",
+      "next_node_id": "street_view_node_0018",
+      "left_node_id": null,
+      "right_node_id": null,
+      "coverage_status": "missing"
+    },
+    {
+      "id": "street_view_node_0018",
+      "street_part_id": "street_part_0018",
+      "active_photo_id": null,
+      "sequence_id": null,
+      "sequence_index": 18,
+      "lng": 103.76594471636199,
+      "lat": 1.3132107021338462,
+      "canonical_heading_deg": 142.25,
+      "desired_orientation": "road_right",
+      "prev_node_id": "street_view_node_0017",
+      "next_node_id": "street_view_node_0019",
+      "left_node_id": null,
+      "right_node_id": null,
+      "coverage_status": "missing"
+    },
+    {
+      "id": "street_view_node_0019",
+      "street_part_id": "street_part_0019",
+      "active_photo_id": null,
+      "sequence_id": null,
+      "sequence_index": 19,
+      "lng": 103.76601623604671,
+      "lat": 1.3131192046505178,
+      "canonical_heading_deg": 141.21,
+      "desired_orientation": "road_right",
+      "prev_node_id": "street_view_node_0018",
+      "next_node_id": "street_view_node_0020",
+      "left_node_id": null,
+      "right_node_id": null,
+      "coverage_status": "missing"
+    },
+    {
+      "id": "street_view_node_0020",
+      "street_part_id": "street_part_0020",
+      "active_photo_id": null,
+      "sequence_id": null,
+      "sequence_index": 20,
+      "lng": 103.76608906628746,
+      "lat": 1.313032857423712,
+      "canonical_heading_deg": 139.03,
+      "desired_orientation": "road_right",
+      "prev_node_id": "street_view_node_0019",
+      "next_node_id": "street_view_node_0021",
+      "left_node_id": null,
+      "right_node_id": null,
+      "coverage_status": "missing"
+    },
+    {
+      "id": "street_view_node_0021",
+      "street_part_id": "street_part_0021",
+      "active_photo_id": null,
+      "sequence_id": null,
+      "sequence_index": 21,
+      "lng": 103.76616438499465,
+      "lat": 1.3129481902961668,
+      "canonical_heading_deg": 137.26,
+      "desired_orientation": "road_right",
+      "prev_node_id": "street_view_node_0020",
+      "next_node_id": "street_view_node_0022",
+      "left_node_id": null,
+      "right_node_id": null,
+      "coverage_status": "missing"
+    },
+    {
+      "id": "street_view_node_0022",
+      "street_part_id": "street_part_0022",
+      "active_photo_id": null,
+      "sequence_id": null,
+      "sequence_index": 22,
+      "lng": 103.76619821610001,
+      "lat": 1.312850738293667,
+      "canonical_heading_deg": 186.41,
+      "desired_orientation": "road_right",
+      "prev_node_id": "street_view_node_0021",
+      "next_node_id": "street_view_node_0023",
+      "left_node_id": null,
+      "right_node_id": null,
+      "coverage_status": "missing"
+    },
+    {
+      "id": "street_view_node_0023",
+      "street_part_id": "street_part_0023",
+      "active_photo_id": null,
+      "sequence_id": null,
+      "sequence_index": 23,
+      "lng": 103.76448548562709,
+      "lat": 1.3136843360830106,
+      "canonical_heading_deg": 296.92,
+      "desired_orientation": "road_right",
+      "prev_node_id": "street_view_node_0022",
+      "next_node_id": "street_view_node_0024",
+      "left_node_id": null,
+      "right_node_id": null,
+      "coverage_status": "missing"
+    },
+    {
+      "id": "street_view_node_0024",
+      "street_part_id": "street_part_0024",
+      "active_photo_id": null,
+      "sequence_id": null,
+      "sequence_index": 24,
+      "lng": 103.7633481831212,
+      "lat": 1.314186834068021,
+      "canonical_heading_deg": 180.17,
+      "desired_orientation": "road_right",
+      "prev_node_id": "street_view_node_0023",
+      "next_node_id": "street_view_node_0025",
+      "left_node_id": null,
+      "right_node_id": null,
+      "coverage_status": "missing"
+    },
+    {
+      "id": "street_view_node_0025",
+      "street_part_id": "street_part_0025",
+      "active_photo_id": null,
+      "sequence_id": null,
+      "sequence_index": 25,
+      "lng": 103.76334782217576,
+      "lat": 1.3140663979631082,
+      "canonical_heading_deg": 180.17,
+      "desired_orientation": "road_right",
+      "prev_node_id": "street_view_node_0024",
+      "next_node_id": "street_view_node_0026",
+      "left_node_id": null,
+      "right_node_id": null,
+      "coverage_status": "missing"
+    },
+    {
+      "id": "street_view_node_0026",
+      "street_part_id": "street_part_0026",
+      "active_photo_id": null,
+      "sequence_id": null,
+      "sequence_index": 26,
+      "lng": 103.76335297914962,
+      "lat": 1.313945767459096,
+      "canonical_heading_deg": 174.95,
+      "desired_orientation": "road_right",
+      "prev_node_id": "street_view_node_0025",
+      "next_node_id": "street_view_node_0027",
+      "left_node_id": null,
+      "right_node_id": null,
+      "coverage_status": "missing"
+    },
+    {
+      "id": "street_view_node_0027",
+      "street_part_id": "street_part_0027",
+      "active_photo_id": null,
+      "sequence_id": null,
+      "sequence_index": 27,
+      "lng": 103.76352803008082,
+      "lat": 1.3147735468039583,
+      "canonical_heading_deg": 11.58,
+      "desired_orientation": "road_right",
+      "prev_node_id": "street_view_node_0026",
+      "next_node_id": "street_view_node_0028",
+      "left_node_id": null,
+      "right_node_id": null,
+      "coverage_status": "missing"
+    },
+    {
+      "id": "street_view_node_0028",
+      "street_part_id": "street_part_0028",
+      "active_photo_id": null,
+      "sequence_id": null,
+      "sequence_index": 28,
+      "lng": 103.76367973645254,
+      "lat": 1.3153065656902307,
+      "canonical_heading_deg": 41.79,
+      "desired_orientation": "road_right",
+      "prev_node_id": "street_view_node_0027",
+      "next_node_id": "street_view_node_0029",
+      "left_node_id": null,
+      "right_node_id": null,
+      "coverage_status": "missing"
+    },
+    {
+      "id": "street_view_node_0029",
+      "street_part_id": "street_part_0029",
+      "active_photo_id": null,
+      "sequence_id": null,
+      "sequence_index": 29,
+      "lng": 103.76376415572268,
+      "lat": 1.3154014494110304,
+      "canonical_heading_deg": 41.52,
+      "desired_orientation": "road_right",
+      "prev_node_id": "street_view_node_0028",
+      "next_node_id": null,
+      "left_node_id": null,
+      "right_node_id": null,
+      "coverage_status": "missing"
+    }
+  ]
+}

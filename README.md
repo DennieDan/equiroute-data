@@ -61,6 +61,14 @@ This writes `accessibility_world.geojson` for the Google Earth-style street insp
 
 `earth_accessibility.html` uses MapTalks for the geospatial map/satellite layer and Three.js for custom animated accessibility overlays: glowing route paths, wheelchair/PMA agent avatars, and intervention blocks such as ramps/shelters/bus-stop markers. Mapillary is wired as the real-life street-view provider. Mapillary requires a free client token from the Mapillary developer dashboard; enter it in the in-browser token field only. The token is stored in that browser's `localStorage` and is not committed to the repo.
 
+The street-view navigation now uses a lightweight Google-Street-View-style node graph instead of random nearest-photo lookup. Generate the curated demo corridor registry with:
+
+```bash
+python3 scripts/street_view_registry.py --max-parts 30 --target-length-m 10
+```
+
+This writes `data/street_view_registry.json`, grouping the existing 5 m path metrics into 8–10 m street-view nodes with stable previous/next links, canonical headings, and road-on-right orientation metadata. Supabase starter schema/RLS files live in `supabase/` for the later multi-user feedback/photo/upvote layer.
+
 7. **View the 3D MVP** — from the project root, start a local server:
 
 ```bash
