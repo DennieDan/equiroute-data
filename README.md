@@ -29,7 +29,47 @@ In JupyterLab, select **Python (equiroute)** as the kernel when opening `persona
 
 1. **Filter geospatial layers** — run `filter_estate.py` to crop LTA shapefiles to the Clementi bounding box and write outputs to `CLEMENTI/`.
 2. **Explore & simulate** — open `persona_agent.ipynb` and run cells to load filtered layers and build route simulations.
-3. **View the 3D MVP** — from the project root, start a local server:
+3. **Generate persona before/after simulation output** — after placing `sim_output.json` and `threejs_3d_roads.json` in the project root, run:
+
+```bash
+python persona_simulation.py
+```
+
+This writes `sim_persona_before_after.json`, which contains persona-specific scores, bottlenecks, and the simulated impact of an accessibility intervention.
+
+4. **Apply PERS-inspired scoring** — our benchmark basis is PERS (Pedestrian Environment Review System), the TRL/TfL pedestrian-audit framework. The prototype is not a certified PERS audit, but it maps available OSM/LTA proxy risks onto PERS-style weighted link/crossing criteria and a 0–100 RAG score:
+
+```bash
+python accessibility_scoring.py
+```
+
+5. **Generate OSM building footprints for 3D context** — fetch buildings from Overpass, save the response to `/tmp/overpass_buildings.json`, then run:
+
+```bash
+python buildings_from_overpass.py
+```
+
+This writes `buildings_clementi.geojson`, used by `maptalks_three.html` and `earth_accessibility.html` to show building context behind obstacles and improvements.
+
+6. **Generate the Earth/street accessibility layer** — fuses LTA footpaths, kerblines, crossings, bus stops, MRT, bollards, covered linkways and overhead bridges into selectable traversable segments with ISO 21542 + ADA/PROWAG-inspired metrics:
+
+```bash
+.venv/bin/python generate_accessibility_world.py
+```
+
+This writes `accessibility_world.geojson` for the Google Earth-style street inspection UI.
+
+`earth_accessibility.html` uses MapTalks for the geospatial map/satellite layer and Three.js for custom animated accessibility overlays: glowing route paths, wheelchair/PMA agent avatars, and intervention blocks such as ramps/shelters/bus-stop markers. Mapillary is wired as the real-life street-view provider. Mapillary requires a free client token from the Mapillary developer dashboard; enter it in the in-browser token field only. The token is stored in that browser's `localStorage` and is not committed to the repo.
+
+The street-view navigation now uses a lightweight Google-Street-View-style node graph instead of random nearest-photo lookup. Generate the curated demo corridor registry with:
+
+```bash
+python3 scripts/street_view_registry.py --max-parts 30 --target-length-m 10
+```
+
+This writes `data/street_view_registry.json`, grouping the existing 5 m path metrics into 8–10 m street-view nodes with stable previous/next links, canonical headings, and road-on-right orientation metadata. The registry now has a hierarchy: **many streets → many street parts per street → one street-view node per street part**. Supabase schema/RLS/seed files live in `supabase/`; the frontend reads the Supabase street registry first and falls back to local JSON if the backend is unavailable. The active-photo layer is ready: each street part can own one active `street_photo`, keep photo history, and preserve comments/upvotes on the street part when newer photos replace older photos.
+
+7. **View the 3D MVP** — from the project root, start a local server:
 
 ```bash
 python -m http.server 8000
@@ -45,4 +85,11 @@ Open [http://localhost:8000](http://localhost:8000) in your browser.
 | `CLEMENTI/`           | Filtered shapefiles for the estate        |
 | `filter_estate.py`    | Crops layers to the Clementi bounding box |
 | `persona_agent.ipynb` | Route graph and persona simulation        |
+| `persona_simulation.py` | Generates persona before/after payloads |
+| `accessibility_scoring.py` | Applies PERS-inspired scoring to the payload |
+| `buildings_clementi.geojson` | OSM building footprints for map context |
+| `generate_accessibility_world.py` | Creates selectable street/feature accessibility world layer |
+| `accessibility_world.geojson` | Segment-level Earth/street-view accessibility metrics and POIs |
+| `earth_accessibility.html` | Google Earth-style street inspection UI with selectable streets, buildings, feature layers, persona passability, and standards-based metrics |
+| `maptalks_three.html` | MapTalks + Three.js prototype with before/after toggle, buildings, and obstacle/improvement markers |
 | `index.html`          | Three.js 3D route viewer                  |

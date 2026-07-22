@@ -1,0 +1,821 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EquiRoute MapTalks + Three.js Prototype</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/maptalks/dist/maptalks.css"
+    />
+    <style>
+      :root {
+        color-scheme: dark;
+        --panel-bg: rgba(8, 14, 22, 0.86);
+        --panel-border: rgba(129, 212, 250, 0.35);
+        --text: #ecfeff;
+        --muted: #a7c7d8;
+        --green: #35f36d;
+        --red: #ff334e;
+        --blue: #31c5ff;
+        --yellow: #ffe45e;
+      }
+      html,
+      body,
+      #map {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        background: #07111f;
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+      }
+      .panel {
+        position: absolute;
+        top: 16px;
+        left: 16px;
+        z-index: 20;
+        width: min(390px, calc(100vw - 32px));
+        color: var(--text);
+        background: var(--panel-bg);
+        border: 1px solid var(--panel-border);
+        border-radius: 18px;
+        box-shadow: 0 18px 50px rgba(0, 0, 0, 0.38);
+        backdrop-filter: blur(14px);
+        padding: 16px;
+      }
+      .eyebrow {
+        color: #7dd3fc;
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        font-weight: 800;
+      }
+      h1 {
+        margin: 5px 0 6px;
+        font-size: 21px;
+        line-height: 1.14;
+      }
+      .thesis {
+        margin: 0 0 12px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.45;
+      }
+      .controls {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin: 12px 0;
+      }
+      button,
+      select {
+        border: 1px solid rgba(125, 211, 252, 0.32);
+        border-radius: 12px;
+        background: rgba(15, 23, 42, 0.8);
+        color: var(--text);
+        padding: 9px 10px;
+        font-weight: 750;
+        cursor: pointer;
+      }
+      button.active {
+        background: linear-gradient(135deg, #075985, #0e7490);
+        border-color: rgba(186, 230, 253, 0.72);
+        box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.18) inset;
+      }
+      select {
+        grid-column: 1 / -1;
+        width: 100%;
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        margin: 12px 0;
+      }
+      .stat {
+        padding: 10px;
+        border-radius: 13px;
+        background: rgba(15, 23, 42, 0.72);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+      }
+      .stat b {
+        display: block;
+        font-size: 18px;
+      }
+      .stat span {
+        color: var(--muted);
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      .legend {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 7px 12px;
+        font-size: 12px;
+        color: #dff7ff;
+        margin: 10px 0 12px;
+      }
+      .dot {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        margin-right: 7px;
+        box-shadow: 0 0 14px currentColor;
+      }
+      .summary {
+        border-top: 1px solid rgba(148, 163, 184, 0.22);
+        padding-top: 12px;
+        font-size: 12px;
+        line-height: 1.45;
+        color: #dbeafe;
+      }
+      .summary strong {
+        color: white;
+      }
+      .methodology {
+        margin-top: 10px;
+        padding: 10px;
+        border-radius: 12px;
+        background: rgba(14, 116, 144, 0.18);
+        border: 1px solid rgba(125, 211, 252, 0.22);
+        color: #cffafe;
+        font-size: 11px;
+        line-height: 1.35;
+      }
+      #status {
+        position: absolute;
+        left: 16px;
+        bottom: 16px;
+        z-index: 20;
+        max-width: min(640px, calc(100vw - 32px));
+        color: #dff7ff;
+        background: rgba(2, 6, 23, 0.82);
+        border: 1px solid rgba(125, 211, 252, 0.28);
+        border-radius: 999px;
+        padding: 9px 14px;
+        font-size: 12px;
+        backdrop-filter: blur(12px);
+      }
+      .maptalks-attribution {
+        color: #bae6fd !important;
+      }
+      @media (max-width: 700px) {
+        .panel {
+          width: calc(100vw - 32px);
+        }
+        .stats {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+    <script src="https://unpkg.com/three@0.138.3/build/three.min.js"></script>
+    <script src="https://unpkg.com/maptalks/dist/maptalks.min.js"></script>
+    <script src="https://unpkg.com/maptalks.three/dist/maptalks.three.js"></script>
+  </head>
+  <body>
+    <div id="map"></div>
+
+    <section class="panel">
+      <div class="eyebrow">Tech4City direction test</div>
+      <h1>MapTalks + Three.js Accessibility Twin</h1>
+      <p class="thesis">
+        Real Clementi coordinates from MapTalks, custom 3D intervention objects
+        from Three.js.
+      </p>
+
+      <div class="controls">
+        <button id="beforeBtn" class="active" type="button">Before</button>
+        <button id="afterBtn" type="button">After</button>
+        <select id="personaSelect" aria-label="Persona selector"></select>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><b id="totalEdges">–</b><span>edges</span></div>
+        <div class="stat"><b id="bottlenecks">–</b><span>bottlenecks</span></div>
+        <div class="stat"><b id="score">–</b><span>PERS score</span></div>
+        <div class="stat"><b id="buildingCount">–</b><span>buildings</span></div>
+      </div>
+
+      <div class="legend">
+        <div><span class="dot" style="color: var(--green); background: var(--green)"></span>accessible edge</div>
+        <div><span class="dot" style="color: var(--red); background: var(--red)"></span>bottleneck / barrier</div>
+        <div><span class="dot" style="color: var(--yellow); background: var(--yellow)"></span>start / end marker</div>
+        <div><span class="dot" style="color: var(--blue); background: var(--blue)"></span>after intervention</div>
+        <div><span class="dot" style="color: #94a3b8; background: #94a3b8"></span>OSM buildings</div>
+      </div>
+
+      <div class="summary" id="interventionSummary">
+        Loading persona before/after simulation…
+      </div>
+      <div class="methodology" id="scoringMethodology">
+        Scoring: loading PERS-inspired methodology…
+      </div>
+    </section>
+
+    <div id="status">Initializing MapTalks + Three.js…</div>
+
+    <script>
+      const PERSONA_ORDER = [
+        "wheelchair_user",
+        "senior_with_walker",
+        "visually_impaired",
+        "pma_user",
+      ];
+
+      const COLORS = {
+        accessible: "#35f36d",
+        bottleneck: "#ff334e",
+        afterFixed: "#31c5ff",
+        afterStillBlocked: "#ff9f1c",
+        startEnd: "#ffe45e",
+      };
+
+      const state = {
+        mode: "before",
+        persona: "wheelchair_user",
+        payload: null,
+        edgeLayer: null,
+        markerLayer: null,
+        buildingLayer: null,
+        threeLayer: null,
+        threeOverlay: null,
+        threeObjects: [],
+        geometryByEdgeId: new Map(),
+      };
+      window.__EQUIROUTE_STATE = state;
+
+      window.__EQUIROUTE_PROGRESS = ["state-created"];
+
+      const statusEl = document.getElementById("status");
+      const beforeBtn = document.getElementById("beforeBtn");
+      const afterBtn = document.getElementById("afterBtn");
+      const personaSelect = document.getElementById("personaSelect");
+
+      window.__EQUIROUTE_PROGRESS.push("before-map");
+      // Avoid naming this variable `map`: browsers expose an element with id="map"
+      // as window.map in some contexts, which can collide with top-level bindings.
+      const equiMap = new maptalks.Map("map", {
+        center: [103.7716, 1.3062],
+        zoom: 17,
+        pitch: 62,
+        bearing: -18,
+        baseLayer: new maptalks.TileLayer("base", {
+          urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+          renderer: "canvas",
+          subdomains: ["a", "b", "c"],
+          attribution: "© OpenStreetMap contributors",
+        }),
+      });
+
+      window.__EQUIROUTE_PROGRESS.push("after-map");
+
+      const edgeLayer = new maptalks.VectorLayer("accessibility-edges", [], {
+        enableSimplify: true,
+        drawImmediate: true,
+      }).addTo(equiMap);
+      const buildingLayer = new maptalks.VectorLayer("osm-buildings", [], {
+        enableSimplify: true,
+        drawImmediate: true,
+      }).addTo(equiMap);
+      const markerLayer = new maptalks.VectorLayer("fallback-markers").addTo(equiMap);
+      state.edgeLayer = edgeLayer;
+      state.markerLayer = markerLayer;
+      state.buildingLayer = buildingLayer;
+
+      function setStatus(message) {
+        statusEl.textContent = message;
+        state.status = message;
+      }
+
+      function activePersona(edge) {
+        return edge.personas?.[state.persona] || {};
+      }
+
+      function edgeSymbol(edge) {
+        const persona = activePersona(edge);
+        const beforeBlocked = Boolean(
+          persona.is_bottleneck_before || edge.isHighCost || edge.is_high_cost,
+        );
+        const afterBlocked = Boolean(persona.is_bottleneck_after);
+        const fixed = beforeBlocked && !afterBlocked;
+
+        if (state.mode === "before") {
+          return {
+            lineColor: beforeBlocked ? COLORS.bottleneck : COLORS.accessible,
+            lineWidth: beforeBlocked ? 4 : 1.4,
+            lineOpacity: beforeBlocked ? 0.95 : 0.68,
+          };
+        }
+
+        return {
+          lineColor: afterBlocked
+            ? COLORS.afterStillBlocked
+            : fixed
+              ? COLORS.afterFixed
+              : COLORS.accessible,
+          lineWidth: afterBlocked || fixed ? 4.5 : 1.25,
+          lineOpacity: afterBlocked || fixed ? 0.96 : 0.48,
+        };
+      }
+
+      function groupedEdgeGeometry(coords, symbol) {
+        if (!coords.length) return null;
+        return new maptalks.MultiLineString(coords, { symbol });
+      }
+
+      function buildEdgeGeometries(edges) {
+        const groups = {
+          beforeAccessible: [],
+          beforeBottleneck: [],
+          afterAccessible: [],
+          afterFixed: [],
+          afterStillBlocked: [],
+        };
+
+        for (const edge of edges) {
+          if (!Array.isArray(edge.coords) || edge.coords.length < 2) continue;
+          const persona = activePersona(edge);
+          const beforeBlocked = Boolean(
+            persona.is_bottleneck_before || edge.isHighCost || edge.is_high_cost,
+          );
+          const afterBlocked = Boolean(persona.is_bottleneck_after);
+          const fixed = beforeBlocked && !afterBlocked;
+
+          if (beforeBlocked) groups.beforeBottleneck.push(edge.coords);
+          else groups.beforeAccessible.push(edge.coords);
+
+          if (afterBlocked) groups.afterStillBlocked.push(edge.coords);
+          else if (fixed) groups.afterFixed.push(edge.coords);
+          else groups.afterAccessible.push(edge.coords);
+        }
+
+        state.edgeGroups = groups;
+        recolorEdges();
+      }
+
+      function recolorEdges() {
+        if (!state.edgeGroups) return;
+        edgeLayer.clear();
+        const geometries = [];
+        if (state.mode === "before") {
+          geometries.push(
+            groupedEdgeGeometry(state.edgeGroups.beforeAccessible, {
+              lineColor: COLORS.accessible,
+              lineWidth: 1.4,
+              lineOpacity: 0.68,
+            }),
+            groupedEdgeGeometry(state.edgeGroups.beforeBottleneck, {
+              lineColor: COLORS.bottleneck,
+              lineWidth: 4,
+              lineOpacity: 0.96,
+            }),
+          );
+        } else {
+          geometries.push(
+            groupedEdgeGeometry(state.edgeGroups.afterAccessible, {
+              lineColor: COLORS.accessible,
+              lineWidth: 1.25,
+              lineOpacity: 0.46,
+            }),
+            groupedEdgeGeometry(state.edgeGroups.afterFixed, {
+              lineColor: COLORS.afterFixed,
+              lineWidth: 4.5,
+              lineOpacity: 0.96,
+            }),
+            groupedEdgeGeometry(state.edgeGroups.afterStillBlocked, {
+              lineColor: COLORS.afterStillBlocked,
+              lineWidth: 4.5,
+              lineOpacity: 0.96,
+            }),
+          );
+        }
+        edgeLayer.addGeometry(geometries.filter(Boolean));
+      }
+
+      function initializeThreeLayer() {
+        try {
+          const renderer = new THREE.WebGLRenderer({
+            alpha: true,
+            antialias: true,
+          });
+          renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+          renderer.setSize(window.innerWidth, window.innerHeight);
+          renderer.domElement.style.position = "absolute";
+          renderer.domElement.style.inset = "0";
+          renderer.domElement.style.pointerEvents = "none";
+          renderer.domElement.style.zIndex = "12";
+          document.body.appendChild(renderer.domElement);
+
+          const scene = new THREE.Scene();
+          const camera = new THREE.OrthographicCamera(
+            0,
+            window.innerWidth,
+            window.innerHeight,
+            0,
+            -1000,
+            1000,
+          );
+          camera.position.z = 100;
+
+          const overlay = { renderer, scene, camera };
+          state.threeOverlay = overlay;
+          state.threeLayer = overlay;
+
+          const render = () => renderer.render(scene, camera);
+          const resize = () => {
+            camera.right = window.innerWidth;
+            camera.bottom = window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            updateThreeObjectPositions();
+            render();
+          };
+          window.addEventListener("resize", resize);
+          equiMap.on("moving zooming rotate pitch viewchange", () => {
+            updateThreeObjectPositions();
+            render();
+          });
+          render();
+          return overlay;
+        } catch (err) {
+          console.warn("Three.js overlay unavailable; using MapTalks fallback markers", err);
+          state.threeLayerError = err.message;
+          setStatus("MapTalks rendered; Three.js overlay unavailable here, using fallback markers.");
+          return null;
+        }
+      }
+
+      function clearThreeObjects() {
+        if (state.threeOverlay) {
+          for (const obj of state.threeObjects) state.threeOverlay.scene.remove(obj);
+          state.threeOverlay.renderer.render(
+            state.threeOverlay.scene,
+            state.threeOverlay.camera,
+          );
+        }
+        state.threeObjects = [];
+        markerLayer.clear();
+      }
+
+      function updateThreeObjectPositions() {
+        if (!state.threeOverlay) return;
+        for (const obj of state.threeObjects) {
+          const coord = obj.userData?.coord;
+          if (!coord) continue;
+          const point = equiMap.coordinateToContainerPoint(coord);
+          obj.position.x = point.x;
+          obj.position.y = point.y - (obj.userData.altitude || 0);
+        }
+      }
+
+      function addMeshAt(mesh, coord, altitude = 0) {
+        if (!state.threeOverlay) return false;
+        mesh.userData.coord = new maptalks.Coordinate(coord[0], coord[1]);
+        mesh.userData.altitude = altitude;
+        const point = equiMap.coordinateToContainerPoint(mesh.userData.coord);
+        mesh.position.set(point.x, point.y - altitude, 0);
+        state.threeObjects.push(mesh);
+        return true;
+      }
+
+      function addThreeMesh(meshes) {
+        if (!state.threeOverlay) return false;
+        try {
+          meshes.forEach((mesh) => state.threeOverlay.scene.add(mesh));
+          updateThreeObjectPositions();
+          state.threeOverlay.renderer.render(
+            state.threeOverlay.scene,
+            state.threeOverlay.camera,
+          );
+          return true;
+        } catch (err) {
+          console.warn("Three.js object layer failed; keeping MapTalks fallback markers", err);
+          state.threeLayer = null;
+          state.threeLayerError = err.message;
+        }
+        return false;
+      }
+
+      function addFallbackMarker(coord, color, label, size = 18) {
+        new maptalks.Marker(coord, {
+          symbol: [
+            {
+              markerType: "ellipse",
+              markerFill: color,
+              markerLineColor: "#ffffff",
+              markerLineWidth: 2,
+              markerWidth: size,
+              markerHeight: size,
+              markerOpacity: 0.95,
+            },
+            {
+              textName: label,
+              textFill: "#ffffff",
+              textHaloFill: "#0f172a",
+              textHaloRadius: 3,
+              textDy: -22,
+              textSize: 11,
+              textWeight: "bold",
+            },
+          ],
+        }).addTo(markerLayer);
+      }
+
+      function midpoint(coords) {
+        return [
+          (coords[0][0] + coords[1][0]) / 2,
+          (coords[0][1] + coords[1][1]) / 2,
+        ];
+      }
+
+      function topBottlenecks(limit = 10) {
+        const persona = state.payload.personas[state.persona];
+        if (persona?.top_bottlenecks?.length) {
+          return persona.top_bottlenecks.slice(0, limit);
+        }
+
+        return state.payload.edges
+          .filter((edge) => activePersona(edge).is_bottleneck_before)
+          .map((edge) => ({
+            edge_id: edge.id,
+            coords: edge.coords,
+            before_cost: activePersona(edge).before_cost,
+            after_cost: activePersona(edge).after_cost,
+            improvement:
+              (activePersona(edge).before_cost || 0) -
+              (activePersona(edge).after_cost || 0),
+          }))
+          .sort((a, b) => (b.improvement || 0) - (a.improvement || 0))
+          .slice(0, limit);
+      }
+
+      function refreshCustomObjects() {
+        clearThreeObjects();
+        const route = state.payload.route || {};
+        const meshes = [];
+
+        const makeStar = (color) => {
+          const shape = new THREE.Shape();
+          for (let i = 0; i < 10; i++) {
+            const r = i % 2 === 0 ? 10 : 4.5;
+            const angle = (i / 10) * Math.PI * 2 - Math.PI / 2;
+            const x = Math.cos(angle) * r;
+            const y = Math.sin(angle) * r;
+            if (i === 0) shape.moveTo(x, y);
+            else shape.lineTo(x, y);
+          }
+          shape.closePath();
+          const mesh = new THREE.Mesh(
+            new THREE.ShapeGeometry(shape),
+            new THREE.MeshBasicMaterial({
+              color,
+              side: THREE.DoubleSide,
+              transparent: true,
+              opacity: 0.98,
+            }),
+          );
+          mesh.rotation.x = -Math.PI / 2;
+          return mesh;
+        };
+
+        if (route.start) {
+          const start = makeStar(0xffe45e);
+          if (addMeshAt(start, route.start, 35)) meshes.push(start);
+          addFallbackMarker(route.start, COLORS.startEnd, "START", 20);
+        }
+        if (route.end) {
+          const end = makeStar(0xffe45e);
+          if (addMeshAt(end, route.end, 35)) meshes.push(end);
+          addFallbackMarker(route.end, COLORS.startEnd, "END", 20);
+        }
+
+        const bottlenecks = topBottlenecks(state.mode === "before" ? 12 : 16);
+        bottlenecks.forEach((item, index) => {
+          if (!item.coords) return;
+          const coord = midpoint(item.coords);
+          const isAfter = state.mode === "after";
+          const geometry = isAfter
+            ? new THREE.BoxGeometry(12, 18, 12)
+            : new THREE.BoxGeometry(16, 24, 8);
+          const material = new THREE.MeshStandardMaterial({
+            color: isAfter ? 0x31c5ff : 0xff334e,
+            emissive: isAfter ? 0x06384a : 0x4a0610,
+            roughness: 0.58,
+            metalness: 0.08,
+            transparent: true,
+            opacity: isAfter ? 0.82 : 0.94,
+          });
+          const block = new THREE.Mesh(geometry, material);
+          block.rotation.y = (index % 4) * 0.45;
+          block.userData = {
+            type: isAfter ? "intervention-block" : "red-barrier",
+            edgeId: item.edge_id,
+            improvement: item.improvement,
+          };
+          if (addMeshAt(block, coord, isAfter ? 28 : 22)) meshes.push(block);
+
+          addFallbackMarker(
+            coord,
+            isAfter ? COLORS.afterFixed : COLORS.bottleneck,
+            isAfter ? "UPGRADE" : "BARRIER",
+            isAfter ? 13 : 15,
+          );
+        });
+
+        if (meshes.length) addThreeMesh(meshes);
+        state.threeObjectCount = meshes.length;
+      }
+
+      function updatePanel() {
+        const persona = state.payload.personas[state.persona];
+        const beforeCount = Number(persona.bottleneck_edges_before || 0);
+        const afterCount = Number(persona.bottleneck_edges_after || 0);
+        const count = state.mode === "before" ? beforeCount : afterCount;
+        const score =
+          state.mode === "before" ? persona.before_score : persona.after_score;
+        const delta = Number(
+          (persona.after_score || 0) - (persona.before_score || 0),
+        );
+
+        document.getElementById("totalEdges").textContent =
+          state.payload.edges.length.toLocaleString();
+        document.getElementById("bottlenecks").textContent =
+          count.toLocaleString();
+        document.getElementById("score").textContent = score ?? "–";
+        document.getElementById("buildingCount").textContent =
+          state.buildingCount ? state.buildingCount.toLocaleString() : "–";
+
+        const summary = document.getElementById("interventionSummary");
+        const modeLabel = state.mode === "before" ? "before intervention" : "after intervention";
+        summary.innerHTML = `
+          <strong>${persona.name}</strong> · ${modeLabel}<br />
+          ${state.payload.intervention.description}<br />
+          <strong>Scoring:</strong> PERS-inspired weighted pedestrian audit, adapted from -3..+3 criteria to 0..100.<br />
+          <strong>Impact:</strong> score ${persona.before_score} → ${persona.after_score}
+          (${delta >= 0 ? "+" : ""}${delta}), bottlenecks ${beforeCount} → ${afterCount}.
+          <br /><strong>3D layer:</strong>
+          ${state.mode === "before" ? "red Three.js barrier blocks show top risk edges." : "blue Three.js intervention blocks show upgraded segments."}
+        `;
+
+        const methodology = state.payload.scoring_methodology;
+        document.getElementById("scoringMethodology").innerHTML = methodology
+          ? `<strong>${methodology.name}</strong><br />Benchmark basis: ${methodology.benchmark_basis}<br />RAG: red ${methodology.rag_thresholds.red}, amber ${methodology.rag_thresholds.amber}, green ${methodology.rag_thresholds.green}.`
+          : "Scoring uses persona-weighted risk proxies.";
+      }
+
+      function setMode(mode) {
+        state.mode = mode;
+        beforeBtn.classList.toggle("active", mode === "before");
+        afterBtn.classList.toggle("active", mode === "after");
+        recolorEdges();
+        refreshCustomObjects();
+        updatePanel();
+        setStatus(
+          `${mode === "before" ? "Before" : "After"} view · ${state.payload.personas[state.persona].name} · ${state.threeObjectCount || 0} custom Three.js objects`,
+        );
+      }
+
+      function populatePersonas() {
+        const keys = PERSONA_ORDER.filter((key) => state.payload.personas[key]);
+        personaSelect.innerHTML = keys
+          .map((key) => {
+            const persona = state.payload.personas[key];
+            return `<option value="${key}">${persona.name}</option>`;
+          })
+          .join("");
+        personaSelect.value = state.persona;
+      }
+
+      beforeBtn.addEventListener("click", () => setMode("before"));
+      afterBtn.addEventListener("click", () => setMode("after"));
+      personaSelect.addEventListener("change", (event) => {
+        state.persona = event.target.value;
+        buildEdgeGeometries(state.payload.edges);
+        setMode(state.mode);
+      });
+
+
+
+      function polygonFromFeature(feature) {
+        const geom = feature.geometry || {};
+        if (geom.type !== "Polygon" || !geom.coordinates?.[0]?.length) return null;
+        const height = Number(feature.properties?.height_m || 18);
+        const shade = height > 35 ? "#64748b" : height > 20 ? "#78909c" : "#94a3b8";
+        return new maptalks.Polygon(geom.coordinates, {
+          properties: feature.properties,
+          symbol: {
+            polygonFill: shade,
+            polygonOpacity: 0.42,
+            lineColor: "rgba(226,232,240,0.32)",
+            lineWidth: 0.6,
+          },
+        });
+      }
+
+      async function loadBuildings() {
+        try {
+          const response = await fetch("buildings_clementi.geojson");
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const geojson = await response.json();
+          const features = Array.isArray(geojson.features) ? geojson.features : [];
+          state.buildingCount = features.length;
+          document.getElementById("buildingCount").textContent = features.length.toLocaleString();
+
+          if (maptalks.ExtrudePolygonLayer) {
+            const extrusion = new maptalks.ExtrudePolygonLayer("osm-building-extrusions", features, {
+              forceRenderOnMoving: true,
+              forceRenderOnRotating: true,
+              altitudeProperty: "height_m",
+            }).setStyle([
+              {
+                filter: true,
+                symbol: {
+                  polygonFill: "#8fa3b8",
+                  polygonOpacity: 0.58,
+                  lineColor: "rgba(255,255,255,0.22)",
+                  lineWidth: 0.4,
+                },
+              },
+            ]);
+            extrusion.addTo(equiMap);
+            state.buildingLayer = extrusion;
+            return;
+          }
+
+          const polygons = features.map(polygonFromFeature).filter(Boolean);
+          buildingLayer.clear();
+          buildingLayer.addGeometry(polygons);
+        } catch (err) {
+          console.warn("Could not load buildings_clementi.geojson", err);
+          document.getElementById("buildingCount").textContent = "0";
+        }
+      }
+
+      async function loadPayload() {
+        const response = await fetch("sim_persona_before_after.json");
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const payload = await response.json();
+        if (!Array.isArray(payload.edges) || payload.edges.length === 0) {
+          throw new Error("sim_persona_before_after.json has no edges");
+        }
+        return payload;
+      }
+
+      window.__EQUIROUTE_PROGRESS.push("before-loadPayload-call");
+      loadPayload()
+        .then((payload) => {
+          state.payload = payload;
+          state.persona = payload.personas[state.persona]
+            ? state.persona
+            : Object.keys(payload.personas)[0];
+
+          initializeThreeLayer();
+          loadBuildings();
+          populatePersonas();
+          buildEdgeGeometries(payload.edges);
+
+          const allCoords = payload.edges.flatMap((edge) => edge.coords || []);
+          const extent = allCoords.reduce(
+            (acc, coord) => {
+              acc.xmin = Math.min(acc.xmin, coord[0]);
+              acc.ymin = Math.min(acc.ymin, coord[1]);
+              acc.xmax = Math.max(acc.xmax, coord[0]);
+              acc.ymax = Math.max(acc.ymax, coord[1]);
+              return acc;
+            },
+            { xmin: Infinity, ymin: Infinity, xmax: -Infinity, ymax: -Infinity },
+          );
+          if (Number.isFinite(extent.xmin)) {
+            equiMap.fitExtent(
+              new maptalks.Extent(
+                extent.xmin,
+                extent.ymin,
+                extent.xmax,
+                extent.ymax,
+              ),
+              0,
+              { animation: false },
+            );
+            equiMap.setPitch(62);
+            equiMap.setBearing(-18);
+          }
+
+          setMode("before");
+          setStatus(
+            `Loaded ${payload.edges.length.toLocaleString()} edges + OSM buildings; PERS-inspired scoring active`,
+          );
+        })
+        .catch((err) => {
+          console.error(err);
+          setStatus(`Failed to load prototype: ${err.message}`);
+          document.getElementById("interventionSummary").textContent =
+            `Failed to load sim_persona_before_after.json: ${err.message}`;
+        });
+    </script>
+  </body>
+</html>

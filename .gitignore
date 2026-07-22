@@ -40,10 +40,14 @@ env/
 GEOSPATIAL/
 CLEMENTI/
 raw_data/
-CLEMENTI_MALL/
-OSM_CLEMENTI/
-OSM_CLEMENTI_MALL/
 malaysia-singapore-brunei-260706-free.shp/
+OSM_CLEMENTI/
+CLEMENTI_MALL/
+OSM_CLEMENTI_MALL/
+
+# JSON data
+*.json
+*.geojson
 
 # Large archives
 *.zip
