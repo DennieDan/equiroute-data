@@ -43,6 +43,11 @@ drop policy if exists "auth insert crowd photos" on public.street_photos;
 create policy "auth insert crowd photos" on public.street_photos
   for insert with check (auth.uid() = submitted_by and source = 'crowd');
 
+-- Demo/anon feedback from the map UI (no auth yet).
+drop policy if exists "public insert feedback threads" on public.feedback_threads;
+create policy "public insert feedback threads" on public.feedback_threads
+  for insert with check (created_by is null);
+
 drop policy if exists "auth insert feedback threads" on public.feedback_threads;
 create policy "auth insert feedback threads" on public.feedback_threads
   for insert with check (auth.uid() = created_by);
