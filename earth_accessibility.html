@@ -1809,28 +1809,44 @@
           const nodeByUuid = new Map(
             nodesRaw.map((n) => [n.id, n.external_id]),
           );
-          const photos = photosRaw.map((p) => ({
-            id: p.external_id || p.id,
-            db_id: p.id,
-            external_id: p.external_id,
-            street_part_id:
-              partByUuid.get(p.street_part_id) || p.street_part_id,
-            street_view_node_id:
-              nodeByUuid.get(p.street_view_node_id) || p.street_view_node_id,
-            source: p.source,
-            source_image_id: p.source_image_id,
-            image_url: p.image_url,
-            captured_at: p.captured_at,
-            lng: p.lng,
-            lat: p.lat,
-            compass_angle_deg: p.compass_angle_deg,
-            direction_valid: p.direction_valid,
-            direction_confidence: p.direction_confidence,
-            is_pano: p.is_pano,
-            is_active: p.is_active,
-            validation_status: p.validation_status,
-            metadata: p.metadata || {},
-          }));
+          let localPhotos = [];
+          if (!photosRaw.length) {
+            try {
+              const localRegistry = await fetch("data/street_view_registry.json").then((r) =>
+                r.ok ? r.json() : null,
+              );
+              localPhotos = localRegistry?.street_photos || [];
+            } catch (localErr) {
+              console.warn("local active-photo fallback unavailable", localErr);
+            }
+          }
+          const photos = photosRaw.length
+            ? photosRaw.map((p) => ({
+                id: p.external_id || p.id,
+                db_id: p.id,
+                external_id: p.external_id,
+                street_part_id:
+                  partByUuid.get(p.street_part_id) || p.street_part_id,
+                street_view_node_id:
+                  nodeByUuid.get(p.street_view_node_id) || p.street_view_node_id,
+                source: p.source,
+                source_image_id: p.source_image_id,
+                image_url: p.image_url,
+                captured_at: p.captured_at,
+                lng: p.lng,
+                lat: p.lat,
+                compass_angle_deg: p.compass_angle_deg,
+                direction_valid: p.direction_valid,
+                direction_confidence: p.direction_confidence,
+                is_pano: p.is_pano,
+                is_active: p.is_active,
+                validation_status: p.validation_status,
+                metadata: p.metadata || {},
+              }))
+            : localPhotos;
+          const activePhotoPartIds = new Set(
+            photos.filter((p) => p.is_active).map((p) => p.street_part_id),
+          );
           const nodes = nodesRaw.map((n) => ({
             id: n.external_id,
             db_id: n.id,
@@ -1848,11 +1864,15 @@
             next_node_id: n.next_node_external_id,
             left_node_id: n.left_node_external_id,
             right_node_id: n.right_node_external_id,
-            coverage_status: n.coverage_status,
+            coverage_status: activePhotoPartIds.has(
+              partByUuid.get(n.street_part_id) || n.street_part_id,
+            )
+              ? "active"
+              : n.coverage_status,
           }));
           return {
             schema_version: 2,
-            source: "supabase",
+            source: photosRaw.length ? "supabase" : "supabase+local_active_photos",
             streets,
             street_parts: streetParts,
             street_view_nodes: nodes,
@@ -1885,7 +1905,11 @@
           renderSatelliteFallback();
           const streetCount = registry?.streets?.length || 0,
             nodeCount = registry?.street_view_nodes?.length || 0,
-            src = registry?.source === "supabase" ? "Supabase" : "local JSON";
+            src = registry?.source === "supabase"
+              ? "Supabase"
+              : registry?.source === "supabase+local_active_photos"
+                ? "Supabase + local active photos"
+                : "local JSON";
           setStatus(
             `Loaded ${state.segments.length.toLocaleString()} 5 m segments, ${streetCount} streets, ${nodeCount} street-view nodes from ${src}`,
           );
