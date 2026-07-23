@@ -275,6 +275,11 @@
         gap: 8px;
         align-items: center;
         margin-top: 10px;
+        flex-wrap: wrap;
+      }
+      .detail-actions #feedbackMeta {
+        flex: 1 1 180px;
+        margin-top: 0;
       }
       .detail-actions button {
         font-size: 12px;
@@ -508,9 +513,9 @@
       <div class="metrics" id="metricList"></div>
       <div class="detail-actions">
         <button type="button" id="feedbackBtn">Give feedback</button>
+        <div id="feedbackMeta"></div>
       </div>
       <form id="feedbackForm">
-        <div id="feedbackMeta"></div>
         <label for="feedbackTitle">Title</label>
         <input
           id="feedbackTitle"
@@ -1042,22 +1047,41 @@
         featureExternalId = null,
         name = "",
       } = {}) {
-        const part = currentStreetPart() || streetPartForSegmentId(segmentId);
+        const part = streetPartForSegmentId(segmentId) || currentStreetPart();
         const resolvedFeatureId = featureExternalIdForKind(
           kind,
           segmentId,
           featureExternalId,
         );
-        state.detailContext = {
+        const next = {
           kind: kind || "",
-          segmentId,
+          segmentId: segmentId || null,
           streetPartExternalId: part?.id || null,
           streetPartDbId: part?.db_id || null,
           featureExternalId: resolvedFeatureId,
           name: name || "",
         };
+        const prev = state.detailContext;
+        const changed =
+          !prev ||
+          prev.kind !== next.kind ||
+          prev.segmentId !== next.segmentId ||
+          prev.featureExternalId !== next.featureExternalId ||
+          prev.streetPartExternalId !== next.streetPartExternalId ||
+          prev.name !== next.name;
+        state.detailContext = next;
         updateFeedbackMeta();
-        closeFeedbackForm(true);
+        if (changed) {
+          feedbackStatus.textContent = "";
+          feedbackStatus.className = "";
+          fillFeedbackTitleFromContext();
+          feedbackBody.value = "";
+        }
+      }
+      function fillFeedbackTitleFromContext() {
+        const ctx = state.detailContext || {};
+        const label = capitalizeKind(ctx.kind) || "Accessibility";
+        feedbackTitle.value = `${label} issue${ctx.name ? ": " + ctx.name : ""}`;
       }
       function updateFeedbackMeta() {
         const ctx = state.detailContext || {};
@@ -1072,18 +1096,17 @@
       }
       function closeFeedbackForm(clearStatus = false) {
         feedbackForm.classList.remove("open");
-        if (clearStatus) feedbackStatus.textContent = "";
+        if (clearStatus) {
+          feedbackStatus.textContent = "";
+          feedbackStatus.className = "";
+        }
       }
       function openFeedbackForm() {
-        const ctx = state.detailContext || {};
         feedbackForm.classList.add("open");
         feedbackStatus.textContent = "";
         feedbackStatus.className = "";
-        if (!feedbackTitle.value) {
-          const label = capitalizeKind(ctx.kind) || "Accessibility";
-          feedbackTitle.value = `${label} issue${ctx.name ? ": " + ctx.name : ""}`;
-        }
         updateFeedbackMeta();
+        fillFeedbackTitleFromContext();
         feedbackTitle.focus();
       }
       async function supabaseLookupByExternalId(table, externalId) {
