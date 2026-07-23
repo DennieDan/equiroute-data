@@ -270,6 +270,70 @@
         gap: 8px;
         margin-top: 10px;
       }
+      .detail-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-top: 10px;
+        flex-wrap: wrap;
+      }
+      .detail-actions #feedbackMeta {
+        flex: 1 1 180px;
+        margin-top: 0;
+      }
+      .detail-actions button {
+        font-size: 12px;
+        padding: 7px 12px;
+      }
+      #feedbackForm {
+        display: none;
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid rgba(148, 163, 184, 0.22);
+      }
+      #feedbackForm.open {
+        display: block;
+      }
+      #feedbackForm label {
+        display: block;
+        font-size: 11px;
+        color: var(--muted);
+        margin: 6px 0 4px;
+      }
+      #feedbackForm input,
+      #feedbackForm textarea {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.28);
+        background: rgba(15, 23, 42, 0.72);
+        color: white;
+        padding: 8px 10px;
+        font: inherit;
+      }
+      #feedbackForm textarea {
+        min-height: 72px;
+        resize: vertical;
+      }
+      #feedbackMeta,
+      #feedbackStatus {
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 6px;
+      }
+      #feedbackStatus.ok {
+        color: var(--green);
+      }
+      #feedbackStatus.err {
+        color: var(--red);
+      }
+      .feedback-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+      }
       .metric {
         background: rgba(15, 23, 42, 0.72);
         border: 1px solid rgba(148, 163, 184, 0.18);
@@ -447,8 +511,36 @@
         <button class="close" id="closeDetail">×</button>
       </div>
       <div class="metrics" id="metricList"></div>
+      <div class="detail-actions">
+        <button type="button" id="feedbackBtn">Give feedback</button>
+        <div id="feedbackMeta"></div>
+      </div>
+      <form id="feedbackForm">
+        <label for="feedbackTitle">Title</label>
+        <input
+          id="feedbackTitle"
+          name="title"
+          required
+          maxlength="120"
+          placeholder="What should be fixed?"
+        />
+        <label for="feedbackBody">Details</label>
+        <textarea
+          id="feedbackBody"
+          name="body"
+          required
+          maxlength="2000"
+          placeholder="Describe the accessibility issue or suggestion."
+        ></textarea>
+        <div class="feedback-actions">
+          <button type="submit" id="feedbackSubmitBtn">Submit</button>
+          <button type="button" id="feedbackCancelBtn">Cancel</button>
+        </div>
+        <div id="feedbackStatus"></div>
+      </form>
     </section>
     <div class="status" id="status">Loading Clementi digital twin…</div>
+    <script src="feedback-form.js"></script>
     <script>
       const COLORS = {
         green: "#22f36e",
@@ -475,13 +567,14 @@
         streetRegistry: null,
         streetNodeIndex: 0,
         nodePhotoCache: {},
+        detailContext: null,
       };
       window.__EARTH_ACCESSIBILITY_STATE = state;
       const SATELLITE_TILE =
         "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
-      const SUPABASE_URL = "https://fhsnfvhydwtmdlrxokur.supabase.co";
+      const SUPABASE_URL = "https://khddsjemkdcgumfvkraa.supabase.co";
       const SUPABASE_PUBLISHABLE_KEY =
-        "sb_publishable_NPba4pJEkVVc8g6H-xYCIA_NQ-KaQLT";
+        "sb_publishable_lqGtwkNAOMV7qsYPKVZr8w_GytZx3Qm";
       const map = new maptalks.Map("map", {
         center: [103.7716, 1.3062],
         zoom: 17,
@@ -810,6 +903,9 @@
         state.features = world.features.filter(
           (f) => f.properties.kind !== "route_segment",
         );
+        state.features.forEach((f, i) => {
+          f.properties.external_id = poiExternalId(f.properties, i);
+        });
         const allRoutes = world.features.filter(
           (f) => f.properties.kind === "route_segment",
         );
@@ -900,35 +996,128 @@
           .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
           .join(" ");
       }
-      function showDetail(p, kind = "") {
+      function slugify(text) {
+        return (
+          String(text || "")
+            .trim()
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "_")
+            .replace(/^_+|_+$/g, "") || "unnamed"
+        );
+      }
+      function poiExternalId(props, index) {
+        const kind = props.kind,
+          src = props.source_properties || {};
+        if (kind === "bus_stop" && src.BUS_STOP_N != null)
+          return `bus_stop_${src.BUS_STOP_N}`;
+        if (kind === "mrt_station" && src.STN_NAM_DE)
+          return `mrt_${slugify(src.STN_NAM_DE)}`;
+        if (src.OBJECTID != null) return `${kind}_${src.OBJECTID}`;
+        if (src.SHAPE_LEN != null)
+          return `${kind}_${index}_${slugify(src.TYP_CD_DES || kind)}`;
+        return `${kind}_${index}`;
+      }
+      function featureExternalIdForKind(kind, segmentId, poiExternalIdValue) {
+        if (poiExternalIdValue) return poiExternalIdValue;
+        if (kind === "ramp" && segmentId) return `kerb_ramp_${segmentId}`;
+        if (kind === "tactile" && segmentId)
+          return `tactile_guidance_${segmentId}`;
+        return null;
+      }
+      function streetPartForSegmentId(segId) {
+        const parts = state.streetRegistry?.street_parts || [];
+        if (!segId) return null;
+        return (
+          parts.find((p) => (p.route_segment_ids || []).includes(segId)) || null
+        );
+      }
+      function currentStreetPart() {
+        const node = currentStreetNode();
+        if (node?.street_part_id) {
+          const parts = state.streetRegistry?.street_parts || [];
+          const byId = parts.find((p) => p.id === node.street_part_id);
+          if (byId) return byId;
+        }
+        const seg =
+          state.currentStreetSegment || state.segments[state.selectedIndex];
+        return streetPartForSegmentId(seg?.properties?.id);
+      }
+      function setDetailContext({
+        kind = "",
+        segmentId = null,
+        featureExternalId = null,
+        name = "",
+      } = {}) {
+        const part = streetPartForSegmentId(segmentId) || currentStreetPart();
+        const resolvedFeatureId = featureExternalIdForKind(
+          kind,
+          segmentId,
+          featureExternalId,
+        );
+        const next = {
+          kind: kind || "",
+          segmentId: segmentId || null,
+          streetPartExternalId: part?.id || null,
+          streetPartDbId: part?.db_id || null,
+          featureExternalId: resolvedFeatureId,
+          name: name || "",
+        };
+        const prev = state.detailContext;
+        const changed =
+          !prev ||
+          prev.kind !== next.kind ||
+          prev.segmentId !== next.segmentId ||
+          prev.featureExternalId !== next.featureExternalId ||
+          prev.streetPartExternalId !== next.streetPartExternalId ||
+          prev.name !== next.name;
+        state.detailContext = next;
+        EquirouteFeedback.onContextChange(changed);
+      }
+      function showDetail(p, kind = "", extras = {}) {
         detailCard.classList.add("visible");
-        const typeLabel = p.feature_type.replaceAll("_", " ");
+        const typeLabel = (p.feature_type || p.kind || "feature").replaceAll(
+          "_",
+          " ",
+        );
         const kindLabel = capitalizeKind(kind || addonFor(p));
         selectedKind.textContent = kindLabel;
-        selectedName.textContent = `${p.name} · ${typeLabel}`;
-        selectedDesc.textContent = `${Math.round(p.metrics.length_m * 10) / 10} m segment${kindLabel ? " · " + kindLabel.toLowerCase() : ""}`;
-        activeScore.textContent = p.overall_accessibility_score;
+        selectedName.textContent = `${p.name || "Feature"} · ${typeLabel}`;
+        selectedDesc.textContent = p.metrics?.length_m
+          ? `${Math.round(p.metrics.length_m * 10) / 10} m segment${kindLabel ? " · " + kindLabel.toLowerCase() : ""}`
+          : `${kindLabel || typeLabel}${extras.distanceM != null ? ` · ~${Math.round(extras.distanceM)}m from camera` : ""}`;
+        activeScore.textContent =
+          p.overall_accessibility_score ?? extras.score ?? "–";
         const m = p.metrics,
           c = p.component_scores;
-        metricList.innerHTML = [
-          ["Width", m.clear_width_m + " m", c.clear_width],
-          ["Slope", m.running_slope_pct + "%", c.running_slope],
-          ["Cross slope", m.cross_slope_pct + "%", c.cross_slope],
-          ["Roughness", m.roughness_mm + " mm", c.surface_roughness],
-          ["Level change", m.vertical_change_mm + " mm", c.vertical_change],
-          ["Obstructions", m.obstruction_count, c.obstructions],
-          ["Shelter", m.covered ? "yes" : "no", c.shelter],
-          [
-            "Tactile",
-            m.tactile_guidance ? "yes" : "unknown",
-            c.tactile_guidance,
-          ],
-        ]
-          .map(
-            (x) =>
-              `<div class="metric"><span>${x[0]}</span><b style="color:${scoreColor(x[2])}">${x[1]}</b><small>${x[2]}/100</small></div>`,
-          )
-          .join("");
+        if (m && c) {
+          metricList.innerHTML = [
+            ["Width", m.clear_width_m + " m", c.clear_width],
+            ["Slope", m.running_slope_pct + "%", c.running_slope],
+            ["Cross slope", m.cross_slope_pct + "%", c.cross_slope],
+            ["Roughness", m.roughness_mm + " mm", c.surface_roughness],
+            ["Level change", m.vertical_change_mm + " mm", c.vertical_change],
+            ["Obstructions", m.obstruction_count, c.obstructions],
+            ["Shelter", m.covered ? "yes" : "no", c.shelter],
+            [
+              "Tactile",
+              m.tactile_guidance ? "yes" : "unknown",
+              c.tactile_guidance,
+            ],
+          ]
+            .map(
+              (x) =>
+                `<div class="metric"><span>${x[0]}</span><b style="color:${scoreColor(x[2])}">${x[1]}</b><small>${x[2]}/100</small></div>`,
+            )
+            .join("");
+        } else {
+          metricList.innerHTML = `<div class="metric"><span>Feature</span><b>${capitalizeKind(kind) || typeLabel}</b><small>POI</small></div>`;
+        }
+        setDetailContext({
+          kind: kind || addonFor(p) || "",
+          segmentId: p.id || null,
+          featureExternalId: extras.featureExternalId || p.external_id || null,
+          name: p.name || "",
+        });
       }
       function selectSegment(index, street = false) {
         if (!state.segments.length) return;
@@ -1279,10 +1468,13 @@
             add({
               kind,
               f: null,
+              poi: f,
               coord,
               score: kind === "obstruction" ? 45 : kind === "mrt" ? 88 : 82,
               label: kind,
               name: p.name || kind,
+              featureExternalId: p.external_id || null,
+              distanceM: d,
             });
         });
         add({
@@ -1361,13 +1553,26 @@
             b.title = x.f
               ? featureComment(x.f.properties, kind)
               : `${kind} near this photo · ${Math.round(pt.d)}m away`;
-            b.onclick = () =>
-              x.f
-                ? showFeatureForSegment(idx, kind)
-                : ((selectedDesc.textContent = `${kind} near this street image, approximately ${Math.round(pt.d)}m away from the camera direction.`),
-                  (selectedKind.textContent = capitalizeKind(kind)),
-                  (activeScore.textContent = x.score),
-                  detailCard.classList.add("visible"));
+            b.onclick = () => {
+              if (x.f) {
+                showFeatureForSegment(idx, kind);
+                return;
+              }
+              showDetail(
+                {
+                  name: x.name || kind,
+                  kind: x.poi?.properties?.kind || kind,
+                  external_id: x.featureExternalId || null,
+                  source_properties: x.poi?.properties?.source_properties,
+                },
+                kind,
+                {
+                  featureExternalId: x.featureExternalId || null,
+                  score: x.score,
+                  distanceM: x.distanceM ?? pt.d,
+                },
+              );
+            };
             segmentButtons.appendChild(b);
           });
           return;
@@ -1520,7 +1725,16 @@
       streetBtn.onclick = () => selectSegment(state.selectedIndex, true);
       settingsBtn.onclick = () => settings.classList.toggle("visible");
       closeSettings.onclick = () => settings.classList.remove("visible");
-      closeDetail.onclick = () => detailCard.classList.remove("visible");
+      closeDetail.onclick = () => {
+        detailCard.classList.remove("visible");
+        EquirouteFeedback.close(true);
+      };
+      EquirouteFeedback.init({
+        getDetailContext: () => state.detailContext,
+        supabaseUrl: SUPABASE_URL,
+        supabaseKey: SUPABASE_PUBLISHABLE_KEY,
+        capitalizeKind,
+      });
       saveMapillaryTokenBtn.onclick = () => setToken(mapillaryTokenInput.value);
       map.on("moving zooming resize viewchange", () => {
         renderSatelliteFallback();

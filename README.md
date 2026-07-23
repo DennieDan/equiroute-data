@@ -69,6 +69,23 @@ python3 scripts/street_view_registry.py --max-parts 30 --target-length-m 10
 
 This writes `data/street_view_registry.json`, grouping the existing 5 m path metrics into 8–10 m street-view nodes with stable previous/next links, canonical headings, and road-on-right orientation metadata. The registry now has a hierarchy: **many streets → many street parts per street → one street-view node per street part**. Supabase schema/RLS/seed files live in `supabase/`; the frontend reads the Supabase street registry first and falls back to local JSON if the backend is unavailable. The active-photo layer is ready: each street part can own one active `street_photo`, keep photo history, and preserve comments/upvotes on the street part when newer photos replace older photos.
 
+Seed `accessibility_features` from the world layer with:
+
+```bash
+python3 scripts/seed_accessibility_features.py
+```
+
+This writes `supabase/seed_accessibility_features.sql`. Stable `external_id` values are formed as follows (kind + segment id only for derived ramp/tactile rows; point POIs use LTA/source IDs):
+
+| Feature type | `external_id` pattern | Example |
+| --- | --- | --- |
+| kerb ramp | `{kind}_{seg_id}` | `kerb_ramp_seg_00040` |
+| tactile | `{kind}_{seg_id}` | `tactile_guidance_seg_00040` |
+| bus stop | `bus_stop_{BUS_STOP_N}` | `bus_stop_17239` |
+| bollard / linkway | `{kind}_{OBJECTID}` | `bollard_21659` |
+| MRT | `mrt_{station_name_slug}` | `mrt_clementi_mrt_station` |
+| overhead bridge | `{kind}_{index}_{slug}` | `pedestrian_overhead_bridge_0_...` |
+
 7. **View the 3D MVP** — from the project root, start a local server:
 
 ```bash
