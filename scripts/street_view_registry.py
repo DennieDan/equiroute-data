@@ -12,6 +12,10 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import os
+import time
+import urllib.parse
+import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
@@ -180,6 +184,93 @@ def build_streets(street_parts: list[dict[str, Any]], turn_threshold_deg: float 
             street["length_m"] = round(sum(haversine_m(a, b) for a, b in zip(coords, coords[1:])), 2)
             street["metrics"] = {"street_part_count": len(street["street_part_ids"])}
     return streets
+
+
+MAPILLARY_FIELDS = ",".join(
+    [
+        "id",
+        "is_pano",
+        "thumb_2048_url",
+        "thumb_1024_url",
+        "thumb_256_url",
+        "geometry",
+        "computed_geometry",
+        "compass_angle",
+        "computed_compass_angle",
+        "captured_at",
+        "sequence",
+    ]
+)
+
+
+def mapillary_images_url(lng: float, lat: float, token: str, radius_m: int = 45, limit: int = 12) -> str:
+    params = {
+        "fields": MAPILLARY_FIELDS,
+        "lat": f"{lat:.7f}",
+        "lng": f"{lng:.7f}",
+        "radius": str(radius_m),
+        "limit": str(limit),
+        "access_token": token,
+    }
+    return "https://graph.mapillary.com/images?" + urllib.parse.urlencode(params)
+
+
+def fetch_mapillary_images(
+    lng: float,
+    lat: float,
+    token: str,
+    radius_m: int = 45,
+    limit: int = 12,
+    timeout_s: int = 20,
+) -> list[dict[str, Any]]:
+    """Fetch Mapillary image candidates for one street-part midpoint.
+
+    The caller is responsible for providing a token; this function never logs or
+    stores the token, and the token is not included in returned metadata.
+    """
+    url = mapillary_images_url(lng, lat, token, radius_m=radius_m, limit=limit)
+    with urllib.request.urlopen(url, timeout=timeout_s) as response:
+        payload = json.loads(response.read().decode("utf-8"))
+    rows = payload.get("data", []) if isinstance(payload, dict) else []
+    for row in rows:
+        row.setdefault("source", "mapillary")
+    return rows
+
+
+def harvest_mapillary_candidates(
+    street_parts: list[dict[str, Any]],
+    token: str,
+    radius_m: int = 45,
+    limit_per_part: int = 12,
+    sleep_s: float = 0.12,
+) -> dict[str, list[dict[str, Any]]]:
+    """Harvest candidate photos keyed by street_part external id."""
+    candidates_by_part: dict[str, list[dict[str, Any]]] = {}
+    seen_by_part: dict[str, set[str]] = {}
+    for i, part in enumerate(street_parts, start=1):
+        mid = part.get("midpoint") or [None, None]
+        lng, lat = mid[0], mid[1]
+        if lng is None or lat is None:
+            continue
+        rows = fetch_mapillary_images(
+            float(lng),
+            float(lat),
+            token=token,
+            radius_m=radius_m,
+            limit=limit_per_part,
+        )
+        seen = seen_by_part.setdefault(part["id"], set())
+        clean_rows = []
+        for row in rows:
+            image_id = str(row.get("id") or "")
+            if not image_id or image_id in seen:
+                continue
+            seen.add(image_id)
+            clean_rows.append(row)
+        candidates_by_part[part["id"]] = clean_rows
+        if sleep_s and i < len(street_parts):
+            time.sleep(sleep_s)
+    return candidates_by_part
 
 
 def candidate_coord(candidate: dict[str, Any]) -> list[float] | None:
@@ -445,11 +536,36 @@ def main() -> None:
     parser.add_argument("--target-length-m", type=float, default=10.0)
     parser.add_argument("--max-parts", type=int, default=30)
     parser.add_argument("--photo-candidates", type=Path, default=None, help="Optional JSON mapping street_part_id -> Mapillary/crowd candidate photos")
+    parser.add_argument("--harvest-mapillary", action="store_true", help="Fetch Mapillary candidates for generated street parts before selecting active photos")
+    parser.add_argument("--mapillary-token-env", default="MAPILLARY_TOKEN", help="Environment variable containing the Mapillary token")
+    parser.add_argument("--mapillary-radius-m", type=int, default=45)
+    parser.add_argument("--mapillary-limit-per-part", type=int, default=12)
+    parser.add_argument("--candidate-out", type=Path, default=None, help="Optional JSON output path for raw candidates keyed by street_part id")
     parser.add_argument("--seed-sql", type=Path, default=None, help="Optional Supabase seed SQL output path")
     args = parser.parse_args()
 
     world = json.loads(args.world.read_text())
     photo_candidates = json.loads(args.photo_candidates.read_text()) if args.photo_candidates else None
+    if args.harvest_mapillary:
+        token = os.environ.get(args.mapillary_token_env, "").strip()
+        if not token:
+            raise SystemExit(f"Missing Mapillary token env var: {args.mapillary_token_env}")
+        preview_parts = group_segments_into_street_parts(
+            world.get("features", []),
+            target_length_m=args.target_length_m,
+            max_parts=args.max_parts,
+        )
+        photo_candidates = harvest_mapillary_candidates(
+            preview_parts,
+            token=token,
+            radius_m=args.mapillary_radius_m,
+            limit_per_part=args.mapillary_limit_per_part,
+        )
+        if args.candidate_out:
+            args.candidate_out.parent.mkdir(parents=True, exist_ok=True)
+            args.candidate_out.write_text(json.dumps(photo_candidates, indent=2))
+            total_candidates = sum(len(v) for v in photo_candidates.values())
+            print(f"wrote {args.candidate_out} with {total_candidates} raw Mapillary candidates")
     registry = build_registry(
         world,
         target_length_m=args.target_length_m,

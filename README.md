@@ -67,6 +67,19 @@ The street-view navigation now uses a lightweight Google-Street-View-style node 
 python3 scripts/street_view_registry.py --max-parts 30 --target-length-m 10
 ```
 
+To harvest real Mapillary candidates and select active photos for the 30 demo street parts:
+
+```bash
+MAPILLARY_TOKEN=... python3 scripts/street_view_registry.py \
+  --max-parts 30 \
+  --target-length-m 10 \
+  --harvest-mapillary \
+  --candidate-out data/mapillary_candidates.json \
+  --seed-sql supabase/seed_street_view_registry.sql
+```
+
+The harvester fetches Mapillary camera geometry/compass metadata per street part, filters by canonical road-on-right heading, selects one active photo per part when direction-valid, and leaves missing-photo states intact when no suitable photo exists.
+
 This writes `data/street_view_registry.json`, grouping the existing 5 m path metrics into 8–10 m street-view nodes with stable previous/next links, canonical headings, and road-on-right orientation metadata. The registry now has a hierarchy: **many streets → many street parts per street → one street-view node per street part**. Supabase schema/RLS/seed files live in `supabase/`; the frontend reads the Supabase street registry first and falls back to local JSON if the backend is unavailable. The active-photo layer is ready: each street part can own one active `street_photo`, keep photo history, and preserve comments/upvotes on the street part when newer photos replace older photos.
 
 Seed `accessibility_features` from the world layer with:

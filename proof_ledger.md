@@ -17,6 +17,8 @@ Track every judge-visible claim with evidence before pitch polish.
 
 | Active photo registry schema/read path exists | `supabase/schema.sql`, `scripts/street_view_registry.py`, `earth_accessibility.html` | `python3 -m unittest tests.test_street_view_registry -v`; REST query `street_photos?select=external_id,street_view_node_id,validation_status,selected_reason,replaces_photo_id&limit=0` returned HTTP 200 | 8 tests pass, active photo columns readable | "Each street part can now own one active photo while preserving history/comments when photos are replaced." | built |
 
+| Mapillary candidate harvester exists for active photo curation | `scripts/street_view_registry.py`, `tests/test_street_view_registry.py` | `python3 -m unittest tests.test_street_view_registry tests.test_seed_accessibility_features -v`; CLI dry run with seed SQL | 30-part harvester command supports `--harvest-mapillary`, `--candidate-out`, direction filtering, active-photo seed output | Ready; needs Mapillary token at run time |
+
 ## Next proof targets
 
 - Direction-consistent Mapillary/crowd photo corridor: 15–30 active photos, road-on-right.

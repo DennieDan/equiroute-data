@@ -8,6 +8,8 @@ from scripts.street_view_registry import (
     build_streets,
     choose_best_photo,
     group_segments_into_street_parts,
+    harvest_mapillary_candidates,
+    mapillary_images_url,
     registry_to_supabase_seed_sql,
 )
 
@@ -150,6 +152,39 @@ class StreetViewRegistryTest(unittest.TestCase):
         self.assertTrue(photos[0]["is_active"])
         self.assertEqual(nodes[0]["active_photo_id"], photos[0]["id"])
         self.assertEqual(nodes[0]["coverage_status"], "active")
+
+    def test_mapillary_url_requests_metadata_without_printing_token(self):
+        url = mapillary_images_url(103.123456789, 1.234567891, "tok/with spaces", radius_m=35, limit=7)
+
+        self.assertIn("https://graph.mapillary.com/images?", url)
+        self.assertIn("thumb_2048_url", url)
+        self.assertIn("computed_geometry", url)
+        self.assertIn("computed_compass_angle", url)
+        self.assertIn("radius=35", url)
+        self.assertIn("limit=7", url)
+        self.assertIn("access_token=tok%2Fwith+spaces", url)
+
+    def test_harvest_mapillary_candidates_keys_rows_by_street_part(self):
+        import scripts.street_view_registry as svr
+
+        original = svr.fetch_mapillary_images
+        calls = []
+        try:
+            def fake_fetch(lng, lat, token, radius_m=45, limit=12, timeout_s=20):
+                calls.append((round(lng, 6), round(lat, 6), token, radius_m, limit))
+                return [
+                    {"id": "same", "computed_geometry": {"coordinates": [lng, lat]}, "computed_compass_angle": 90},
+                    {"id": "same", "computed_geometry": {"coordinates": [lng, lat]}, "computed_compass_angle": 90},
+                ]
+            svr.fetch_mapillary_images = fake_fetch
+            parts = [{"id": "street_part_0000", "midpoint": [103.0, 1.0]}]
+            rows = harvest_mapillary_candidates(parts, "secret-token", radius_m=20, limit_per_part=3, sleep_s=0)
+        finally:
+            svr.fetch_mapillary_images = original
+
+        self.assertEqual(calls, [(103.0, 1.0, "secret-token", 20, 3)])
+        self.assertEqual(len(rows["street_part_0000"]), 1)
+        self.assertEqual(rows["street_part_0000"][0]["id"], "same")
 
     def test_registry_exports_supabase_seed_sql_for_streets_parts_nodes_and_photos(self):
         segments = [
