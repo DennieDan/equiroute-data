@@ -540,6 +540,7 @@
       </form>
     </section>
     <div class="status" id="status">Loading Clementi digital twin…</div>
+    <script src="feedback-form.js"></script>
     <script>
       const COLORS = {
         green: "#22f36e",
@@ -1070,101 +1071,7 @@
           prev.streetPartExternalId !== next.streetPartExternalId ||
           prev.name !== next.name;
         state.detailContext = next;
-        updateFeedbackMeta();
-        if (changed) {
-          feedbackStatus.textContent = "";
-          feedbackStatus.className = "";
-          fillFeedbackTitleFromContext();
-          feedbackBody.value = "";
-        }
-      }
-      function fillFeedbackTitleFromContext() {
-        const ctx = state.detailContext || {};
-        const label = capitalizeKind(ctx.kind) || "Accessibility";
-        feedbackTitle.value = `${label} issue${ctx.name ? ": " + ctx.name : ""}`;
-      }
-      function updateFeedbackMeta() {
-        const ctx = state.detailContext || {};
-        const bits = [];
-        if (ctx.streetPartExternalId)
-          bits.push(`street part ${ctx.streetPartExternalId}`);
-        if (ctx.featureExternalId)
-          bits.push(`feature ${ctx.featureExternalId}`);
-        else if (ctx.kind) bits.push(`${ctx.kind} (street-part only)`);
-        else bits.push("street-part only");
-        feedbackMeta.textContent = bits.join(" · ");
-      }
-      function closeFeedbackForm(clearStatus = false) {
-        feedbackForm.classList.remove("open");
-        if (clearStatus) {
-          feedbackStatus.textContent = "";
-          feedbackStatus.className = "";
-        }
-      }
-      function openFeedbackForm() {
-        feedbackForm.classList.add("open");
-        feedbackStatus.textContent = "";
-        feedbackStatus.className = "";
-        updateFeedbackMeta();
-        fillFeedbackTitleFromContext();
-        feedbackTitle.focus();
-      }
-      async function supabaseLookupByExternalId(table, externalId) {
-        if (!externalId) return null;
-        const rows = await supabaseRest(
-          table,
-          `select=id,external_id&external_id=eq.${encodeURIComponent(externalId)}&limit=1`,
-        );
-        return rows?.[0] || null;
-      }
-      async function submitFeedback(title, body) {
-        const ctx = state.detailContext || {};
-        let streetPartId = ctx.streetPartDbId;
-        if (!streetPartId && ctx.streetPartExternalId) {
-          const part = await supabaseLookupByExternalId(
-            "street_parts",
-            ctx.streetPartExternalId,
-          );
-          streetPartId = part?.id || null;
-        }
-        if (!streetPartId) {
-          throw new Error(
-            "No street_part match yet. Open a seeded demo corridor segment first.",
-          );
-        }
-        let featureId = null;
-        if (ctx.featureExternalId) {
-          const feat = await supabaseLookupByExternalId(
-            "accessibility_features",
-            ctx.featureExternalId,
-          );
-          featureId = feat?.id || null;
-        }
-        const payload = {
-          street_part_id: streetPartId,
-          feature_id: featureId,
-          title,
-          body,
-          created_by: null,
-          status: "open",
-          priority_score: 0,
-        };
-        const url = `${SUPABASE_URL}/rest/v1/feedback_threads`;
-        const r = await fetch(url, {
-          method: "POST",
-          headers: {
-            apikey: SUPABASE_PUBLISHABLE_KEY,
-            Authorization: "Bearer " + SUPABASE_PUBLISHABLE_KEY,
-            "Content-Type": "application/json",
-            Prefer: "return=representation",
-          },
-          body: JSON.stringify(payload),
-        });
-        if (!r.ok) {
-          const errText = await r.text();
-          throw new Error(`Supabase feedback ${r.status}: ${errText}`);
-        }
-        return r.json();
+        EquirouteFeedback.onContextChange(changed);
       }
       function showDetail(p, kind = "", extras = {}) {
         detailCard.classList.add("visible");
@@ -1820,35 +1727,14 @@
       closeSettings.onclick = () => settings.classList.remove("visible");
       closeDetail.onclick = () => {
         detailCard.classList.remove("visible");
-        closeFeedbackForm(true);
+        EquirouteFeedback.close(true);
       };
-      feedbackBtn.onclick = () => openFeedbackForm();
-      feedbackCancelBtn.onclick = () => closeFeedbackForm(true);
-      feedbackForm.onsubmit = async (e) => {
-        e.preventDefault();
-        const title = feedbackTitle.value.trim();
-        const body = feedbackBody.value.trim();
-        if (!title || !body) return;
-        feedbackSubmitBtn.disabled = true;
-        feedbackStatus.className = "";
-        feedbackStatus.textContent = "Submitting…";
-        try {
-          const rows = await submitFeedback(title, body);
-          const row = Array.isArray(rows) ? rows[0] : rows;
-          feedbackStatus.className = "ok";
-          feedbackStatus.textContent = row?.feature_id
-            ? `Feedback saved and linked to feature.`
-            : `Feedback saved on street part${state.detailContext?.featureExternalId ? " (feature not found in DB yet)" : ""}.`;
-          feedbackTitle.value = "";
-          feedbackBody.value = "";
-          setTimeout(() => closeFeedbackForm(false), 1200);
-        } catch (err) {
-          feedbackStatus.className = "err";
-          feedbackStatus.textContent = err.message || String(err);
-        } finally {
-          feedbackSubmitBtn.disabled = false;
-        }
-      };
+      EquirouteFeedback.init({
+        getDetailContext: () => state.detailContext,
+        supabaseUrl: SUPABASE_URL,
+        supabaseKey: SUPABASE_PUBLISHABLE_KEY,
+        capitalizeKind,
+      });
       saveMapillaryTokenBtn.onclick = () => setToken(mapillaryTokenInput.value);
       map.on("moving zooming resize viewchange", () => {
         renderSatelliteFallback();
