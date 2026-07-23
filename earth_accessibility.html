@@ -297,7 +297,10 @@
       }
       #feedbackForm input,
       #feedbackForm textarea {
+        display: block;
         width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
         border-radius: 10px;
         border: 1px solid rgba(148, 163, 184, 0.28);
         background: rgba(15, 23, 42, 0.72);
@@ -509,9 +512,21 @@
       <form id="feedbackForm">
         <div id="feedbackMeta"></div>
         <label for="feedbackTitle">Title</label>
-        <input id="feedbackTitle" name="title" required maxlength="120" placeholder="What should be fixed?" />
+        <input
+          id="feedbackTitle"
+          name="title"
+          required
+          maxlength="120"
+          placeholder="What should be fixed?"
+        />
         <label for="feedbackBody">Details</label>
-        <textarea id="feedbackBody" name="body" required maxlength="2000" placeholder="Describe the accessibility issue or suggestion."></textarea>
+        <textarea
+          id="feedbackBody"
+          name="body"
+          required
+          maxlength="2000"
+          placeholder="Describe the accessibility issue or suggestion."
+        ></textarea>
         <div class="feedback-actions">
           <button type="submit" id="feedbackSubmitBtn">Submit</button>
           <button type="button" id="feedbackCancelBtn">Cancel</button>
@@ -976,11 +991,13 @@
           .join(" ");
       }
       function slugify(text) {
-        return String(text || "")
-          .trim()
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, "_")
-          .replace(/^_+|_+$/g, "") || "unnamed";
+        return (
+          String(text || "")
+            .trim()
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "_")
+            .replace(/^_+|_+$/g, "") || "unnamed"
+        );
       }
       function poiExternalId(props, index) {
         const kind = props.kind,
@@ -1047,7 +1064,8 @@
         const bits = [];
         if (ctx.streetPartExternalId)
           bits.push(`street part ${ctx.streetPartExternalId}`);
-        if (ctx.featureExternalId) bits.push(`feature ${ctx.featureExternalId}`);
+        if (ctx.featureExternalId)
+          bits.push(`feature ${ctx.featureExternalId}`);
         else if (ctx.kind) bits.push(`${ctx.kind} (street-part only)`);
         else bits.push("street-part only");
         feedbackMeta.textContent = bits.join(" · ");
