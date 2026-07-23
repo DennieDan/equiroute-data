@@ -65,3 +65,5 @@ OSM_CLEMENTI_MALL/
 .pytest_cache/
 .coverage
 htmlcov/
+
+.env
