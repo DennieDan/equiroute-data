@@ -484,18 +484,10 @@
       <button class="close" id="closeSettings">×</button>
       <h3>Settings</h3>
       <p>
-        Mapillary token, data-source notes, and standards references live here
-        so the main demo stays clean.
+        Data-source notes and standards references for the public demo.
       </p>
-      <div class="settings-grid">
-        <input
-          id="mapillaryTokenInput"
-          type="password"
-          placeholder="Mapillary client token"
-        /><button id="saveMapillaryTokenBtn">Save</button>
-      </div>
-      <p id="tokenStatus"></p>
-      <h4>References hidden from demo</h4>
+      <p id="tokenStatus" hidden></p>
+      <h4>References</h4>
       <p id="standardsText"></p>
     </div>
     <div id="miniMap"><div class="label">Earth context</div></div>
@@ -1214,7 +1206,7 @@
         const img = imgs[state.streetImageIndex];
         if (!img) {
           mapillaryView.innerHTML =
-            '<div class="street-note">No Mapillary photo here yet, showing Esri/Maxar Earth satellite underlay. Choose another footpath or paste token in ⚙.</div>';
+            '<div class="street-note">No curated street photo is available here yet, showing Esri/Maxar Earth satellite underlay. Choose another footpath or wait for a verified crowd/Mapillary photo.</div>';
           earthSource.textContent =
             "street fallback: Esri/Maxar satellite underlay";
           return;
@@ -1735,7 +1727,9 @@
         supabaseKey: SUPABASE_PUBLISHABLE_KEY,
         capitalizeKind,
       });
-      saveMapillaryTokenBtn.onclick = () => setToken(mapillaryTokenInput.value);
+      if (window.saveMapillaryTokenBtn && window.mapillaryTokenInput) {
+        saveMapillaryTokenBtn.onclick = () => setToken(mapillaryTokenInput.value);
+      }
       map.on("moving zooming resize viewchange", () => {
         renderSatelliteFallback();
         if (state.mode === "earth") {
