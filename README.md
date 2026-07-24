@@ -77,14 +77,14 @@ python3 scripts/seed_accessibility_features.py
 
 This writes `supabase/seed_accessibility_features.sql`. Stable `external_id` values are formed as follows (kind + segment id only for derived ramp/tactile rows; point POIs use LTA/source IDs):
 
-| Feature type | `external_id` pattern | Example |
-| --- | --- | --- |
-| kerb ramp | `{kind}_{seg_id}` | `kerb_ramp_seg_00040` |
-| tactile | `{kind}_{seg_id}` | `tactile_guidance_seg_00040` |
-| bus stop | `bus_stop_{BUS_STOP_N}` | `bus_stop_17239` |
-| bollard / linkway | `{kind}_{OBJECTID}` | `bollard_21659` |
-| MRT | `mrt_{station_name_slug}` | `mrt_clementi_mrt_station` |
-| overhead bridge | `{kind}_{index}_{slug}` | `pedestrian_overhead_bridge_0_...` |
+| Feature type      | `external_id` pattern     | Example                            |
+| ----------------- | ------------------------- | ---------------------------------- |
+| kerb ramp         | `{kind}_{seg_id}`         | `kerb_ramp_seg_00040`              |
+| tactile           | `{kind}_{seg_id}`         | `tactile_guidance_seg_00040`       |
+| bus stop          | `bus_stop_{BUS_STOP_N}`   | `bus_stop_17239`                   |
+| bollard / linkway | `{kind}_{OBJECTID}`       | `bollard_21659`                    |
+| MRT               | `mrt_{station_name_slug}` | `mrt_clementi_mrt_station`         |
+| overhead bridge   | `{kind}_{index}_{slug}`   | `pedestrian_overhead_bridge_0_...` |
 
 7. **View the 3D MVP** — from the project root, start a local server:
 
@@ -96,17 +96,79 @@ Open [http://localhost:8000](http://localhost:8000) in your browser.
 
 ## Project layout
 
-| Path                  | Description                               |
-| --------------------- | ----------------------------------------- |
-| `GEOSPATIAL/`         | Raw LTA shapefile downloads               |
-| `CLEMENTI/`           | Filtered shapefiles for the estate        |
-| `filter_estate.py`    | Crops layers to the Clementi bounding box |
-| `persona_agent.ipynb` | Route graph and persona simulation        |
-| `persona_simulation.py` | Generates persona before/after payloads |
-| `accessibility_scoring.py` | Applies PERS-inspired scoring to the payload |
-| `buildings_clementi.geojson` | OSM building footprints for map context |
-| `generate_accessibility_world.py` | Creates selectable street/feature accessibility world layer |
-| `accessibility_world.geojson` | Segment-level Earth/street-view accessibility metrics and POIs |
-| `earth_accessibility.html` | Google Earth-style street inspection UI with selectable streets, buildings, feature layers, persona passability, and standards-based metrics |
-| `maptalks_three.html` | MapTalks + Three.js prototype with before/after toggle, buildings, and obstacle/improvement markers |
-| `index.html`          | Three.js 3D route viewer                  |
+| Path                              | Description                                                                                                                                  |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GEOSPATIAL/`                     | Raw LTA shapefile downloads                                                                                                                  |
+| `CLEMENTI/`                       | Filtered shapefiles for the estate                                                                                                           |
+| `filter_estate.py`                | Crops layers to the Clementi bounding box                                                                                                    |
+| `persona_agent.ipynb`             | Route graph and persona simulation                                                                                                           |
+| `persona_simulation.py`           | Generates persona before/after payloads                                                                                                      |
+| `accessibility_scoring.py`        | Applies PERS-inspired scoring to the payload                                                                                                 |
+| `buildings_clementi.geojson`      | OSM building footprints for map context                                                                                                      |
+| `generate_accessibility_world.py` | Creates selectable street/feature accessibility world layer                                                                                  |
+| `accessibility_world.geojson`     | Segment-level Earth/street-view accessibility metrics and POIs                                                                               |
+| `earth_accessibility.html`        | Google Earth-style street inspection UI with selectable streets, buildings, feature layers, persona passability, and standards-based metrics |
+| `maptalks_three.html`             | MapTalks + Three.js prototype with before/after toggle, buildings, and obstacle/improvement markers                                          |
+| `index.html`                      | Three.js 3D route viewer                                                                                                                     |
+
+## Split Public - Admin interface Project Layout
+
+```
+equiroute-data/
+│
+├── web/                                      ← NEW: all browser UIs live here
+│   │
+│   ├── public/                               ← citizen entry
+│   │   ├── index.html                        ← thin shell (was earth_accessibility.html HTML)
+│   │   ├── public.css                        ← public-only chrome styles
+│   │   └── public.js                         ← mounts PublicShell + shared createApp
+│   │
+│   ├── admin/                                ← operator entry
+│   │   ├── index.html                        ← thin shell
+│   │   ├── admin.css                         ← admin chrome + preview toggle UI
+│   │   └── admin.js                          ← mounts AdminShell; can flip mode → public
+│   │
+│   └── shared/                               ← used by both; neither UI owns this
+│       ├── index.css                         ← extracted <style> from earth_accessibility.html
+│       ├── config.js                         ← SUPABASE_URL / keys, Mapillary helpers
+│       ├── createApp.js                      ← main boot (map + layers + data load)
+│       ├── modes.js                          ← 'public' | 'admin'
+│       │
+│       ├── map/
+│       │   ├── map.js                        ← MapTalks + satellite fallback
+│       │   ├── threeOverlay.js               ← Three.js overlay
+│       │   └── mapillary.js                  ← street-view / Mapillary wiring
+│       │
+│       ├── data/
+│       │   ├── supabase.js                   ← supabaseRest + registry fetch
+│       │   └── layers.js                     ← accessibility_world + buildings load
+│       │
+│       └── ui/
+│           ├── detailPanel.js                ← #detail / segment controls
+│           └── feedback-form.js              ← MOVE from ./feedback-form.js
+│
+├── data/                                     ← KEEP (runtime assets for web/)
+│   └── street_view_registry.json             ← already here; public+admin both read
+│
+├── assets/                                   ← OPTIONAL later: large GeoJSON out of root
+│   ├── accessibility_world.geojson           ← MOVE from ./accessibility_world.geojson
+│   └── buildings_clementi.geojson            ← MOVE from ./buildings_clementi.geojson
+│   # until then, leave GeoJSONs at root and fetch("../accessibility_world.geojson")
+│
+├── earth_accessibility.html                  ← TEMP: redirect → web/public/ or web/admin/
+├── feedback-form.js                          ← TEMP: delete after move to web/shared/ui/
+│
+├── index.html                                ← KEEP as prototype / archive (not the product UI)
+├── index_datamall.html                       ← KEEP (legacy experiment)
+├── index_osm_clementi.html                   ← KEEP
+├── maptalks_three.html                       ← KEEP
+│
+├── scripts/                                  ← unchanged (pipeline)
+├── supabase/                                 ← unchanged (schema/RLS/seed)
+├── tests/                                    ← unchanged
+├── generate_accessibility_world.py           ← unchanged
+├── accessibility_scoring.py                  ← unchanged
+├── persona_simulation.py                     ← unchanged
+├── *.ipynb, CLEMENTI/, GEOSPATIAL/, …        ← unchanged data/pipeline world
+└── README.md
+```

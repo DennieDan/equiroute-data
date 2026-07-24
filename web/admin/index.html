@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en" data-asset-base="../..">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EquiRoute Admin</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/maptalks/dist/maptalks.css"
+    />
+    <link
+      href="https://unpkg.com/mapillary-js@4.1.2/dist/mapillary.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../shared/index.css" />
+    <link rel="stylesheet" href="./admin.css" />
+    <script src="https://unpkg.com/maptalks/dist/maptalks.min.js"></script>
+    <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+    <script src="https://unpkg.com/mapillary-js@4.1.2/dist/mapillary.js"></script>
+  </head>
+  <body>
+    <div id="adminChrome" class="hud">
+      <span class="pill">Admin</span>
+      <button type="button" id="previewPublicBtn">Preview public</button>
+      <button type="button" id="exitPreviewBtn" hidden>Exit preview</button>
+    </div>
+    <div id="satelliteFallback" aria-hidden="true"></div>
+    <div id="map"></div>
+    <div id="threeOverlay"></div>
+    <div id="mapillaryView"></div>
+    <div id="segmentButtons"></div>
+    <div id="topbar" class="hud">
+      <div class="brand">EquiRoute Earth</div>
+      <span class="pill" id="modeLabel">Esri/Maxar Earth satellite</span>
+      <span class="pill" id="earthSource">daylight aerial imagery</span>
+      <select id="segmentSelect" title="Choose a 5 m segment"></select>
+      <button id="earthBtn" class="active">Earth Satellite</button>
+      <button id="streetBtn">Street View</button>
+      <button id="prevBtn">←</button><button id="nextBtn">→</button>
+      <div class="spacer"></div>
+      <span class="pill"><b id="segCount">–</b> segments</span>
+      <span class="pill"><b id="buildingCount">–</b> buildings</span>
+      <button id="settingsBtn">⚙</button>
+    </div>
+    <div id="settings" class="hud">
+      <button class="close" id="closeSettings">×</button>
+      <h3>Settings</h3>
+      <p>
+        Mapillary token, data-source notes, and standards references live here
+        so the main demo stays clean.
+      </p>
+      <div class="settings-grid">
+        <input
+          id="mapillaryTokenInput"
+          type="password"
+          placeholder="Mapillary client token"
+        /><button id="saveMapillaryTokenBtn">Save</button>
+      </div>
+      <p id="tokenStatus"></p>
+      <h4>References hidden from demo</h4>
+      <p id="standardsText"></p>
+    </div>
+    <div id="miniMap"><div class="label">Earth context</div></div>
+    <section id="detailCard" class="hud">
+      <div class="detail-head">
+        <div>
+          <div class="title" id="selectedName">Select a segment</div>
+          <div class="kindTitle" id="selectedKind"></div>
+          <div class="sub" id="selectedDesc"></div>
+        </div>
+        <div class="spacer"></div>
+        <div class="score" id="activeScore">–</div>
+        <button class="close" id="closeDetail">×</button>
+      </div>
+      <div class="metrics" id="metricList"></div>
+      <div class="detail-actions">
+        <button type="button" id="feedbackBtn">Give feedback</button>
+        <div id="feedbackMeta"></div>
+      </div>
+      <form id="feedbackForm">
+        <label for="feedbackTitle">Title</label>
+        <input
+          id="feedbackTitle"
+          name="title"
+          required
+          maxlength="120"
+          placeholder="What should be fixed?"
+        />
+        <label for="feedbackBody">Details</label>
+        <textarea
+          id="feedbackBody"
+          name="body"
+          required
+          maxlength="2000"
+          placeholder="Describe the accessibility issue or suggestion."
+        ></textarea>
+        <div class="feedback-actions">
+          <button type="submit" id="feedbackSubmitBtn">Submit</button>
+          <button type="button" id="feedbackCancelBtn">Cancel</button>
+        </div>
+        <div id="feedbackStatus"></div>
+      </form>
+    </section>
+    <div class="status" id="status">Loading Clementi digital twin…</div>
+    <script src="../shared/ui/feedback-form.js"></script>
+    <script src="../shared/modes.js"></script>
+    <script src="../shared/config.js"></script>
+    <script src="../shared/createApp.js"></script>
+    <script src="./admin.js"></script>
+  </body>
+</html>

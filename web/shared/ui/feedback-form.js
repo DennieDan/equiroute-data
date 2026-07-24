@@ -1,4 +1,3 @@
-/** @deprecated Load web/shared/ui/feedback-form.js — kept at repo root for compatibility. */
 /**
  * Feedback form for EquiRoute Earth (shared UI).
  * Bind with EquirouteFeedback.init({ getDetailContext, supabaseUrl, supabaseKey, capitalizeKind }).

@@ -1,0 +1,4 @@
+/* Admin-only chrome hooks. */
+#adminChrome .pill {
+  font-weight: 900;
+}
