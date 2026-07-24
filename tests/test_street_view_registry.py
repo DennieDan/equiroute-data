@@ -7,6 +7,7 @@ from scripts.street_view_registry import (
     build_street_view_nodes,
     build_streets,
     choose_best_photo,
+    desired_photo_headings,
     group_segments_into_street_parts,
     harvest_mapillary_candidates,
     mapillary_images_url,
@@ -76,6 +77,26 @@ class StreetViewRegistryTest(unittest.TestCase):
 
         self.assertEqual(chosen["source_image_id"], "older-correct")
         self.assertTrue(chosen["direction_valid"])
+
+    def test_two_way_roads_accept_opposite_heading_for_other_pavement_side(self):
+        self.assertEqual(desired_photo_headings(90)[1]["heading_deg"], 270)
+        candidates = [
+            {
+                "id": "opposite-side-pavement",
+                "computed_compass_angle": 270,
+                "computed_geometry": {"coordinates": [103.0, 1.0]},
+                "captured_at": "2026-07-01T00:00:00Z",
+                "is_pano": False,
+            }
+        ]
+
+        chosen = choose_best_photo(candidates, [103.0, 1.0], desired_heading_deg=90)
+
+        self.assertIsNotNone(chosen)
+        self.assertEqual(chosen["source_image_id"], "opposite-side-pavement")
+        self.assertTrue(chosen["direction_valid"])
+        self.assertEqual(chosen["heading_role"], "opposite")
+        self.assertEqual(chosen["desired_orientation"], "road_left_pavement_right")
 
     def test_builds_prev_next_node_graph_for_curated_corridor(self):
         segments = [

@@ -131,10 +131,16 @@ create table if not exists public.photo_feature_instances (
   pixel_y double precision null,
   bbox jsonb null,
   detection_method text not null default 'geo_projection',
+  detection_model text null,
+  detection_label text null,
   confidence double precision not null default 0,
   created_at timestamptz not null default now(),
   unique(photo_id, feature_id)
 );
+
+alter table public.photo_feature_instances
+  add column if not exists detection_model text null,
+  add column if not exists detection_label text null;
 
 create table if not exists public.feedback_threads (
   id uuid primary key default gen_random_uuid(),

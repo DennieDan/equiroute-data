@@ -19,6 +19,8 @@ Track every judge-visible claim with evidence before pitch polish.
 
 | Mapillary candidate harvester exists for active photo curation | `scripts/street_view_registry.py`, `tests/test_street_view_registry.py`, `data/mapillary_candidates.json`, `data/street_view_registry.json` | `python3 -m unittest tests.test_street_view_registry tests.test_seed_accessibility_features -v`; browser smoke on `earth_accessibility.html?activephotos=2` | Harvested 435 raw Mapillary candidates; 29/30 street parts selected active photos; frontend loaded 29 active photos and rendered Mapillary photo from registry | "Street mode now uses curated active photos for almost every demo street part instead of random live lookup." | built; Supabase SQL ready but dashboard write blocked for `khdds...` project |
 
+| CV-localized photo feature pins | `scripts/cv_localize_photo_features.py`, `data/photo_feature_instances_cv.json`, `supabase/seed_photo_feature_instances.sql`, `earth_accessibility.html` | OWL-ViT run with `google/owlvit-base-patch32`; browser smoke on `earth_accessibility.html?cv=2`; unit tests | 164 matched photo-feature instances across 20 photos; frontend loaded 164 CV instances and showed `4 CV-localized feature pins` on street_part_0005 | "Pins can now come from image-space object detections rather than only map projection." | built; Supabase SQL ready but dashboard session still needs login |
+
 ## Next proof targets
 
 - Direction-consistent Mapillary/crowd photo corridor: 15–30 active photos, road-on-right.

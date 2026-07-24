@@ -82,6 +82,22 @@ The harvester fetches Mapillary camera geometry/compass metadata per street part
 
 This writes `data/street_view_registry.json`, grouping the existing 5 m path metrics into 8–10 m street-view nodes with stable previous/next links, canonical headings, and road-on-right orientation metadata. The registry now has a hierarchy: **many streets → many street parts per street → one street-view node per street part**. Supabase schema/RLS/seed files live in `supabase/`; the frontend reads the Supabase street registry first and falls back to local JSON if the backend is unavailable. The active-photo layer is ready: each street part can own one active `street_photo`, keep photo history, and preserve comments/upvotes on the street part when newer photos replace older photos.
 
+Run zero-shot computer-vision localization for accessibility pins:
+
+```bash
+python3 -m venv .venv-cv
+. .venv-cv/bin/activate
+pip install --index-url https://download.pytorch.org/whl/cpu torch torchvision
+pip install transformers accelerate safetensors
+PYTHONPATH=. python3 scripts/cv_localize_photo_features.py \
+  --threshold 0.02 \
+  --feature-match-threshold 0.02
+```
+
+This uses `google/owlvit-base-patch32` (OWL-ViT zero-shot object detection) to localize objects like tactile paving, curb ramps, covered walkways, bollards, bus stops, and crossings in active street photos. It writes `data/photo_feature_instances_cv.json`, visual QA overlays under `data/cv_overlays/`, and `supabase/seed_photo_feature_instances.sql` for the `photo_feature_instances` table.
+
+The harvester now evaluates both compass directions for two-way roads: canonical road-on-right and opposite road-left/pavement-on-right.
+
 Seed `accessibility_features` from the world layer with:
 
 ```bash

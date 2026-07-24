@@ -296,31 +296,56 @@ def captured_ts(candidate: dict[str, Any]) -> float:
         return 0.0
 
 
+def desired_photo_headings(part_heading_deg: float) -> list[dict[str, Any]]:
+    """Return candidate camera headings for both pavement sides of a two-way road.
+
+    `road_right` preserves the original direction. `road_left_pavement_right`
+    uses the opposite compass heading so a two-way road with pavement on the
+    other side can still show the pedestrian path on the right of the image.
+    """
+    base = float(part_heading_deg) % 360
+    return [
+        {"heading_deg": base, "orientation": "road_right", "heading_role": "canonical"},
+        {"heading_deg": (base + 180) % 360, "orientation": "road_left_pavement_right", "heading_role": "opposite"},
+    ]
+
+
 def choose_best_photo(
     candidates: list[dict[str, Any]],
     midpoint: list[float],
     desired_heading_deg: float,
     max_heading_delta: float = 35,
+    allow_opposite_heading: bool = True,
 ) -> dict[str, Any] | None:
-    """Choose best candidate by direction first, then distance/recency/pano."""
-    scored: list[tuple[float, dict[str, Any], bool, float, float]] = []
+    """Choose best candidate by direction first, then distance/recency/pano.
+
+    For two-way roads we evaluate both headings: the canonical road-on-right
+    heading and the opposite heading where the road may be left and pavement
+    stays visible on the right.
+    """
+    heading_options = desired_photo_headings(desired_heading_deg) if allow_opposite_heading else [desired_photo_headings(desired_heading_deg)[0]]
+    scored: list[tuple[float, dict[str, Any], bool, float, float, dict[str, Any]]] = []
     for cand in candidates:
         coord = candidate_coord(cand)
         heading = candidate_heading(cand)
         if coord is None or heading is None:
             continue
-        delta = abs(angle_diff(heading, desired_heading_deg))
+        best_option = min(heading_options, key=lambda opt: abs(angle_diff(heading, opt["heading_deg"])))
+        delta = abs(angle_diff(heading, best_option["heading_deg"]))
         direction_valid = delta <= max_heading_delta
         dist = haversine_m(coord, midpoint)
         recency_bonus = min(captured_ts(cand) / 1_000_000_000, 3)
         pano_bonus = 4 if cand.get("is_pano") else 0
-        score = (1000 if direction_valid else 0) - delta * 8 - dist * 2 + recency_bonus + pano_bonus
-        scored.append((score, cand, direction_valid, delta, dist))
+        opposite_penalty = 8 if best_option["heading_role"] == "opposite" else 0
+        score = (1000 if direction_valid else 0) - delta * 8 - dist * 2 + recency_bonus + pano_bonus - opposite_penalty
+        scored.append((score, cand, direction_valid, delta, dist, best_option))
     if not scored:
         return None
-    score, cand, direction_valid, delta, dist = max(scored, key=lambda x: x[0])
+    score, cand, direction_valid, delta, dist, best_option = max(scored, key=lambda x: x[0])
     coord = candidate_coord(cand) or midpoint
     heading = candidate_heading(cand) or desired_heading_deg
+    metadata = dict(cand)
+    metadata["selected_heading_option"] = best_option
     return {
         "id": f"photo_{cand.get('id', 'candidate')}",
         "source": "mapillary",
@@ -330,11 +355,14 @@ def choose_best_photo(
         "lng": coord[0],
         "lat": coord[1],
         "compass_angle_deg": heading,
+        "matched_heading_deg": best_option["heading_deg"],
+        "heading_role": best_option["heading_role"],
+        "desired_orientation": best_option["orientation"],
         "direction_valid": direction_valid,
         "direction_confidence": round(max(0, 1 - delta / max_heading_delta), 3) if direction_valid else 0,
         "distance_to_midpoint_m": round(dist, 2),
         "is_pano": bool(cand.get("is_pano")),
-        "metadata": cand,
+        "metadata": metadata,
     }
 
 

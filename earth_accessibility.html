@@ -551,6 +551,7 @@
         mapillaryViewer: null,
         miniMap: null,
         layers: {},
+        photoFeatureInstances: [],
         token: null,
         three: {},
         streetImages: [],
@@ -1223,7 +1224,8 @@
         }
         mapillaryView.innerHTML = `<img id="streetPhoto" src="${thumb}" alt="Mapillary street-level image"/>`;
         state.mapillaryImageId = img.id;
-        earthSource.textContent = `Mapillary ${state.streetImageIndex + 1}/${imgs.length} · geo-anchored feature pins`;
+        const cvCount = cvInstancesForCurrentPhoto().length;
+        earthSource.textContent = `Mapillary ${state.streetImageIndex + 1}/${imgs.length} · ${cvCount ? cvCount + " CV-localized feature pins" : "map-projected feature pins"}`;
         setTimeout(() => renderSegmentButtons(true), 120);
       }
       function cycleStreetPhoto(delta) {
@@ -1411,6 +1413,30 @@
           visible: Math.abs(delta) <= 82,
         };
       }
+      function kindFromFeatureKind(kind) {
+        return kind === "bus_stop"
+          ? "bus stop"
+          : kind === "mrt_station"
+            ? "mrt"
+            : kind === "covered_linkway"
+              ? "shelter"
+              : kind === "pedestrian_overhead_bridge"
+                ? "walkway"
+                : kind === "bollard"
+                  ? "obstruction"
+                  : kind === "kerb_ramp"
+                    ? "ramp"
+                    : kind === "tactile_guidance"
+                      ? "tactile"
+                      : kind || "feature";
+      }
+      function cvInstancesForCurrentPhoto() {
+        const img = (state.streetImages || [])[state.streetImageIndex] || {};
+        const photoId = img.external_id || img.id || img.source_image_id;
+        return (state.photoFeatureInstances || []).filter(
+          (x) => x.photo_external_id === photoId,
+        );
+      }
       function streetFeatureCandidates(selected) {
         const img = (state.streetImages || [])[state.streetImageIndex] || {},
           origin = imageCoord(img) || middle(selected),
@@ -1418,12 +1444,38 @@
           seen = new Set();
         function add(it) {
           const key =
+            it.featureExternalId ||
             it.kind + ":" + it.coord.map((v) => v.toFixed(5)).join(",");
           if (!seen.has(key)) {
             seen.add(key);
             items.push(it);
           }
         }
+        cvInstancesForCurrentPhoto().forEach((inst) => {
+          const w = Number(inst.image_width || 1),
+            h = Number(inst.image_height || 1),
+            px = Number(inst.pixel_x || inst.bbox?.x1 || 0),
+            py = Number(inst.pixel_y || inst.bbox?.y1 || 0);
+          add({
+            kind: kindFromFeatureKind(inst.feature_kind),
+            f: null,
+            poi: null,
+            coord: origin,
+            score: Math.round((inst.confidence || 0) * 100),
+            label: inst.label || inst.feature_kind,
+            name: `${kindFromFeatureKind(inst.feature_kind)} · CV localized`,
+            featureExternalId: inst.feature_external_id,
+            distanceM: inst.feature_distance_to_photo_m,
+            cv: inst,
+            pt: {
+              x: (px / w) * innerWidth,
+              y: (py / h) * innerHeight,
+              d: inst.feature_distance_to_photo_m || 0,
+              delta: 0,
+              visible: true,
+            },
+          });
+        });
         state.segments.forEach((f) => {
           const coord = middle(f),
             d = distM(coord, origin);
@@ -1480,7 +1532,7 @@
         return items
           .map((it, i) => ({
             ...it,
-            pt: projectToStreetPhoto(it.coord, it.kind, i),
+            pt: it.cv ? it.pt : projectToStreetPhoto(it.coord, it.kind, i),
           }))
           .filter((it) => it.pt)
           .sort((a, b) => b.pt.visible - a.pt.visible || a.pt.d - b.pt.d)
@@ -1646,6 +1698,7 @@
             is_pano: !!p.is_pano,
             captured_at: p.captured_at,
             source: p.source,
+            external_id: p.external_id || p.id,
             registry_photo_id: p.id || p.external_id,
             validation_status: p.validation_status,
           }));
@@ -1885,11 +1938,15 @@
         fetch("accessibility_world.geojson").then((r) => r.json()),
         fetch("buildings_clementi.geojson").then((r) => r.json()),
         loadStreetRegistry(),
+        fetch("data/photo_feature_instances_cv.json")
+          .then((r) => (r.ok ? r.json() : { instances: [] }))
+          .catch(() => ({ instances: [] })),
       ])
-        .then(([world, buildings, registry]) => {
+        .then(([world, buildings, registry, cvInstances]) => {
           state.world = world;
           state.buildings = buildings;
           state.streetRegistry = registry;
+          state.photoFeatureInstances = cvInstances?.instances || [];
           renderBuildings(buildings);
           renderWorld(world);
           const ext = routeLayer.getExtent();
