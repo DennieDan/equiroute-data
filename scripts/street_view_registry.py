@@ -371,8 +371,10 @@ def photo_external_id(photo: dict[str, Any]) -> str:
         return str(photo["external_id"])
     source = photo.get("source", "photo")
     raw = photo.get("source_image_id") or photo.get("id") or "unknown"
-    safe = "".join(ch if ch.isalnum() or ch in "_-" else "_" for ch in str(raw))
-    return f"photo_{source}_{safe}"
+    part = photo.get("street_part_id")
+    safe_raw = "".join(ch if ch.isalnum() or ch in "_-" else "_" for ch in str(raw))
+    safe_part = "".join(ch if ch.isalnum() or ch in "_-" else "_" for ch in str(part)) if part else None
+    return f"photo_{source}_{safe_part}_{safe_raw}" if safe_part else f"photo_{source}_{safe_raw}"
 
 
 def attach_active_photos(
@@ -396,10 +398,10 @@ def attach_active_photos(
         )
         if not chosen:
             continue
-        chosen["external_id"] = photo_external_id(chosen)
-        chosen["id"] = chosen["external_id"]
         chosen["street_part_id"] = part["id"]
         chosen["street_id"] = part.get("street_id")
+        chosen["external_id"] = photo_external_id(chosen)
+        chosen["id"] = chosen["external_id"]
         chosen["is_active"] = True
         chosen["validation_status"] = "direction_valid" if chosen.get("direction_valid") else "needs_review"
         chosen["selected_reason"] = "best_direction_distance_recency_candidate"
@@ -446,11 +448,27 @@ def jsonb_literal(value: Any) -> str:
     return sql_literal(json.dumps(value, separators=(",", ":"))) + "::jsonb"
 
 
+def timestamptz_expr(value: Any) -> str:
+    if value in (None, ""):
+        return "null"
+    if isinstance(value, (int, float)):
+        # Mapillary API returns milliseconds since epoch.
+        return f"to_timestamp({float(value) / 1000.0})"
+    text = str(value)
+    if text.isdigit():
+        return f"to_timestamp({int(text) / 1000.0})"
+    return sql_literal(text)
+
+
 def registry_to_supabase_seed_sql(registry: dict[str, Any]) -> str:
     """Export a street-view registry as idempotent Supabase seed SQL."""
     lines = [
         "-- Generated AccessTwin demo-corridor seed data.",
         "begin;",
+        "update public.street_view_nodes set active_photo_id=null, coverage_status='missing' where external_id like 'street_view_node_%';",
+        "update public.street_parts set active_photo_id=null where external_id like 'street_part_%';",
+        "delete from public.photo_feature_instances where photo_id in (select id from public.street_photos where source='mapillary' and external_id like 'photo_mapillary_%');",
+        "delete from public.street_photos where source='mapillary' and external_id like 'photo_mapillary_%';",
     ]
     for street in registry.get("streets", []):
         mid = street.get("midpoint", [None, None])
@@ -486,7 +504,7 @@ def registry_to_supabase_seed_sql(registry: dict[str, Any]) -> str:
             "direction_valid, direction_confidence, is_pano, is_active, validation_status, selected_reason, metadata) values ("
             f"{sql_literal(photo['external_id'])}, (select id from public.street_parts where external_id={sql_literal(photo['street_part_id'])}), "
             f"{sql_literal(photo.get('source', 'mapillary'))}, {sql_literal(photo.get('source_image_id'))}, {sql_literal(photo.get('image_url'))}, "
-            f"{sql_literal(photo.get('captured_at'))}, {photo.get('lng')}, {photo.get('lat')}, {photo.get('compass_angle_deg')}, "
+            f"{timestamptz_expr(photo.get('captured_at'))}, {photo.get('lng')}, {photo.get('lat')}, {photo.get('compass_angle_deg')}, "
             f"{str(bool(photo.get('direction_valid'))).lower()}, {photo.get('direction_confidence') if photo.get('direction_confidence') is not None else 'null'}, "
             f"{str(bool(photo.get('is_pano'))).lower()}, {str(bool(photo.get('is_active'))).lower()}, "
             f"{sql_literal(photo.get('validation_status', 'needs_review'))}, {sql_literal(photo.get('selected_reason'))}, {jsonb_literal(photo.get('metadata', {}))}) "

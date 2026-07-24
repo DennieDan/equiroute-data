@@ -229,7 +229,7 @@ class StreetViewRegistryTest(unittest.TestCase):
         self.assertIn("insert into public.street_view_nodes", sql)
         self.assertIn("street_view_node_0000", sql)
         self.assertIn("insert into public.street_photos", sql)
-        self.assertIn("photo_mapillary_mly-seed", sql)
+        self.assertIn("photo_mapillary_street_part_0000_mly-seed", sql)
         self.assertIn("active_photo_id =", sql)
         self.assertIn("on conflict (external_id) do update", sql)
 

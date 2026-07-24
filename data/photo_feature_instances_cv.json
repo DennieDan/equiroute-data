@@ -2,7 +2,7 @@
   "model": "google/owlvit-base-patch32",
   "photos": [
     {
-      "photo_external_id": "photo_mapillary_158305022912618",
+      "photo_external_id": "photo_mapillary_street_part_0000_158305022912618",
       "street_part_id": "street_part_0000",
       "source_image_id": "158305022912618",
       "model": "google/owlvit-base-patch32",
@@ -37,7 +37,7 @@
       "matched_instances": []
     },
     {
-      "photo_external_id": "photo_mapillary_1631219660412953",
+      "photo_external_id": "photo_mapillary_street_part_0001_1631219660412953",
       "street_part_id": "street_part_0001",
       "source_image_id": "1631219660412953",
       "model": "google/owlvit-base-patch32",
@@ -281,7 +281,7 @@
       "matched_instances": []
     },
     {
-      "photo_external_id": "photo_mapillary_471303173946237",
+      "photo_external_id": "photo_mapillary_street_part_0002_471303173946237",
       "street_part_id": "street_part_0002",
       "source_image_id": "471303173946237",
       "model": "google/owlvit-base-patch32",
@@ -624,7 +624,7 @@
       "matched_instances": []
     },
     {
-      "photo_external_id": "photo_mapillary_2066037676869808",
+      "photo_external_id": "photo_mapillary_street_part_0003_2066037676869808",
       "street_part_id": "street_part_0003",
       "source_image_id": "2066037676869808",
       "model": "google/owlvit-base-patch32",
@@ -967,7 +967,7 @@
       "matched_instances": []
     },
     {
-      "photo_external_id": "photo_mapillary_211677373933731",
+      "photo_external_id": "photo_mapillary_street_part_0004_211677373933731",
       "street_part_id": "street_part_0004",
       "source_image_id": "211677373933731",
       "model": "google/owlvit-base-patch32",
@@ -1310,7 +1310,7 @@
       "matched_instances": []
     },
     {
-      "photo_external_id": "photo_mapillary_314185020210754",
+      "photo_external_id": "photo_mapillary_street_part_0005_314185020210754",
       "street_part_id": "street_part_0005",
       "source_image_id": "314185020210754",
       "model": "google/owlvit-base-patch32",
@@ -1652,7 +1652,7 @@
       ],
       "matched_instances": [
         {
-          "photo_external_id": "photo_mapillary_314185020210754",
+          "photo_external_id": "photo_mapillary_street_part_0005_314185020210754",
           "feature_external_id": "covered_linkway_3398",
           "street_part_id": "street_part_0005",
           "feature_kind": "covered_linkway",
@@ -1673,7 +1673,7 @@
           "feature_distance_to_photo_m": 25.33
         },
         {
-          "photo_external_id": "photo_mapillary_314185020210754",
+          "photo_external_id": "photo_mapillary_street_part_0005_314185020210754",
           "feature_external_id": "covered_linkway_3399",
           "street_part_id": "street_part_0005",
           "feature_kind": "covered_linkway",
@@ -1696,7 +1696,7 @@
       ]
     },
     {
-      "photo_external_id": "photo_mapillary_314185020210754",
+      "photo_external_id": "photo_mapillary_street_part_0006_314185020210754",
       "street_part_id": "street_part_0006",
       "source_image_id": "314185020210754",
       "model": "google/owlvit-base-patch32",
@@ -2038,7 +2038,7 @@
       ],
       "matched_instances": [
         {
-          "photo_external_id": "photo_mapillary_314185020210754",
+          "photo_external_id": "photo_mapillary_street_part_0006_314185020210754",
           "feature_external_id": "covered_linkway_3398",
           "street_part_id": "street_part_0006",
           "feature_kind": "covered_linkway",
@@ -2059,7 +2059,7 @@
           "feature_distance_to_photo_m": 25.33
         },
         {
-          "photo_external_id": "photo_mapillary_314185020210754",
+          "photo_external_id": "photo_mapillary_street_part_0006_314185020210754",
           "feature_external_id": "covered_linkway_3399",
           "street_part_id": "street_part_0006",
           "feature_kind": "covered_linkway",
@@ -2082,7 +2082,7 @@
       ]
     },
     {
-      "photo_external_id": "photo_mapillary_5571605572960452",
+      "photo_external_id": "photo_mapillary_street_part_0007_5571605572960452",
       "street_part_id": "street_part_0007",
       "source_image_id": "5571605572960452",
       "model": "google/owlvit-base-patch32",
@@ -2105,7 +2105,7 @@
       ],
       "matched_instances": [
         {
-          "photo_external_id": "photo_mapillary_5571605572960452",
+          "photo_external_id": "photo_mapillary_street_part_0007_5571605572960452",
           "feature_external_id": "tactile_guidance_seg_00557",
           "street_part_id": "street_part_0007",
           "feature_kind": "tactile_guidance",
@@ -2126,7 +2126,7 @@
           "feature_distance_to_photo_m": 10.83
         },
         {
-          "photo_external_id": "photo_mapillary_5571605572960452",
+          "photo_external_id": "photo_mapillary_street_part_0007_5571605572960452",
           "feature_external_id": "tactile_guidance_seg_00558",
           "street_part_id": "street_part_0007",
           "feature_kind": "tactile_guidance",
@@ -2147,7 +2147,7 @@
           "feature_distance_to_photo_m": 12.77
         },
         {
-          "photo_external_id": "photo_mapillary_5571605572960452",
+          "photo_external_id": "photo_mapillary_street_part_0007_5571605572960452",
           "feature_external_id": "tactile_guidance_seg_00559",
           "street_part_id": "street_part_0007",
           "feature_kind": "tactile_guidance",
@@ -2168,7 +2168,7 @@
           "feature_distance_to_photo_m": 15.88
         },
         {
-          "photo_external_id": "photo_mapillary_5571605572960452",
+          "photo_external_id": "photo_mapillary_street_part_0007_5571605572960452",
           "feature_external_id": "tactile_guidance_seg_00548",
           "street_part_id": "street_part_0007",
           "feature_kind": "tactile_guidance",
@@ -2189,7 +2189,7 @@
           "feature_distance_to_photo_m": 24.32
         },
         {
-          "photo_external_id": "photo_mapillary_5571605572960452",
+          "photo_external_id": "photo_mapillary_street_part_0007_5571605572960452",
           "feature_external_id": "tactile_guidance_seg_00547",
           "street_part_id": "street_part_0007",
           "feature_kind": "tactile_guidance",
@@ -2212,7 +2212,7 @@
       ]
     },
     {
-      "photo_external_id": "photo_mapillary_516645799746461",
+      "photo_external_id": "photo_mapillary_street_part_0008_516645799746461",
       "street_part_id": "street_part_0008",
       "source_image_id": "516645799746461",
       "model": "google/owlvit-base-patch32",
@@ -2554,7 +2554,7 @@
       ],
       "matched_instances": [
         {
-          "photo_external_id": "photo_mapillary_516645799746461",
+          "photo_external_id": "photo_mapillary_street_part_0008_516645799746461",
           "feature_external_id": "covered_linkway_3399",
           "street_part_id": "street_part_0008",
           "feature_kind": "covered_linkway",
@@ -2575,7 +2575,7 @@
           "feature_distance_to_photo_m": 24.9
         },
         {
-          "photo_external_id": "photo_mapillary_516645799746461",
+          "photo_external_id": "photo_mapillary_street_part_0008_516645799746461",
           "feature_external_id": "covered_linkway_3400",
           "street_part_id": "street_part_0008",
           "feature_kind": "covered_linkway",
@@ -2596,7 +2596,7 @@
           "feature_distance_to_photo_m": 24.9
         },
         {
-          "photo_external_id": "photo_mapillary_516645799746461",
+          "photo_external_id": "photo_mapillary_street_part_0008_516645799746461",
           "feature_external_id": "bollard_41911",
           "street_part_id": "street_part_0008",
           "feature_kind": "bollard",
@@ -2617,7 +2617,7 @@
           "feature_distance_to_photo_m": 25.57
         },
         {
-          "photo_external_id": "photo_mapillary_516645799746461",
+          "photo_external_id": "photo_mapillary_street_part_0008_516645799746461",
           "feature_external_id": "bollard_46612",
           "street_part_id": "street_part_0008",
           "feature_kind": "bollard",
@@ -2640,7 +2640,7 @@
       ]
     },
     {
-      "photo_external_id": "photo_mapillary_516645799746461",
+      "photo_external_id": "photo_mapillary_street_part_0009_516645799746461",
       "street_part_id": "street_part_0009",
       "source_image_id": "516645799746461",
       "model": "google/owlvit-base-patch32",
@@ -2982,7 +2982,7 @@
       ],
       "matched_instances": [
         {
-          "photo_external_id": "photo_mapillary_516645799746461",
+          "photo_external_id": "photo_mapillary_street_part_0009_516645799746461",
           "feature_external_id": "covered_linkway_3399",
           "street_part_id": "street_part_0009",
           "feature_kind": "covered_linkway",
@@ -3003,7 +3003,7 @@
           "feature_distance_to_photo_m": 24.9
         },
         {
-          "photo_external_id": "photo_mapillary_516645799746461",
+          "photo_external_id": "photo_mapillary_street_part_0009_516645799746461",
           "feature_external_id": "covered_linkway_3400",
           "street_part_id": "street_part_0009",
           "feature_kind": "covered_linkway",
@@ -3024,7 +3024,7 @@
           "feature_distance_to_photo_m": 24.9
         },
         {
-          "photo_external_id": "photo_mapillary_516645799746461",
+          "photo_external_id": "photo_mapillary_street_part_0009_516645799746461",
           "feature_external_id": "bollard_41911",
           "street_part_id": "street_part_0009",
           "feature_kind": "bollard",
@@ -3045,7 +3045,7 @@
           "feature_distance_to_photo_m": 25.57
         },
         {
-          "photo_external_id": "photo_mapillary_516645799746461",
+          "photo_external_id": "photo_mapillary_street_part_0009_516645799746461",
           "feature_external_id": "bollard_46612",
           "street_part_id": "street_part_0009",
           "feature_kind": "bollard",
@@ -3068,7 +3068,7 @@
       ]
     },
     {
-      "photo_external_id": "photo_mapillary_644176977184642",
+      "photo_external_id": "photo_mapillary_street_part_0010_644176977184642",
       "street_part_id": "street_part_0010",
       "source_image_id": "644176977184642",
       "model": "google/owlvit-base-patch32",
@@ -3102,7 +3102,7 @@
       ],
       "matched_instances": [
         {
-          "photo_external_id": "photo_mapillary_644176977184642",
+          "photo_external_id": "photo_mapillary_street_part_0010_644176977184642",
           "feature_external_id": "tactile_guidance_seg_00557",
           "street_part_id": "street_part_0010",
           "feature_kind": "tactile_guidance",
@@ -3123,7 +3123,7 @@
           "feature_distance_to_photo_m": 23.02
         },
         {
-          "photo_external_id": "photo_mapillary_644176977184642",
+          "photo_external_id": "photo_mapillary_street_part_0010_644176977184642",
           "feature_external_id": "tactile_guidance_seg_00558",
           "street_part_id": "street_part_0010",
           "feature_kind": "tactile_guidance",
@@ -3144,7 +3144,7 @@
           "feature_distance_to_photo_m": 24.55
         },
         {
-          "photo_external_id": "photo_mapillary_644176977184642",
+          "photo_external_id": "photo_mapillary_street_part_0010_644176977184642",
           "feature_external_id": "tactile_guidance_seg_00559",
           "street_part_id": "street_part_0010",
           "feature_kind": "tactile_guidance",
@@ -3165,7 +3165,7 @@
           "feature_distance_to_photo_m": 26.82
         },
         {
-          "photo_external_id": "photo_mapillary_644176977184642",
+          "photo_external_id": "photo_mapillary_street_part_0010_644176977184642",
           "feature_external_id": "tactile_guidance_seg_00548",
           "street_part_id": "street_part_0010",
           "feature_kind": "tactile_guidance",
@@ -3188,7 +3188,7 @@
       ]
     },
     {
-      "photo_external_id": "photo_mapillary_611892423788363",
+      "photo_external_id": "photo_mapillary_street_part_0011_611892423788363",
       "street_part_id": "street_part_0011",
       "source_image_id": "611892423788363",
       "model": "google/owlvit-base-patch32",
@@ -3475,7 +3475,7 @@
       ],
       "matched_instances": [
         {
-          "photo_external_id": "photo_mapillary_611892423788363",
+          "photo_external_id": "photo_mapillary_street_part_0011_611892423788363",
           "feature_external_id": "tactile_guidance_seg_00040",
           "street_part_id": "street_part_0011",
           "feature_kind": "tactile_guidance",
@@ -3496,7 +3496,7 @@
           "feature_distance_to_photo_m": 68.02
         },
         {
-          "photo_external_id": "photo_mapillary_611892423788363",
+          "photo_external_id": "photo_mapillary_street_part_0011_611892423788363",
           "feature_external_id": "tactile_guidance_seg_00041",
           "street_part_id": "street_part_0011",
           "feature_kind": "tactile_guidance",
@@ -3517,7 +3517,7 @@
           "feature_distance_to_photo_m": 69.52
         },
         {
-          "photo_external_id": "photo_mapillary_611892423788363",
+          "photo_external_id": "photo_mapillary_street_part_0011_611892423788363",
           "feature_external_id": "tactile_guidance_seg_00042",
           "street_part_id": "street_part_0011",
           "feature_kind": "tactile_guidance",
@@ -3540,7 +3540,7 @@
       ]
     },
     {
-      "photo_external_id": "photo_mapillary_1988578568720068",
+      "photo_external_id": "photo_mapillary_street_part_0012_1988578568720068",
       "street_part_id": "street_part_0012",
       "source_image_id": "1988578568720068",
       "model": "google/owlvit-base-patch32",
@@ -3882,7 +3882,7 @@
       ],
       "matched_instances": [
         {
-          "photo_external_id": "photo_mapillary_1988578568720068",
+          "photo_external_id": "photo_mapillary_street_part_0012_1988578568720068",
           "feature_external_id": "kerb_ramp_seg_00537",
           "street_part_id": "street_part_0012",
           "feature_kind": "kerb_ramp",
@@ -3903,7 +3903,7 @@
           "feature_distance_to_photo_m": 1.42
         },
         {
-          "photo_external_id": "photo_mapillary_1988578568720068",
+          "photo_external_id": "photo_mapillary_street_part_0012_1988578568720068",
           "feature_external_id": "tactile_guidance_seg_00537",
           "street_part_id": "street_part_0012",
           "feature_kind": "tactile_guidance",
@@ -3924,7 +3924,7 @@
           "feature_distance_to_photo_m": 1.42
         },
         {
-          "photo_external_id": "photo_mapillary_1988578568720068",
+          "photo_external_id": "photo_mapillary_street_part_0012_1988578568720068",
           "feature_external_id": "kerb_ramp_seg_00536",
           "street_part_id": "street_part_0012",
           "feature_kind": "kerb_ramp",
@@ -3945,7 +3945,7 @@
           "feature_distance_to_photo_m": 2.91
         },
         {
-          "photo_external_id": "photo_mapillary_1988578568720068",
+          "photo_external_id": "photo_mapillary_street_part_0012_1988578568720068",
           "feature_external_id": "tactile_guidance_seg_00536",
           "street_part_id": "street_part_0012",
           "feature_kind": "tactile_guidance",
@@ -3966,7 +3966,7 @@
           "feature_distance_to_photo_m": 2.91
         },
         {
-          "photo_external_id": "photo_mapillary_1988578568720068",
+          "photo_external_id": "photo_mapillary_street_part_0012_1988578568720068",
           "feature_external_id": "kerb_ramp_seg_00535",
           "street_part_id": "street_part_0012",
           "feature_kind": "kerb_ramp",
@@ -3987,7 +3987,7 @@
           "feature_distance_to_photo_m": 6.12
         },
         {
-          "photo_external_id": "photo_mapillary_1988578568720068",
+          "photo_external_id": "photo_mapillary_street_part_0012_1988578568720068",
           "feature_external_id": "tactile_guidance_seg_00535",
           "street_part_id": "street_part_0012",
           "feature_kind": "tactile_guidance",
@@ -4008,7 +4008,7 @@
           "feature_distance_to_photo_m": 6.12
         },
         {
-          "photo_external_id": "photo_mapillary_1988578568720068",
+          "photo_external_id": "photo_mapillary_street_part_0012_1988578568720068",
           "feature_external_id": "kerb_ramp_seg_00532",
           "street_part_id": "street_part_0012",
           "feature_kind": "kerb_ramp",
@@ -4029,7 +4029,7 @@
           "feature_distance_to_photo_m": 15.73
         },
         {
-          "photo_external_id": "photo_mapillary_1988578568720068",
+          "photo_external_id": "photo_mapillary_street_part_0012_1988578568720068",
           "feature_external_id": "tactile_guidance_seg_00532",
           "street_part_id": "street_part_0012",
           "feature_kind": "tactile_guidance",
@@ -4050,7 +4050,7 @@
           "feature_distance_to_photo_m": 15.73
         },
         {
-          "photo_external_id": "photo_mapillary_1988578568720068",
+          "photo_external_id": "photo_mapillary_street_part_0012_1988578568720068",
           "feature_external_id": "kerb_ramp_seg_00533",
           "street_part_id": "street_part_0012",
           "feature_kind": "kerb_ramp",
@@ -4071,7 +4071,7 @@
           "feature_distance_to_photo_m": 19.03
         },
         {
-          "photo_external_id": "photo_mapillary_1988578568720068",
+          "photo_external_id": "photo_mapillary_street_part_0012_1988578568720068",
           "feature_external_id": "tactile_guidance_seg_00533",
           "street_part_id": "street_part_0012",
           "feature_kind": "tactile_guidance",
@@ -4092,7 +4092,7 @@
           "feature_distance_to_photo_m": 19.03
         },
         {
-          "photo_external_id": "photo_mapillary_1988578568720068",
+          "photo_external_id": "photo_mapillary_street_part_0012_1988578568720068",
           "feature_external_id": "kerb_ramp_seg_00534",
           "street_part_id": "street_part_0012",
           "feature_kind": "kerb_ramp",
@@ -4113,7 +4113,7 @@
           "feature_distance_to_photo_m": 22.39
         },
         {
-          "photo_external_id": "photo_mapillary_1988578568720068",
+          "photo_external_id": "photo_mapillary_street_part_0012_1988578568720068",
           "feature_external_id": "tactile_guidance_seg_00534",
           "street_part_id": "street_part_0012",
           "feature_kind": "tactile_guidance",
@@ -4134,7 +4134,7 @@
           "feature_distance_to_photo_m": 22.39
         },
         {
-          "photo_external_id": "photo_mapillary_1988578568720068",
+          "photo_external_id": "photo_mapillary_street_part_0012_1988578568720068",
           "feature_external_id": "tactile_guidance_seg_02507",
           "street_part_id": "street_part_0012",
           "feature_kind": "tactile_guidance",
@@ -4157,7 +4157,7 @@
       ]
     },
     {
-      "photo_external_id": "photo_mapillary_1972382013402958",
+      "photo_external_id": "photo_mapillary_street_part_0013_1972382013402958",
       "street_part_id": "street_part_0013",
       "source_image_id": "1972382013402958",
       "model": "google/owlvit-base-patch32",
@@ -4499,7 +4499,7 @@
       ],
       "matched_instances": [
         {
-          "photo_external_id": "photo_mapillary_1972382013402958",
+          "photo_external_id": "photo_mapillary_street_part_0013_1972382013402958",
           "feature_external_id": "kerb_ramp_seg_00537",
           "street_part_id": "street_part_0013",
           "feature_kind": "kerb_ramp",
@@ -4520,7 +4520,7 @@
           "feature_distance_to_photo_m": 16.71
         },
         {
-          "photo_external_id": "photo_mapillary_1972382013402958",
+          "photo_external_id": "photo_mapillary_street_part_0013_1972382013402958",
           "feature_external_id": "tactile_guidance_seg_00537",
           "street_part_id": "street_part_0013",
           "feature_kind": "tactile_guidance",
@@ -4541,7 +4541,7 @@
           "feature_distance_to_photo_m": 16.71
         },
         {
-          "photo_external_id": "photo_mapillary_1972382013402958",
+          "photo_external_id": "photo_mapillary_street_part_0013_1972382013402958",
           "feature_external_id": "kerb_ramp_seg_00536",
           "street_part_id": "street_part_0013",
           "feature_kind": "kerb_ramp",
@@ -4562,7 +4562,7 @@
           "feature_distance_to_photo_m": 16.92
         },
         {
-          "photo_external_id": "photo_mapillary_1972382013402958",
+          "photo_external_id": "photo_mapillary_street_part_0013_1972382013402958",
           "feature_external_id": "tactile_guidance_seg_00536",
           "street_part_id": "street_part_0013",
           "feature_kind": "tactile_guidance",
@@ -4583,7 +4583,7 @@
           "feature_distance_to_photo_m": 16.92
         },
         {
-          "photo_external_id": "photo_mapillary_1972382013402958",
+          "photo_external_id": "photo_mapillary_street_part_0013_1972382013402958",
           "feature_external_id": "kerb_ramp_seg_00535",
           "street_part_id": "street_part_0013",
           "feature_kind": "kerb_ramp",
@@ -4604,7 +4604,7 @@
           "feature_distance_to_photo_m": 17.76
         },
         {
-          "photo_external_id": "photo_mapillary_1972382013402958",
+          "photo_external_id": "photo_mapillary_street_part_0013_1972382013402958",
           "feature_external_id": "tactile_guidance_seg_00535",
           "street_part_id": "street_part_0013",
           "feature_kind": "tactile_guidance",
@@ -4625,7 +4625,7 @@
           "feature_distance_to_photo_m": 17.76
         },
         {
-          "photo_external_id": "photo_mapillary_1972382013402958",
+          "photo_external_id": "photo_mapillary_street_part_0013_1972382013402958",
           "feature_external_id": "tactile_guidance_seg_02507",
           "street_part_id": "street_part_0013",
           "feature_kind": "tactile_guidance",
@@ -4646,7 +4646,7 @@
           "feature_distance_to_photo_m": 18.12
         },
         {
-          "photo_external_id": "photo_mapillary_1972382013402958",
+          "photo_external_id": "photo_mapillary_street_part_0013_1972382013402958",
           "feature_external_id": "kerb_ramp_seg_00532",
           "street_part_id": "street_part_0013",
           "feature_kind": "kerb_ramp",
@@ -4667,7 +4667,7 @@
           "feature_distance_to_photo_m": 18.4
         },
         {
-          "photo_external_id": "photo_mapillary_1972382013402958",
+          "photo_external_id": "photo_mapillary_street_part_0013_1972382013402958",
           "feature_external_id": "tactile_guidance_seg_00532",
           "street_part_id": "street_part_0013",
           "feature_kind": "tactile_guidance",
@@ -4688,7 +4688,7 @@
           "feature_distance_to_photo_m": 18.4
         },
         {
-          "photo_external_id": "photo_mapillary_1972382013402958",
+          "photo_external_id": "photo_mapillary_street_part_0013_1972382013402958",
           "feature_external_id": "kerb_ramp_seg_00533",
           "street_part_id": "street_part_0013",
           "feature_kind": "kerb_ramp",
@@ -4709,7 +4709,7 @@
           "feature_distance_to_photo_m": 21.36
         },
         {
-          "photo_external_id": "photo_mapillary_1972382013402958",
+          "photo_external_id": "photo_mapillary_street_part_0013_1972382013402958",
           "feature_external_id": "tactile_guidance_seg_00533",
           "street_part_id": "street_part_0013",
           "feature_kind": "tactile_guidance",
@@ -4730,7 +4730,7 @@
           "feature_distance_to_photo_m": 21.36
         },
         {
-          "photo_external_id": "photo_mapillary_1972382013402958",
+          "photo_external_id": "photo_mapillary_street_part_0013_1972382013402958",
           "feature_external_id": "tactile_guidance_seg_02508",
           "street_part_id": "street_part_0013",
           "feature_kind": "tactile_guidance",
@@ -4751,7 +4751,7 @@
           "feature_distance_to_photo_m": 21.51
         },
         {
-          "photo_external_id": "photo_mapillary_1972382013402958",
+          "photo_external_id": "photo_mapillary_street_part_0013_1972382013402958",
           "feature_external_id": "tactile_guidance_seg_00693",
           "street_part_id": "street_part_0013",
           "feature_kind": "tactile_guidance",
@@ -4772,7 +4772,7 @@
           "feature_distance_to_photo_m": 23.34
         },
         {
-          "photo_external_id": "photo_mapillary_1972382013402958",
+          "photo_external_id": "photo_mapillary_street_part_0013_1972382013402958",
           "feature_external_id": "kerb_ramp_seg_00534",
           "street_part_id": "street_part_0013",
           "feature_kind": "kerb_ramp",
@@ -4793,7 +4793,7 @@
           "feature_distance_to_photo_m": 24.45
         },
         {
-          "photo_external_id": "photo_mapillary_1972382013402958",
+          "photo_external_id": "photo_mapillary_street_part_0013_1972382013402958",
           "feature_external_id": "tactile_guidance_seg_00534",
           "street_part_id": "street_part_0013",
           "feature_kind": "tactile_guidance",
@@ -4814,7 +4814,7 @@
           "feature_distance_to_photo_m": 24.45
         },
         {
-          "photo_external_id": "photo_mapillary_1972382013402958",
+          "photo_external_id": "photo_mapillary_street_part_0013_1972382013402958",
           "feature_external_id": "tactile_guidance_seg_02509",
           "street_part_id": "street_part_0013",
           "feature_kind": "tactile_guidance",
@@ -4837,7 +4837,7 @@
       ]
     },
     {
-      "photo_external_id": "photo_mapillary_1972382013402958",
+      "photo_external_id": "photo_mapillary_street_part_0014_1972382013402958",
       "street_part_id": "street_part_0014",
       "source_image_id": "1972382013402958",
       "model": "google/owlvit-base-patch32",
@@ -5179,7 +5179,7 @@
       ],
       "matched_instances": [
         {
-          "photo_external_id": "photo_mapillary_1972382013402958",
+          "photo_external_id": "photo_mapillary_street_part_0014_1972382013402958",
           "feature_external_id": "kerb_ramp_seg_00537",
           "street_part_id": "street_part_0014",
           "feature_kind": "kerb_ramp",
@@ -5200,7 +5200,7 @@
           "feature_distance_to_photo_m": 16.71
         },
         {
-          "photo_external_id": "photo_mapillary_1972382013402958",
+          "photo_external_id": "photo_mapillary_street_part_0014_1972382013402958",
           "feature_external_id": "tactile_guidance_seg_00537",
           "street_part_id": "street_part_0014",
           "feature_kind": "tactile_guidance",
@@ -5221,7 +5221,7 @@
           "feature_distance_to_photo_m": 16.71
         },
         {
-          "photo_external_id": "photo_mapillary_1972382013402958",
+          "photo_external_id": "photo_mapillary_street_part_0014_1972382013402958",
           "feature_external_id": "kerb_ramp_seg_00536",
           "street_part_id": "street_part_0014",
           "feature_kind": "kerb_ramp",
@@ -5242,7 +5242,7 @@
           "feature_distance_to_photo_m": 16.92
         },
         {
-          "photo_external_id": "photo_mapillary_1972382013402958",
+          "photo_external_id": "photo_mapillary_street_part_0014_1972382013402958",
           "feature_external_id": "tactile_guidance_seg_00536",
           "street_part_id": "street_part_0014",
           "feature_kind": "tactile_guidance",
@@ -5263,7 +5263,7 @@
           "feature_distance_to_photo_m": 16.92
         },
         {
-          "photo_external_id": "photo_mapillary_1972382013402958",
+          "photo_external_id": "photo_mapillary_street_part_0014_1972382013402958",
           "feature_external_id": "kerb_ramp_seg_00535",
           "street_part_id": "street_part_0014",
           "feature_kind": "kerb_ramp",
@@ -5284,7 +5284,7 @@
           "feature_distance_to_photo_m": 17.76
         },
         {
-          "photo_external_id": "photo_mapillary_1972382013402958",
+          "photo_external_id": "photo_mapillary_street_part_0014_1972382013402958",
           "feature_external_id": "tactile_guidance_seg_00535",
           "street_part_id": "street_part_0014",
           "feature_kind": "tactile_guidance",
@@ -5305,7 +5305,7 @@
           "feature_distance_to_photo_m": 17.76
         },
         {
-          "photo_external_id": "photo_mapillary_1972382013402958",
+          "photo_external_id": "photo_mapillary_street_part_0014_1972382013402958",
           "feature_external_id": "tactile_guidance_seg_02507",
           "street_part_id": "street_part_0014",
           "feature_kind": "tactile_guidance",
@@ -5326,7 +5326,7 @@
           "feature_distance_to_photo_m": 18.12
         },
         {
-          "photo_external_id": "photo_mapillary_1972382013402958",
+          "photo_external_id": "photo_mapillary_street_part_0014_1972382013402958",
           "feature_external_id": "kerb_ramp_seg_00532",
           "street_part_id": "street_part_0014",
           "feature_kind": "kerb_ramp",
@@ -5347,7 +5347,7 @@
           "feature_distance_to_photo_m": 18.4
         },
         {
-          "photo_external_id": "photo_mapillary_1972382013402958",
+          "photo_external_id": "photo_mapillary_street_part_0014_1972382013402958",
           "feature_external_id": "tactile_guidance_seg_00532",
           "street_part_id": "street_part_0014",
           "feature_kind": "tactile_guidance",
@@ -5368,7 +5368,7 @@
           "feature_distance_to_photo_m": 18.4
         },
         {
-          "photo_external_id": "photo_mapillary_1972382013402958",
+          "photo_external_id": "photo_mapillary_street_part_0014_1972382013402958",
           "feature_external_id": "kerb_ramp_seg_00533",
           "street_part_id": "street_part_0014",
           "feature_kind": "kerb_ramp",
@@ -5389,7 +5389,7 @@
           "feature_distance_to_photo_m": 21.36
         },
         {
-          "photo_external_id": "photo_mapillary_1972382013402958",
+          "photo_external_id": "photo_mapillary_street_part_0014_1972382013402958",
           "feature_external_id": "tactile_guidance_seg_00533",
           "street_part_id": "street_part_0014",
           "feature_kind": "tactile_guidance",
@@ -5410,7 +5410,7 @@
           "feature_distance_to_photo_m": 21.36
         },
         {
-          "photo_external_id": "photo_mapillary_1972382013402958",
+          "photo_external_id": "photo_mapillary_street_part_0014_1972382013402958",
           "feature_external_id": "tactile_guidance_seg_02508",
           "street_part_id": "street_part_0014",
           "feature_kind": "tactile_guidance",
@@ -5431,7 +5431,7 @@
           "feature_distance_to_photo_m": 21.51
         },
         {
-          "photo_external_id": "photo_mapillary_1972382013402958",
+          "photo_external_id": "photo_mapillary_street_part_0014_1972382013402958",
           "feature_external_id": "tactile_guidance_seg_00693",
           "street_part_id": "street_part_0014",
           "feature_kind": "tactile_guidance",
@@ -5452,7 +5452,7 @@
           "feature_distance_to_photo_m": 23.34
         },
         {
-          "photo_external_id": "photo_mapillary_1972382013402958",
+          "photo_external_id": "photo_mapillary_street_part_0014_1972382013402958",
           "feature_external_id": "kerb_ramp_seg_00534",
           "street_part_id": "street_part_0014",
           "feature_kind": "kerb_ramp",
@@ -5473,7 +5473,7 @@
           "feature_distance_to_photo_m": 24.45
         },
         {
-          "photo_external_id": "photo_mapillary_1972382013402958",
+          "photo_external_id": "photo_mapillary_street_part_0014_1972382013402958",
           "feature_external_id": "tactile_guidance_seg_00534",
           "street_part_id": "street_part_0014",
           "feature_kind": "tactile_guidance",
@@ -5494,7 +5494,7 @@
           "feature_distance_to_photo_m": 24.45
         },
         {
-          "photo_external_id": "photo_mapillary_1972382013402958",
+          "photo_external_id": "photo_mapillary_street_part_0014_1972382013402958",
           "feature_external_id": "tactile_guidance_seg_02509",
           "street_part_id": "street_part_0014",
           "feature_kind": "tactile_guidance",
@@ -5517,7 +5517,7 @@
       ]
     },
     {
-      "photo_external_id": "photo_mapillary_1330408172300774",
+      "photo_external_id": "photo_mapillary_street_part_0015_1330408172300774",
       "street_part_id": "street_part_0015",
       "source_image_id": "1330408172300774",
       "model": "google/owlvit-base-patch32",
@@ -5859,7 +5859,7 @@
       ],
       "matched_instances": [
         {
-          "photo_external_id": "photo_mapillary_1330408172300774",
+          "photo_external_id": "photo_mapillary_street_part_0015_1330408172300774",
           "feature_external_id": "kerb_ramp_seg_00537",
           "street_part_id": "street_part_0015",
           "feature_kind": "kerb_ramp",
@@ -5880,7 +5880,7 @@
           "feature_distance_to_photo_m": 9.01
         },
         {
-          "photo_external_id": "photo_mapillary_1330408172300774",
+          "photo_external_id": "photo_mapillary_street_part_0015_1330408172300774",
           "feature_external_id": "tactile_guidance_seg_00537",
           "street_part_id": "street_part_0015",
           "feature_kind": "tactile_guidance",
@@ -5901,7 +5901,7 @@
           "feature_distance_to_photo_m": 9.01
         },
         {
-          "photo_external_id": "photo_mapillary_1330408172300774",
+          "photo_external_id": "photo_mapillary_street_part_0015_1330408172300774",
           "feature_external_id": "kerb_ramp_seg_00536",
           "street_part_id": "street_part_0015",
           "feature_kind": "kerb_ramp",
@@ -5922,7 +5922,7 @@
           "feature_distance_to_photo_m": 9.41
         },
         {
-          "photo_external_id": "photo_mapillary_1330408172300774",
+          "photo_external_id": "photo_mapillary_street_part_0015_1330408172300774",
           "feature_external_id": "tactile_guidance_seg_00536",
           "street_part_id": "street_part_0015",
           "feature_kind": "tactile_guidance",
@@ -5943,7 +5943,7 @@
           "feature_distance_to_photo_m": 9.41
         },
         {
-          "photo_external_id": "photo_mapillary_1330408172300774",
+          "photo_external_id": "photo_mapillary_street_part_0015_1330408172300774",
           "feature_external_id": "kerb_ramp_seg_00535",
           "street_part_id": "street_part_0015",
           "feature_kind": "kerb_ramp",
@@ -5964,7 +5964,7 @@
           "feature_distance_to_photo_m": 10.87
         },
         {
-          "photo_external_id": "photo_mapillary_1330408172300774",
+          "photo_external_id": "photo_mapillary_street_part_0015_1330408172300774",
           "feature_external_id": "tactile_guidance_seg_00535",
           "street_part_id": "street_part_0015",
           "feature_kind": "tactile_guidance",
@@ -5985,7 +5985,7 @@
           "feature_distance_to_photo_m": 10.87
         },
         {
-          "photo_external_id": "photo_mapillary_1330408172300774",
+          "photo_external_id": "photo_mapillary_street_part_0015_1330408172300774",
           "feature_external_id": "kerb_ramp_seg_00532",
           "street_part_id": "street_part_0015",
           "feature_kind": "kerb_ramp",
@@ -6006,7 +6006,7 @@
           "feature_distance_to_photo_m": 15.35
         },
         {
-          "photo_external_id": "photo_mapillary_1330408172300774",
+          "photo_external_id": "photo_mapillary_street_part_0015_1330408172300774",
           "feature_external_id": "tactile_guidance_seg_00532",
           "street_part_id": "street_part_0015",
           "feature_kind": "tactile_guidance",
@@ -6027,7 +6027,7 @@
           "feature_distance_to_photo_m": 15.35
         },
         {
-          "photo_external_id": "photo_mapillary_1330408172300774",
+          "photo_external_id": "photo_mapillary_street_part_0015_1330408172300774",
           "feature_external_id": "kerb_ramp_seg_00533",
           "street_part_id": "street_part_0015",
           "feature_kind": "kerb_ramp",
@@ -6048,7 +6048,7 @@
           "feature_distance_to_photo_m": 18.78
         },
         {
-          "photo_external_id": "photo_mapillary_1330408172300774",
+          "photo_external_id": "photo_mapillary_street_part_0015_1330408172300774",
           "feature_external_id": "tactile_guidance_seg_00533",
           "street_part_id": "street_part_0015",
           "feature_kind": "tactile_guidance",
@@ -6069,7 +6069,7 @@
           "feature_distance_to_photo_m": 18.78
         },
         {
-          "photo_external_id": "photo_mapillary_1330408172300774",
+          "photo_external_id": "photo_mapillary_street_part_0015_1330408172300774",
           "feature_external_id": "kerb_ramp_seg_00534",
           "street_part_id": "street_part_0015",
           "feature_kind": "kerb_ramp",
@@ -6090,7 +6090,7 @@
           "feature_distance_to_photo_m": 22.21
         },
         {
-          "photo_external_id": "photo_mapillary_1330408172300774",
+          "photo_external_id": "photo_mapillary_street_part_0015_1330408172300774",
           "feature_external_id": "tactile_guidance_seg_00534",
           "street_part_id": "street_part_0015",
           "feature_kind": "tactile_guidance",
@@ -6111,7 +6111,7 @@
           "feature_distance_to_photo_m": 22.21
         },
         {
-          "photo_external_id": "photo_mapillary_1330408172300774",
+          "photo_external_id": "photo_mapillary_street_part_0015_1330408172300774",
           "feature_external_id": "tactile_guidance_seg_02507",
           "street_part_id": "street_part_0015",
           "feature_kind": "tactile_guidance",
@@ -6132,7 +6132,7 @@
           "feature_distance_to_photo_m": 25.78
         },
         {
-          "photo_external_id": "photo_mapillary_1330408172300774",
+          "photo_external_id": "photo_mapillary_street_part_0015_1330408172300774",
           "feature_external_id": "tactile_guidance_seg_02508",
           "street_part_id": "street_part_0015",
           "feature_kind": "tactile_guidance",
@@ -6153,7 +6153,7 @@
           "feature_distance_to_photo_m": 29.17
         },
         {
-          "photo_external_id": "photo_mapillary_1330408172300774",
+          "photo_external_id": "photo_mapillary_street_part_0015_1330408172300774",
           "feature_external_id": "tactile_guidance_seg_00693",
           "street_part_id": "street_part_0015",
           "feature_kind": "tactile_guidance",
@@ -6174,7 +6174,7 @@
           "feature_distance_to_photo_m": 30.47
         },
         {
-          "photo_external_id": "photo_mapillary_1330408172300774",
+          "photo_external_id": "photo_mapillary_street_part_0015_1330408172300774",
           "feature_external_id": "tactile_guidance_seg_02425",
           "street_part_id": "street_part_0015",
           "feature_kind": "tactile_guidance",
@@ -6197,7 +6197,7 @@
       ]
     },
     {
-      "photo_external_id": "photo_mapillary_1988578568720068",
+      "photo_external_id": "photo_mapillary_street_part_0016_1988578568720068",
       "street_part_id": "street_part_0016",
       "source_image_id": "1988578568720068",
       "model": "google/owlvit-base-patch32",
@@ -6539,7 +6539,7 @@
       ],
       "matched_instances": [
         {
-          "photo_external_id": "photo_mapillary_1988578568720068",
+          "photo_external_id": "photo_mapillary_street_part_0016_1988578568720068",
           "feature_external_id": "kerb_ramp_seg_00537",
           "street_part_id": "street_part_0016",
           "feature_kind": "kerb_ramp",
@@ -6560,7 +6560,7 @@
           "feature_distance_to_photo_m": 1.42
         },
         {
-          "photo_external_id": "photo_mapillary_1988578568720068",
+          "photo_external_id": "photo_mapillary_street_part_0016_1988578568720068",
           "feature_external_id": "tactile_guidance_seg_00537",
           "street_part_id": "street_part_0016",
           "feature_kind": "tactile_guidance",
@@ -6581,7 +6581,7 @@
           "feature_distance_to_photo_m": 1.42
         },
         {
-          "photo_external_id": "photo_mapillary_1988578568720068",
+          "photo_external_id": "photo_mapillary_street_part_0016_1988578568720068",
           "feature_external_id": "kerb_ramp_seg_00536",
           "street_part_id": "street_part_0016",
           "feature_kind": "kerb_ramp",
@@ -6602,7 +6602,7 @@
           "feature_distance_to_photo_m": 2.91
         },
         {
-          "photo_external_id": "photo_mapillary_1988578568720068",
+          "photo_external_id": "photo_mapillary_street_part_0016_1988578568720068",
           "feature_external_id": "tactile_guidance_seg_00536",
           "street_part_id": "street_part_0016",
           "feature_kind": "tactile_guidance",
@@ -6623,7 +6623,7 @@
           "feature_distance_to_photo_m": 2.91
         },
         {
-          "photo_external_id": "photo_mapillary_1988578568720068",
+          "photo_external_id": "photo_mapillary_street_part_0016_1988578568720068",
           "feature_external_id": "kerb_ramp_seg_00535",
           "street_part_id": "street_part_0016",
           "feature_kind": "kerb_ramp",
@@ -6644,7 +6644,7 @@
           "feature_distance_to_photo_m": 6.12
         },
         {
-          "photo_external_id": "photo_mapillary_1988578568720068",
+          "photo_external_id": "photo_mapillary_street_part_0016_1988578568720068",
           "feature_external_id": "tactile_guidance_seg_00535",
           "street_part_id": "street_part_0016",
           "feature_kind": "tactile_guidance",
@@ -6665,7 +6665,7 @@
           "feature_distance_to_photo_m": 6.12
         },
         {
-          "photo_external_id": "photo_mapillary_1988578568720068",
+          "photo_external_id": "photo_mapillary_street_part_0016_1988578568720068",
           "feature_external_id": "kerb_ramp_seg_00532",
           "street_part_id": "street_part_0016",
           "feature_kind": "kerb_ramp",
@@ -6686,7 +6686,7 @@
           "feature_distance_to_photo_m": 15.73
         },
         {
-          "photo_external_id": "photo_mapillary_1988578568720068",
+          "photo_external_id": "photo_mapillary_street_part_0016_1988578568720068",
           "feature_external_id": "tactile_guidance_seg_00532",
           "street_part_id": "street_part_0016",
           "feature_kind": "tactile_guidance",
@@ -6707,7 +6707,7 @@
           "feature_distance_to_photo_m": 15.73
         },
         {
-          "photo_external_id": "photo_mapillary_1988578568720068",
+          "photo_external_id": "photo_mapillary_street_part_0016_1988578568720068",
           "feature_external_id": "kerb_ramp_seg_00533",
           "street_part_id": "street_part_0016",
           "feature_kind": "kerb_ramp",
@@ -6728,7 +6728,7 @@
           "feature_distance_to_photo_m": 19.03
         },
         {
-          "photo_external_id": "photo_mapillary_1988578568720068",
+          "photo_external_id": "photo_mapillary_street_part_0016_1988578568720068",
           "feature_external_id": "tactile_guidance_seg_00533",
           "street_part_id": "street_part_0016",
           "feature_kind": "tactile_guidance",
@@ -6749,7 +6749,7 @@
           "feature_distance_to_photo_m": 19.03
         },
         {
-          "photo_external_id": "photo_mapillary_1988578568720068",
+          "photo_external_id": "photo_mapillary_street_part_0016_1988578568720068",
           "feature_external_id": "kerb_ramp_seg_00534",
           "street_part_id": "street_part_0016",
           "feature_kind": "kerb_ramp",
@@ -6770,7 +6770,7 @@
           "feature_distance_to_photo_m": 22.39
         },
         {
-          "photo_external_id": "photo_mapillary_1988578568720068",
+          "photo_external_id": "photo_mapillary_street_part_0016_1988578568720068",
           "feature_external_id": "tactile_guidance_seg_00534",
           "street_part_id": "street_part_0016",
           "feature_kind": "tactile_guidance",
@@ -6791,7 +6791,7 @@
           "feature_distance_to_photo_m": 22.39
         },
         {
-          "photo_external_id": "photo_mapillary_1988578568720068",
+          "photo_external_id": "photo_mapillary_street_part_0016_1988578568720068",
           "feature_external_id": "tactile_guidance_seg_02507",
           "street_part_id": "street_part_0016",
           "feature_kind": "tactile_guidance",
@@ -6814,7 +6814,7 @@
       ]
     },
     {
-      "photo_external_id": "photo_mapillary_2122100255255260",
+      "photo_external_id": "photo_mapillary_street_part_0017_2122100255255260",
       "street_part_id": "street_part_0017",
       "source_image_id": "2122100255255260",
       "model": "google/owlvit-base-patch32",
@@ -7156,7 +7156,7 @@
       ],
       "matched_instances": [
         {
-          "photo_external_id": "photo_mapillary_2122100255255260",
+          "photo_external_id": "photo_mapillary_street_part_0017_2122100255255260",
           "feature_external_id": "kerb_ramp_seg_00537",
           "street_part_id": "street_part_0017",
           "feature_kind": "kerb_ramp",
@@ -7177,7 +7177,7 @@
           "feature_distance_to_photo_m": 6.56
         },
         {
-          "photo_external_id": "photo_mapillary_2122100255255260",
+          "photo_external_id": "photo_mapillary_street_part_0017_2122100255255260",
           "feature_external_id": "tactile_guidance_seg_00537",
           "street_part_id": "street_part_0017",
           "feature_kind": "tactile_guidance",
@@ -7198,7 +7198,7 @@
           "feature_distance_to_photo_m": 6.56
         },
         {
-          "photo_external_id": "photo_mapillary_2122100255255260",
+          "photo_external_id": "photo_mapillary_street_part_0017_2122100255255260",
           "feature_external_id": "kerb_ramp_seg_00536",
           "street_part_id": "street_part_0017",
           "feature_kind": "kerb_ramp",
@@ -7219,7 +7219,7 @@
           "feature_distance_to_photo_m": 6.9
         },
         {
-          "photo_external_id": "photo_mapillary_2122100255255260",
+          "photo_external_id": "photo_mapillary_street_part_0017_2122100255255260",
           "feature_external_id": "tactile_guidance_seg_00536",
           "street_part_id": "street_part_0017",
           "feature_kind": "tactile_guidance",
@@ -7240,7 +7240,7 @@
           "feature_distance_to_photo_m": 6.9
         },
         {
-          "photo_external_id": "photo_mapillary_2122100255255260",
+          "photo_external_id": "photo_mapillary_street_part_0017_2122100255255260",
           "feature_external_id": "kerb_ramp_seg_00535",
           "street_part_id": "street_part_0017",
           "feature_kind": "kerb_ramp",
@@ -7261,7 +7261,7 @@
           "feature_distance_to_photo_m": 8.65
         },
         {
-          "photo_external_id": "photo_mapillary_2122100255255260",
+          "photo_external_id": "photo_mapillary_street_part_0017_2122100255255260",
           "feature_external_id": "tactile_guidance_seg_00535",
           "street_part_id": "street_part_0017",
           "feature_kind": "tactile_guidance",
@@ -7282,7 +7282,7 @@
           "feature_distance_to_photo_m": 8.65
         },
         {
-          "photo_external_id": "photo_mapillary_2122100255255260",
+          "photo_external_id": "photo_mapillary_street_part_0017_2122100255255260",
           "feature_external_id": "kerb_ramp_seg_00532",
           "street_part_id": "street_part_0017",
           "feature_kind": "kerb_ramp",
@@ -7303,7 +7303,7 @@
           "feature_distance_to_photo_m": 19.32
         },
         {
-          "photo_external_id": "photo_mapillary_2122100255255260",
+          "photo_external_id": "photo_mapillary_street_part_0017_2122100255255260",
           "feature_external_id": "tactile_guidance_seg_00532",
           "street_part_id": "street_part_0017",
           "feature_kind": "tactile_guidance",
@@ -7324,7 +7324,7 @@
           "feature_distance_to_photo_m": 19.32
         },
         {
-          "photo_external_id": "photo_mapillary_2122100255255260",
+          "photo_external_id": "photo_mapillary_street_part_0017_2122100255255260",
           "feature_external_id": "kerb_ramp_seg_00533",
           "street_part_id": "street_part_0017",
           "feature_kind": "kerb_ramp",
@@ -7345,7 +7345,7 @@
           "feature_distance_to_photo_m": 22.02
         },
         {
-          "photo_external_id": "photo_mapillary_2122100255255260",
+          "photo_external_id": "photo_mapillary_street_part_0017_2122100255255260",
           "feature_external_id": "tactile_guidance_seg_00533",
           "street_part_id": "street_part_0017",
           "feature_kind": "tactile_guidance",
@@ -7366,7 +7366,7 @@
           "feature_distance_to_photo_m": 22.02
         },
         {
-          "photo_external_id": "photo_mapillary_2122100255255260",
+          "photo_external_id": "photo_mapillary_street_part_0017_2122100255255260",
           "feature_external_id": "kerb_ramp_seg_00534",
           "street_part_id": "street_part_0017",
           "feature_kind": "kerb_ramp",
@@ -7387,7 +7387,7 @@
           "feature_distance_to_photo_m": 24.92
         },
         {
-          "photo_external_id": "photo_mapillary_2122100255255260",
+          "photo_external_id": "photo_mapillary_street_part_0017_2122100255255260",
           "feature_external_id": "tactile_guidance_seg_00534",
           "street_part_id": "street_part_0017",
           "feature_kind": "tactile_guidance",
@@ -7410,7 +7410,7 @@
       ]
     },
     {
-      "photo_external_id": "photo_mapillary_901745566192518",
+      "photo_external_id": "photo_mapillary_street_part_0018_901745566192518",
       "street_part_id": "street_part_0018",
       "source_image_id": "901745566192518",
       "model": "google/owlvit-base-patch32",
@@ -7752,7 +7752,7 @@
       ],
       "matched_instances": [
         {
-          "photo_external_id": "photo_mapillary_901745566192518",
+          "photo_external_id": "photo_mapillary_street_part_0018_901745566192518",
           "feature_external_id": "kerb_ramp_seg_00536",
           "street_part_id": "street_part_0018",
           "feature_kind": "kerb_ramp",
@@ -7773,7 +7773,7 @@
           "feature_distance_to_photo_m": 28.97
         },
         {
-          "photo_external_id": "photo_mapillary_901745566192518",
+          "photo_external_id": "photo_mapillary_street_part_0018_901745566192518",
           "feature_external_id": "tactile_guidance_seg_00536",
           "street_part_id": "street_part_0018",
           "feature_kind": "tactile_guidance",
@@ -7794,7 +7794,7 @@
           "feature_distance_to_photo_m": 28.97
         },
         {
-          "photo_external_id": "photo_mapillary_901745566192518",
+          "photo_external_id": "photo_mapillary_street_part_0018_901745566192518",
           "feature_external_id": "kerb_ramp_seg_00537",
           "street_part_id": "street_part_0018",
           "feature_kind": "kerb_ramp",
@@ -7815,7 +7815,7 @@
           "feature_distance_to_photo_m": 29.11
         },
         {
-          "photo_external_id": "photo_mapillary_901745566192518",
+          "photo_external_id": "photo_mapillary_street_part_0018_901745566192518",
           "feature_external_id": "tactile_guidance_seg_00537",
           "street_part_id": "street_part_0018",
           "feature_kind": "tactile_guidance",
@@ -7836,7 +7836,7 @@
           "feature_distance_to_photo_m": 29.11
         },
         {
-          "photo_external_id": "photo_mapillary_901745566192518",
+          "photo_external_id": "photo_mapillary_street_part_0018_901745566192518",
           "feature_external_id": "kerb_ramp_seg_00535",
           "street_part_id": "street_part_0018",
           "feature_kind": "kerb_ramp",
@@ -7857,7 +7857,7 @@
           "feature_distance_to_photo_m": 29.21
         },
         {
-          "photo_external_id": "photo_mapillary_901745566192518",
+          "photo_external_id": "photo_mapillary_street_part_0018_901745566192518",
           "feature_external_id": "tactile_guidance_seg_00535",
           "street_part_id": "street_part_0018",
           "feature_kind": "tactile_guidance",
@@ -7880,7 +7880,7 @@
       ]
     },
     {
-      "photo_external_id": "photo_mapillary_901745566192518",
+      "photo_external_id": "photo_mapillary_street_part_0019_901745566192518",
       "street_part_id": "street_part_0019",
       "source_image_id": "901745566192518",
       "model": "google/owlvit-base-patch32",
@@ -8222,7 +8222,7 @@
       ],
       "matched_instances": [
         {
-          "photo_external_id": "photo_mapillary_901745566192518",
+          "photo_external_id": "photo_mapillary_street_part_0019_901745566192518",
           "feature_external_id": "kerb_ramp_seg_00536",
           "street_part_id": "street_part_0019",
           "feature_kind": "kerb_ramp",
@@ -8243,7 +8243,7 @@
           "feature_distance_to_photo_m": 28.97
         },
         {
-          "photo_external_id": "photo_mapillary_901745566192518",
+          "photo_external_id": "photo_mapillary_street_part_0019_901745566192518",
           "feature_external_id": "tactile_guidance_seg_00536",
           "street_part_id": "street_part_0019",
           "feature_kind": "tactile_guidance",
@@ -8264,7 +8264,7 @@
           "feature_distance_to_photo_m": 28.97
         },
         {
-          "photo_external_id": "photo_mapillary_901745566192518",
+          "photo_external_id": "photo_mapillary_street_part_0019_901745566192518",
           "feature_external_id": "kerb_ramp_seg_00537",
           "street_part_id": "street_part_0019",
           "feature_kind": "kerb_ramp",
@@ -8285,7 +8285,7 @@
           "feature_distance_to_photo_m": 29.11
         },
         {
-          "photo_external_id": "photo_mapillary_901745566192518",
+          "photo_external_id": "photo_mapillary_street_part_0019_901745566192518",
           "feature_external_id": "tactile_guidance_seg_00537",
           "street_part_id": "street_part_0019",
           "feature_kind": "tactile_guidance",
@@ -8306,7 +8306,7 @@
           "feature_distance_to_photo_m": 29.11
         },
         {
-          "photo_external_id": "photo_mapillary_901745566192518",
+          "photo_external_id": "photo_mapillary_street_part_0019_901745566192518",
           "feature_external_id": "kerb_ramp_seg_00535",
           "street_part_id": "street_part_0019",
           "feature_kind": "kerb_ramp",
@@ -8327,7 +8327,7 @@
           "feature_distance_to_photo_m": 29.21
         },
         {
-          "photo_external_id": "photo_mapillary_901745566192518",
+          "photo_external_id": "photo_mapillary_street_part_0019_901745566192518",
           "feature_external_id": "tactile_guidance_seg_00535",
           "street_part_id": "street_part_0019",
           "feature_kind": "tactile_guidance",
@@ -8350,7 +8350,7 @@
       ]
     },
     {
-      "photo_external_id": "photo_mapillary_1702560444250824",
+      "photo_external_id": "photo_mapillary_street_part_0020_1702560444250824",
       "street_part_id": "street_part_0020",
       "source_image_id": "1702560444250824",
       "model": "google/owlvit-base-patch32",
@@ -8693,7 +8693,7 @@
       "matched_instances": []
     },
     {
-      "photo_external_id": "photo_mapillary_4306383756269452",
+      "photo_external_id": "photo_mapillary_street_part_0021_4306383756269452",
       "street_part_id": "street_part_0021",
       "source_image_id": "4306383756269452",
       "model": "google/owlvit-base-patch32",
@@ -9036,7 +9036,7 @@
       "matched_instances": []
     },
     {
-      "photo_external_id": "photo_mapillary_267050878776148",
+      "photo_external_id": "photo_mapillary_street_part_0022_267050878776148",
       "street_part_id": "street_part_0022",
       "source_image_id": "267050878776148",
       "model": "google/owlvit-base-patch32",
@@ -9092,7 +9092,7 @@
       ],
       "matched_instances": [
         {
-          "photo_external_id": "photo_mapillary_267050878776148",
+          "photo_external_id": "photo_mapillary_street_part_0022_267050878776148",
           "feature_external_id": "kerb_ramp_seg_00544",
           "street_part_id": "street_part_0022",
           "feature_kind": "kerb_ramp",
@@ -9113,7 +9113,7 @@
           "feature_distance_to_photo_m": 27.86
         },
         {
-          "photo_external_id": "photo_mapillary_267050878776148",
+          "photo_external_id": "photo_mapillary_street_part_0022_267050878776148",
           "feature_external_id": "kerb_ramp_seg_00543",
           "street_part_id": "street_part_0022",
           "feature_kind": "kerb_ramp",
@@ -9134,7 +9134,7 @@
           "feature_distance_to_photo_m": 28.13
         },
         {
-          "photo_external_id": "photo_mapillary_267050878776148",
+          "photo_external_id": "photo_mapillary_street_part_0022_267050878776148",
           "feature_external_id": "kerb_ramp_seg_00541",
           "street_part_id": "street_part_0022",
           "feature_kind": "kerb_ramp",
@@ -9155,7 +9155,7 @@
           "feature_distance_to_photo_m": 28.87
         },
         {
-          "photo_external_id": "photo_mapillary_267050878776148",
+          "photo_external_id": "photo_mapillary_street_part_0022_267050878776148",
           "feature_external_id": "kerb_ramp_seg_00542",
           "street_part_id": "street_part_0022",
           "feature_kind": "kerb_ramp",
@@ -9176,7 +9176,7 @@
           "feature_distance_to_photo_m": 29.02
         },
         {
-          "photo_external_id": "photo_mapillary_267050878776148",
+          "photo_external_id": "photo_mapillary_street_part_0022_267050878776148",
           "feature_external_id": "covered_linkway_2980",
           "street_part_id": "street_part_0022",
           "feature_kind": "covered_linkway",
@@ -9197,7 +9197,7 @@
           "feature_distance_to_photo_m": 30.18
         },
         {
-          "photo_external_id": "photo_mapillary_267050878776148",
+          "photo_external_id": "photo_mapillary_street_part_0022_267050878776148",
           "feature_external_id": "kerb_ramp_seg_00538",
           "street_part_id": "street_part_0022",
           "feature_kind": "kerb_ramp",
@@ -9218,7 +9218,7 @@
           "feature_distance_to_photo_m": 32.78
         },
         {
-          "photo_external_id": "photo_mapillary_267050878776148",
+          "photo_external_id": "photo_mapillary_street_part_0022_267050878776148",
           "feature_external_id": "kerb_ramp_seg_00539",
           "street_part_id": "street_part_0022",
           "feature_kind": "kerb_ramp",
@@ -9241,7 +9241,7 @@
       ]
     },
     {
-      "photo_external_id": "photo_mapillary_1104293193608922",
+      "photo_external_id": "photo_mapillary_street_part_0024_1104293193608922",
       "street_part_id": "street_part_0024",
       "source_image_id": "1104293193608922",
       "model": "google/owlvit-base-patch32",
@@ -9583,7 +9583,7 @@
       ],
       "matched_instances": [
         {
-          "photo_external_id": "photo_mapillary_1104293193608922",
+          "photo_external_id": "photo_mapillary_street_part_0024_1104293193608922",
           "feature_external_id": "kerb_ramp_seg_00558",
           "street_part_id": "street_part_0024",
           "feature_kind": "kerb_ramp",
@@ -9604,7 +9604,7 @@
           "feature_distance_to_photo_m": 1.93
         },
         {
-          "photo_external_id": "photo_mapillary_1104293193608922",
+          "photo_external_id": "photo_mapillary_street_part_0024_1104293193608922",
           "feature_external_id": "tactile_guidance_seg_00558",
           "street_part_id": "street_part_0024",
           "feature_kind": "tactile_guidance",
@@ -9625,7 +9625,7 @@
           "feature_distance_to_photo_m": 1.93
         },
         {
-          "photo_external_id": "photo_mapillary_1104293193608922",
+          "photo_external_id": "photo_mapillary_street_part_0024_1104293193608922",
           "feature_external_id": "kerb_ramp_seg_00557",
           "street_part_id": "street_part_0024",
           "feature_kind": "kerb_ramp",
@@ -9646,7 +9646,7 @@
           "feature_distance_to_photo_m": 3.58
         },
         {
-          "photo_external_id": "photo_mapillary_1104293193608922",
+          "photo_external_id": "photo_mapillary_street_part_0024_1104293193608922",
           "feature_external_id": "tactile_guidance_seg_00557",
           "street_part_id": "street_part_0024",
           "feature_kind": "tactile_guidance",
@@ -9667,7 +9667,7 @@
           "feature_distance_to_photo_m": 3.58
         },
         {
-          "photo_external_id": "photo_mapillary_1104293193608922",
+          "photo_external_id": "photo_mapillary_street_part_0024_1104293193608922",
           "feature_external_id": "kerb_ramp_seg_00559",
           "street_part_id": "street_part_0024",
           "feature_kind": "kerb_ramp",
@@ -9688,7 +9688,7 @@
           "feature_distance_to_photo_m": 6.15
         },
         {
-          "photo_external_id": "photo_mapillary_1104293193608922",
+          "photo_external_id": "photo_mapillary_street_part_0024_1104293193608922",
           "feature_external_id": "tactile_guidance_seg_00559",
           "street_part_id": "street_part_0024",
           "feature_kind": "tactile_guidance",
@@ -9709,7 +9709,7 @@
           "feature_distance_to_photo_m": 6.15
         },
         {
-          "photo_external_id": "photo_mapillary_1104293193608922",
+          "photo_external_id": "photo_mapillary_street_part_0024_1104293193608922",
           "feature_external_id": "bollard_46613",
           "street_part_id": "street_part_0024",
           "feature_kind": "bollard",
@@ -9730,7 +9730,7 @@
           "feature_distance_to_photo_m": 11.19
         },
         {
-          "photo_external_id": "photo_mapillary_1104293193608922",
+          "photo_external_id": "photo_mapillary_street_part_0024_1104293193608922",
           "feature_external_id": "kerb_ramp_seg_00548",
           "street_part_id": "street_part_0024",
           "feature_kind": "kerb_ramp",
@@ -9751,7 +9751,7 @@
           "feature_distance_to_photo_m": 13.14
         },
         {
-          "photo_external_id": "photo_mapillary_1104293193608922",
+          "photo_external_id": "photo_mapillary_street_part_0024_1104293193608922",
           "feature_external_id": "tactile_guidance_seg_00548",
           "street_part_id": "street_part_0024",
           "feature_kind": "tactile_guidance",
@@ -9772,7 +9772,7 @@
           "feature_distance_to_photo_m": 13.14
         },
         {
-          "photo_external_id": "photo_mapillary_1104293193608922",
+          "photo_external_id": "photo_mapillary_street_part_0024_1104293193608922",
           "feature_external_id": "kerb_ramp_seg_00547",
           "street_part_id": "street_part_0024",
           "feature_kind": "kerb_ramp",
@@ -9793,7 +9793,7 @@
           "feature_distance_to_photo_m": 13.37
         },
         {
-          "photo_external_id": "photo_mapillary_1104293193608922",
+          "photo_external_id": "photo_mapillary_street_part_0024_1104293193608922",
           "feature_external_id": "tactile_guidance_seg_00547",
           "street_part_id": "street_part_0024",
           "feature_kind": "tactile_guidance",
@@ -9814,7 +9814,7 @@
           "feature_distance_to_photo_m": 13.37
         },
         {
-          "photo_external_id": "photo_mapillary_1104293193608922",
+          "photo_external_id": "photo_mapillary_street_part_0024_1104293193608922",
           "feature_external_id": "covered_linkway_3403",
           "street_part_id": "street_part_0024",
           "feature_kind": "covered_linkway",
@@ -9835,7 +9835,7 @@
           "feature_distance_to_photo_m": 13.44
         },
         {
-          "photo_external_id": "photo_mapillary_1104293193608922",
+          "photo_external_id": "photo_mapillary_street_part_0024_1104293193608922",
           "feature_external_id": "covered_linkway_3404",
           "street_part_id": "street_part_0024",
           "feature_kind": "covered_linkway",
@@ -9856,7 +9856,7 @@
           "feature_distance_to_photo_m": 13.71
         },
         {
-          "photo_external_id": "photo_mapillary_1104293193608922",
+          "photo_external_id": "photo_mapillary_street_part_0024_1104293193608922",
           "feature_external_id": "kerb_ramp_seg_00546",
           "street_part_id": "street_part_0024",
           "feature_kind": "kerb_ramp",
@@ -9877,7 +9877,7 @@
           "feature_distance_to_photo_m": 14.82
         },
         {
-          "photo_external_id": "photo_mapillary_1104293193608922",
+          "photo_external_id": "photo_mapillary_street_part_0024_1104293193608922",
           "feature_external_id": "tactile_guidance_seg_00546",
           "street_part_id": "street_part_0024",
           "feature_kind": "tactile_guidance",
@@ -9898,7 +9898,7 @@
           "feature_distance_to_photo_m": 14.82
         },
         {
-          "photo_external_id": "photo_mapillary_1104293193608922",
+          "photo_external_id": "photo_mapillary_street_part_0024_1104293193608922",
           "feature_external_id": "bollard_46612",
           "street_part_id": "street_part_0024",
           "feature_kind": "bollard",
@@ -9921,7 +9921,7 @@
       ]
     },
     {
-      "photo_external_id": "photo_mapillary_1891196238085652",
+      "photo_external_id": "photo_mapillary_street_part_0025_1891196238085652",
       "street_part_id": "street_part_0025",
       "source_image_id": "1891196238085652",
       "model": "google/owlvit-base-patch32",
@@ -10263,7 +10263,7 @@
       ],
       "matched_instances": [
         {
-          "photo_external_id": "photo_mapillary_1891196238085652",
+          "photo_external_id": "photo_mapillary_street_part_0025_1891196238085652",
           "feature_external_id": "kerb_ramp_seg_00561",
           "street_part_id": "street_part_0025",
           "feature_kind": "kerb_ramp",
@@ -10284,7 +10284,7 @@
           "feature_distance_to_photo_m": 10.76
         },
         {
-          "photo_external_id": "photo_mapillary_1891196238085652",
+          "photo_external_id": "photo_mapillary_street_part_0025_1891196238085652",
           "feature_external_id": "tactile_guidance_seg_00561",
           "street_part_id": "street_part_0025",
           "feature_kind": "tactile_guidance",
@@ -10305,7 +10305,7 @@
           "feature_distance_to_photo_m": 10.76
         },
         {
-          "photo_external_id": "photo_mapillary_1891196238085652",
+          "photo_external_id": "photo_mapillary_street_part_0025_1891196238085652",
           "feature_external_id": "kerb_ramp_seg_00557",
           "street_part_id": "street_part_0025",
           "feature_kind": "kerb_ramp",
@@ -10326,7 +10326,7 @@
           "feature_distance_to_photo_m": 10.77
         },
         {
-          "photo_external_id": "photo_mapillary_1891196238085652",
+          "photo_external_id": "photo_mapillary_street_part_0025_1891196238085652",
           "feature_external_id": "tactile_guidance_seg_00557",
           "street_part_id": "street_part_0025",
           "feature_kind": "tactile_guidance",
@@ -10347,7 +10347,7 @@
           "feature_distance_to_photo_m": 10.77
         },
         {
-          "photo_external_id": "photo_mapillary_1891196238085652",
+          "photo_external_id": "photo_mapillary_street_part_0025_1891196238085652",
           "feature_external_id": "kerb_ramp_seg_00560",
           "street_part_id": "street_part_0025",
           "feature_kind": "kerb_ramp",
@@ -10368,7 +10368,7 @@
           "feature_distance_to_photo_m": 11.13
         },
         {
-          "photo_external_id": "photo_mapillary_1891196238085652",
+          "photo_external_id": "photo_mapillary_street_part_0025_1891196238085652",
           "feature_external_id": "tactile_guidance_seg_00560",
           "street_part_id": "street_part_0025",
           "feature_kind": "tactile_guidance",
@@ -10389,7 +10389,7 @@
           "feature_distance_to_photo_m": 11.13
         },
         {
-          "photo_external_id": "photo_mapillary_1891196238085652",
+          "photo_external_id": "photo_mapillary_street_part_0025_1891196238085652",
           "feature_external_id": "kerb_ramp_seg_00558",
           "street_part_id": "street_part_0025",
           "feature_kind": "kerb_ramp",
@@ -10410,7 +10410,7 @@
           "feature_distance_to_photo_m": 11.48
         },
         {
-          "photo_external_id": "photo_mapillary_1891196238085652",
+          "photo_external_id": "photo_mapillary_street_part_0025_1891196238085652",
           "feature_external_id": "tactile_guidance_seg_00558",
           "street_part_id": "street_part_0025",
           "feature_kind": "tactile_guidance",
@@ -10431,7 +10431,7 @@
           "feature_distance_to_photo_m": 11.48
         },
         {
-          "photo_external_id": "photo_mapillary_1891196238085652",
+          "photo_external_id": "photo_mapillary_street_part_0025_1891196238085652",
           "feature_external_id": "kerb_ramp_seg_00545",
           "street_part_id": "street_part_0025",
           "feature_kind": "kerb_ramp",
@@ -10452,7 +10452,7 @@
           "feature_distance_to_photo_m": 11.87
         },
         {
-          "photo_external_id": "photo_mapillary_1891196238085652",
+          "photo_external_id": "photo_mapillary_street_part_0025_1891196238085652",
           "feature_external_id": "tactile_guidance_seg_00545",
           "street_part_id": "street_part_0025",
           "feature_kind": "tactile_guidance",
@@ -10473,7 +10473,7 @@
           "feature_distance_to_photo_m": 11.87
         },
         {
-          "photo_external_id": "photo_mapillary_1891196238085652",
+          "photo_external_id": "photo_mapillary_street_part_0025_1891196238085652",
           "feature_external_id": "kerb_ramp_seg_00546",
           "street_part_id": "street_part_0025",
           "feature_kind": "kerb_ramp",
@@ -10494,7 +10494,7 @@
           "feature_distance_to_photo_m": 12.07
         },
         {
-          "photo_external_id": "photo_mapillary_1891196238085652",
+          "photo_external_id": "photo_mapillary_street_part_0025_1891196238085652",
           "feature_external_id": "tactile_guidance_seg_00546",
           "street_part_id": "street_part_0025",
           "feature_kind": "tactile_guidance",
@@ -10515,7 +10515,7 @@
           "feature_distance_to_photo_m": 12.07
         },
         {
-          "photo_external_id": "photo_mapillary_1891196238085652",
+          "photo_external_id": "photo_mapillary_street_part_0025_1891196238085652",
           "feature_external_id": "kerb_ramp_seg_00547",
           "street_part_id": "street_part_0025",
           "feature_kind": "kerb_ramp",
@@ -10536,7 +10536,7 @@
           "feature_distance_to_photo_m": 13.61
         },
         {
-          "photo_external_id": "photo_mapillary_1891196238085652",
+          "photo_external_id": "photo_mapillary_street_part_0025_1891196238085652",
           "feature_external_id": "tactile_guidance_seg_00547",
           "street_part_id": "street_part_0025",
           "feature_kind": "tactile_guidance",
@@ -10557,7 +10557,7 @@
           "feature_distance_to_photo_m": 13.61
         },
         {
-          "photo_external_id": "photo_mapillary_1891196238085652",
+          "photo_external_id": "photo_mapillary_street_part_0025_1891196238085652",
           "feature_external_id": "kerb_ramp_seg_00559",
           "street_part_id": "street_part_0025",
           "feature_kind": "kerb_ramp",
@@ -10580,7 +10580,7 @@
       ]
     },
     {
-      "photo_external_id": "photo_mapillary_208220884992067",
+      "photo_external_id": "photo_mapillary_street_part_0026_208220884992067",
       "street_part_id": "street_part_0026",
       "source_image_id": "208220884992067",
       "model": "google/owlvit-base-patch32",
@@ -10845,7 +10845,7 @@
       ],
       "matched_instances": [
         {
-          "photo_external_id": "photo_mapillary_208220884992067",
+          "photo_external_id": "photo_mapillary_street_part_0026_208220884992067",
           "feature_external_id": "bollard_46732",
           "street_part_id": "street_part_0026",
           "feature_kind": "bollard",
@@ -10866,7 +10866,7 @@
           "feature_distance_to_photo_m": 7.6
         },
         {
-          "photo_external_id": "photo_mapillary_208220884992067",
+          "photo_external_id": "photo_mapillary_street_part_0026_208220884992067",
           "feature_external_id": "bollard_46734",
           "street_part_id": "street_part_0026",
           "feature_kind": "bollard",
@@ -10889,7 +10889,7 @@
       ]
     },
     {
-      "photo_external_id": "photo_mapillary_470424490917072",
+      "photo_external_id": "photo_mapillary_street_part_0027_470424490917072",
       "street_part_id": "street_part_0027",
       "source_image_id": "470424490917072",
       "model": "google/owlvit-base-patch32",
@@ -11231,7 +11231,7 @@
       ],
       "matched_instances": [
         {
-          "photo_external_id": "photo_mapillary_470424490917072",
+          "photo_external_id": "photo_mapillary_street_part_0027_470424490917072",
           "feature_external_id": "covered_linkway_3399",
           "street_part_id": "street_part_0027",
           "feature_kind": "covered_linkway",
@@ -11252,7 +11252,7 @@
           "feature_distance_to_photo_m": 26.78
         },
         {
-          "photo_external_id": "photo_mapillary_470424490917072",
+          "photo_external_id": "photo_mapillary_street_part_0027_470424490917072",
           "feature_external_id": "covered_linkway_3398",
           "street_part_id": "street_part_0027",
           "feature_kind": "covered_linkway",
@@ -11275,7 +11275,7 @@
       ]
     },
     {
-      "photo_external_id": "photo_mapillary_471897683903465",
+      "photo_external_id": "photo_mapillary_street_part_0028_471897683903465",
       "street_part_id": "street_part_0028",
       "source_image_id": "471897683903465",
       "model": "google/owlvit-base-patch32",
@@ -11618,7 +11618,7 @@
       "matched_instances": []
     },
     {
-      "photo_external_id": "photo_mapillary_190950532897090",
+      "photo_external_id": "photo_mapillary_street_part_0029_190950532897090",
       "street_part_id": "street_part_0029",
       "source_image_id": "190950532897090",
       "model": "google/owlvit-base-patch32",
@@ -11963,7 +11963,7 @@
   ],
   "instances": [
     {
-      "photo_external_id": "photo_mapillary_314185020210754",
+      "photo_external_id": "photo_mapillary_street_part_0005_314185020210754",
       "feature_external_id": "covered_linkway_3398",
       "street_part_id": "street_part_0005",
       "feature_kind": "covered_linkway",
@@ -11984,7 +11984,7 @@
       "feature_distance_to_photo_m": 25.33
     },
     {
-      "photo_external_id": "photo_mapillary_314185020210754",
+      "photo_external_id": "photo_mapillary_street_part_0005_314185020210754",
       "feature_external_id": "covered_linkway_3399",
       "street_part_id": "street_part_0005",
       "feature_kind": "covered_linkway",
@@ -12005,7 +12005,7 @@
       "feature_distance_to_photo_m": 32.59
     },
     {
-      "photo_external_id": "photo_mapillary_314185020210754",
+      "photo_external_id": "photo_mapillary_street_part_0006_314185020210754",
       "feature_external_id": "covered_linkway_3398",
       "street_part_id": "street_part_0006",
       "feature_kind": "covered_linkway",
@@ -12026,7 +12026,7 @@
       "feature_distance_to_photo_m": 25.33
     },
     {
-      "photo_external_id": "photo_mapillary_314185020210754",
+      "photo_external_id": "photo_mapillary_street_part_0006_314185020210754",
       "feature_external_id": "covered_linkway_3399",
       "street_part_id": "street_part_0006",
       "feature_kind": "covered_linkway",
@@ -12047,7 +12047,7 @@
       "feature_distance_to_photo_m": 32.59
     },
     {
-      "photo_external_id": "photo_mapillary_5571605572960452",
+      "photo_external_id": "photo_mapillary_street_part_0007_5571605572960452",
       "feature_external_id": "tactile_guidance_seg_00557",
       "street_part_id": "street_part_0007",
       "feature_kind": "tactile_guidance",
@@ -12068,7 +12068,7 @@
       "feature_distance_to_photo_m": 10.83
     },
     {
-      "photo_external_id": "photo_mapillary_5571605572960452",
+      "photo_external_id": "photo_mapillary_street_part_0007_5571605572960452",
       "feature_external_id": "tactile_guidance_seg_00558",
       "street_part_id": "street_part_0007",
       "feature_kind": "tactile_guidance",
@@ -12089,7 +12089,7 @@
       "feature_distance_to_photo_m": 12.77
     },
     {
-      "photo_external_id": "photo_mapillary_5571605572960452",
+      "photo_external_id": "photo_mapillary_street_part_0007_5571605572960452",
       "feature_external_id": "tactile_guidance_seg_00559",
       "street_part_id": "street_part_0007",
       "feature_kind": "tactile_guidance",
@@ -12110,7 +12110,7 @@
       "feature_distance_to_photo_m": 15.88
     },
     {
-      "photo_external_id": "photo_mapillary_5571605572960452",
+      "photo_external_id": "photo_mapillary_street_part_0007_5571605572960452",
       "feature_external_id": "tactile_guidance_seg_00548",
       "street_part_id": "street_part_0007",
       "feature_kind": "tactile_guidance",
@@ -12131,7 +12131,7 @@
       "feature_distance_to_photo_m": 24.32
     },
     {
-      "photo_external_id": "photo_mapillary_5571605572960452",
+      "photo_external_id": "photo_mapillary_street_part_0007_5571605572960452",
       "feature_external_id": "tactile_guidance_seg_00547",
       "street_part_id": "street_part_0007",
       "feature_kind": "tactile_guidance",
@@ -12152,7 +12152,7 @@
       "feature_distance_to_photo_m": 25.87
     },
     {
-      "photo_external_id": "photo_mapillary_516645799746461",
+      "photo_external_id": "photo_mapillary_street_part_0008_516645799746461",
       "feature_external_id": "covered_linkway_3399",
       "street_part_id": "street_part_0008",
       "feature_kind": "covered_linkway",
@@ -12173,7 +12173,7 @@
       "feature_distance_to_photo_m": 24.9
     },
     {
-      "photo_external_id": "photo_mapillary_516645799746461",
+      "photo_external_id": "photo_mapillary_street_part_0008_516645799746461",
       "feature_external_id": "covered_linkway_3400",
       "street_part_id": "street_part_0008",
       "feature_kind": "covered_linkway",
@@ -12194,7 +12194,7 @@
       "feature_distance_to_photo_m": 24.9
     },
     {
-      "photo_external_id": "photo_mapillary_516645799746461",
+      "photo_external_id": "photo_mapillary_street_part_0008_516645799746461",
       "feature_external_id": "bollard_41911",
       "street_part_id": "street_part_0008",
       "feature_kind": "bollard",
@@ -12215,7 +12215,7 @@
       "feature_distance_to_photo_m": 25.57
     },
     {
-      "photo_external_id": "photo_mapillary_516645799746461",
+      "photo_external_id": "photo_mapillary_street_part_0008_516645799746461",
       "feature_external_id": "bollard_46612",
       "street_part_id": "street_part_0008",
       "feature_kind": "bollard",
@@ -12236,7 +12236,7 @@
       "feature_distance_to_photo_m": 34.09
     },
     {
-      "photo_external_id": "photo_mapillary_516645799746461",
+      "photo_external_id": "photo_mapillary_street_part_0009_516645799746461",
       "feature_external_id": "covered_linkway_3399",
       "street_part_id": "street_part_0009",
       "feature_kind": "covered_linkway",
@@ -12257,7 +12257,7 @@
       "feature_distance_to_photo_m": 24.9
     },
     {
-      "photo_external_id": "photo_mapillary_516645799746461",
+      "photo_external_id": "photo_mapillary_street_part_0009_516645799746461",
       "feature_external_id": "covered_linkway_3400",
       "street_part_id": "street_part_0009",
       "feature_kind": "covered_linkway",
@@ -12278,7 +12278,7 @@
       "feature_distance_to_photo_m": 24.9
     },
     {
-      "photo_external_id": "photo_mapillary_516645799746461",
+      "photo_external_id": "photo_mapillary_street_part_0009_516645799746461",
       "feature_external_id": "bollard_41911",
       "street_part_id": "street_part_0009",
       "feature_kind": "bollard",
@@ -12299,7 +12299,7 @@
       "feature_distance_to_photo_m": 25.57
     },
     {
-      "photo_external_id": "photo_mapillary_516645799746461",
+      "photo_external_id": "photo_mapillary_street_part_0009_516645799746461",
       "feature_external_id": "bollard_46612",
       "street_part_id": "street_part_0009",
       "feature_kind": "bollard",
@@ -12320,7 +12320,7 @@
       "feature_distance_to_photo_m": 34.09
     },
     {
-      "photo_external_id": "photo_mapillary_644176977184642",
+      "photo_external_id": "photo_mapillary_street_part_0010_644176977184642",
       "feature_external_id": "tactile_guidance_seg_00557",
       "street_part_id": "street_part_0010",
       "feature_kind": "tactile_guidance",
@@ -12341,7 +12341,7 @@
       "feature_distance_to_photo_m": 23.02
     },
     {
-      "photo_external_id": "photo_mapillary_644176977184642",
+      "photo_external_id": "photo_mapillary_street_part_0010_644176977184642",
       "feature_external_id": "tactile_guidance_seg_00558",
       "street_part_id": "street_part_0010",
       "feature_kind": "tactile_guidance",
@@ -12362,7 +12362,7 @@
       "feature_distance_to_photo_m": 24.55
     },
     {
-      "photo_external_id": "photo_mapillary_644176977184642",
+      "photo_external_id": "photo_mapillary_street_part_0010_644176977184642",
       "feature_external_id": "tactile_guidance_seg_00559",
       "street_part_id": "street_part_0010",
       "feature_kind": "tactile_guidance",
@@ -12383,7 +12383,7 @@
       "feature_distance_to_photo_m": 26.82
     },
     {
-      "photo_external_id": "photo_mapillary_644176977184642",
+      "photo_external_id": "photo_mapillary_street_part_0010_644176977184642",
       "feature_external_id": "tactile_guidance_seg_00548",
       "street_part_id": "street_part_0010",
       "feature_kind": "tactile_guidance",
@@ -12404,7 +12404,7 @@
       "feature_distance_to_photo_m": 34.99
     },
     {
-      "photo_external_id": "photo_mapillary_611892423788363",
+      "photo_external_id": "photo_mapillary_street_part_0011_611892423788363",
       "feature_external_id": "tactile_guidance_seg_00040",
       "street_part_id": "street_part_0011",
       "feature_kind": "tactile_guidance",
@@ -12425,7 +12425,7 @@
       "feature_distance_to_photo_m": 68.02
     },
     {
-      "photo_external_id": "photo_mapillary_611892423788363",
+      "photo_external_id": "photo_mapillary_street_part_0011_611892423788363",
       "feature_external_id": "tactile_guidance_seg_00041",
       "street_part_id": "street_part_0011",
       "feature_kind": "tactile_guidance",
@@ -12446,7 +12446,7 @@
       "feature_distance_to_photo_m": 69.52
     },
     {
-      "photo_external_id": "photo_mapillary_611892423788363",
+      "photo_external_id": "photo_mapillary_street_part_0011_611892423788363",
       "feature_external_id": "tactile_guidance_seg_00042",
       "street_part_id": "street_part_0011",
       "feature_kind": "tactile_guidance",
@@ -12467,7 +12467,7 @@
       "feature_distance_to_photo_m": 71.99
     },
     {
-      "photo_external_id": "photo_mapillary_1988578568720068",
+      "photo_external_id": "photo_mapillary_street_part_0012_1988578568720068",
       "feature_external_id": "kerb_ramp_seg_00537",
       "street_part_id": "street_part_0012",
       "feature_kind": "kerb_ramp",
@@ -12488,7 +12488,7 @@
       "feature_distance_to_photo_m": 1.42
     },
     {
-      "photo_external_id": "photo_mapillary_1988578568720068",
+      "photo_external_id": "photo_mapillary_street_part_0012_1988578568720068",
       "feature_external_id": "tactile_guidance_seg_00537",
       "street_part_id": "street_part_0012",
       "feature_kind": "tactile_guidance",
@@ -12509,7 +12509,7 @@
       "feature_distance_to_photo_m": 1.42
     },
     {
-      "photo_external_id": "photo_mapillary_1988578568720068",
+      "photo_external_id": "photo_mapillary_street_part_0012_1988578568720068",
       "feature_external_id": "kerb_ramp_seg_00536",
       "street_part_id": "street_part_0012",
       "feature_kind": "kerb_ramp",
@@ -12530,7 +12530,7 @@
       "feature_distance_to_photo_m": 2.91
     },
     {
-      "photo_external_id": "photo_mapillary_1988578568720068",
+      "photo_external_id": "photo_mapillary_street_part_0012_1988578568720068",
       "feature_external_id": "tactile_guidance_seg_00536",
       "street_part_id": "street_part_0012",
       "feature_kind": "tactile_guidance",
@@ -12551,7 +12551,7 @@
       "feature_distance_to_photo_m": 2.91
     },
     {
-      "photo_external_id": "photo_mapillary_1988578568720068",
+      "photo_external_id": "photo_mapillary_street_part_0012_1988578568720068",
       "feature_external_id": "kerb_ramp_seg_00535",
       "street_part_id": "street_part_0012",
       "feature_kind": "kerb_ramp",
@@ -12572,7 +12572,7 @@
       "feature_distance_to_photo_m": 6.12
     },
     {
-      "photo_external_id": "photo_mapillary_1988578568720068",
+      "photo_external_id": "photo_mapillary_street_part_0012_1988578568720068",
       "feature_external_id": "tactile_guidance_seg_00535",
       "street_part_id": "street_part_0012",
       "feature_kind": "tactile_guidance",
@@ -12593,7 +12593,7 @@
       "feature_distance_to_photo_m": 6.12
     },
     {
-      "photo_external_id": "photo_mapillary_1988578568720068",
+      "photo_external_id": "photo_mapillary_street_part_0012_1988578568720068",
       "feature_external_id": "kerb_ramp_seg_00532",
       "street_part_id": "street_part_0012",
       "feature_kind": "kerb_ramp",
@@ -12614,7 +12614,7 @@
       "feature_distance_to_photo_m": 15.73
     },
     {
-      "photo_external_id": "photo_mapillary_1988578568720068",
+      "photo_external_id": "photo_mapillary_street_part_0012_1988578568720068",
       "feature_external_id": "tactile_guidance_seg_00532",
       "street_part_id": "street_part_0012",
       "feature_kind": "tactile_guidance",
@@ -12635,7 +12635,7 @@
       "feature_distance_to_photo_m": 15.73
     },
     {
-      "photo_external_id": "photo_mapillary_1988578568720068",
+      "photo_external_id": "photo_mapillary_street_part_0012_1988578568720068",
       "feature_external_id": "kerb_ramp_seg_00533",
       "street_part_id": "street_part_0012",
       "feature_kind": "kerb_ramp",
@@ -12656,7 +12656,7 @@
       "feature_distance_to_photo_m": 19.03
     },
     {
-      "photo_external_id": "photo_mapillary_1988578568720068",
+      "photo_external_id": "photo_mapillary_street_part_0012_1988578568720068",
       "feature_external_id": "tactile_guidance_seg_00533",
       "street_part_id": "street_part_0012",
       "feature_kind": "tactile_guidance",
@@ -12677,7 +12677,7 @@
       "feature_distance_to_photo_m": 19.03
     },
     {
-      "photo_external_id": "photo_mapillary_1988578568720068",
+      "photo_external_id": "photo_mapillary_street_part_0012_1988578568720068",
       "feature_external_id": "kerb_ramp_seg_00534",
       "street_part_id": "street_part_0012",
       "feature_kind": "kerb_ramp",
@@ -12698,7 +12698,7 @@
       "feature_distance_to_photo_m": 22.39
     },
     {
-      "photo_external_id": "photo_mapillary_1988578568720068",
+      "photo_external_id": "photo_mapillary_street_part_0012_1988578568720068",
       "feature_external_id": "tactile_guidance_seg_00534",
       "street_part_id": "street_part_0012",
       "feature_kind": "tactile_guidance",
@@ -12719,7 +12719,7 @@
       "feature_distance_to_photo_m": 22.39
     },
     {
-      "photo_external_id": "photo_mapillary_1988578568720068",
+      "photo_external_id": "photo_mapillary_street_part_0012_1988578568720068",
       "feature_external_id": "tactile_guidance_seg_02507",
       "street_part_id": "street_part_0012",
       "feature_kind": "tactile_guidance",
@@ -12740,7 +12740,7 @@
       "feature_distance_to_photo_m": 33.5
     },
     {
-      "photo_external_id": "photo_mapillary_1972382013402958",
+      "photo_external_id": "photo_mapillary_street_part_0013_1972382013402958",
       "feature_external_id": "kerb_ramp_seg_00537",
       "street_part_id": "street_part_0013",
       "feature_kind": "kerb_ramp",
@@ -12761,7 +12761,7 @@
       "feature_distance_to_photo_m": 16.71
     },
     {
-      "photo_external_id": "photo_mapillary_1972382013402958",
+      "photo_external_id": "photo_mapillary_street_part_0013_1972382013402958",
       "feature_external_id": "tactile_guidance_seg_00537",
       "street_part_id": "street_part_0013",
       "feature_kind": "tactile_guidance",
@@ -12782,7 +12782,7 @@
       "feature_distance_to_photo_m": 16.71
     },
     {
-      "photo_external_id": "photo_mapillary_1972382013402958",
+      "photo_external_id": "photo_mapillary_street_part_0013_1972382013402958",
       "feature_external_id": "kerb_ramp_seg_00536",
       "street_part_id": "street_part_0013",
       "feature_kind": "kerb_ramp",
@@ -12803,7 +12803,7 @@
       "feature_distance_to_photo_m": 16.92
     },
     {
-      "photo_external_id": "photo_mapillary_1972382013402958",
+      "photo_external_id": "photo_mapillary_street_part_0013_1972382013402958",
       "feature_external_id": "tactile_guidance_seg_00536",
       "street_part_id": "street_part_0013",
       "feature_kind": "tactile_guidance",
@@ -12824,7 +12824,7 @@
       "feature_distance_to_photo_m": 16.92
     },
     {
-      "photo_external_id": "photo_mapillary_1972382013402958",
+      "photo_external_id": "photo_mapillary_street_part_0013_1972382013402958",
       "feature_external_id": "kerb_ramp_seg_00535",
       "street_part_id": "street_part_0013",
       "feature_kind": "kerb_ramp",
@@ -12845,7 +12845,7 @@
       "feature_distance_to_photo_m": 17.76
     },
     {
-      "photo_external_id": "photo_mapillary_1972382013402958",
+      "photo_external_id": "photo_mapillary_street_part_0013_1972382013402958",
       "feature_external_id": "tactile_guidance_seg_00535",
       "street_part_id": "street_part_0013",
       "feature_kind": "tactile_guidance",
@@ -12866,7 +12866,7 @@
       "feature_distance_to_photo_m": 17.76
     },
     {
-      "photo_external_id": "photo_mapillary_1972382013402958",
+      "photo_external_id": "photo_mapillary_street_part_0013_1972382013402958",
       "feature_external_id": "tactile_guidance_seg_02507",
       "street_part_id": "street_part_0013",
       "feature_kind": "tactile_guidance",
@@ -12887,7 +12887,7 @@
       "feature_distance_to_photo_m": 18.12
     },
     {
-      "photo_external_id": "photo_mapillary_1972382013402958",
+      "photo_external_id": "photo_mapillary_street_part_0013_1972382013402958",
       "feature_external_id": "kerb_ramp_seg_00532",
       "street_part_id": "street_part_0013",
       "feature_kind": "kerb_ramp",
@@ -12908,7 +12908,7 @@
       "feature_distance_to_photo_m": 18.4
     },
     {
-      "photo_external_id": "photo_mapillary_1972382013402958",
+      "photo_external_id": "photo_mapillary_street_part_0013_1972382013402958",
       "feature_external_id": "tactile_guidance_seg_00532",
       "street_part_id": "street_part_0013",
       "feature_kind": "tactile_guidance",
@@ -12929,7 +12929,7 @@
       "feature_distance_to_photo_m": 18.4
     },
     {
-      "photo_external_id": "photo_mapillary_1972382013402958",
+      "photo_external_id": "photo_mapillary_street_part_0013_1972382013402958",
       "feature_external_id": "kerb_ramp_seg_00533",
       "street_part_id": "street_part_0013",
       "feature_kind": "kerb_ramp",
@@ -12950,7 +12950,7 @@
       "feature_distance_to_photo_m": 21.36
     },
     {
-      "photo_external_id": "photo_mapillary_1972382013402958",
+      "photo_external_id": "photo_mapillary_street_part_0013_1972382013402958",
       "feature_external_id": "tactile_guidance_seg_00533",
       "street_part_id": "street_part_0013",
       "feature_kind": "tactile_guidance",
@@ -12971,7 +12971,7 @@
       "feature_distance_to_photo_m": 21.36
     },
     {
-      "photo_external_id": "photo_mapillary_1972382013402958",
+      "photo_external_id": "photo_mapillary_street_part_0013_1972382013402958",
       "feature_external_id": "tactile_guidance_seg_02508",
       "street_part_id": "street_part_0013",
       "feature_kind": "tactile_guidance",
@@ -12992,7 +12992,7 @@
       "feature_distance_to_photo_m": 21.51
     },
     {
-      "photo_external_id": "photo_mapillary_1972382013402958",
+      "photo_external_id": "photo_mapillary_street_part_0013_1972382013402958",
       "feature_external_id": "tactile_guidance_seg_00693",
       "street_part_id": "street_part_0013",
       "feature_kind": "tactile_guidance",
@@ -13013,7 +13013,7 @@
       "feature_distance_to_photo_m": 23.34
     },
     {
-      "photo_external_id": "photo_mapillary_1972382013402958",
+      "photo_external_id": "photo_mapillary_street_part_0013_1972382013402958",
       "feature_external_id": "kerb_ramp_seg_00534",
       "street_part_id": "street_part_0013",
       "feature_kind": "kerb_ramp",
@@ -13034,7 +13034,7 @@
       "feature_distance_to_photo_m": 24.45
     },
     {
-      "photo_external_id": "photo_mapillary_1972382013402958",
+      "photo_external_id": "photo_mapillary_street_part_0013_1972382013402958",
       "feature_external_id": "tactile_guidance_seg_00534",
       "street_part_id": "street_part_0013",
       "feature_kind": "tactile_guidance",
@@ -13055,7 +13055,7 @@
       "feature_distance_to_photo_m": 24.45
     },
     {
-      "photo_external_id": "photo_mapillary_1972382013402958",
+      "photo_external_id": "photo_mapillary_street_part_0013_1972382013402958",
       "feature_external_id": "tactile_guidance_seg_02509",
       "street_part_id": "street_part_0013",
       "feature_kind": "tactile_guidance",
@@ -13076,7 +13076,7 @@
       "feature_distance_to_photo_m": 25.27
     },
     {
-      "photo_external_id": "photo_mapillary_1972382013402958",
+      "photo_external_id": "photo_mapillary_street_part_0014_1972382013402958",
       "feature_external_id": "kerb_ramp_seg_00537",
       "street_part_id": "street_part_0014",
       "feature_kind": "kerb_ramp",
@@ -13097,7 +13097,7 @@
       "feature_distance_to_photo_m": 16.71
     },
     {
-      "photo_external_id": "photo_mapillary_1972382013402958",
+      "photo_external_id": "photo_mapillary_street_part_0014_1972382013402958",
       "feature_external_id": "tactile_guidance_seg_00537",
       "street_part_id": "street_part_0014",
       "feature_kind": "tactile_guidance",
@@ -13118,7 +13118,7 @@
       "feature_distance_to_photo_m": 16.71
     },
     {
-      "photo_external_id": "photo_mapillary_1972382013402958",
+      "photo_external_id": "photo_mapillary_street_part_0014_1972382013402958",
       "feature_external_id": "kerb_ramp_seg_00536",
       "street_part_id": "street_part_0014",
       "feature_kind": "kerb_ramp",
@@ -13139,7 +13139,7 @@
       "feature_distance_to_photo_m": 16.92
     },
     {
-      "photo_external_id": "photo_mapillary_1972382013402958",
+      "photo_external_id": "photo_mapillary_street_part_0014_1972382013402958",
       "feature_external_id": "tactile_guidance_seg_00536",
       "street_part_id": "street_part_0014",
       "feature_kind": "tactile_guidance",
@@ -13160,7 +13160,7 @@
       "feature_distance_to_photo_m": 16.92
     },
     {
-      "photo_external_id": "photo_mapillary_1972382013402958",
+      "photo_external_id": "photo_mapillary_street_part_0014_1972382013402958",
       "feature_external_id": "kerb_ramp_seg_00535",
       "street_part_id": "street_part_0014",
       "feature_kind": "kerb_ramp",
@@ -13181,7 +13181,7 @@
       "feature_distance_to_photo_m": 17.76
     },
     {
-      "photo_external_id": "photo_mapillary_1972382013402958",
+      "photo_external_id": "photo_mapillary_street_part_0014_1972382013402958",
       "feature_external_id": "tactile_guidance_seg_00535",
       "street_part_id": "street_part_0014",
       "feature_kind": "tactile_guidance",
@@ -13202,7 +13202,7 @@
       "feature_distance_to_photo_m": 17.76
     },
     {
-      "photo_external_id": "photo_mapillary_1972382013402958",
+      "photo_external_id": "photo_mapillary_street_part_0014_1972382013402958",
       "feature_external_id": "tactile_guidance_seg_02507",
       "street_part_id": "street_part_0014",
       "feature_kind": "tactile_guidance",
@@ -13223,7 +13223,7 @@
       "feature_distance_to_photo_m": 18.12
     },
     {
-      "photo_external_id": "photo_mapillary_1972382013402958",
+      "photo_external_id": "photo_mapillary_street_part_0014_1972382013402958",
       "feature_external_id": "kerb_ramp_seg_00532",
       "street_part_id": "street_part_0014",
       "feature_kind": "kerb_ramp",
@@ -13244,7 +13244,7 @@
       "feature_distance_to_photo_m": 18.4
     },
     {
-      "photo_external_id": "photo_mapillary_1972382013402958",
+      "photo_external_id": "photo_mapillary_street_part_0014_1972382013402958",
       "feature_external_id": "tactile_guidance_seg_00532",
       "street_part_id": "street_part_0014",
       "feature_kind": "tactile_guidance",
@@ -13265,7 +13265,7 @@
       "feature_distance_to_photo_m": 18.4
     },
     {
-      "photo_external_id": "photo_mapillary_1972382013402958",
+      "photo_external_id": "photo_mapillary_street_part_0014_1972382013402958",
       "feature_external_id": "kerb_ramp_seg_00533",
       "street_part_id": "street_part_0014",
       "feature_kind": "kerb_ramp",
@@ -13286,7 +13286,7 @@
       "feature_distance_to_photo_m": 21.36
     },
     {
-      "photo_external_id": "photo_mapillary_1972382013402958",
+      "photo_external_id": "photo_mapillary_street_part_0014_1972382013402958",
       "feature_external_id": "tactile_guidance_seg_00533",
       "street_part_id": "street_part_0014",
       "feature_kind": "tactile_guidance",
@@ -13307,7 +13307,7 @@
       "feature_distance_to_photo_m": 21.36
     },
     {
-      "photo_external_id": "photo_mapillary_1972382013402958",
+      "photo_external_id": "photo_mapillary_street_part_0014_1972382013402958",
       "feature_external_id": "tactile_guidance_seg_02508",
       "street_part_id": "street_part_0014",
       "feature_kind": "tactile_guidance",
@@ -13328,7 +13328,7 @@
       "feature_distance_to_photo_m": 21.51
     },
     {
-      "photo_external_id": "photo_mapillary_1972382013402958",
+      "photo_external_id": "photo_mapillary_street_part_0014_1972382013402958",
       "feature_external_id": "tactile_guidance_seg_00693",
       "street_part_id": "street_part_0014",
       "feature_kind": "tactile_guidance",
@@ -13349,7 +13349,7 @@
       "feature_distance_to_photo_m": 23.34
     },
     {
-      "photo_external_id": "photo_mapillary_1972382013402958",
+      "photo_external_id": "photo_mapillary_street_part_0014_1972382013402958",
       "feature_external_id": "kerb_ramp_seg_00534",
       "street_part_id": "street_part_0014",
       "feature_kind": "kerb_ramp",
@@ -13370,7 +13370,7 @@
       "feature_distance_to_photo_m": 24.45
     },
     {
-      "photo_external_id": "photo_mapillary_1972382013402958",
+      "photo_external_id": "photo_mapillary_street_part_0014_1972382013402958",
       "feature_external_id": "tactile_guidance_seg_00534",
       "street_part_id": "street_part_0014",
       "feature_kind": "tactile_guidance",
@@ -13391,7 +13391,7 @@
       "feature_distance_to_photo_m": 24.45
     },
     {
-      "photo_external_id": "photo_mapillary_1972382013402958",
+      "photo_external_id": "photo_mapillary_street_part_0014_1972382013402958",
       "feature_external_id": "tactile_guidance_seg_02509",
       "street_part_id": "street_part_0014",
       "feature_kind": "tactile_guidance",
@@ -13412,7 +13412,7 @@
       "feature_distance_to_photo_m": 25.27
     },
     {
-      "photo_external_id": "photo_mapillary_1330408172300774",
+      "photo_external_id": "photo_mapillary_street_part_0015_1330408172300774",
       "feature_external_id": "kerb_ramp_seg_00537",
       "street_part_id": "street_part_0015",
       "feature_kind": "kerb_ramp",
@@ -13433,7 +13433,7 @@
       "feature_distance_to_photo_m": 9.01
     },
     {
-      "photo_external_id": "photo_mapillary_1330408172300774",
+      "photo_external_id": "photo_mapillary_street_part_0015_1330408172300774",
       "feature_external_id": "tactile_guidance_seg_00537",
       "street_part_id": "street_part_0015",
       "feature_kind": "tactile_guidance",
@@ -13454,7 +13454,7 @@
       "feature_distance_to_photo_m": 9.01
     },
     {
-      "photo_external_id": "photo_mapillary_1330408172300774",
+      "photo_external_id": "photo_mapillary_street_part_0015_1330408172300774",
       "feature_external_id": "kerb_ramp_seg_00536",
       "street_part_id": "street_part_0015",
       "feature_kind": "kerb_ramp",
@@ -13475,7 +13475,7 @@
       "feature_distance_to_photo_m": 9.41
     },
     {
-      "photo_external_id": "photo_mapillary_1330408172300774",
+      "photo_external_id": "photo_mapillary_street_part_0015_1330408172300774",
       "feature_external_id": "tactile_guidance_seg_00536",
       "street_part_id": "street_part_0015",
       "feature_kind": "tactile_guidance",
@@ -13496,7 +13496,7 @@
       "feature_distance_to_photo_m": 9.41
     },
     {
-      "photo_external_id": "photo_mapillary_1330408172300774",
+      "photo_external_id": "photo_mapillary_street_part_0015_1330408172300774",
       "feature_external_id": "kerb_ramp_seg_00535",
       "street_part_id": "street_part_0015",
       "feature_kind": "kerb_ramp",
@@ -13517,7 +13517,7 @@
       "feature_distance_to_photo_m": 10.87
     },
     {
-      "photo_external_id": "photo_mapillary_1330408172300774",
+      "photo_external_id": "photo_mapillary_street_part_0015_1330408172300774",
       "feature_external_id": "tactile_guidance_seg_00535",
       "street_part_id": "street_part_0015",
       "feature_kind": "tactile_guidance",
@@ -13538,7 +13538,7 @@
       "feature_distance_to_photo_m": 10.87
     },
     {
-      "photo_external_id": "photo_mapillary_1330408172300774",
+      "photo_external_id": "photo_mapillary_street_part_0015_1330408172300774",
       "feature_external_id": "kerb_ramp_seg_00532",
       "street_part_id": "street_part_0015",
       "feature_kind": "kerb_ramp",
@@ -13559,7 +13559,7 @@
       "feature_distance_to_photo_m": 15.35
     },
     {
-      "photo_external_id": "photo_mapillary_1330408172300774",
+      "photo_external_id": "photo_mapillary_street_part_0015_1330408172300774",
       "feature_external_id": "tactile_guidance_seg_00532",
       "street_part_id": "street_part_0015",
       "feature_kind": "tactile_guidance",
@@ -13580,7 +13580,7 @@
       "feature_distance_to_photo_m": 15.35
     },
     {
-      "photo_external_id": "photo_mapillary_1330408172300774",
+      "photo_external_id": "photo_mapillary_street_part_0015_1330408172300774",
       "feature_external_id": "kerb_ramp_seg_00533",
       "street_part_id": "street_part_0015",
       "feature_kind": "kerb_ramp",
@@ -13601,7 +13601,7 @@
       "feature_distance_to_photo_m": 18.78
     },
     {
-      "photo_external_id": "photo_mapillary_1330408172300774",
+      "photo_external_id": "photo_mapillary_street_part_0015_1330408172300774",
       "feature_external_id": "tactile_guidance_seg_00533",
       "street_part_id": "street_part_0015",
       "feature_kind": "tactile_guidance",
@@ -13622,7 +13622,7 @@
       "feature_distance_to_photo_m": 18.78
     },
     {
-      "photo_external_id": "photo_mapillary_1330408172300774",
+      "photo_external_id": "photo_mapillary_street_part_0015_1330408172300774",
       "feature_external_id": "kerb_ramp_seg_00534",
       "street_part_id": "street_part_0015",
       "feature_kind": "kerb_ramp",
@@ -13643,7 +13643,7 @@
       "feature_distance_to_photo_m": 22.21
     },
     {
-      "photo_external_id": "photo_mapillary_1330408172300774",
+      "photo_external_id": "photo_mapillary_street_part_0015_1330408172300774",
       "feature_external_id": "tactile_guidance_seg_00534",
       "street_part_id": "street_part_0015",
       "feature_kind": "tactile_guidance",
@@ -13664,7 +13664,7 @@
       "feature_distance_to_photo_m": 22.21
     },
     {
-      "photo_external_id": "photo_mapillary_1330408172300774",
+      "photo_external_id": "photo_mapillary_street_part_0015_1330408172300774",
       "feature_external_id": "tactile_guidance_seg_02507",
       "street_part_id": "street_part_0015",
       "feature_kind": "tactile_guidance",
@@ -13685,7 +13685,7 @@
       "feature_distance_to_photo_m": 25.78
     },
     {
-      "photo_external_id": "photo_mapillary_1330408172300774",
+      "photo_external_id": "photo_mapillary_street_part_0015_1330408172300774",
       "feature_external_id": "tactile_guidance_seg_02508",
       "street_part_id": "street_part_0015",
       "feature_kind": "tactile_guidance",
@@ -13706,7 +13706,7 @@
       "feature_distance_to_photo_m": 29.17
     },
     {
-      "photo_external_id": "photo_mapillary_1330408172300774",
+      "photo_external_id": "photo_mapillary_street_part_0015_1330408172300774",
       "feature_external_id": "tactile_guidance_seg_00693",
       "street_part_id": "street_part_0015",
       "feature_kind": "tactile_guidance",
@@ -13727,7 +13727,7 @@
       "feature_distance_to_photo_m": 30.47
     },
     {
-      "photo_external_id": "photo_mapillary_1330408172300774",
+      "photo_external_id": "photo_mapillary_street_part_0015_1330408172300774",
       "feature_external_id": "tactile_guidance_seg_02425",
       "street_part_id": "street_part_0015",
       "feature_kind": "tactile_guidance",
@@ -13748,7 +13748,7 @@
       "feature_distance_to_photo_m": 31.65
     },
     {
-      "photo_external_id": "photo_mapillary_1988578568720068",
+      "photo_external_id": "photo_mapillary_street_part_0016_1988578568720068",
       "feature_external_id": "kerb_ramp_seg_00537",
       "street_part_id": "street_part_0016",
       "feature_kind": "kerb_ramp",
@@ -13769,7 +13769,7 @@
       "feature_distance_to_photo_m": 1.42
     },
     {
-      "photo_external_id": "photo_mapillary_1988578568720068",
+      "photo_external_id": "photo_mapillary_street_part_0016_1988578568720068",
       "feature_external_id": "tactile_guidance_seg_00537",
       "street_part_id": "street_part_0016",
       "feature_kind": "tactile_guidance",
@@ -13790,7 +13790,7 @@
       "feature_distance_to_photo_m": 1.42
     },
     {
-      "photo_external_id": "photo_mapillary_1988578568720068",
+      "photo_external_id": "photo_mapillary_street_part_0016_1988578568720068",
       "feature_external_id": "kerb_ramp_seg_00536",
       "street_part_id": "street_part_0016",
       "feature_kind": "kerb_ramp",
@@ -13811,7 +13811,7 @@
       "feature_distance_to_photo_m": 2.91
     },
     {
-      "photo_external_id": "photo_mapillary_1988578568720068",
+      "photo_external_id": "photo_mapillary_street_part_0016_1988578568720068",
       "feature_external_id": "tactile_guidance_seg_00536",
       "street_part_id": "street_part_0016",
       "feature_kind": "tactile_guidance",
@@ -13832,7 +13832,7 @@
       "feature_distance_to_photo_m": 2.91
     },
     {
-      "photo_external_id": "photo_mapillary_1988578568720068",
+      "photo_external_id": "photo_mapillary_street_part_0016_1988578568720068",
       "feature_external_id": "kerb_ramp_seg_00535",
       "street_part_id": "street_part_0016",
       "feature_kind": "kerb_ramp",
@@ -13853,7 +13853,7 @@
       "feature_distance_to_photo_m": 6.12
     },
     {
-      "photo_external_id": "photo_mapillary_1988578568720068",
+      "photo_external_id": "photo_mapillary_street_part_0016_1988578568720068",
       "feature_external_id": "tactile_guidance_seg_00535",
       "street_part_id": "street_part_0016",
       "feature_kind": "tactile_guidance",
@@ -13874,7 +13874,7 @@
       "feature_distance_to_photo_m": 6.12
     },
     {
-      "photo_external_id": "photo_mapillary_1988578568720068",
+      "photo_external_id": "photo_mapillary_street_part_0016_1988578568720068",
       "feature_external_id": "kerb_ramp_seg_00532",
       "street_part_id": "street_part_0016",
       "feature_kind": "kerb_ramp",
@@ -13895,7 +13895,7 @@
       "feature_distance_to_photo_m": 15.73
     },
     {
-      "photo_external_id": "photo_mapillary_1988578568720068",
+      "photo_external_id": "photo_mapillary_street_part_0016_1988578568720068",
       "feature_external_id": "tactile_guidance_seg_00532",
       "street_part_id": "street_part_0016",
       "feature_kind": "tactile_guidance",
@@ -13916,7 +13916,7 @@
       "feature_distance_to_photo_m": 15.73
     },
     {
-      "photo_external_id": "photo_mapillary_1988578568720068",
+      "photo_external_id": "photo_mapillary_street_part_0016_1988578568720068",
       "feature_external_id": "kerb_ramp_seg_00533",
       "street_part_id": "street_part_0016",
       "feature_kind": "kerb_ramp",
@@ -13937,7 +13937,7 @@
       "feature_distance_to_photo_m": 19.03
     },
     {
-      "photo_external_id": "photo_mapillary_1988578568720068",
+      "photo_external_id": "photo_mapillary_street_part_0016_1988578568720068",
       "feature_external_id": "tactile_guidance_seg_00533",
       "street_part_id": "street_part_0016",
       "feature_kind": "tactile_guidance",
@@ -13958,7 +13958,7 @@
       "feature_distance_to_photo_m": 19.03
     },
     {
-      "photo_external_id": "photo_mapillary_1988578568720068",
+      "photo_external_id": "photo_mapillary_street_part_0016_1988578568720068",
       "feature_external_id": "kerb_ramp_seg_00534",
       "street_part_id": "street_part_0016",
       "feature_kind": "kerb_ramp",
@@ -13979,7 +13979,7 @@
       "feature_distance_to_photo_m": 22.39
     },
     {
-      "photo_external_id": "photo_mapillary_1988578568720068",
+      "photo_external_id": "photo_mapillary_street_part_0016_1988578568720068",
       "feature_external_id": "tactile_guidance_seg_00534",
       "street_part_id": "street_part_0016",
       "feature_kind": "tactile_guidance",
@@ -14000,7 +14000,7 @@
       "feature_distance_to_photo_m": 22.39
     },
     {
-      "photo_external_id": "photo_mapillary_1988578568720068",
+      "photo_external_id": "photo_mapillary_street_part_0016_1988578568720068",
       "feature_external_id": "tactile_guidance_seg_02507",
       "street_part_id": "street_part_0016",
       "feature_kind": "tactile_guidance",
@@ -14021,7 +14021,7 @@
       "feature_distance_to_photo_m": 33.5
     },
     {
-      "photo_external_id": "photo_mapillary_2122100255255260",
+      "photo_external_id": "photo_mapillary_street_part_0017_2122100255255260",
       "feature_external_id": "kerb_ramp_seg_00537",
       "street_part_id": "street_part_0017",
       "feature_kind": "kerb_ramp",
@@ -14042,7 +14042,7 @@
       "feature_distance_to_photo_m": 6.56
     },
     {
-      "photo_external_id": "photo_mapillary_2122100255255260",
+      "photo_external_id": "photo_mapillary_street_part_0017_2122100255255260",
       "feature_external_id": "tactile_guidance_seg_00537",
       "street_part_id": "street_part_0017",
       "feature_kind": "tactile_guidance",
@@ -14063,7 +14063,7 @@
       "feature_distance_to_photo_m": 6.56
     },
     {
-      "photo_external_id": "photo_mapillary_2122100255255260",
+      "photo_external_id": "photo_mapillary_street_part_0017_2122100255255260",
       "feature_external_id": "kerb_ramp_seg_00536",
       "street_part_id": "street_part_0017",
       "feature_kind": "kerb_ramp",
@@ -14084,7 +14084,7 @@
       "feature_distance_to_photo_m": 6.9
     },
     {
-      "photo_external_id": "photo_mapillary_2122100255255260",
+      "photo_external_id": "photo_mapillary_street_part_0017_2122100255255260",
       "feature_external_id": "tactile_guidance_seg_00536",
       "street_part_id": "street_part_0017",
       "feature_kind": "tactile_guidance",
@@ -14105,7 +14105,7 @@
       "feature_distance_to_photo_m": 6.9
     },
     {
-      "photo_external_id": "photo_mapillary_2122100255255260",
+      "photo_external_id": "photo_mapillary_street_part_0017_2122100255255260",
       "feature_external_id": "kerb_ramp_seg_00535",
       "street_part_id": "street_part_0017",
       "feature_kind": "kerb_ramp",
@@ -14126,7 +14126,7 @@
       "feature_distance_to_photo_m": 8.65
     },
     {
-      "photo_external_id": "photo_mapillary_2122100255255260",
+      "photo_external_id": "photo_mapillary_street_part_0017_2122100255255260",
       "feature_external_id": "tactile_guidance_seg_00535",
       "street_part_id": "street_part_0017",
       "feature_kind": "tactile_guidance",
@@ -14147,7 +14147,7 @@
       "feature_distance_to_photo_m": 8.65
     },
     {
-      "photo_external_id": "photo_mapillary_2122100255255260",
+      "photo_external_id": "photo_mapillary_street_part_0017_2122100255255260",
       "feature_external_id": "kerb_ramp_seg_00532",
       "street_part_id": "street_part_0017",
       "feature_kind": "kerb_ramp",
@@ -14168,7 +14168,7 @@
       "feature_distance_to_photo_m": 19.32
     },
     {
-      "photo_external_id": "photo_mapillary_2122100255255260",
+      "photo_external_id": "photo_mapillary_street_part_0017_2122100255255260",
       "feature_external_id": "tactile_guidance_seg_00532",
       "street_part_id": "street_part_0017",
       "feature_kind": "tactile_guidance",
@@ -14189,7 +14189,7 @@
       "feature_distance_to_photo_m": 19.32
     },
     {
-      "photo_external_id": "photo_mapillary_2122100255255260",
+      "photo_external_id": "photo_mapillary_street_part_0017_2122100255255260",
       "feature_external_id": "kerb_ramp_seg_00533",
       "street_part_id": "street_part_0017",
       "feature_kind": "kerb_ramp",
@@ -14210,7 +14210,7 @@
       "feature_distance_to_photo_m": 22.02
     },
     {
-      "photo_external_id": "photo_mapillary_2122100255255260",
+      "photo_external_id": "photo_mapillary_street_part_0017_2122100255255260",
       "feature_external_id": "tactile_guidance_seg_00533",
       "street_part_id": "street_part_0017",
       "feature_kind": "tactile_guidance",
@@ -14231,7 +14231,7 @@
       "feature_distance_to_photo_m": 22.02
     },
     {
-      "photo_external_id": "photo_mapillary_2122100255255260",
+      "photo_external_id": "photo_mapillary_street_part_0017_2122100255255260",
       "feature_external_id": "kerb_ramp_seg_00534",
       "street_part_id": "street_part_0017",
       "feature_kind": "kerb_ramp",
@@ -14252,7 +14252,7 @@
       "feature_distance_to_photo_m": 24.92
     },
     {
-      "photo_external_id": "photo_mapillary_2122100255255260",
+      "photo_external_id": "photo_mapillary_street_part_0017_2122100255255260",
       "feature_external_id": "tactile_guidance_seg_00534",
       "street_part_id": "street_part_0017",
       "feature_kind": "tactile_guidance",
@@ -14273,7 +14273,7 @@
       "feature_distance_to_photo_m": 24.92
     },
     {
-      "photo_external_id": "photo_mapillary_901745566192518",
+      "photo_external_id": "photo_mapillary_street_part_0018_901745566192518",
       "feature_external_id": "kerb_ramp_seg_00536",
       "street_part_id": "street_part_0018",
       "feature_kind": "kerb_ramp",
@@ -14294,7 +14294,7 @@
       "feature_distance_to_photo_m": 28.97
     },
     {
-      "photo_external_id": "photo_mapillary_901745566192518",
+      "photo_external_id": "photo_mapillary_street_part_0018_901745566192518",
       "feature_external_id": "tactile_guidance_seg_00536",
       "street_part_id": "street_part_0018",
       "feature_kind": "tactile_guidance",
@@ -14315,7 +14315,7 @@
       "feature_distance_to_photo_m": 28.97
     },
     {
-      "photo_external_id": "photo_mapillary_901745566192518",
+      "photo_external_id": "photo_mapillary_street_part_0018_901745566192518",
       "feature_external_id": "kerb_ramp_seg_00537",
       "street_part_id": "street_part_0018",
       "feature_kind": "kerb_ramp",
@@ -14336,7 +14336,7 @@
       "feature_distance_to_photo_m": 29.11
     },
     {
-      "photo_external_id": "photo_mapillary_901745566192518",
+      "photo_external_id": "photo_mapillary_street_part_0018_901745566192518",
       "feature_external_id": "tactile_guidance_seg_00537",
       "street_part_id": "street_part_0018",
       "feature_kind": "tactile_guidance",
@@ -14357,7 +14357,7 @@
       "feature_distance_to_photo_m": 29.11
     },
     {
-      "photo_external_id": "photo_mapillary_901745566192518",
+      "photo_external_id": "photo_mapillary_street_part_0018_901745566192518",
       "feature_external_id": "kerb_ramp_seg_00535",
       "street_part_id": "street_part_0018",
       "feature_kind": "kerb_ramp",
@@ -14378,7 +14378,7 @@
       "feature_distance_to_photo_m": 29.21
     },
     {
-      "photo_external_id": "photo_mapillary_901745566192518",
+      "photo_external_id": "photo_mapillary_street_part_0018_901745566192518",
       "feature_external_id": "tactile_guidance_seg_00535",
       "street_part_id": "street_part_0018",
       "feature_kind": "tactile_guidance",
@@ -14399,7 +14399,7 @@
       "feature_distance_to_photo_m": 29.21
     },
     {
-      "photo_external_id": "photo_mapillary_901745566192518",
+      "photo_external_id": "photo_mapillary_street_part_0019_901745566192518",
       "feature_external_id": "kerb_ramp_seg_00536",
       "street_part_id": "street_part_0019",
       "feature_kind": "kerb_ramp",
@@ -14420,7 +14420,7 @@
       "feature_distance_to_photo_m": 28.97
     },
     {
-      "photo_external_id": "photo_mapillary_901745566192518",
+      "photo_external_id": "photo_mapillary_street_part_0019_901745566192518",
       "feature_external_id": "tactile_guidance_seg_00536",
       "street_part_id": "street_part_0019",
       "feature_kind": "tactile_guidance",
@@ -14441,7 +14441,7 @@
       "feature_distance_to_photo_m": 28.97
     },
     {
-      "photo_external_id": "photo_mapillary_901745566192518",
+      "photo_external_id": "photo_mapillary_street_part_0019_901745566192518",
       "feature_external_id": "kerb_ramp_seg_00537",
       "street_part_id": "street_part_0019",
       "feature_kind": "kerb_ramp",
@@ -14462,7 +14462,7 @@
       "feature_distance_to_photo_m": 29.11
     },
     {
-      "photo_external_id": "photo_mapillary_901745566192518",
+      "photo_external_id": "photo_mapillary_street_part_0019_901745566192518",
       "feature_external_id": "tactile_guidance_seg_00537",
       "street_part_id": "street_part_0019",
       "feature_kind": "tactile_guidance",
@@ -14483,7 +14483,7 @@
       "feature_distance_to_photo_m": 29.11
     },
     {
-      "photo_external_id": "photo_mapillary_901745566192518",
+      "photo_external_id": "photo_mapillary_street_part_0019_901745566192518",
       "feature_external_id": "kerb_ramp_seg_00535",
       "street_part_id": "street_part_0019",
       "feature_kind": "kerb_ramp",
@@ -14504,7 +14504,7 @@
       "feature_distance_to_photo_m": 29.21
     },
     {
-      "photo_external_id": "photo_mapillary_901745566192518",
+      "photo_external_id": "photo_mapillary_street_part_0019_901745566192518",
       "feature_external_id": "tactile_guidance_seg_00535",
       "street_part_id": "street_part_0019",
       "feature_kind": "tactile_guidance",
@@ -14525,7 +14525,7 @@
       "feature_distance_to_photo_m": 29.21
     },
     {
-      "photo_external_id": "photo_mapillary_267050878776148",
+      "photo_external_id": "photo_mapillary_street_part_0022_267050878776148",
       "feature_external_id": "kerb_ramp_seg_00544",
       "street_part_id": "street_part_0022",
       "feature_kind": "kerb_ramp",
@@ -14546,7 +14546,7 @@
       "feature_distance_to_photo_m": 27.86
     },
     {
-      "photo_external_id": "photo_mapillary_267050878776148",
+      "photo_external_id": "photo_mapillary_street_part_0022_267050878776148",
       "feature_external_id": "kerb_ramp_seg_00543",
       "street_part_id": "street_part_0022",
       "feature_kind": "kerb_ramp",
@@ -14567,7 +14567,7 @@
       "feature_distance_to_photo_m": 28.13
     },
     {
-      "photo_external_id": "photo_mapillary_267050878776148",
+      "photo_external_id": "photo_mapillary_street_part_0022_267050878776148",
       "feature_external_id": "kerb_ramp_seg_00541",
       "street_part_id": "street_part_0022",
       "feature_kind": "kerb_ramp",
@@ -14588,7 +14588,7 @@
       "feature_distance_to_photo_m": 28.87
     },
     {
-      "photo_external_id": "photo_mapillary_267050878776148",
+      "photo_external_id": "photo_mapillary_street_part_0022_267050878776148",
       "feature_external_id": "kerb_ramp_seg_00542",
       "street_part_id": "street_part_0022",
       "feature_kind": "kerb_ramp",
@@ -14609,7 +14609,7 @@
       "feature_distance_to_photo_m": 29.02
     },
     {
-      "photo_external_id": "photo_mapillary_267050878776148",
+      "photo_external_id": "photo_mapillary_street_part_0022_267050878776148",
       "feature_external_id": "covered_linkway_2980",
       "street_part_id": "street_part_0022",
       "feature_kind": "covered_linkway",
@@ -14630,7 +14630,7 @@
       "feature_distance_to_photo_m": 30.18
     },
     {
-      "photo_external_id": "photo_mapillary_267050878776148",
+      "photo_external_id": "photo_mapillary_street_part_0022_267050878776148",
       "feature_external_id": "kerb_ramp_seg_00538",
       "street_part_id": "street_part_0022",
       "feature_kind": "kerb_ramp",
@@ -14651,7 +14651,7 @@
       "feature_distance_to_photo_m": 32.78
     },
     {
-      "photo_external_id": "photo_mapillary_267050878776148",
+      "photo_external_id": "photo_mapillary_street_part_0022_267050878776148",
       "feature_external_id": "kerb_ramp_seg_00539",
       "street_part_id": "street_part_0022",
       "feature_kind": "kerb_ramp",
@@ -14672,7 +14672,7 @@
       "feature_distance_to_photo_m": 34.82
     },
     {
-      "photo_external_id": "photo_mapillary_1104293193608922",
+      "photo_external_id": "photo_mapillary_street_part_0024_1104293193608922",
       "feature_external_id": "kerb_ramp_seg_00558",
       "street_part_id": "street_part_0024",
       "feature_kind": "kerb_ramp",
@@ -14693,7 +14693,7 @@
       "feature_distance_to_photo_m": 1.93
     },
     {
-      "photo_external_id": "photo_mapillary_1104293193608922",
+      "photo_external_id": "photo_mapillary_street_part_0024_1104293193608922",
       "feature_external_id": "tactile_guidance_seg_00558",
       "street_part_id": "street_part_0024",
       "feature_kind": "tactile_guidance",
@@ -14714,7 +14714,7 @@
       "feature_distance_to_photo_m": 1.93
     },
     {
-      "photo_external_id": "photo_mapillary_1104293193608922",
+      "photo_external_id": "photo_mapillary_street_part_0024_1104293193608922",
       "feature_external_id": "kerb_ramp_seg_00557",
       "street_part_id": "street_part_0024",
       "feature_kind": "kerb_ramp",
@@ -14735,7 +14735,7 @@
       "feature_distance_to_photo_m": 3.58
     },
     {
-      "photo_external_id": "photo_mapillary_1104293193608922",
+      "photo_external_id": "photo_mapillary_street_part_0024_1104293193608922",
       "feature_external_id": "tactile_guidance_seg_00557",
       "street_part_id": "street_part_0024",
       "feature_kind": "tactile_guidance",
@@ -14756,7 +14756,7 @@
       "feature_distance_to_photo_m": 3.58
     },
     {
-      "photo_external_id": "photo_mapillary_1104293193608922",
+      "photo_external_id": "photo_mapillary_street_part_0024_1104293193608922",
       "feature_external_id": "kerb_ramp_seg_00559",
       "street_part_id": "street_part_0024",
       "feature_kind": "kerb_ramp",
@@ -14777,7 +14777,7 @@
       "feature_distance_to_photo_m": 6.15
     },
     {
-      "photo_external_id": "photo_mapillary_1104293193608922",
+      "photo_external_id": "photo_mapillary_street_part_0024_1104293193608922",
       "feature_external_id": "tactile_guidance_seg_00559",
       "street_part_id": "street_part_0024",
       "feature_kind": "tactile_guidance",
@@ -14798,7 +14798,7 @@
       "feature_distance_to_photo_m": 6.15
     },
     {
-      "photo_external_id": "photo_mapillary_1104293193608922",
+      "photo_external_id": "photo_mapillary_street_part_0024_1104293193608922",
       "feature_external_id": "bollard_46613",
       "street_part_id": "street_part_0024",
       "feature_kind": "bollard",
@@ -14819,7 +14819,7 @@
       "feature_distance_to_photo_m": 11.19
     },
     {
-      "photo_external_id": "photo_mapillary_1104293193608922",
+      "photo_external_id": "photo_mapillary_street_part_0024_1104293193608922",
       "feature_external_id": "kerb_ramp_seg_00548",
       "street_part_id": "street_part_0024",
       "feature_kind": "kerb_ramp",
@@ -14840,7 +14840,7 @@
       "feature_distance_to_photo_m": 13.14
     },
     {
-      "photo_external_id": "photo_mapillary_1104293193608922",
+      "photo_external_id": "photo_mapillary_street_part_0024_1104293193608922",
       "feature_external_id": "tactile_guidance_seg_00548",
       "street_part_id": "street_part_0024",
       "feature_kind": "tactile_guidance",
@@ -14861,7 +14861,7 @@
       "feature_distance_to_photo_m": 13.14
     },
     {
-      "photo_external_id": "photo_mapillary_1104293193608922",
+      "photo_external_id": "photo_mapillary_street_part_0024_1104293193608922",
       "feature_external_id": "kerb_ramp_seg_00547",
       "street_part_id": "street_part_0024",
       "feature_kind": "kerb_ramp",
@@ -14882,7 +14882,7 @@
       "feature_distance_to_photo_m": 13.37
     },
     {
-      "photo_external_id": "photo_mapillary_1104293193608922",
+      "photo_external_id": "photo_mapillary_street_part_0024_1104293193608922",
       "feature_external_id": "tactile_guidance_seg_00547",
       "street_part_id": "street_part_0024",
       "feature_kind": "tactile_guidance",
@@ -14903,7 +14903,7 @@
       "feature_distance_to_photo_m": 13.37
     },
     {
-      "photo_external_id": "photo_mapillary_1104293193608922",
+      "photo_external_id": "photo_mapillary_street_part_0024_1104293193608922",
       "feature_external_id": "covered_linkway_3403",
       "street_part_id": "street_part_0024",
       "feature_kind": "covered_linkway",
@@ -14924,7 +14924,7 @@
       "feature_distance_to_photo_m": 13.44
     },
     {
-      "photo_external_id": "photo_mapillary_1104293193608922",
+      "photo_external_id": "photo_mapillary_street_part_0024_1104293193608922",
       "feature_external_id": "covered_linkway_3404",
       "street_part_id": "street_part_0024",
       "feature_kind": "covered_linkway",
@@ -14945,7 +14945,7 @@
       "feature_distance_to_photo_m": 13.71
     },
     {
-      "photo_external_id": "photo_mapillary_1104293193608922",
+      "photo_external_id": "photo_mapillary_street_part_0024_1104293193608922",
       "feature_external_id": "kerb_ramp_seg_00546",
       "street_part_id": "street_part_0024",
       "feature_kind": "kerb_ramp",
@@ -14966,7 +14966,7 @@
       "feature_distance_to_photo_m": 14.82
     },
     {
-      "photo_external_id": "photo_mapillary_1104293193608922",
+      "photo_external_id": "photo_mapillary_street_part_0024_1104293193608922",
       "feature_external_id": "tactile_guidance_seg_00546",
       "street_part_id": "street_part_0024",
       "feature_kind": "tactile_guidance",
@@ -14987,7 +14987,7 @@
       "feature_distance_to_photo_m": 14.82
     },
     {
-      "photo_external_id": "photo_mapillary_1104293193608922",
+      "photo_external_id": "photo_mapillary_street_part_0024_1104293193608922",
       "feature_external_id": "bollard_46612",
       "street_part_id": "street_part_0024",
       "feature_kind": "bollard",
@@ -15008,7 +15008,7 @@
       "feature_distance_to_photo_m": 15.81
     },
     {
-      "photo_external_id": "photo_mapillary_1891196238085652",
+      "photo_external_id": "photo_mapillary_street_part_0025_1891196238085652",
       "feature_external_id": "kerb_ramp_seg_00561",
       "street_part_id": "street_part_0025",
       "feature_kind": "kerb_ramp",
@@ -15029,7 +15029,7 @@
       "feature_distance_to_photo_m": 10.76
     },
     {
-      "photo_external_id": "photo_mapillary_1891196238085652",
+      "photo_external_id": "photo_mapillary_street_part_0025_1891196238085652",
       "feature_external_id": "tactile_guidance_seg_00561",
       "street_part_id": "street_part_0025",
       "feature_kind": "tactile_guidance",
@@ -15050,7 +15050,7 @@
       "feature_distance_to_photo_m": 10.76
     },
     {
-      "photo_external_id": "photo_mapillary_1891196238085652",
+      "photo_external_id": "photo_mapillary_street_part_0025_1891196238085652",
       "feature_external_id": "kerb_ramp_seg_00557",
       "street_part_id": "street_part_0025",
       "feature_kind": "kerb_ramp",
@@ -15071,7 +15071,7 @@
       "feature_distance_to_photo_m": 10.77
     },
     {
-      "photo_external_id": "photo_mapillary_1891196238085652",
+      "photo_external_id": "photo_mapillary_street_part_0025_1891196238085652",
       "feature_external_id": "tactile_guidance_seg_00557",
       "street_part_id": "street_part_0025",
       "feature_kind": "tactile_guidance",
@@ -15092,7 +15092,7 @@
       "feature_distance_to_photo_m": 10.77
     },
     {
-      "photo_external_id": "photo_mapillary_1891196238085652",
+      "photo_external_id": "photo_mapillary_street_part_0025_1891196238085652",
       "feature_external_id": "kerb_ramp_seg_00560",
       "street_part_id": "street_part_0025",
       "feature_kind": "kerb_ramp",
@@ -15113,7 +15113,7 @@
       "feature_distance_to_photo_m": 11.13
     },
     {
-      "photo_external_id": "photo_mapillary_1891196238085652",
+      "photo_external_id": "photo_mapillary_street_part_0025_1891196238085652",
       "feature_external_id": "tactile_guidance_seg_00560",
       "street_part_id": "street_part_0025",
       "feature_kind": "tactile_guidance",
@@ -15134,7 +15134,7 @@
       "feature_distance_to_photo_m": 11.13
     },
     {
-      "photo_external_id": "photo_mapillary_1891196238085652",
+      "photo_external_id": "photo_mapillary_street_part_0025_1891196238085652",
       "feature_external_id": "kerb_ramp_seg_00558",
       "street_part_id": "street_part_0025",
       "feature_kind": "kerb_ramp",
@@ -15155,7 +15155,7 @@
       "feature_distance_to_photo_m": 11.48
     },
     {
-      "photo_external_id": "photo_mapillary_1891196238085652",
+      "photo_external_id": "photo_mapillary_street_part_0025_1891196238085652",
       "feature_external_id": "tactile_guidance_seg_00558",
       "street_part_id": "street_part_0025",
       "feature_kind": "tactile_guidance",
@@ -15176,7 +15176,7 @@
       "feature_distance_to_photo_m": 11.48
     },
     {
-      "photo_external_id": "photo_mapillary_1891196238085652",
+      "photo_external_id": "photo_mapillary_street_part_0025_1891196238085652",
       "feature_external_id": "kerb_ramp_seg_00545",
       "street_part_id": "street_part_0025",
       "feature_kind": "kerb_ramp",
@@ -15197,7 +15197,7 @@
       "feature_distance_to_photo_m": 11.87
     },
     {
-      "photo_external_id": "photo_mapillary_1891196238085652",
+      "photo_external_id": "photo_mapillary_street_part_0025_1891196238085652",
       "feature_external_id": "tactile_guidance_seg_00545",
       "street_part_id": "street_part_0025",
       "feature_kind": "tactile_guidance",
@@ -15218,7 +15218,7 @@
       "feature_distance_to_photo_m": 11.87
     },
     {
-      "photo_external_id": "photo_mapillary_1891196238085652",
+      "photo_external_id": "photo_mapillary_street_part_0025_1891196238085652",
       "feature_external_id": "kerb_ramp_seg_00546",
       "street_part_id": "street_part_0025",
       "feature_kind": "kerb_ramp",
@@ -15239,7 +15239,7 @@
       "feature_distance_to_photo_m": 12.07
     },
     {
-      "photo_external_id": "photo_mapillary_1891196238085652",
+      "photo_external_id": "photo_mapillary_street_part_0025_1891196238085652",
       "feature_external_id": "tactile_guidance_seg_00546",
       "street_part_id": "street_part_0025",
       "feature_kind": "tactile_guidance",
@@ -15260,7 +15260,7 @@
       "feature_distance_to_photo_m": 12.07
     },
     {
-      "photo_external_id": "photo_mapillary_1891196238085652",
+      "photo_external_id": "photo_mapillary_street_part_0025_1891196238085652",
       "feature_external_id": "kerb_ramp_seg_00547",
       "street_part_id": "street_part_0025",
       "feature_kind": "kerb_ramp",
@@ -15281,7 +15281,7 @@
       "feature_distance_to_photo_m": 13.61
     },
     {
-      "photo_external_id": "photo_mapillary_1891196238085652",
+      "photo_external_id": "photo_mapillary_street_part_0025_1891196238085652",
       "feature_external_id": "tactile_guidance_seg_00547",
       "street_part_id": "street_part_0025",
       "feature_kind": "tactile_guidance",
@@ -15302,7 +15302,7 @@
       "feature_distance_to_photo_m": 13.61
     },
     {
-      "photo_external_id": "photo_mapillary_1891196238085652",
+      "photo_external_id": "photo_mapillary_street_part_0025_1891196238085652",
       "feature_external_id": "kerb_ramp_seg_00559",
       "street_part_id": "street_part_0025",
       "feature_kind": "kerb_ramp",
@@ -15323,7 +15323,7 @@
       "feature_distance_to_photo_m": 13.82
     },
     {
-      "photo_external_id": "photo_mapillary_208220884992067",
+      "photo_external_id": "photo_mapillary_street_part_0026_208220884992067",
       "feature_external_id": "bollard_46732",
       "street_part_id": "street_part_0026",
       "feature_kind": "bollard",
@@ -15344,7 +15344,7 @@
       "feature_distance_to_photo_m": 7.6
     },
     {
-      "photo_external_id": "photo_mapillary_208220884992067",
+      "photo_external_id": "photo_mapillary_street_part_0026_208220884992067",
       "feature_external_id": "bollard_46734",
       "street_part_id": "street_part_0026",
       "feature_kind": "bollard",
@@ -15365,7 +15365,7 @@
       "feature_distance_to_photo_m": 8.63
     },
     {
-      "photo_external_id": "photo_mapillary_470424490917072",
+      "photo_external_id": "photo_mapillary_street_part_0027_470424490917072",
       "feature_external_id": "covered_linkway_3399",
       "street_part_id": "street_part_0027",
       "feature_kind": "covered_linkway",
@@ -15386,7 +15386,7 @@
       "feature_distance_to_photo_m": 26.78
     },
     {
-      "photo_external_id": "photo_mapillary_470424490917072",
+      "photo_external_id": "photo_mapillary_street_part_0027_470424490917072",
       "feature_external_id": "covered_linkway_3398",
       "street_part_id": "street_part_0027",
       "feature_kind": "covered_linkway",
