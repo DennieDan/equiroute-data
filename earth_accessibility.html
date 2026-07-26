@@ -474,6 +474,7 @@
       <select id="segmentSelect" title="Choose a 5 m segment"></select>
       <button id="earthBtn" class="active">Earth Satellite</button>
       <button id="streetBtn">Street View</button>
+      <button id="directionBtn" title="Swap pavement-side direction" disabled>Swap direction</button>
       <button id="prevBtn">←</button><button id="nextBtn">→</button>
       <div class="spacer"></div>
       <span class="pill"><b id="segCount">–</b> segments</span>
@@ -1200,6 +1201,13 @@
         }
         return out;
       }
+      function photoDirectionLabel(img) {
+        const role = img?.heading_role || img?.metadata?.selected_heading_option?.heading_role;
+        const orientation = img?.desired_orientation || img?.metadata?.selected_heading_option?.orientation;
+        if (role === "opposite" || orientation === "road_left_pavement_right") return "opposite view · pavement right";
+        if (role === "canonical" || orientation === "road_right") return "canonical view · road right";
+        return "direction view";
+      }
       function renderStreetPhoto(index = 0) {
         const imgs = state.streetImages || [];
         state.streetImageIndex =
@@ -1210,6 +1218,10 @@
             '<div class="street-note">No curated street photo is available here yet, showing Esri/Maxar Earth satellite underlay. Choose another footpath or wait for a verified crowd/Mapillary photo.</div>';
           earthSource.textContent =
             "street fallback: Esri/Maxar satellite underlay";
+          if (window.directionBtn) {
+            directionBtn.disabled = true;
+            directionBtn.textContent = "Swap direction";
+          }
           return;
         }
         const thumb =
@@ -1225,7 +1237,12 @@
         mapillaryView.innerHTML = `<img id="streetPhoto" src="${thumb}" alt="Mapillary street-level image"/>`;
         state.mapillaryImageId = img.id;
         const cvCount = cvInstancesForCurrentPhoto().length;
-        earthSource.textContent = `Mapillary ${state.streetImageIndex + 1}/${imgs.length} · ${cvCount ? cvCount + " CV-localized feature pins" : "map-projected feature pins"}`;
+        const direction = photoDirectionLabel(img);
+        earthSource.textContent = `Mapillary ${state.streetImageIndex + 1}/${imgs.length} · ${direction} · ${cvCount ? cvCount + " CV-localized feature pins" : "map-projected feature pins"}`;
+        if (window.directionBtn) {
+          directionBtn.disabled = imgs.length < 2;
+          directionBtn.textContent = imgs.length > 1 ? `Swap direction (${imgs.length})` : direction;
+        }
         setTimeout(() => renderSegmentButtons(true), 120);
       }
       function cycleStreetPhoto(delta) {
@@ -1285,6 +1302,10 @@
         streetBtn.classList.remove("active");
         modeLabel.textContent = "Esri/Maxar Earth satellite · Three.js overlay";
         earthSource.textContent = "real daylight aerial tiles, not grey blocks";
+        if (window.directionBtn) {
+          directionBtn.disabled = true;
+          directionBtn.textContent = "Swap direction";
+        }
         if (state.mapillaryViewer) {
           try {
             state.mapillaryViewer.remove();
@@ -1689,6 +1710,10 @@
                 p.street_view_node_id === node.id ||
                 p.node_id === node.id),
           )
+          .sort((a, b) => {
+            const order = { canonical: 0, opposite: 1 };
+            return (order[a.heading_role] ?? 9) - (order[b.heading_role] ?? 9);
+          })
           .map((p) => ({
             id: p.source_image_id || p.external_id || p.id,
             image_url: p.image_url,
@@ -1699,6 +1724,9 @@
             captured_at: p.captured_at,
             source: p.source,
             external_id: p.external_id || p.id,
+            heading_role: p.heading_role,
+            desired_orientation: p.desired_orientation,
+            matched_heading_deg: p.matched_heading_deg,
             registry_photo_id: p.id || p.external_id,
             validation_status: p.validation_status,
           }));
@@ -1754,6 +1782,9 @@
       }
       segmentSelect.onchange = (e) =>
         selectSegment(Number(e.target.value), state.mode === "street");
+      directionBtn.onclick = () => {
+        if (state.mode === "street") cycleStreetPhoto(1);
+      };
       prevBtn.onclick = () => {
         if (state.mode === "street") {
           if (!moveStreetNode(-1) && !cycleStreetPhoto(-1))
@@ -1806,6 +1837,10 @@
         return r.json();
       }
       async function loadStreetRegistry() {
+        if (new URLSearchParams(location.search).has("localRegistry")) {
+          const r = await fetch("data/street_view_registry.json");
+          return r.ok ? r.json() : null;
+        }
         try {
           const [streetsRaw, partsRaw, nodesRaw, photosRaw] = await Promise.all(
             [
@@ -1883,6 +1918,9 @@
                 lng: p.lng,
                 lat: p.lat,
                 compass_angle_deg: p.compass_angle_deg,
+                matched_heading_deg: p.matched_heading_deg,
+                heading_role: p.heading_role,
+                desired_orientation: p.desired_orientation,
                 direction_valid: p.direction_valid,
                 direction_confidence: p.direction_confidence,
                 is_pano: p.is_pano,

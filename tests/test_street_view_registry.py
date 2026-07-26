@@ -7,6 +7,7 @@ from scripts.street_view_registry import (
     build_street_view_nodes,
     build_streets,
     choose_best_photo,
+    choose_best_photos_by_direction,
     desired_photo_headings,
     group_segments_into_street_parts,
     harvest_mapillary_candidates,
@@ -36,19 +37,22 @@ class StreetViewRegistryTest(unittest.TestCase):
         self.assertEqual(angle_diff(10, 350), 20)
         self.assertEqual(angle_diff(90, 90), 0)
 
-    def test_groups_five_meter_segments_into_ten_meter_street_parts(self):
+    def test_groups_five_meter_measurements_into_photo_visible_street_parts(self):
         segments = [
             seg("seg_0", [[103.0, 1.0], [103.000045, 1.0]]),
             seg("seg_1", [[103.000045, 1.0], [103.00009, 1.0]]),
             seg("seg_2", [[103.00009, 1.0], [103.000135, 1.0]]),
+            seg("seg_3", [[103.000135, 1.0], [103.00018, 1.0]]),
+            seg("seg_4", [[103.00018, 1.0], [103.000225, 1.0]]),
+            seg("seg_5", [[103.000225, 1.0], [103.00027, 1.0]]),
         ]
 
-        parts = group_segments_into_street_parts(segments, target_length_m=10)
+        parts = group_segments_into_street_parts(segments, target_length_m=25)
 
         self.assertEqual(len(parts), 2)
-        self.assertEqual(parts[0]["route_segment_ids"], ["seg_0", "seg_1"])
-        self.assertEqual(parts[1]["route_segment_ids"], ["seg_2"])
-        self.assertAlmostEqual(parts[0]["length_m"], 10.0, delta=1.5)
+        self.assertEqual(parts[0]["route_segment_ids"], ["seg_0", "seg_1", "seg_2", "seg_3", "seg_4"])
+        self.assertEqual(parts[1]["route_segment_ids"], ["seg_5"])
+        self.assertAlmostEqual(parts[0]["length_m"], 25.0, delta=2.0)
 
     def test_best_photo_prefers_correct_heading_over_newer_wrong_direction(self):
         candidates = [
@@ -97,6 +101,29 @@ class StreetViewRegistryTest(unittest.TestCase):
         self.assertTrue(chosen["direction_valid"])
         self.assertEqual(chosen["heading_role"], "opposite")
         self.assertEqual(chosen["desired_orientation"], "road_left_pavement_right")
+
+    def test_selects_one_active_photo_per_available_direction(self):
+        candidates = [
+            {
+                "id": "canonical",
+                "computed_compass_angle": 90,
+                "computed_geometry": {"coordinates": [103.0, 1.0]},
+                "captured_at": "2026-07-01T00:00:00Z",
+                "is_pano": False,
+            },
+            {
+                "id": "opposite",
+                "computed_compass_angle": 270,
+                "computed_geometry": {"coordinates": [103.0, 1.0]},
+                "captured_at": "2026-07-01T00:00:00Z",
+                "is_pano": False,
+            },
+        ]
+
+        photos = choose_best_photos_by_direction(candidates, [103.0, 1.0], desired_heading_deg=90)
+
+        self.assertEqual([p["heading_role"] for p in photos], ["canonical", "opposite"])
+        self.assertEqual([p["desired_orientation"] for p in photos], ["road_right", "road_left_pavement_right"])
 
     def test_builds_prev_next_node_graph_for_curated_corridor(self):
         segments = [

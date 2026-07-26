@@ -53,6 +53,9 @@ create table if not exists public.street_photos (
   lng double precision not null,
   lat double precision not null,
   compass_angle_deg double precision null,
+  matched_heading_deg double precision null,
+  heading_role text null,
+  desired_orientation text null,
   direction_valid boolean not null default false,
   direction_confidence double precision null,
   road_on_right_score double precision null,
@@ -70,6 +73,9 @@ alter table public.street_photos
   add column if not exists external_id text unique,
   add column if not exists street_view_node_id uuid null,
   add column if not exists validation_status text not null default 'needs_review',
+  add column if not exists matched_heading_deg double precision null,
+  add column if not exists heading_role text null,
+  add column if not exists desired_orientation text null,
   add column if not exists selected_reason text null,
   add column if not exists replaces_photo_id uuid null references public.street_photos(id);
 
