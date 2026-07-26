@@ -469,16 +469,16 @@
     <div id="segmentButtons"></div>
     <div id="topbar" class="hud">
       <div class="brand">EquiRoute Earth</div>
-      <span class="pill" id="modeLabel">Esri/Maxar Earth satellite</span>
-      <span class="pill" id="earthSource">daylight aerial imagery</span>
-      <select id="segmentSelect" title="Choose a 5 m segment"></select>
+      <span class="pill" id="modeLabel" hidden></span>
+      <span class="pill" id="earthSource" hidden></span>
+      <select id="segmentSelect" title="Choose a footpath street part"></select>
       <button id="earthBtn" class="active">Earth Satellite</button>
       <button id="streetBtn">Street View</button>
       <button id="directionBtn" title="Swap pavement-side direction" disabled>Swap direction</button>
       <button id="prevBtn">←</button><button id="nextBtn">→</button>
       <div class="spacer"></div>
-      <span class="pill"><b id="segCount">–</b> segments</span>
-      <span class="pill"><b id="buildingCount">–</b> buildings</span>
+      <span class="pill" hidden><b id="segCount">–</b> segments</span>
+      <span class="pill" hidden><b id="buildingCount">–</b> buildings</span>
       <button id="settingsBtn">⚙</button>
     </div>
     <div id="settings" class="hud">
@@ -888,11 +888,21 @@
         }
         t.renderer.render(t.scene, t.camera);
       }
+      function registryRouteSegmentIds() {
+        const ids = new Set();
+        (state.streetRegistry?.street_parts || []).forEach((p) =>
+          (p.route_segment_ids || []).forEach((id) => ids.add(id)),
+        );
+        return ids;
+      }
       function renderWorld(world) {
+        const registryIds = registryRouteSegmentIds();
+        const hasRegistryParts = registryIds.size > 0;
         state.segments = world.features.filter(
           (f) =>
             f.properties.kind === "route_segment" &&
-            f.properties.feature_type !== "kerb_line",
+            f.properties.feature_type !== "kerb_line" &&
+            (!hasRegistryParts || registryIds.has(f.properties.id)),
         );
         state.features = world.features.filter(
           (f) => f.properties.kind !== "route_segment",
@@ -904,7 +914,7 @@
           (f) => f.properties.kind === "route_segment",
         );
         const routeGeoms = allRoutes.map((f, i) => {
-          const selectable = f.properties.feature_type !== "kerb_line";
+          const selectable = f.properties.feature_type !== "kerb_line" && (!hasRegistryParts || registryIds.has(f.properties.id));
           const selectableIndex = selectable ? state.segments.indexOf(f) : -1;
           return new maptalks.LineString(f.geometry.coordinates, {
             properties: { ...f.properties, index: selectableIndex },
@@ -975,12 +985,32 @@
         selectSegment(0, false);
         detailCard.classList.remove("visible");
       }
+      function streetPartNumber(part) {
+        const m = String(part?.id || "").match(/(\d+)$/);
+        return m ? String(Number(m[1]) + 1) : "–";
+      }
+      function streetPartDisplayName(part) {
+        return `Footpath ${streetPartNumber(part)}`;
+      }
       function populateSelect() {
+        const parts = state.streetRegistry?.street_parts || [];
+        if (parts.length) {
+          segmentSelect.innerHTML = parts
+            .map((part) => {
+              const idx = segmentIndexForStreetPart(part);
+              const score = part.metrics?.overall_accessibility_score ?? "–";
+              const len = Math.round(part.length_m || part.metrics?.length_m || 0);
+              return `<option value="${idx >= 0 ? idx : 0}">${streetPartDisplayName(part)} · ${len}m · ${score}</option>`;
+            })
+            .join("");
+          return;
+        }
         segmentSelect.innerHTML = state.segments
-          .map(
-            (f, i) =>
-              `<option value="${i}">${f.properties.name} · ${Math.round(f.properties.metrics.length_m)}m · ${f.properties.overall_accessibility_score}</option>`,
-          )
+          .filter((f) => f.properties?.kind === "route_segment")
+          .map((f) => {
+            const i = state.segments.indexOf(f);
+            return `<option value="${i}">${f.properties.name} · ${Math.round(f.properties.metrics.length_m)}m · ${f.properties.overall_accessibility_score}</option>`;
+          })
           .join("");
       }
       function capitalizeKind(kind) {
@@ -1067,18 +1097,40 @@
         state.detailContext = next;
         EquirouteFeedback.onContextChange(changed);
       }
+      function displayPropsForSegmentFeature(f) {
+        const raw = f?.properties || {};
+        const part = streetPartForSegmentId(raw.id);
+        if (!part) return raw;
+        return {
+          id: raw.id,
+          name: streetPartDisplayName(part),
+          kind: "street_part",
+          feature_type: "footpath",
+          overall_accessibility_score:
+            part.metrics?.overall_accessibility_score ?? raw.overall_accessibility_score,
+          metrics: {
+            length_m: part.length_m,
+            source_segment_count: part.metrics?.source_segment_count,
+          },
+          street_part_external_id: part.id,
+        };
+      }
       function showDetail(p, kind = "", extras = {}) {
         detailCard.classList.add("visible");
         const typeLabel = (p.feature_type || p.kind || "feature").replaceAll(
           "_",
           " ",
         );
-        const kindLabel = capitalizeKind(kind || addonFor(p));
-        selectedKind.textContent = kindLabel;
-        selectedName.textContent = `${p.name || "Feature"} · ${typeLabel}`;
+        const baseName = p.name || "Feature";
+        const cleanType = typeLabel && typeLabel !== "street part" ? typeLabel : "";
+        const kindLabel = capitalizeKind(kind || "");
+        selectedKind.textContent = kindLabel && kindLabel.toLowerCase() !== String(baseName).toLowerCase() ? kindLabel : "";
+        selectedName.textContent = cleanType && !baseName.toLowerCase().includes(cleanType.toLowerCase())
+          ? `${baseName} · ${cleanType}`
+          : baseName;
         selectedDesc.textContent = p.metrics?.length_m
-          ? `${Math.round(p.metrics.length_m * 10) / 10} m segment${kindLabel ? " · " + kindLabel.toLowerCase() : ""}`
-          : `${kindLabel || typeLabel}${extras.distanceM != null ? ` · ~${Math.round(extras.distanceM)}m from camera` : ""}`;
+          ? `${Math.round(p.metrics.length_m * 10) / 10} m footpath${p.metrics.source_segment_count ? ` · ${p.metrics.source_segment_count} measurements` : ""}`
+          : `${kindLabel || cleanType}${extras.distanceM != null ? ` · ~${Math.round(extras.distanceM)}m from camera` : ""}`;
         activeScore.textContent =
           p.overall_accessibility_score ?? extras.score ?? "–";
         const m = p.metrics,
@@ -1103,11 +1155,21 @@
                 `<div class="metric"><span>${x[0]}</span><b style="color:${scoreColor(x[2])}">${x[1]}</b><small>${x[2]}/100</small></div>`,
             )
             .join("");
+        } else if (m?.length_m) {
+          metricList.innerHTML = [
+            ["Length", `${Math.round(m.length_m * 10) / 10} m`, p.overall_accessibility_score ?? extras.score ?? "–"],
+            ["Measurements", m.source_segment_count || "–", p.overall_accessibility_score ?? extras.score ?? "–"],
+          ]
+            .map(
+              (x) =>
+                `<div class="metric"><span>${x[0]}</span><b>${x[1]}</b><small>${x[2]}/100</small></div>`,
+            )
+            .join("");
         } else {
-          metricList.innerHTML = `<div class="metric"><span>Feature</span><b>${capitalizeKind(kind) || typeLabel}</b><small>POI</small></div>`;
+          metricList.innerHTML = `<div class="metric"><span>Feature</span><b>${kindLabel || cleanType || "Detected"}</b><small>photo evidence</small></div>`;
         }
         setDetailContext({
-          kind: kind || addonFor(p) || "",
+          kind: kind || "",
           segmentId: p.id || null,
           featureExternalId: extras.featureExternalId || p.external_id || null,
           name: p.name || "",
@@ -1131,7 +1193,8 @@
             },
           }),
         );
-        showDetail(p, addonFor(p));
+        const partDisplay = displayPropsForSegmentFeature(f);
+        showDetail(partDisplay, "");
         const mid = middle(f),
           brg = bearing(coords[0], coords[coords.length - 1]);
         if (street) {
@@ -1483,8 +1546,8 @@
             poi: null,
             coord: origin,
             score: Math.round((inst.confidence || 0) * 100),
-            label: inst.label || inst.feature_kind,
-            name: `${kindFromFeatureKind(inst.feature_kind)} · CV localized`,
+            label: inst.label || kindFromFeatureKind(inst.feature_kind),
+            name: capitalizeKind(kindFromFeatureKind(inst.feature_kind)),
             featureExternalId: inst.feature_external_id,
             distanceM: inst.feature_distance_to_photo_m,
             cv: inst,
@@ -1497,21 +1560,11 @@
             },
           });
         });
-        state.segments.forEach((f) => {
-          const coord = middle(f),
-            d = distM(coord, origin);
-          if (d < 120) {
-            const kind = addonFor(f.properties);
-            if (kind)
-              add({
-                kind,
-                f,
-                coord,
-                score: f.properties.overall_accessibility_score,
-                label: kind,
-              });
-          }
-        });
+        // Do not add raw 5 m measurement-segment pseudo-features in street view.
+        // They caused confusing labels like "crossing" plus "ramp/shelter" for
+        // the same scorecard. Street mode should show CV-localized photo
+        // evidence and real POIs only, with the current 25 m street part as the
+        // walkway context.
         state.features.forEach((f) => {
           const p = f.properties || {},
             kind =
@@ -1620,7 +1673,8 @@
               : `${kind} near this photo · ${Math.round(pt.d)}m away`;
             b.onclick = () => {
               if (x.f) {
-                showFeatureForSegment(idx, kind);
+                showDetail(displayPropsForSegmentFeature(x.f), x.kind === "walkway" ? "" : kind);
+                if (x.kind !== "walkway") selectedDesc.textContent = featureComment(x.f.properties, kind);
                 return;
               }
               showDetail(
@@ -1642,9 +1696,14 @@
           });
           return;
         }
-        let candidates = state.segments
-          .filter((_, i) => i % 12 === 0)
-          .slice(0, 180);
+        let candidates = state.streetRegistry?.street_parts?.length
+          ? state.streetRegistry.street_parts
+              .map((part) => {
+                const idx = segmentIndexForStreetPart(part);
+                return idx >= 0 ? state.segments[idx] : null;
+              })
+              .filter(Boolean)
+          : state.segments.filter((_, i) => i % 12 === 0).slice(0, 180);
         candidates.forEach((f) => {
           const idx = state.segments.indexOf(f),
             p = f.properties,
@@ -1771,9 +1830,27 @@
           nodes = state.streetRegistry?.street_view_nodes || [];
         if (!node || !nodes.length) return false;
         const targetId = delta > 0 ? node.next_node_id : node.prev_node_id;
-        if (!targetId) return false;
-        const targetIdx = nodes.findIndex((n) => n.id === targetId);
-        return targetIdx >= 0 ? selectStreetNode(targetIdx) : false;
+        if (targetId) {
+          const targetIdx = nodes.findIndex((n) => n.id === targetId);
+          if (targetIdx >= 0) return selectStreetNode(targetIdx);
+        }
+        const adjacentIdx = state.streetNodeIndex + delta;
+        return adjacentIdx >= 0 && adjacentIdx < nodes.length
+          ? selectStreetNode(adjacentIdx)
+          : false;
+      }
+      function moveStreetPart(delta, street = state.mode === "street") {
+        const parts = state.streetRegistry?.street_parts || [];
+        if (!parts.length) return false;
+        const current = currentStreetPart();
+        const currentIdx = Math.max(0, parts.findIndex((p) => p.id === current?.id));
+        const nextIdx = Math.max(0, Math.min(parts.length - 1, currentIdx + delta));
+        const idx = segmentIndexForStreetPart(parts[nextIdx]);
+        if (idx < 0) return false;
+        const nodeIdx = (state.streetRegistry?.street_view_nodes || []).findIndex((n) => n.street_part_id === parts[nextIdx].id);
+        if (nodeIdx >= 0) state.streetNodeIndex = nodeIdx;
+        selectSegment(idx, street);
+        return true;
       }
       function updateSettings() {
         tokenStatus.textContent = getToken()
@@ -1786,16 +1863,12 @@
         if (state.mode === "street") cycleStreetPhoto(1);
       };
       prevBtn.onclick = () => {
-        if (state.mode === "street") {
-          if (!moveStreetNode(-1) && !cycleStreetPhoto(-1))
-            selectSegment(state.selectedIndex - 1, true);
-        } else selectSegment(state.selectedIndex - 1, false);
+        if (!moveStreetPart(-1, state.mode === "street"))
+          selectSegment(state.selectedIndex - 1, state.mode === "street");
       };
       nextBtn.onclick = () => {
-        if (state.mode === "street") {
-          if (!moveStreetNode(1) && !cycleStreetPhoto(1))
-            selectSegment(state.selectedIndex + 1, true);
-        } else selectSegment(state.selectedIndex + 1, false);
+        if (!moveStreetPart(1, state.mode === "street"))
+          selectSegment(state.selectedIndex + 1, state.mode === "street");
       };
       earthBtn.onclick = () => selectSegment(state.selectedIndex, false);
       streetBtn.onclick = () => selectSegment(state.selectedIndex, true);

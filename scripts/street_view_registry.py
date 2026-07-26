@@ -203,6 +203,24 @@ MAPILLARY_FIELDS = ",".join(
     ]
 )
 
+# Manual visual QA rejects from the demo-corridor photo audit. These are
+# direction-valid by compass, but not useful accessibility evidence because they
+# are road-only, dominated by a bus/blank structure, blurry, or do not show a
+# usable pedestrian path/street-accessibility context.
+REJECTED_MAPILLARY_IMAGE_IDS = {
+    "158305022912618",
+    "474699267149343",
+    "915343820661531",
+    "644176977184642",
+    "149906617428263",
+    "320862360007937",
+    "150551397353401",
+    "245085431176456",
+    "5254710051242737",
+    "340347634774322",
+    "5571605572960452",
+}
+
 
 def mapillary_images_url(lng: float, lat: float, token: str, radius_m: int = 45, limit: int = 12) -> str:
     params = {
@@ -319,6 +337,8 @@ def _choose_best_photo_from_options(
 ) -> dict[str, Any] | None:
     scored: list[tuple[float, dict[str, Any], bool, float, float, dict[str, Any]]] = []
     for cand in candidates:
+        if str(cand.get("id")) in REJECTED_MAPILLARY_IMAGE_IDS:
+            continue
         coord = candidate_coord(cand)
         heading = candidate_heading(cand)
         if coord is None or heading is None:
@@ -420,8 +440,13 @@ def attach_active_photos(
     two active photos: one canonical road-on-right and one opposite-side view.
     """
     photos: list[dict[str, Any]] = []
+    used_source_image_ids: set[str] = set()
     for part in street_parts:
-        candidates = candidates_by_part.get(part["id"], [])
+        candidates = [
+            c
+            for c in candidates_by_part.get(part["id"], [])
+            if str(c.get("id")) not in used_source_image_ids
+        ]
         chosen_photos = choose_best_photos_by_direction(
             candidates,
             midpoint=part["midpoint"],
@@ -437,6 +462,7 @@ def attach_active_photos(
             chosen["validation_status"] = "direction_valid" if chosen.get("direction_valid") else "needs_review"
             chosen["selected_reason"] = "best_direction_distance_recency_candidate"
             chosen["replaces_photo_id"] = None
+            used_source_image_ids.add(str(chosen.get("source_image_id")))
             photos.append(chosen)
     return photos
 
