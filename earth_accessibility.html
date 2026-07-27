@@ -533,7 +533,7 @@
       </form>
     </section>
     <div class="status" id="status">Loading Clementi digital twin…</div>
-    <script src="feedback-form.js"></script>
+    <script src="feedback-form.js?v=scorecard-clean-2"></script>
     <script>
       const COLORS = {
         green: "#22f36e",
@@ -1555,6 +1555,42 @@
           items = [],
           seen = new Set();
         function add(it) {
+          const clusterableKinds = new Set([
+            "shelter",
+            "obstruction",
+            "tactile",
+            "ramp",
+            "walkway",
+          ]);
+          const nearIdx = clusterableKinds.has(it.kind)
+            ? items.findIndex((existing) => {
+                if (existing.kind !== it.kind) return false;
+                if (existing.pt && it.pt) {
+                  const dx = Number(existing.pt.x || 0) - Number(it.pt.x || 0),
+                    dy = Number(existing.pt.y || 0) - Number(it.pt.y || 0);
+                  if (Math.hypot(dx, dy) < 90) return true;
+                }
+                if (
+                  existing.name &&
+                  it.name &&
+                  String(existing.name).toLowerCase() === String(it.name).toLowerCase() &&
+                  Math.abs(Number(existing.distanceM || 0) - Number(it.distanceM || 0)) < 75
+                ) {
+                  return true;
+                }
+                if (existing.coord && it.coord) {
+                  return distM(existing.coord, it.coord) < 12;
+                }
+                return false;
+              })
+            : -1;
+          if (nearIdx >= 0) {
+            const prev = items[nearIdx];
+            const prevQuality = Number(prev.score || 0) - Number(prev.distanceM || 0) / 20;
+            const nextQuality = Number(it.score || 0) - Number(it.distanceM || 0) / 20;
+            if (nextQuality > prevQuality) items[nearIdx] = { ...prev, ...it };
+            return;
+          }
           const key =
             it.featureExternalId ||
             it.kind + ":" + it.coord.map((v) => v.toFixed(5)).join(",");
