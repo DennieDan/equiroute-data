@@ -566,17 +566,26 @@
       window.__EARTH_ACCESSIBILITY_STATE = state;
       const SATELLITE_TILE =
         "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
+      // Esri World Imagery stops adding native detail beyond this level in the
+      // Clementi demo area. Clamp the MapTalks camera here too, so the vector
+      // accessibility/OSM lines do not keep separating while the satellite
+      // raster is only being over-zoomed.
+      const SATELLITE_MAX_NATIVE_ZOOM = 18;
       const SUPABASE_URL = "https://khddsjemkdcgumfvkraa.supabase.co";
       const SUPABASE_PUBLISHABLE_KEY =
         "sb_publishable_lqGtwkNAOMV7qsYPKVZr8w_GytZx3Qm";
       const map = new maptalks.Map("map", {
         center: [103.7716, 1.3062],
         zoom: 17,
+        minZoom: 12,
+        maxZoom: SATELLITE_MAX_NATIVE_ZOOM,
         pitch: 0,
         bearing: 0,
         baseLayer: new maptalks.TileLayer("satellite-daylight", {
           urlTemplate: SATELLITE_TILE,
           renderer: "canvas",
+          maxAvailableZoom: SATELLITE_MAX_NATIVE_ZOOM,
+          maxZoom: SATELLITE_MAX_NATIVE_ZOOM,
           attribution: "Tiles © Esri, Maxar, Earthstar Geographics",
         }),
       });
@@ -603,6 +612,19 @@
       function setStatus(t) {
         document.getElementById("status").textContent = t;
       }
+      function clampSatelliteZoom() {
+        const z = map.getZoom?.();
+        if (Number.isFinite(z) && z > SATELLITE_MAX_NATIVE_ZOOM) {
+          map.setZoom(SATELLITE_MAX_NATIVE_ZOOM, { animation: false });
+          return true;
+        }
+        return false;
+      }
+      ["zooming", "zoomend", "moveend"].forEach((eventName) =>
+        map.on(eventName, () => {
+          if (clampSatelliteZoom()) renderSatelliteFallback();
+        }),
+      );
       function scoreColor(s) {
         return s >= 67 ? COLORS.green : s >= 45 ? COLORS.amber : COLORS.red;
       }
@@ -654,7 +676,7 @@
         const box = document.getElementById("satelliteFallback");
         if (!box) return;
         const center = map.getCenter(),
-          z = Math.max(15, Math.min(19, Math.round(map.getZoom() || 17)));
+          z = Math.max(15, Math.min(SATELLITE_MAX_NATIVE_ZOOM, Math.round(map.getZoom() || 17)));
         const w = innerWidth,
           h = innerHeight,
           tile = 256;
@@ -1202,7 +1224,7 @@
         } else {
           enterEarth();
           map.animateTo(
-            { center: mid, zoom: 18, pitch: 0, bearing: 0 },
+            { center: mid, zoom: SATELLITE_MAX_NATIVE_ZOOM, pitch: 0, bearing: 0 },
             { duration: 500 },
           );
           renderSegmentButtons();
@@ -1328,7 +1350,7 @@
         earthSource.textContent =
           "loading active street-part photo, Earth satellite stays behind";
         map.animateTo(
-          { center: coord, zoom: 20, pitch: 78, bearing: brg },
+          { center: coord, zoom: SATELLITE_MAX_NATIVE_ZOOM, pitch: 78, bearing: brg },
           { duration: 350 },
         );
         setupMiniMap();
@@ -1385,12 +1407,16 @@
         if (state.miniMap) return;
         state.miniMap = new maptalks.Map("miniMap", {
           center: map.getCenter(),
-          zoom: 18,
+          zoom: SATELLITE_MAX_NATIVE_ZOOM,
+          minZoom: 12,
+          maxZoom: SATELLITE_MAX_NATIVE_ZOOM,
           pitch: 0,
           bearing: 0,
           baseLayer: new maptalks.TileLayer("miniBase", {
             urlTemplate: SATELLITE_TILE,
             renderer: "canvas",
+            maxAvailableZoom: SATELLITE_MAX_NATIVE_ZOOM,
+            maxZoom: SATELLITE_MAX_NATIVE_ZOOM,
           }),
         });
         new maptalks.VectorLayer(
@@ -2062,6 +2088,7 @@
           renderWorld(world);
           const ext = routeLayer.getExtent();
           if (ext) map.fitExtent(ext, 0, { animation: false });
+          clampSatelliteZoom();
           map.setPitch(0);
           map.setBearing(0);
           renderSatelliteFallback();
