@@ -22,14 +22,10 @@
   }
 
   function updateMeta() {
-    const ctx = getDetailContext() || {};
-    const bits = [];
-    if (ctx.streetPartExternalId)
-      bits.push(`street part ${ctx.streetPartExternalId}`);
-    if (ctx.featureExternalId) bits.push(`feature ${ctx.featureExternalId}`);
-    else if (ctx.kind) bits.push(`${ctx.kind} (street-part only)`);
-    else bits.push("street-part only");
-    els.meta.textContent = bits.join(" · ");
+    // Public scorecard should not expose internal IDs like
+    // "street part street_part_0000 · feature covered_linkway_3399".
+    // IDs are still kept in detailContext for feedback submission.
+    els.meta.textContent = "";
   }
 
   function close(clearStatus = false) {

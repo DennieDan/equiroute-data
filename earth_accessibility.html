@@ -1146,7 +1146,9 @@
         const baseName = p.name || "Feature";
         const cleanType = typeLabel && typeLabel !== "street part" ? typeLabel : "";
         const kindLabel = capitalizeKind(kind || "");
-        selectedKind.textContent = kindLabel && kindLabel.toLowerCase() !== String(baseName).toLowerCase() ? kindLabel : "";
+        // Keep the scorecard clean: the title/description already name the
+        // feature type, so do not repeat "Shelter" / "Ramp" as a second line.
+        selectedKind.textContent = "";
         selectedName.textContent = cleanType && !baseName.toLowerCase().includes(cleanType.toLowerCase())
           ? `${baseName} · ${cleanType}`
           : baseName;
@@ -1188,7 +1190,7 @@
             )
             .join("");
         } else {
-          metricList.innerHTML = `<div class="metric"><span>Feature</span><b>${kindLabel || cleanType || "Detected"}</b><small>photo evidence</small></div>`;
+          metricList.innerHTML = "";
         }
         setDetailContext({
           kind: kind || "",
