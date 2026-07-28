@@ -539,6 +539,11 @@
       .role-pill {
         border-color: rgba(125, 211, 252, 0.45);
       }
+      #roleLabel,
+      #modeLabel,
+      #earthSource {
+        display: none !important;
+      }
 
       #photoUploadPanel {
         position: absolute;
@@ -820,9 +825,8 @@
       }
       function applyRoleUi() {
         if (window.roleSwitchBtn) {
-          const userName = state.appUser?.display_name || (state.role === "authority" ? "Authority user" : "Public user");
-          roleSwitchBtn.textContent = state.role === "authority" ? `Authority · ${userName}` : `Public · ${userName}`;
-          roleSwitchBtn.title = "Current database user. Use the role-select page only when changing accounts.";
+          roleSwitchBtn.textContent = "Role";
+          roleSwitchBtn.title = "Switch AccessTwin role";
           roleSwitchBtn.onclick = () => {
             if (state.role === "authority") settings.classList.toggle("visible");
           };
