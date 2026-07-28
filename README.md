@@ -1,6 +1,38 @@
 # EquiRoute Data
 
-Geospatial data pipeline and simulation for EquiRoute — filtering LTA layers to a local HDB estate and exploring routes in Jupyter and a 3D web viewer.
+AccessTwin / EquiRoute geospatial accessibility demo for Tech4City: a Clementi digital twin with real satellite imagery, 25 m public footpath street parts, Mapillary street-view photos, direction swapping, Supabase-backed feedback threads, and computer-vision/photo-feature evidence pins.
+
+The active demo branch is `abel`. `main` is still the shared base branch; the public AccessTwin street-view work lives on `abel` until merged.
+
+## Quick start: run the current AccessTwin frontend
+
+This repo is a static HTML/Python data project, not a Node app. No `npm install` is needed for the demo frontend.
+
+```bash
+git checkout abel
+git pull --ff-only origin abel
+python3 -m http.server 8011 --bind 127.0.0.1
+```
+
+Open:
+
+```text
+http://127.0.0.1:8011/earth_accessibility.html
+```
+
+The page loads live Supabase data first and falls back to committed local JSON if Supabase is unavailable. For deterministic local-only testing, use:
+
+```text
+http://127.0.0.1:8011/earth_accessibility.html?localRegistry=1
+```
+
+Expected current demo state:
+
+- dropdown shows about 30 public 25 m footpath street parts, not raw 3–5 m measurement segments
+- Earth view uses Esri/Maxar satellite imagery with vector overlays clamped to satellite-native zoom
+- Street View shows one Mapillary photo per direction when available
+- `←` / `→` move to previous/next footpath; `Swap direction` only swaps direction photos
+- feature scorecards hide internal IDs and avoid duplicate labels
 
 ## Prerequisites
 
@@ -115,13 +147,19 @@ This writes `supabase/seed_accessibility_features.sql`. Stable `external_id` val
 | MRT | `mrt_{station_name_slug}` | `mrt_clementi_mrt_station` |
 | overhead bridge | `{kind}_{index}_{slug}` | `pedestrian_overhead_bridge_0_...` |
 
-7. **View the 3D MVP** — from the project root, start a local server:
+7. **View the AccessTwin frontend** — from the project root, start a static server:
 
 ```bash
-python -m http.server 8000
+python3 -m http.server 8011 --bind 127.0.0.1
 ```
 
-Open [http://localhost:8000](http://localhost:8000) in your browser.
+Open:
+
+```text
+http://127.0.0.1:8011/earth_accessibility.html
+```
+
+Use `?localRegistry=1` only when you want to bypass Supabase and verify the committed local registry payload.
 
 ## Project layout
 
