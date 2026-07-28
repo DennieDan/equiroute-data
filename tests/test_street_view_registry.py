@@ -1,6 +1,7 @@
 import math
 import unittest
 
+from scripts.cv_localize_photo_features import assign_feature_detections, box_area_ratio, clamp_box
 from scripts.street_view_registry import (
     angle_diff,
     attach_active_photos,
@@ -259,6 +260,40 @@ class StreetViewRegistryTest(unittest.TestCase):
         self.assertIn("photo_mapillary_street_part_0000_mly-seed", sql)
         self.assertIn("active_photo_id =", sql)
         self.assertIn("on conflict (external_id) do update", sql)
+
+
+class PhotoFeatureCvMatchingTest(unittest.TestCase):
+    def test_assigns_each_detection_to_only_one_feature(self):
+        features = [
+            {"external_id": "covered_linkway_a", "kind": "covered_linkway", "distance_to_photo_m": 5},
+            {"external_id": "covered_linkway_b", "kind": "covered_linkway", "distance_to_photo_m": 8},
+        ]
+        detections = [
+            {"label": "covered walkway", "score": 0.52, "bbox": {"x1": 100, "y1": 420, "x2": 300, "y2": 560}},
+        ]
+
+        assignments = assign_feature_detections(features, detections, min_score=0.1, image_width=1000, image_height=800)
+
+        self.assertEqual(len(assignments), 1)
+        self.assertEqual(assignments[0][0]["external_id"], "covered_linkway_a")
+
+    def test_rejects_giant_generic_boxes_for_ground_features(self):
+        feature = {"external_id": "tactile_guidance_seg_1", "kind": "tactile_guidance", "distance_to_photo_m": 3}
+        detections = [
+            {"label": "sidewalk", "score": 0.4, "bbox": {"x1": 0, "y1": 0, "x2": 1000, "y2": 800}},
+            {"label": "yellow tactile paving", "score": 0.3, "bbox": {"x1": 420, "y1": 600, "x2": 620, "y2": 730}},
+        ]
+
+        assignments = assign_feature_detections([feature], detections, min_score=0.1, image_width=1000, image_height=800)
+
+        self.assertEqual(len(assignments), 1)
+        self.assertEqual(assignments[0][1]["label"], "yellow tactile paving")
+
+    def test_clamps_boxes_to_image_bounds_before_export(self):
+        box = clamp_box({"x1": -4, "y1": 20, "x2": 1200, "y2": 900}, image_width=1000, image_height=800)
+
+        self.assertEqual(box, {"x1": 0.0, "y1": 20.0, "x2": 1000, "y2": 800})
+        self.assertAlmostEqual(box_area_ratio(box, 1000, 800), 0.975)
 
 
 if __name__ == "__main__":

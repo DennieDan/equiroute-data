@@ -112,10 +112,20 @@ def download_image(url: str) -> Image.Image:
 
 
 def load_model(model_name: str):
-    from transformers import OwlViTForObjectDetection, OwlViTProcessor
+    """Load an open-vocabulary detector.
 
-    processor = OwlViTProcessor.from_pretrained(model_name)
-    model = OwlViTForObjectDetection.from_pretrained(model_name)
+    OWL-ViT base was too loose for our street photos: it produced giant road/car
+    boxes and then the old matcher reused one box for many nearby features. Prefer
+    OWLv2 when available, while keeping OWL-ViT compatibility for older cached runs.
+    """
+    from transformers import Owlv2ForObjectDetection, Owlv2Processor, OwlViTForObjectDetection, OwlViTProcessor
+
+    if "owlv2" in model_name.lower():
+        processor = Owlv2Processor.from_pretrained(model_name)
+        model = Owlv2ForObjectDetection.from_pretrained(model_name)
+    else:
+        processor = OwlViTProcessor.from_pretrained(model_name)
+        model = OwlViTForObjectDetection.from_pretrained(model_name)
     model.eval()
     return processor, model
 
@@ -165,12 +175,74 @@ def prompts_for_features(features: list[dict[str, Any]]) -> list[str]:
     return sorted(set(prompts))
 
 
-def match_feature_detection(feature: dict[str, Any], detections: list[dict[str, Any]], min_score: float) -> dict[str, Any] | None:
+def box_center(box: dict[str, Any]) -> tuple[float, float]:
+    return ((float(box["x1"]) + float(box["x2"])) / 2, (float(box["y1"]) + float(box["y2"])) / 2)
+
+
+def box_area_ratio(box: dict[str, Any], image_width: float, image_height: float) -> float:
+    width = max(0.0, min(image_width, float(box["x2"])) - max(0.0, float(box["x1"])))
+    height = max(0.0, min(image_height, float(box["y2"])) - max(0.0, float(box["y1"])))
+    return (width * height) / max(1.0, image_width * image_height)
+
+
+def clamp_box(box: dict[str, Any], image_width: float, image_height: float) -> dict[str, float]:
+    return {
+        "x1": round(max(0.0, min(image_width, float(box["x1"]))), 2),
+        "y1": round(max(0.0, min(image_height, float(box["y1"]))), 2),
+        "x2": round(max(0.0, min(image_width, float(box["x2"]))), 2),
+        "y2": round(max(0.0, min(image_height, float(box["y2"]))), 2),
+    }
+
+
+def detection_matches_feature(feature: dict[str, Any], det: dict[str, Any], min_score: float, image_width: float, image_height: float) -> bool:
+    """Reject generic/oversized detections before linking them to map features."""
     prompts = set(PROMPTS_BY_KIND.get(feature.get("kind"), []))
-    if not prompts:
-        return None
-    matches = [d for d in detections if d["label"] in prompts and d["score"] >= min_score]
-    return max(matches, key=lambda d: d["score"]) if matches else None
+    if not prompts or det.get("label") not in prompts or float(det.get("score", 0)) < min_score:
+        return False
+    area = box_area_ratio(det["bbox"], image_width, image_height)
+    if area <= 0 or area > 0.42:
+        return False
+    # Ground-plane objects should not be floating in the sky/building band.
+    _, cy = box_center(det["bbox"])
+    y_ratio = cy / max(1.0, image_height)
+    if feature.get("kind") in {"kerb_ramp", "tactile_guidance", "bollard"} and y_ratio < 0.38:
+        return False
+    return True
+
+
+def assign_feature_detections(
+    features: list[dict[str, Any]],
+    detections: list[dict[str, Any]],
+    min_score: float,
+    image_width: float,
+    image_height: float,
+) -> list[tuple[dict[str, Any], dict[str, Any]]]:
+    """One-to-one feature↔detection matching.
+
+    The earlier matcher picked the best same-label box independently for every
+    nearby feature, so one shelter/sidewalk box could become 3-14 duplicate pins.
+    Assign each detection at most once, prioritising closer map features and higher
+    confidence boxes, so photo-feature positions become distinct and reviewable.
+    """
+    candidates: list[tuple[float, float, str, int, int]] = []
+    for feature_i, feature in enumerate(features):
+        for detection_i, det in enumerate(detections):
+            if detection_matches_feature(feature, det, min_score, image_width, image_height):
+                distance = float(feature.get("distance_to_photo_m", 999_999))
+                score = float(det.get("score", 0))
+                candidates.append((distance, -score, feature.get("external_id", ""), feature_i, detection_i))
+    candidates.sort()
+
+    used_features: set[int] = set()
+    used_detections: set[int] = set()
+    assignments: list[tuple[dict[str, Any], dict[str, Any]]] = []
+    for _distance, _neg_score, _external_id, feature_i, detection_i in candidates:
+        if feature_i in used_features or detection_i in used_detections:
+            continue
+        used_features.add(feature_i)
+        used_detections.add(detection_i)
+        assignments.append((features[feature_i], detections[detection_i]))
+    return assignments
 
 
 def draw_overlay(image: Image.Image, detections: list[dict[str, Any]], out_path: Path) -> None:
@@ -217,9 +289,9 @@ def main() -> None:
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
     parser.add_argument("--sql-out", type=Path, default=DEFAULT_SQL_OUT)
     parser.add_argument("--overlay-dir", type=Path, default=DEFAULT_OVERLAY_DIR)
-    parser.add_argument("--model", default="google/owlvit-base-patch32")
-    parser.add_argument("--threshold", type=float, default=0.08)
-    parser.add_argument("--feature-match-threshold", type=float, default=0.07)
+    parser.add_argument("--model", default="google/owlv2-base-patch16-ensemble")
+    parser.add_argument("--threshold", type=float, default=0.10)
+    parser.add_argument("--feature-match-threshold", type=float, default=0.10)
     parser.add_argument("--nearby-radius-m", type=float, default=35)
     parser.add_argument("--max-photos", type=int, default=None)
     args = parser.parse_args()
@@ -241,13 +313,9 @@ def main() -> None:
         overlay_path = args.overlay_dir / f"{index:02d}_{photo['street_part_id']}_{photo['source_image_id']}.jpg"
         draw_overlay(image, detections, overlay_path)
         matched = []
-        for feat in expected:
-            det = match_feature_detection(feat, detections, args.feature_match_threshold)
-            if not det:
-                continue
-            box = det["bbox"]
-            pixel_x = round((box["x1"] + box["x2"]) / 2, 2)
-            pixel_y = round((box["y1"] + box["y2"]) / 2, 2)
+        for feat, det in assign_feature_detections(expected, detections, args.feature_match_threshold, image.width, image.height):
+            box = clamp_box(det["bbox"], image.width, image.height)
+            pixel_x, pixel_y = [round(v, 2) for v in box_center(box)]
             inst = {
                 "photo_external_id": photo["external_id"],
                 "feature_external_id": feat["external_id"],
@@ -258,7 +326,7 @@ def main() -> None:
                 "pixel_x": pixel_x,
                 "pixel_y": pixel_y,
                 "bbox": box,
-                "detection_method": f"cv:{args.model}:zero_shot_owlvit",
+                "detection_method": f"cv:{args.model}:one_to_one_open_vocab",
                 "detection_model": args.model,
                 "confidence": det["score"],
                 "label": det["label"],
