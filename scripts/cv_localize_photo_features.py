@@ -263,7 +263,11 @@ def draw_overlay(image: Image.Image, detections: list[dict[str, Any]], out_path:
 
 
 def instances_to_seed_sql(instances: list[dict[str, Any]]) -> str:
-    lines = ["-- Generated OWL-ViT photo_feature_instances seed.", "begin;"]
+    lines = [
+        "-- Generated OWL-ViT photo_feature_instances seed.",
+        "begin;",
+        "delete from public.photo_feature_instances where photo_id in (select id from public.street_photos where source='mapillary' and external_id like 'photo_mapillary_%');",
+    ]
     for inst in instances:
         lines.append(
             "insert into public.photo_feature_instances "
