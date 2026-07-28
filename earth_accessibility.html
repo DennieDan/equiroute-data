@@ -291,6 +291,10 @@
         width: min(370px, calc(100vw - 32px));
         padding: 12px;
         z-index: 24;
+        display: none;
+      }
+      #personaPanel.visible {
+        display: block;
       }
       .persona-head {
         display: flex;
@@ -306,22 +310,19 @@
         color: var(--muted);
         font-size: 11px;
       }
-      .persona-list {
+      .persona-selector {
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 8px;
-      }
-      .persona-route {
-        display: grid;
-        grid-template-columns: 1fr 1fr auto;
         gap: 6px;
         margin: 8px 0;
       }
-      .persona-route select,
-      .persona-route button {
-        width: 100%;
+      .persona-selector label {
+        color: var(--muted);
         font-size: 11px;
-        padding: 7px 8px;
+      }
+      .persona-selector select {
+        width: 100%;
+        font-size: 12px;
+        padding: 8px 10px;
       }
       .persona-card {
         text-align: left;
@@ -647,6 +648,9 @@
         Data-source notes and standards references for the public demo.
       </p>
       <p id="tokenStatus" hidden></p>
+      <div class="settings-grid authority-only">
+        <button id="togglePersonaPanelBtn" type="button">Show persona agents</button>
+      </div>
       <h4>References</h4>
       <p id="standardsText"></p>
     </div>
@@ -654,13 +658,11 @@
     <section id="personaPanel" class="hud authority-only">
       <div class="persona-head">
         <b>Persona agents</b>
-        <span class="persona-note">simulate travel + improvements</span>
+        <span class="persona-note">updates when footpath changes</span>
       </div>
-      <div class="persona-list" id="personaList"></div>
-      <div class="persona-route">
-        <select id="personaStartSelect" title="Start street part"></select>
-        <select id="personaEndSelect" title="End street part"></select>
-        <button type="button" id="personaRunBtn">Run</button>
+      <div class="persona-selector">
+        <label for="personaSelect">User type</label>
+        <select id="personaSelect" title="Choose user type"></select>
       </div>
       <div id="personaRecommendation">Loading persona travel simulation…</div>
     </section>
@@ -737,8 +739,6 @@
         detailContext: null,
         personaSimulation: null,
         activePersonaId: "wheelchair_user",
-        personaStartPartId: null,
-        personaEndPartId: null,
         currentPhotoUploadContext: null,
       };
       window.__EARTH_ACCESSIBILITY_STATE = state;
@@ -824,7 +824,9 @@
         }
         if (state.role !== "authority") {
           settings?.classList.remove("visible");
+          personaPanel?.classList.remove("visible");
         }
+        updatePersonaToggleButton();
       }
 
       function setUploadStatus(message, kind = "") {
@@ -1526,14 +1528,17 @@
         );
       }
       function currentStreetPart() {
+        const selectedSeg = state.segments[state.selectedIndex];
+        if (state.mode !== "street") {
+          return streetPartForSegmentId(selectedSeg?.properties?.id);
+        }
         const node = currentStreetNode();
         if (node?.street_part_id) {
           const parts = state.streetRegistry?.street_parts || [];
           const byId = parts.find((p) => p.id === node.street_part_id);
           if (byId) return byId;
         }
-        const seg =
-          state.currentStreetSegment || state.segments[state.selectedIndex];
+        const seg = state.currentStreetSegment || selectedSeg;
         return streetPartForSegmentId(seg?.properties?.id);
       }
       function setDetailContext({
@@ -1575,102 +1580,53 @@
       function personaSummary(personaId = state.activePersonaId) {
         return state.personaSimulation?.personas?.[personaId] || null;
       }
-      function selectedPersonaRouteParts() {
-        const parts = state.streetRegistry?.street_parts || [];
-        if (!parts.length) return [];
-        const startId = state.personaStartPartId || parts[0].id;
-        const endId = state.personaEndPartId || parts[parts.length - 1].id;
-        let a = parts.findIndex((p) => p.id === startId);
-        let b = parts.findIndex((p) => p.id === endId);
-        if (a < 0) a = 0;
-        if (b < 0) b = parts.length - 1;
-        const lo = Math.min(a, b), hi = Math.max(a, b);
-        return parts.slice(lo, hi + 1);
-      }
-      function populatePersonaRouteControls() {
-        if (!window.personaStartSelect || !window.personaEndSelect) return;
-        const parts = state.streetRegistry?.street_parts || [];
-        if (!parts.length) return;
-        if (!state.personaStartPartId) state.personaStartPartId = parts[0].id;
-        if (!state.personaEndPartId) state.personaEndPartId = parts[parts.length - 1].id;
-        const options = parts
-          .map((p) => `<option value="${p.id}">${streetPartDisplayName(p)}</option>`)
+      function populatePersonaSelector() {
+        if (!window.personaSelect) return;
+        const sim = state.personaSimulation;
+        if (!sim?.personas) return;
+        const options = Object.entries(sim.personas)
+          .map(([pid, p]) => `<option value="${pid}">${p.label}</option>`)
           .join("");
-        if (personaStartSelect.innerHTML !== options) {
-          personaStartSelect.innerHTML = options;
-          personaEndSelect.innerHTML = options;
+        if (personaSelect.innerHTML !== options) personaSelect.innerHTML = options;
+        if (!state.activePersonaId || !sim.personas[state.activePersonaId]) {
+          state.activePersonaId = Object.keys(sim.personas)[0] || null;
         }
-        personaStartSelect.value = state.personaStartPartId;
-        personaEndSelect.value = state.personaEndPartId;
-        personaStartSelect.onchange = () => {
-          state.personaStartPartId = personaStartSelect.value;
-          renderPersonaRouteSimulation();
-        };
-        personaEndSelect.onchange = () => {
-          state.personaEndPartId = personaEndSelect.value;
-          renderPersonaRouteSimulation();
-        };
-        if (window.personaRunBtn) personaRunBtn.onclick = renderPersonaRouteSimulation;
-      }
-      function renderPersonaRouteSimulation() {
-        if (!window.personaRecommendation) return;
-        const routeParts = selectedPersonaRouteParts();
-        const personaId = state.activePersonaId;
-        const rows = routeParts
-          .map((p) => ({ part: p, sim: personaPartFor(p.id)?.personas?.[personaId] }))
-          .filter((r) => r.sim);
-        if (!rows.length) {
+        personaSelect.value = state.activePersonaId;
+        personaSelect.onchange = () => {
+          state.activePersonaId = personaSelect.value;
           renderPersonaForCurrentPart();
-          return;
-        }
-        const avg = Math.round(rows.reduce((sum, r) => sum + r.sim.score, 0) / rows.length);
-        const worst = rows.reduce((a, b) => (b.sim.score < a.sim.score ? b : a), rows[0]);
-        const blockers = [...new Set(rows.flatMap((r) => r.sim.blocker_labels || []))].slice(0, 3);
-        const label = rows[0].sim.label || personaSummary()?.label || "Persona";
-        personaRecommendation.innerHTML = `<b>${label}</b> route ${streetPartDisplayName(routeParts[0])} → ${streetPartDisplayName(routeParts[routeParts.length - 1])}: ${avg}/100 across ${rows.length} street parts<br>Worst: ${streetPartDisplayName(worst.part)} · ${worst.sim.score}/100${blockers.length ? ` · ${blockers.join(", ")}` : ""}<br>${worst.sim.recommended_improvement}`;
+        };
       }
       function renderPersonaPanel() {
-        if (!window.personaList || !window.personaRecommendation) return;
+        if (!window.personaRecommendation) return;
         const sim = state.personaSimulation;
         if (!sim?.personas) {
-          personaList.innerHTML = "";
           personaRecommendation.textContent = "Persona simulation unavailable.";
           return;
         }
-        const personaIds = Object.keys(sim.personas);
-        populatePersonaRouteControls();
-        personaList.innerHTML = personaIds
-          .map((pid) => {
-            const p = sim.personas[pid];
-            return `<button class="persona-card ${pid === state.activePersonaId ? "active" : ""}" data-persona="${pid}">
-              <b>${p.label}</b>
-              <small>${p.average_score}/100 · ${p.passable_parts}/${p.total_parts} passable parts</small>
-            </button>`;
-          })
-          .join("");
-        personaList.querySelectorAll("[data-persona]").forEach((btn) => {
-          btn.onclick = () => {
-            state.activePersonaId = btn.dataset.persona;
-            renderPersonaPanel();
-            renderPersonaRouteSimulation();
-          };
-        });
-        const summary = personaSummary();
-        const first = summary?.priority_street_parts?.[0];
-        const firstPart = first
-          ? (state.streetRegistry?.street_parts || []).find((p) => p.id === first.street_part_id)
-          : null;
-        personaRecommendation.innerHTML = first
-          ? `<b>Priority:</b> ${summary.label} · ${firstPart ? streetPartDisplayName(firstPart) : first.street_part_id} · ${first.score}/100<br>${first.recommended_improvement}`
-          : "Persona agents ready.";
+        populatePersonaSelector();
+        renderPersonaForCurrentPart();
       }
       function renderPersonaForCurrentPart() {
         if (!window.personaRecommendation) return;
+        const sim = state.personaSimulation;
+        if (!sim?.personas) {
+          personaRecommendation.textContent = "Persona simulation unavailable.";
+          return;
+        }
+        populatePersonaSelector();
         const part = currentStreetPart();
         const simPart = part ? personaPartFor(part.id) : null;
         const persona = simPart?.personas?.[state.activePersonaId];
         if (!persona) {
-          renderPersonaPanel();
+          const summary = personaSummary();
+          const first = summary?.priority_street_parts?.[0];
+          const firstPart = first
+            ? (state.streetRegistry?.street_parts || []).find((p) => p.id === first.street_part_id)
+            : null;
+          personaRecommendation.innerHTML = first
+            ? `<b>Priority:</b> ${summary.label} · ${firstPart ? streetPartDisplayName(firstPart) : first.street_part_id} · ${first.score}/100<br>${first.recommended_improvement}`
+            : "Persona agents ready. Choose a footpath to see the score and recommendation.";
           return;
         }
         const label = persona.label || personaSummary()?.label || "Persona";
@@ -2481,10 +2437,24 @@
         selectSegment(idx, street);
         return true;
       }
+      function updatePersonaToggleButton() {
+        if (!window.togglePersonaPanelBtn || !window.personaPanel) return;
+        togglePersonaPanelBtn.textContent = personaPanel.classList.contains("visible")
+          ? "Hide persona agents"
+          : "Show persona agents";
+      }
+      function togglePersonaPanel(force) {
+        if (!window.personaPanel) return;
+        const show = typeof force === "boolean" ? force : !personaPanel.classList.contains("visible");
+        personaPanel.classList.toggle("visible", show && state.role === "authority");
+        if (show) renderPersonaPanel();
+        updatePersonaToggleButton();
+      }
       function updateSettings() {
         tokenStatus.textContent = getToken()
           ? "Mapillary token saved in this browser."
           : "No Mapillary token saved; street view may be unavailable.";
+        updatePersonaToggleButton();
       }
       segmentSelect.onchange = (e) =>
         selectSegment(Number(e.target.value), state.mode === "street");
@@ -2505,6 +2475,9 @@
         if (state.role === "authority") settings.classList.toggle("visible");
       };
       closeSettings.onclick = () => settings.classList.remove("visible");
+      if (window.togglePersonaPanelBtn) {
+        togglePersonaPanelBtn.onclick = () => togglePersonaPanel();
+      }
       if (window.photoUploadBtn && window.photoUploadInput) {
         photoUploadBtn.onclick = () => photoUploadInput.click();
         photoUploadInput.onchange = async () => {
@@ -2717,7 +2690,6 @@
           renderPersonaPanel();
           renderBuildings(buildings);
           renderWorld(world);
-          renderPersonaRouteSimulation();
           const ext = routeLayer.getExtent();
           if (ext) map.fitExtent(ext, 0, { animation: false });
           clampSatelliteZoom();
