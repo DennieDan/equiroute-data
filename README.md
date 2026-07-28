@@ -40,7 +40,7 @@ Expected current demo state:
 - Street View shows one curated Mapillary photo per direction when available
 - `←` / `→` move to previous/next footpath; `Swap direction` only swaps direction photos
 - feature scorecards hide internal IDs and avoid duplicate labels
-- persona agents show per-disability passability, bottlenecks, and recommended improvements
+- persona agents show per-disability passability, start/end street-part route simulation, bottlenecks, and recommended improvements
 
 ## Current demo artifacts
 
