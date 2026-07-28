@@ -1,10 +1,10 @@
-# EquiRoute Data
+# EquiRoute Data / AccessTwin
 
-AccessTwin / EquiRoute geospatial accessibility demo for Tech4City: a Clementi digital twin with real satellite imagery, 25 m public footpath street parts, Mapillary street-view photos, direction swapping, Supabase-backed feedback threads, and computer-vision/photo-feature evidence pins.
+AccessTwin / EquiRoute geospatial accessibility demo for Tech4City: a Clementi digital twin with real satellite imagery, ~25 m public footpath street parts, Mapillary street-view photos, direction swapping, Supabase-backed feedback threads, and persona agents that simulate how different people with disabilities experience each street part.
 
 The active demo branch is `abel`. `main` is still the shared base branch; the public AccessTwin street-view work lives on `abel` until merged.
 
-## Quick start: run the current AccessTwin frontend
+## Quick start: run the current frontend
 
 This repo is a static HTML/Python data project, not a Node app. No `npm install` is needed for the demo frontend.
 
@@ -20,7 +20,7 @@ Open:
 http://127.0.0.1:8011/earth_accessibility.html
 ```
 
-The page loads live Supabase data first and falls back to committed local JSON if Supabase is unavailable. For deterministic local-only testing, use:
+The page loads live Supabase street/photo data first and falls back to committed local JSON if Supabase is unavailable. For deterministic local-only testing, use:
 
 ```text
 http://127.0.0.1:8011/earth_accessibility.html?localRegistry=1
@@ -28,78 +28,47 @@ http://127.0.0.1:8011/earth_accessibility.html?localRegistry=1
 
 Expected current demo state:
 
-- dropdown shows about 30 public 25 m footpath street parts, not raw 3–5 m measurement segments
+- dropdown shows about 30 public ~25 m footpath street parts, not raw 3–5 m measurement segments
 - Earth view uses Esri/Maxar satellite imagery with vector overlays clamped to satellite-native zoom
-- Street View shows one Mapillary photo per direction when available
+- Street View shows one curated Mapillary photo per direction when available
 - `←` / `→` move to previous/next footpath; `Swap direction` only swaps direction photos
 - feature scorecards hide internal IDs and avoid duplicate labels
+- persona agents show per-disability passability, bottlenecks, and recommended improvements
 
-## Prerequisites
+## Current demo artifacts
 
-- Python 3.10+
-- LTA geospatial shapefiles placed in `GEOSPATIAL/` (not committed; see `.gitignore`)
+| Path | Purpose |
+| --- | --- |
+| `earth_accessibility.html` | Main public AccessTwin frontend: satellite Earth view, street-view mode, scorecards, persona agents, feedback form |
+| `accessibility_world.geojson` | Hidden ~5 m measurement layer with proxy accessibility metrics, POIs, and persona segment scores |
+| `data/street_view_registry.json` | Public ~25 m street parts, street-view nodes, curated Mapillary active photos |
+| `data/photo_feature_instances_cv.json` | OWL-ViT/zero-shot photo feature detections matched to active street photos |
+| `data/persona_agent_travel_simulation.json` | Persona-agent travel simulation aggregated to public street parts |
+| `buildings_clementi.geojson` | OSM building footprint context overlay |
+| `feedback-form.js` | Supabase-backed feedback submission UI |
+| `supabase/` | Schema, RLS, and seed SQL for live backend tables |
 
-## Setup
+## Regenerate data artifacts
 
-### 1. Create a virtual environment
+Most demo work does **not** require regeneration. Use these only when source layers, photos, or scoring logic change.
 
-```bash
-python3 -m venv venv
-source venv/bin/activate   # Windows: venv\Scripts\activate
-pip install -r requirements.txt
-```
+### 1. Accessibility world layer
 
-### 2. Create a Jupyter kernel from the virtual environment
-
-```bash
-python -m ipykernel install --user --name=equiroute --display-name="Python (equiroute)"
-```
-
-In JupyterLab, select **Python (equiroute)** as the kernel when opening `persona_agent.ipynb`.
-
-## Workflow
-
-1. **Filter geospatial layers** — run `filter_estate.py` to crop LTA shapefiles to the Clementi bounding box and write outputs to `CLEMENTI/`.
-2. **Explore & simulate** — open `persona_agent.ipynb` and run cells to load filtered layers and build route simulations.
-3. **Generate persona before/after simulation output** — after placing `sim_output.json` and `threejs_3d_roads.json` in the project root, run:
+Requires local LTA shapefiles under `CLEMENTI_MALL/`.
 
 ```bash
-python persona_simulation.py
+python3 generate_accessibility_world.py
 ```
 
-This writes `sim_persona_before_after.json`, which contains persona-specific scores, bottlenecks, and the simulated impact of an accessibility intervention.
+Writes `accessibility_world.geojson`. This fuses LTA footpaths, crossings, kerb lines, bus stops, MRT, bollards, covered linkways, pickup bays, and overhead bridges into selectable measurement segments with ISO 21542 + ADA/PROWAG-inspired proxy metrics.
 
-4. **Apply PERS-inspired scoring** — our benchmark basis is PERS (Pedestrian Environment Review System), the TRL/TfL pedestrian-audit framework. The prototype is not a certified PERS audit, but it maps available OSM/LTA proxy risks onto PERS-style weighted link/crossing criteria and a 0–100 RAG score:
-
-```bash
-python accessibility_scoring.py
-```
-
-5. **Generate OSM building footprints for 3D context** — fetch buildings from Overpass, save the response to `/tmp/overpass_buildings.json`, then run:
-
-```bash
-python buildings_from_overpass.py
-```
-
-This writes `buildings_clementi.geojson`, used by `maptalks_three.html` and `earth_accessibility.html` to show building context behind obstacles and improvements.
-
-6. **Generate the Earth/street accessibility layer** — fuses LTA footpaths, kerblines, crossings, bus stops, MRT, bollards, covered linkways and overhead bridges into selectable traversable segments with ISO 21542 + ADA/PROWAG-inspired metrics:
-
-```bash
-.venv/bin/python generate_accessibility_world.py
-```
-
-This writes `accessibility_world.geojson` for the Google Earth-style street inspection UI.
-
-`earth_accessibility.html` uses MapTalks for the geospatial map/satellite layer and Three.js for custom animated accessibility overlays: glowing route paths, wheelchair/PMA agent avatars, and intervention blocks such as ramps/shelters/bus-stop markers. Mapillary is wired as the real-life street-view provider. Mapillary requires a free client token from the Mapillary developer dashboard; enter it in the in-browser token field only. The token is stored in that browser's `localStorage` and is not committed to the repo.
-
-The street-view navigation now uses a lightweight Google-Street-View-style node graph instead of random nearest-photo lookup. Generate the curated demo corridor registry with:
+### 2. Street-view registry / 25 m public parts
 
 ```bash
 python3 scripts/street_view_registry.py --max-parts 30 --target-length-m 25
 ```
 
-To harvest real Mapillary candidates and select active photos for the 30 demo street parts:
+To harvest real Mapillary candidates and select active photos:
 
 ```bash
 MAPILLARY_TOKEN=... python3 scripts/street_view_registry.py \
@@ -110,11 +79,23 @@ MAPILLARY_TOKEN=... python3 scripts/street_view_registry.py \
   --seed-sql supabase/seed_street_view_registry.sql
 ```
 
-The harvester fetches Mapillary camera geometry/compass metadata per street part, filters both pavement-side directions (canonical road-on-right and opposite road-left/pavement-right), selects up to one active photo per direction when valid, and leaves missing-photo states intact when no suitable photo exists.
+The registry hierarchy is:
 
-This writes `data/street_view_registry.json`, grouping the existing hidden 5 m path measurements into ~25 m street-view nodes because a single useful street photo usually covers roughly that much pedestrian path. The registry hierarchy is: **many streets → many street parts per street → one street-view node per street part → up to two active direction photos per street part**. Supabase schema/RLS/seed files live in `supabase/`; the frontend reads the Supabase street registry first and falls back to local JSON if the backend is unavailable. Feedback stays on the street part while photos can be replaced.
+```text
+many streets → many ~25 m street parts → one street-view node per street part → up to two active direction photos per part
+```
 
-Run zero-shot computer-vision localization for accessibility pins:
+The harvester filters both pavement-side directions: canonical road-on-right and opposite pavement-on-right. If no suitable photo exists, the frontend should show the missing-photo state rather than reuse an unrelated photo.
+
+### 3. Accessibility features seed
+
+```bash
+python3 scripts/seed_accessibility_features.py
+```
+
+Writes `supabase/seed_accessibility_features.sql` from the world layer. Stable external IDs are used for feedback and photo-feature matching.
+
+### 4. Photo feature localization
 
 ```bash
 python3 -m venv .venv-cv
@@ -126,54 +107,84 @@ PYTHONPATH=. python3 scripts/cv_localize_photo_features.py \
   --feature-match-threshold 0.02
 ```
 
-This uses `google/owlvit-base-patch32` (OWL-ViT zero-shot object detection) to localize objects like tactile paving, curb ramps, covered walkways, bollards, bus stops, and crossings in active street photos. It writes `data/photo_feature_instances_cv.json`, visual QA overlays under `data/cv_overlays/`, and `supabase/seed_photo_feature_instances.sql` for the `photo_feature_instances` table.
+This uses `google/owlvit-base-patch32` (OWL-ViT zero-shot object detection). It writes:
 
-The harvester now evaluates both compass directions for two-way roads: canonical road-on-right and opposite road-left/pavement-on-right. The frontend exposes a `Swap direction` control when both active photos exist for a street part.
+- `data/photo_feature_instances_cv.json`
+- visual QA overlays under `data/cv_overlays/`
+- `supabase/seed_photo_feature_instances.sql`
 
-Seed `accessibility_features` from the world layer with:
+Current limitation: this is approximate CV/photo-feature evidence, not final audited ground truth. Weak detections can still need manual rejection or a stronger detector.
+
+### 5. Persona-agent travel simulation
 
 ```bash
-python3 scripts/seed_accessibility_features.py
+python3 scripts/persona_accessibility_agents.py
 ```
 
-This writes `supabase/seed_accessibility_features.sql`. Stable `external_id` values are formed as follows (kind + segment id only for derived ramp/tactile rows; point POIs use LTA/source IDs):
+Writes `data/persona_agent_travel_simulation.json`. The script aggregates hidden 5 m segment scores into public ~25 m street parts for:
 
-| Feature type | `external_id` pattern | Example |
-| --- | --- | --- |
-| kerb ramp | `{kind}_{seg_id}` | `kerb_ramp_seg_00040` |
-| tactile | `{kind}_{seg_id}` | `tactile_guidance_seg_00040` |
-| bus stop | `bus_stop_{BUS_STOP_N}` | `bus_stop_17239` |
-| bollard / linkway | `{kind}_{OBJECTID}` | `bollard_21659` |
-| MRT | `mrt_{station_name_slug}` | `mrt_clementi_mrt_station` |
-| overhead bridge | `{kind}_{index}_{slug}` | `pedestrian_overhead_bridge_0_...` |
+- wheelchair user
+- senior with walker
+- visually impaired commuter
+- PMA / PMD user
 
-7. **View the AccessTwin frontend** — from the project root, start a static server:
+For each persona it outputs passability, blockers, priority street parts, and recommended improvements such as kerb-ramp treatment, resurfacing, tactile continuation, obstruction removal, shelter, or rest points.
+
+## Supabase update
+
+After regenerating seeds, apply these in the Supabase SQL editor for project `khddsjemkdcgumfvkraa`:
+
+```text
+supabase/schema.sql
+supabase/rls.sql
+supabase/seed_street_view_registry.sql
+supabase/seed_accessibility_features.sql
+supabase/seed_photo_feature_instances.sql
+```
+
+Verify live counts through REST or the browser status line. The current expected frontend status is roughly:
+
+```text
+Loaded 220 5 m segments, 17 streets, 30 street-view nodes from Supabase
+```
+
+## Testing / verification
 
 ```bash
+python3 -m unittest tests.test_street_view_registry tests.test_seed_accessibility_features -v
+python3 scripts/persona_accessibility_agents.py
 python3 -m http.server 8011 --bind 127.0.0.1
 ```
 
-Open:
+Then open `earth_accessibility.html` and verify:
 
-```text
-http://127.0.0.1:8011/earth_accessibility.html
-```
+- satellite imagery is visible
+- dropdown has ~30 footpaths
+- arrows move footpath-to-footpath
+- `Swap direction` only changes direction photos
+- persona-agent panel is populated
+- feature scorecards do not show duplicated labels or internal IDs
 
-Use `?localRegistry=1` only when you want to bypass Supabase and verify the committed local registry payload.
+## Historical / optional files
+
+These are older exploration utilities and are not required for the current public frontend quick start:
+
+| Path | Notes |
+| --- | --- |
+| `persona_agent.ipynb` | Early Jupyter exploration notebook; not needed to run the current frontend |
+| `persona_simulation.py` / `sim_persona_before_after.json` | Older before/after edge simulation for previous route-graph artifacts |
+| `accessibility_scoring.py` | Earlier PERS-inspired scoring utility; current frontend primarily uses `generate_accessibility_world.py` |
+| `filter_estate.py`, `filter_estate_polygon.py` | Optional source-layer filtering utilities |
+| `maptalks_three.html`, `index.html` | Older 3D viewer prototypes |
+| `buildings_from_overpass.py` | Optional building-footprint regeneration helper |
 
 ## Project layout
 
-| Path                  | Description                               |
-| --------------------- | ----------------------------------------- |
-| `GEOSPATIAL/`         | Raw LTA shapefile downloads               |
-| `CLEMENTI/`           | Filtered shapefiles for the estate        |
-| `filter_estate.py`    | Crops layers to the Clementi bounding box |
-| `persona_agent.ipynb` | Route graph and persona simulation        |
-| `persona_simulation.py` | Generates persona before/after payloads |
-| `accessibility_scoring.py` | Applies PERS-inspired scoring to the payload |
-| `buildings_clementi.geojson` | OSM building footprints for map context |
-| `generate_accessibility_world.py` | Creates selectable street/feature accessibility world layer |
-| `accessibility_world.geojson` | Segment-level Earth/street-view accessibility metrics and POIs |
-| `earth_accessibility.html` | Google Earth-style street inspection UI with selectable streets, buildings, feature layers, persona passability, and standards-based metrics |
-| `maptalks_three.html` | MapTalks + Three.js prototype with before/after toggle, buildings, and obstacle/improvement markers |
-| `index.html`          | Three.js 3D route viewer                  |
+| Path | Description |
+| --- | --- |
+| `CLEMENTI_MALL/` | Local filtered LTA source shapefiles, not committed |
+| `GEOSPATIAL/` | Raw LTA shapefile downloads, not committed |
+| `scripts/` | Registry, Supabase seed, CV localization, and persona-agent generation scripts |
+| `tests/` | Unit tests for registry and Supabase feature seed generation |
+| `data/` | Committed frontend JSON artifacts and CV QA outputs |
+| `supabase/` | Backend schema/RLS/seed SQL |

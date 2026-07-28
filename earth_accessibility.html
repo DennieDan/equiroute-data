@@ -285,6 +285,54 @@
         font-size: 12px;
         padding: 7px 12px;
       }
+      #personaPanel {
+        left: 14px;
+        bottom: 16px;
+        width: min(370px, calc(100vw - 32px));
+        padding: 12px;
+        z-index: 24;
+      }
+      .persona-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 8px;
+      }
+      .persona-head b {
+        font-size: 13px;
+      }
+      .persona-note {
+        color: var(--muted);
+        font-size: 11px;
+      }
+      .persona-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+      .persona-card {
+        text-align: left;
+        border-radius: 14px;
+        padding: 9px;
+        background: rgba(15, 23, 42, 0.74);
+        border-color: rgba(148, 163, 184, 0.28);
+      }
+      .persona-card.active {
+        background: linear-gradient(135deg, rgba(14, 116, 144, 0.92), rgba(30, 64, 175, 0.86));
+        border-color: #bae6fd;
+      }
+      .persona-card small,
+      #personaRecommendation {
+        display: block;
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.35;
+        margin-top: 4px;
+      }
+      #personaRecommendation {
+        margin-top: 8px;
+      }
       #feedbackForm {
         display: none;
         margin-top: 10px;
@@ -492,6 +540,14 @@
       <p id="standardsText"></p>
     </div>
     <div id="miniMap"><div class="label">Earth context</div></div>
+    <section id="personaPanel" class="hud">
+      <div class="persona-head">
+        <b>Persona agents</b>
+        <span class="persona-note">simulate travel + improvements</span>
+      </div>
+      <div class="persona-list" id="personaList"></div>
+      <div id="personaRecommendation">Loading persona travel simulation…</div>
+    </section>
     <section id="detailCard" class="hud">
       <div class="detail-head">
         <div>
@@ -562,6 +618,8 @@
         streetNodeIndex: 0,
         nodePhotoCache: {},
         detailContext: null,
+        personaSimulation: null,
+        activePersonaId: "wheelchair_user",
       };
       window.__EARTH_ACCESSIBILITY_STATE = state;
       const SATELLITE_TILE =
@@ -1119,6 +1177,63 @@
         state.detailContext = next;
         EquirouteFeedback.onContextChange(changed);
       }
+      function personaPartFor(partId) {
+        return (state.personaSimulation?.street_parts || []).find(
+          (p) => p.street_part_id === partId,
+        );
+      }
+      function personaSummary(personaId = state.activePersonaId) {
+        return state.personaSimulation?.personas?.[personaId] || null;
+      }
+      function renderPersonaPanel() {
+        if (!window.personaList || !window.personaRecommendation) return;
+        const sim = state.personaSimulation;
+        if (!sim?.personas) {
+          personaList.innerHTML = "";
+          personaRecommendation.textContent = "Persona simulation unavailable.";
+          return;
+        }
+        const personaIds = Object.keys(sim.personas);
+        personaList.innerHTML = personaIds
+          .map((pid) => {
+            const p = sim.personas[pid];
+            return `<button class="persona-card ${pid === state.activePersonaId ? "active" : ""}" data-persona="${pid}">
+              <b>${p.label}</b>
+              <small>${p.average_score}/100 · ${p.passable_parts}/${p.total_parts} passable parts</small>
+            </button>`;
+          })
+          .join("");
+        personaList.querySelectorAll("[data-persona]").forEach((btn) => {
+          btn.onclick = () => {
+            state.activePersonaId = btn.dataset.persona;
+            renderPersonaPanel();
+            renderPersonaForCurrentPart();
+          };
+        });
+        const summary = personaSummary();
+        const first = summary?.priority_street_parts?.[0];
+        const firstPart = first
+          ? (state.streetRegistry?.street_parts || []).find((p) => p.id === first.street_part_id)
+          : null;
+        personaRecommendation.innerHTML = first
+          ? `<b>Priority:</b> ${summary.label} · ${firstPart ? streetPartDisplayName(firstPart) : first.street_part_id} · ${first.score}/100<br>${first.recommended_improvement}`
+          : "Persona agents ready.";
+      }
+      function renderPersonaForCurrentPart() {
+        if (!window.personaRecommendation) return;
+        const part = currentStreetPart();
+        const simPart = part ? personaPartFor(part.id) : null;
+        const persona = simPart?.personas?.[state.activePersonaId];
+        if (!persona) {
+          renderPersonaPanel();
+          return;
+        }
+        const label = persona.label || personaSummary()?.label || "Persona";
+        const blockers = persona.blocker_labels?.length
+          ? ` · ${persona.blocker_labels.join(", ")}`
+          : "";
+        personaRecommendation.innerHTML = `<b>${label}</b> on ${streetPartDisplayName(part)}: ${persona.score}/100${blockers}<br>${persona.recommended_improvement}`;
+      }
       function displayPropsForSegmentFeature(f) {
         const raw = f?.properties || {};
         const part = streetPartForSegmentId(raw.id);
@@ -1219,6 +1334,7 @@
         );
         const partDisplay = displayPropsForSegmentFeature(f);
         showDetail(partDisplay, "");
+        renderPersonaForCurrentPart();
         const mid = middle(f),
           brg = bearing(coords[0], coords[coords.length - 1]);
         if (street) {
@@ -2116,12 +2232,17 @@
         fetch("data/photo_feature_instances_cv.json")
           .then((r) => (r.ok ? r.json() : { instances: [] }))
           .catch(() => ({ instances: [] })),
+        fetch("data/persona_agent_travel_simulation.json")
+          .then((r) => (r.ok ? r.json() : null))
+          .catch(() => null),
       ])
-        .then(([world, buildings, registry, cvInstances]) => {
+        .then(([world, buildings, registry, cvInstances, personaSimulation]) => {
           state.world = world;
           state.buildings = buildings;
           state.streetRegistry = registry;
           state.photoFeatureInstances = cvInstances?.instances || [];
+          state.personaSimulation = personaSimulation;
+          renderPersonaPanel();
           renderBuildings(buildings);
           renderWorld(world);
           const ext = routeLayer.getExtent();
