@@ -14,16 +14,23 @@ git pull --ff-only origin abel
 python3 -m http.server 8011 --bind 127.0.0.1
 ```
 
-Open:
+Open the role-selection page first:
 
 ```text
-http://127.0.0.1:8011/earth_accessibility.html
+http://127.0.0.1:8011/index.html
+```
+
+Choose **Public user** for the reporting/feedback platform, or **Authority / planner** for the persona-agent dashboard. Direct role URLs also work:
+
+```text
+http://127.0.0.1:8011/earth_accessibility.html?role=public
+http://127.0.0.1:8011/earth_accessibility.html?role=authority
 ```
 
 The page loads live Supabase street/photo data first and falls back to committed local JSON if Supabase is unavailable. For deterministic local-only testing, use:
 
 ```text
-http://127.0.0.1:8011/earth_accessibility.html?localRegistry=1
+http://127.0.0.1:8011/earth_accessibility.html?role=authority&localRegistry=1
 ```
 
 Expected current demo state:
@@ -39,7 +46,8 @@ Expected current demo state:
 
 | Path | Purpose |
 | --- | --- |
-| `earth_accessibility.html` | Main public AccessTwin frontend: satellite Earth view, street-view mode, scorecards, persona agents, feedback form |
+| `index.html` | Role-selection/auth landing page for public vs authority platform |
+| `earth_accessibility.html` | Main role-aware AccessTwin frontend: satellite Earth view, street-view mode, scorecards, persona agents, feedback form |
 | `accessibility_world.geojson` | Hidden ~5 m measurement layer with proxy accessibility metrics, POIs, and persona segment scores |
 | `data/street_view_registry.json` | Public ~25 m street parts, street-view nodes, curated Mapillary active photos |
 | `data/photo_feature_instances_cv.json` | OWL-ViT/zero-shot photo feature detections matched to active street photos |
@@ -175,7 +183,7 @@ These are older exploration utilities and are not required for the current publi
 | `persona_simulation.py` / `sim_persona_before_after.json` | Older before/after edge simulation for previous route-graph artifacts |
 | `accessibility_scoring.py` | Earlier PERS-inspired scoring utility; current frontend primarily uses `generate_accessibility_world.py` |
 | `filter_estate.py`, `filter_estate_polygon.py` | Optional source-layer filtering utilities |
-| `maptalks_three.html`, `index.html` | Older 3D viewer prototypes |
+| `maptalks_three.html` | Older 3D viewer prototype |
 | `buildings_from_overpass.py` | Optional building-footprint regeneration helper |
 
 ## Project layout

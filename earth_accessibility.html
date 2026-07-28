@@ -489,6 +489,12 @@
       .street-mode .status {
         display: none;
       }
+      .public-role .authority-only {
+        display: none !important;
+      }
+      .role-pill {
+        border-color: rgba(125, 211, 252, 0.45);
+      }
 
       #photoUploadPanel {
         position: absolute;
@@ -577,6 +583,7 @@
     <div id="segmentButtons"></div>
     <div id="topbar" class="hud">
       <div class="brand">EquiRoute Earth</div>
+      <span class="pill role-pill" id="roleLabel">Role</span>
       <span class="pill" id="modeLabel" hidden></span>
       <span class="pill" id="earthSource" hidden></span>
       <select id="segmentSelect" title="Choose a footpath street part"></select>
@@ -587,7 +594,8 @@
       <div class="spacer"></div>
       <span class="pill" hidden><b id="segCount">–</b> segments</span>
       <span class="pill" hidden><b id="buildingCount">–</b> buildings</span>
-      <button id="settingsBtn">⚙</button>
+      <button id="settingsBtn" class="authority-only">⚙</button>
+      <button id="roleSwitchBtn" class="role-pill" type="button">Role</button>
     </div>
     <div id="settings" class="hud">
       <button class="close" id="closeSettings">×</button>
@@ -600,7 +608,7 @@
       <p id="standardsText"></p>
     </div>
     <div id="miniMap"><div class="label">Earth context</div></div>
-    <section id="personaPanel" class="hud">
+    <section id="personaPanel" class="hud authority-only">
       <div class="persona-head">
         <b>Persona agents</b>
         <span class="persona-note">simulate travel + improvements</span>
@@ -690,6 +698,23 @@
       // accessibility/OSM lines do not keep separating while the satellite
       // raster is only being over-zoomed.
       const SATELLITE_MAX_NATIVE_ZOOM = 18;
+      const ROLE_STORAGE_KEY = "accesstwin_role";
+      const VALID_ROLES = new Set(["public", "authority"]);
+      const params = new URLSearchParams(location.search);
+      const requestedRole = params.get("role");
+      const storedRole = localStorage.getItem(ROLE_STORAGE_KEY);
+      const activeRole = VALID_ROLES.has(requestedRole)
+        ? requestedRole
+        : VALID_ROLES.has(storedRole)
+          ? storedRole
+          : "";
+      if (!activeRole) {
+        location.replace(`index.html?next=${encodeURIComponent(location.pathname.split("/").pop() + location.search)}`);
+        throw new Error("AccessTwin role required");
+      }
+      state.role = activeRole;
+      localStorage.setItem(ROLE_STORAGE_KEY, activeRole);
+      document.body.classList.add(`${activeRole}-role`);
       const SUPABASE_URL = "https://khddsjemkdcgumfvkraa.supabase.co";
       const SUPABASE_PUBLISHABLE_KEY =
         "sb_publishable_lqGtwkNAOMV7qsYPKVZr8w_GytZx3Qm";
@@ -730,6 +755,25 @@
       }
       function setStatus(t) {
         document.getElementById("status").textContent = t;
+      }
+      function applyRoleUi() {
+        if (window.roleSwitchBtn) {
+          roleSwitchBtn.textContent = state.role === "authority" ? "Authority" : "Public";
+          roleSwitchBtn.title = "Switch AccessTwin role";
+          roleSwitchBtn.onclick = () => {
+            localStorage.removeItem(ROLE_STORAGE_KEY);
+            location.href = `index.html?next=${encodeURIComponent("earth_accessibility.html" + location.search.replace(/[?&]role=(public|authority)/, ""))}`;
+          };
+        }
+        if (window.roleLabel) {
+          roleLabel.textContent = state.role === "authority" ? "Authority dashboard" : "Public feedback";
+        }
+        if (window.modeLabel) {
+          modeLabel.hidden = false;
+        }
+        if (state.role !== "authority") {
+          settings?.classList.remove("visible");
+        }
       }
 
       function setUploadStatus(message, kind = "") {
@@ -2351,7 +2395,9 @@
       };
       earthBtn.onclick = () => selectSegment(state.selectedIndex, false);
       streetBtn.onclick = () => selectSegment(state.selectedIndex, true);
-      settingsBtn.onclick = () => settings.classList.toggle("visible");
+      settingsBtn.onclick = () => {
+        if (state.role === "authority") settings.classList.toggle("visible");
+      };
       closeSettings.onclick = () => settings.classList.remove("visible");
       if (window.photoUploadBtn && window.photoUploadInput) {
         photoUploadBtn.onclick = () => photoUploadInput.click();
@@ -2380,6 +2426,7 @@
         supabaseKey: SUPABASE_PUBLISHABLE_KEY,
         capitalizeKind,
       });
+      applyRoleUi();
       if (window.saveMapillaryTokenBtn && window.mapillaryTokenInput) {
         saveMapillaryTokenBtn.onclick = () => setToken(mapillaryTokenInput.value);
       }
