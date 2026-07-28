@@ -648,6 +648,7 @@
         Data-source notes and standards references for the public demo.
       </p>
       <p id="tokenStatus" hidden></p>
+      <p id="currentUserStatus"></p>
       <div class="settings-grid authority-only">
         <button id="togglePersonaPanelBtn" type="button">Show persona agents</button>
       </div>
@@ -750,6 +751,7 @@
       // raster is only being over-zoomed.
       const SATELLITE_MAX_NATIVE_ZOOM = 18;
       const ROLE_STORAGE_KEY = "accesstwin_role";
+      const USER_STORAGE_KEY = "accesstwin_user";
       const VALID_ROLES = new Set(["public", "authority"]);
       const params = new URLSearchParams(location.search);
       const requestedRole = params.get("role");
@@ -764,6 +766,15 @@
         throw new Error("AccessTwin role required");
       }
       state.role = activeRole;
+      try {
+        state.appUser = JSON.parse(localStorage.getItem(USER_STORAGE_KEY) || "null");
+      } catch (e) {
+        state.appUser = null;
+      }
+      if (params.get("user") && state.appUser?.external_id !== params.get("user")) {
+        state.appUser = { external_id: params.get("user"), display_name: params.get("user"), role: activeRole };
+        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(state.appUser));
+      }
       localStorage.setItem(ROLE_STORAGE_KEY, activeRole);
       document.body.classList.add(`${activeRole}-role`);
       const SUPABASE_URL = "https://khddsjemkdcgumfvkraa.supabase.co";
@@ -809,11 +820,11 @@
       }
       function applyRoleUi() {
         if (window.roleSwitchBtn) {
-          roleSwitchBtn.textContent = state.role === "authority" ? "Authority" : "Public";
-          roleSwitchBtn.title = "Switch AccessTwin role";
+          const userName = state.appUser?.display_name || (state.role === "authority" ? "Authority user" : "Public user");
+          roleSwitchBtn.textContent = state.role === "authority" ? `Authority · ${userName}` : `Public · ${userName}`;
+          roleSwitchBtn.title = "Current database user. Use the role-select page only when changing accounts.";
           roleSwitchBtn.onclick = () => {
-            localStorage.removeItem(ROLE_STORAGE_KEY);
-            location.href = `index.html?next=${encodeURIComponent("earth_accessibility.html" + location.search.replace(/[?&]role=(public|authority)/, ""))}`;
+            if (state.role === "authority") settings.classList.toggle("visible");
           };
         }
         if (window.roleLabel) {
@@ -2454,6 +2465,12 @@
         tokenStatus.textContent = getToken()
           ? "Mapillary token saved in this browser."
           : "No Mapillary token saved; street view may be unavailable.";
+        if (window.currentUserStatus) {
+          const user = state.appUser;
+          currentUserStatus.textContent = user
+            ? `Signed in as ${user.display_name || user.external_id}${user.organization ? ` · ${user.organization}` : ""}`
+            : `Signed in as ${state.role} demo user`;
+        }
         updatePersonaToggleButton();
       }
       segmentSelect.onchange = (e) =>

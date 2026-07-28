@@ -76,6 +76,30 @@
         font-size: 24px;
         margin-bottom: 8px;
       }
+      .role select {
+        width: 100%;
+        margin-top: 16px;
+        padding: 11px 12px;
+        border-radius: 14px;
+        border: 1px solid rgba(125, 211, 252, 0.28);
+        background: rgba(2, 6, 23, 0.72);
+        color: var(--txt);
+        font-weight: 700;
+      }
+      .role .user-label {
+        display: block;
+        margin-top: 14px;
+        color: var(--blue);
+        font-size: 11px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .db-note {
+        margin-top: 18px;
+        font-size: 12px;
+        color: #bae6fd;
+      }
       .role small {
         color: var(--muted);
         line-height: 1.45;
@@ -106,7 +130,7 @@
       <div class="eyebrow">AccessTwin / EquiRoute</div>
       <h1>choose your platform</h1>
       <p>
-        Select a role before entering the Clementi accessibility twin. Public users get a clean feedback/reporting experience; authority users get planning tools, persona-agent simulation, and improvement priorities.
+        Select a user from the database before entering the Clementi accessibility twin. Public users get a clean feedback/reporting experience; authority users get planning tools, persona-agent simulation, and improvement priorities.
       </p>
       <div class="roles">
         <button class="role" data-role="public">
@@ -117,6 +141,8 @@
             <li>submit feedback on a footpath or feature</li>
             <li>upload clear evidence photos when needed</li>
           </ul>
+          <span class="user-label">Public-facing database user</span>
+          <select id="publicUserSelect" data-user-select="public" aria-label="Public user account"></select>
           <span class="tag">enter public platform</span>
         </button>
         <button class="role" data-role="authority">
@@ -127,20 +153,83 @@
             <li>see passability, blockers, and recommended improvements</li>
             <li>review standards/data-source notes and operational layers</li>
           </ul>
+          <span class="user-label">Authority-facing database user</span>
+          <select id="authorityUserSelect" data-user-select="authority" aria-label="Authority user account"></select>
           <span class="tag">enter authority dashboard</span>
         </button>
       </div>
+      <p class="db-note" id="dbUserStatus">Loading users from Supabase…</p>
     </main>
     <script>
+      const SUPABASE_URL = "https://khddsjemkdcgumfvkraa.supabase.co";
+      const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_lqGtwkNAOMV7qsYPKVZr8w_GytZx3Qm";
+      const ROLE_STORAGE_KEY = "accesstwin_role";
+      const USER_STORAGE_KEY = "accesstwin_user";
       const params = new URLSearchParams(location.search);
-      const next = params.get("next") || "earth_accessibility.html";
-      document.querySelectorAll("[data-role]").forEach((button) => {
-        button.addEventListener("click", () => {
-          const role = button.dataset.role;
-          localStorage.setItem("accesstwin_role", role);
-          const target = new URL(next, location.href);
-          target.searchParams.set("role", role);
-          location.href = target.pathname.split("/").pop() + target.search;
+      const fallbackUsers = [
+        { external_id: "public_wheelchair_commuter", display_name: "Nurul, wheelchair commuter", role: "public", organization: "Clementi resident", persona_hint: "wheelchair_user" },
+        { external_id: "public_senior_walker", display_name: "Mr Tan, senior with walker", role: "public", organization: "Clementi resident", persona_hint: "senior_walker" },
+        { external_id: "public_low_vision_commuter", display_name: "Aisha, visually impaired commuter", role: "public", organization: "SMU volunteer tester", persona_hint: "visually_impaired" },
+        { external_id: "authority_lta_planner", display_name: "LTA accessibility planner", role: "authority", organization: "Land Transport Authority", persona_hint: "wheelchair_user" },
+        { external_id: "authority_town_council", display_name: "Town council estate officer", role: "authority", organization: "Clementi Town Council", persona_hint: "senior_walker" },
+        { external_id: "authority_sbs_operator", display_name: "SBS Transit operations reviewer", role: "authority", organization: "SBS Transit", persona_hint: "pma_user" },
+      ];
+      function safeNext() {
+        const raw = params.get("next") || "earth_accessibility.html";
+        let target;
+        try {
+          target = new URL(raw, location.href);
+        } catch (e) {
+          target = new URL("earth_accessibility.html", location.href);
+        }
+        if (target.origin !== location.origin) target = new URL("earth_accessibility.html", location.href);
+        const file = target.pathname.split("/").pop() || "earth_accessibility.html";
+        if (!file.endsWith(".html") || file === "index.html") return "earth_accessibility.html";
+        return file + target.search;
+      }
+      async function loadUsers() {
+        try {
+          const r = await fetch(`${SUPABASE_URL}/rest/v1/app_users?select=external_id,display_name,role,organization,persona_hint,metadata,is_active&is_active=eq.true&order=role.asc,display_name.asc`, {
+            headers: { apikey: SUPABASE_PUBLISHABLE_KEY, Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}` },
+          });
+          if (!r.ok) throw new Error(`Supabase ${r.status}`);
+          const rows = await r.json();
+          if (!rows?.length) throw new Error("no app_users rows");
+          dbUserStatus.textContent = `Loaded ${rows.length} users from Supabase app_users.`;
+          return rows;
+        } catch (e) {
+          dbUserStatus.textContent = `Using local demo users until Supabase app_users is available (${e.message}).`;
+          return fallbackUsers;
+        }
+      }
+      function populateUsers(users) {
+        document.querySelectorAll("[data-user-select]").forEach((select) => {
+          const role = select.dataset.userSelect;
+          const rows = users.filter((u) => u.role === role);
+          select.innerHTML = rows.map((u) => `<option value="${u.external_id}">${u.display_name}${u.organization ? ` · ${u.organization}` : ""}</option>`).join("");
+          select.onclick = (e) => e.stopPropagation();
+          select.onchange = (e) => e.stopPropagation();
+        });
+      }
+      function selectedUserFor(role, users) {
+        const select = document.querySelector(`[data-user-select="${role}"]`);
+        const externalId = select?.value;
+        return users.find((u) => u.external_id === externalId && u.role === role) || users.find((u) => u.role === role) || null;
+      }
+      loadUsers().then((users) => {
+        populateUsers(users);
+        document.querySelectorAll("[data-role]").forEach((button) => {
+          button.addEventListener("click", () => {
+            const role = button.dataset.role;
+            const user = selectedUserFor(role, users);
+            if (!user) return;
+            localStorage.setItem(ROLE_STORAGE_KEY, role);
+            localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+            const target = new URL(safeNext(), location.href);
+            target.searchParams.set("role", role);
+            target.searchParams.set("user", user.external_id);
+            location.href = target.pathname.split("/").pop() + target.search;
+          });
         });
       });
     </script>

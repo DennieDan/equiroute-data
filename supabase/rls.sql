@@ -10,6 +10,7 @@ alter table public.photo_feature_instances enable row level security;
 alter table public.feedback_threads enable row level security;
 alter table public.feedback_votes enable row level security;
 alter table public.feedback_comments enable row level security;
+alter table public.app_users enable row level security;
 alter table public.persona_journey_runs enable row level security;
 alter table public.authority_recommendations enable row level security;
 
@@ -70,6 +71,9 @@ create policy "public read street photo objects" on storage.objects
 drop policy if exists "public insert street photo objects" on storage.objects;
 create policy "public insert street photo objects" on storage.objects
   for insert with check (bucket_id = 'street-photos');
+
+drop policy if exists "public read demo users" on public.app_users;
+create policy "public read demo users" on public.app_users for select using (is_active = true);
 
 -- Demo/anon feedback from the map UI (no auth yet).
 drop policy if exists "public insert feedback threads" on public.feedback_threads;

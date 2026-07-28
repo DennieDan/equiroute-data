@@ -179,6 +179,22 @@ create table if not exists public.feedback_comments (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.app_users (
+  id uuid primary key default gen_random_uuid(),
+  external_id text unique not null,
+  display_name text not null,
+  role text not null check (role in ('public','authority')),
+  organization text null,
+  persona_hint text null,
+  auth_user_id uuid null,
+  is_active boolean not null default true,
+  metadata jsonb not null default '{}',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists app_users_role_active_idx on public.app_users (role, is_active);
+
 create table if not exists public.persona_journey_runs (
   id uuid primary key default gen_random_uuid(),
   persona text not null,
