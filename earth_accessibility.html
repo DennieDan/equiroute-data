@@ -489,6 +489,56 @@
       .street-mode .status {
         display: none;
       }
+
+      #photoUploadPanel {
+        position: absolute;
+        right: 18px;
+        top: 86px;
+        z-index: 28;
+        display: none;
+        width: min(340px, calc(100vw - 36px));
+        padding: 12px;
+      }
+      #photoUploadPanel.visible {
+        display: block;
+      }
+      #photoUploadPanel.compact {
+        width: auto;
+        min-width: 240px;
+        background: rgba(2, 6, 23, 0.68);
+      }
+      #photoUploadTitle {
+        font-weight: 900;
+        font-size: 13px;
+      }
+      #photoUploadPrompt,
+      #photoUploadStatus {
+        margin-top: 5px;
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.35;
+      }
+      #photoUploadStatus.ok {
+        color: var(--green);
+      }
+      #photoUploadStatus.err {
+        color: var(--red);
+      }
+      .photo-upload-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-top: 9px;
+        flex-wrap: wrap;
+      }
+      #photoUploadInput {
+        display: none;
+      }
+      .photo-upload-secondary {
+        border-color: rgba(148, 163, 184, 0.28);
+        color: var(--muted);
+      }
+
       @media (max-width: 800px) {
         #topbar {
           flex-wrap: wrap;
@@ -514,6 +564,16 @@
     <div id="map"></div>
     <div id="threeOverlay"></div>
     <div id="mapillaryView"></div>
+    <section id="photoUploadPanel" class="hud" aria-live="polite">
+      <div id="photoUploadTitle">Upload street-part photo</div>
+      <div id="photoUploadPrompt">Choose a clear photo of this street part for accessibility evidence.</div>
+      <div class="photo-upload-actions">
+        <button type="button" id="photoUploadBtn">Upload photo</button>
+        <button type="button" id="photoUploadDismiss" class="photo-upload-secondary">Hide</button>
+        <input id="photoUploadInput" type="file" accept="image/*" />
+      </div>
+      <div id="photoUploadStatus"></div>
+    </section>
     <div id="segmentButtons"></div>
     <div id="topbar" class="hud">
       <div class="brand">EquiRoute Earth</div>
@@ -620,6 +680,7 @@
         detailContext: null,
         personaSimulation: null,
         activePersonaId: "wheelchair_user",
+        currentPhotoUploadContext: null,
       };
       window.__EARTH_ACCESSIBILITY_STATE = state;
       const SATELLITE_TILE =
@@ -669,6 +730,240 @@
       }
       function setStatus(t) {
         document.getElementById("status").textContent = t;
+      }
+
+      function setUploadStatus(message, kind = "") {
+        if (!window.photoUploadStatus) return;
+        photoUploadStatus.className = kind || "";
+        photoUploadStatus.textContent = message || "";
+      }
+      function supabaseHeaders(extra = {}) {
+        return {
+          apikey: SUPABASE_PUBLISHABLE_KEY,
+          Authorization: "Bearer " + SUPABASE_PUBLISHABLE_KEY,
+          ...extra,
+        };
+      }
+      async function supabaseInsert(table, payload) {
+        const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+          method: "POST",
+          headers: supabaseHeaders({
+            "Content-Type": "application/json",
+            Prefer: "return=representation",
+          }),
+          body: JSON.stringify(payload),
+        });
+        if (!r.ok) throw new Error(`Supabase insert ${table} ${r.status}: ${await r.text()}`);
+        const rows = await r.json();
+        return rows[0] || null;
+      }
+      async function uploadStreetPhotoFile(file, storagePath) {
+        const r = await fetch(`${SUPABASE_URL}/storage/v1/object/street-photos/${storagePath}`, {
+          method: "POST",
+          headers: supabaseHeaders({
+            "Content-Type": file.type || "image/jpeg",
+            "x-upsert": "true",
+          }),
+          body: file,
+        });
+        if (!r.ok) throw new Error(`Supabase Storage upload ${r.status}: ${await r.text()}`);
+        return `${SUPABASE_URL}/storage/v1/object/public/street-photos/${storagePath}`;
+      }
+      function currentActivePhoto() {
+        return (state.streetImages || [])[state.streetImageIndex] || null;
+      }
+      function photoUploadContext(kindOverride = null) {
+        const part = currentStreetPart();
+        const node = currentStreetNode();
+        const existing = currentActivePhoto();
+        const kind = kindOverride || (existing ? "replace" : "missing");
+        return { part, node, existing, kind };
+      }
+      function renderPhotoUploadPanel(kindOverride = null) {
+        if (!window.photoUploadPanel) return;
+        if (state.mode !== "street") {
+          photoUploadPanel.classList.remove("visible");
+          return;
+        }
+        const ctx = photoUploadContext(kindOverride);
+        state.currentPhotoUploadContext = ctx;
+        if (!ctx.part) {
+          photoUploadPanel.classList.remove("visible");
+          return;
+        }
+        const hasPhoto = !!ctx.existing;
+        photoUploadPanel.classList.add("visible");
+        photoUploadPanel.classList.toggle("compact", hasPhoto);
+        photoUploadTitle.textContent = hasPhoto
+          ? "Have a better photo?"
+          : "No photo available here";
+        photoUploadPrompt.textContent = hasPhoto
+          ? `Upload a clearer photo for ${streetPartDisplayName(ctx.part)}. CV will check whether it is sharp, bright, and useful as street-level accessibility evidence before saving it.`
+          : `Would you like to upload a photo for ${streetPartDisplayName(ctx.part)}? CV will check the image before storing it with this street part.`;
+        photoUploadBtn.textContent = hasPhoto ? "Upload better photo" : "Upload photo";
+        setUploadStatus("", "");
+      }
+      function loadImageForCv(file) {
+        return new Promise((resolve, reject) => {
+          const url = URL.createObjectURL(file);
+          const img = new Image();
+          img.onload = () => {
+            URL.revokeObjectURL(url);
+            resolve(img);
+          };
+          img.onerror = () => {
+            URL.revokeObjectURL(url);
+            reject(new Error("Could not read image file"));
+          };
+          img.src = url;
+        });
+      }
+      async function analyzeUploadedStreetPhoto(file) {
+        if (!file?.type?.startsWith("image/")) {
+          return { ok: false, score: 0, message: "Please upload an image file." };
+        }
+        if (file.size > 8 * 1024 * 1024) {
+          return { ok: false, score: 0, message: "Photo is too large. Please keep uploads below 8 MB." };
+        }
+        const img = await loadImageForCv(file);
+        const minDimensionOk = img.naturalWidth >= 900 && img.naturalHeight >= 500;
+        const aspect = img.naturalWidth / Math.max(1, img.naturalHeight);
+        const aspectOk = aspect >= 1.05 && aspect <= 2.4;
+        const canvas = document.createElement("canvas");
+        const w = 256, h = 144;
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        ctx.drawImage(img, 0, 0, w, h);
+        const data = ctx.getImageData(0, 0, w, h).data;
+        let sum = 0, sumSq = 0, edge = 0, saturated = 0;
+        const lum = new Float32Array(w * h);
+        for (let i = 0, j = 0; i < data.length; i += 4, j++) {
+          const y = 0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2];
+          lum[j] = y;
+          sum += y;
+          sumSq += y * y;
+          if (y < 8 || y > 247) saturated++;
+        }
+        for (let y = 1; y < h; y++) {
+          for (let x = 1; x < w; x++) {
+            const idx = y * w + x;
+            edge += Math.abs(lum[idx] - lum[idx - 1]) + Math.abs(lum[idx] - lum[idx - w]);
+          }
+        }
+        const n = w * h;
+        const brightness = sum / n;
+        const contrast = Math.sqrt(Math.max(0, sumSq / n - brightness * brightness));
+        const edgeScore = edge / n;
+        const exposureOk = brightness >= 42 && brightness <= 220 && saturated / n < 0.28;
+        const contrastOk = contrast >= 18;
+        const detailOk = edgeScore >= 12;
+        let score = 0;
+        if (minDimensionOk) score += 25;
+        if (aspectOk) score += 15;
+        if (exposureOk) score += 20;
+        if (contrastOk) score += 20;
+        if (detailOk) score += 20;
+        const checks = [
+          minDimensionOk ? "resolution ok" : "resolution too low",
+          aspectOk ? "street-view aspect ok" : "unusual crop/aspect",
+          exposureOk ? "exposure ok" : "too dark/bright or blown out",
+          contrastOk ? "contrast ok" : "too flat/blank",
+          detailOk ? "detail/edge evidence ok" : "too blurry or lacks street detail",
+        ];
+        const ok = score >= 75;
+        return {
+          ok,
+          score,
+          width: img.naturalWidth,
+          height: img.naturalHeight,
+          checks,
+          message: ok
+            ? `CV passed (${score}/100): ${checks.join(" · ")}`
+            : `CV rejected (${score}/100): ${checks.join(" · ")}`,
+        };
+      }
+      function localPhotoFromDbRow(row, ctx, publicUrl, cv) {
+        const partExternalId = ctx.part?.id;
+        const nodeExternalId = ctx.node?.id;
+        return {
+          id: row?.external_id || `crowd_${Date.now()}`,
+          db_id: row?.id || null,
+          external_id: row?.external_id || `crowd_${partExternalId}_${Date.now()}`,
+          street_part_id: partExternalId,
+          street_view_node_id: nodeExternalId,
+          source: "crowd",
+          image_url: row?.image_url || publicUrl,
+          thumb_2048_url: row?.image_url || publicUrl,
+          lng: row?.lng ?? ctx.node?.lng ?? ctx.part?.midpoint?.[0],
+          lat: row?.lat ?? ctx.node?.lat ?? ctx.part?.midpoint?.[1],
+          compass_angle_deg: row?.compass_angle_deg ?? ctx.node?.canonical_heading_deg ?? 0,
+          heading_role: row?.heading_role || ctx.existing?.heading_role || "canonical",
+          desired_orientation: row?.desired_orientation || ctx.part?.desired_orientation || "road_right",
+          direction_valid: true,
+          direction_confidence: row?.direction_confidence ?? Math.min(1, cv.score / 100),
+          is_pano: false,
+          is_active: true,
+          validation_status: "accepted",
+          metadata: row?.metadata || { cv_validation: cv },
+          registry_photo_id: row?.id || row?.external_id || null,
+        };
+      }
+      async function handlePhotoUploadFile(file) {
+        const ctx = state.currentPhotoUploadContext || photoUploadContext();
+        if (!ctx.part?.db_id) {
+          setUploadStatus("Upload needs the live Supabase registry. Switch off localRegistry fallback and reload.", "err");
+          return;
+        }
+        setUploadStatus("Running computer-vision quality check…");
+        const cv = await analyzeUploadedStreetPhoto(file);
+        if (!cv.ok) {
+          setUploadStatus(cv.message, "err");
+          return;
+        }
+        setUploadStatus(`${cv.message}. Uploading to database…`, "ok");
+        const safeName = file.name.replace(/[^a-z0-9._-]+/gi, "_").slice(-80) || "photo.jpg";
+        const externalId = `crowd_${ctx.part.id}_${Date.now()}`;
+        const storagePath = `${ctx.part.id}/${externalId}_${safeName}`;
+        const publicUrl = await uploadStreetPhotoFile(file, storagePath);
+        const row = await supabaseInsert("street_photos", {
+          external_id: externalId,
+          street_part_id: ctx.part.db_id,
+          street_view_node_id: ctx.node?.db_id || null,
+          source: "crowd",
+          source_image_id: externalId,
+          image_url: publicUrl,
+          storage_path: storagePath,
+          lng: ctx.node?.lng ?? ctx.part.midpoint?.[0],
+          lat: ctx.node?.lat ?? ctx.part.midpoint?.[1],
+          compass_angle_deg: ctx.node?.canonical_heading_deg ?? null,
+          matched_heading_deg: ctx.node?.canonical_heading_deg ?? null,
+          heading_role: ctx.existing?.heading_role || "canonical",
+          desired_orientation: ctx.part.desired_orientation || "road_right",
+          direction_valid: true,
+          direction_confidence: Math.min(1, cv.score / 100),
+          quality_score: cv.score,
+          is_pano: false,
+          is_active: true,
+          validation_status: "accepted",
+          selected_reason: ctx.kind === "replace" ? "crowd_upload_better_photo_cv_passed" : "crowd_upload_missing_photo_cv_passed",
+          replaces_photo_id: ctx.existing?.db_id || null,
+          metadata: {
+            cv_validation: cv,
+            upload_context: ctx.kind,
+            original_filename: file.name,
+            file_size: file.size,
+          },
+        });
+        const normalized = localPhotoFromDbRow(row, ctx, publicUrl, cv);
+        state.streetRegistry.street_photos = [
+          normalized,
+          ...(state.streetRegistry.street_photos || []),
+        ];
+        state.streetImages = [normalized, ...(state.streetImages || [])];
+        state.streetImageIndex = 0;
+        setUploadStatus("Photo accepted and stored with this street part.", "ok");
+        renderStreetPhoto(0);
       }
       function clampSatelliteZoom() {
         const z = map.getZoom?.();
@@ -1418,13 +1713,14 @@
         const img = imgs[state.streetImageIndex];
         if (!img) {
           mapillaryView.innerHTML =
-            '<div class="street-note">No curated street photo is available here yet, showing Esri/Maxar Earth satellite underlay. Choose another footpath or wait for a verified crowd/Mapillary photo.</div>';
+            '<div class="street-note">No curated street photo is available here yet. Would you like to upload one for this street part?</div>';
           earthSource.textContent =
-            "street fallback: Esri/Maxar satellite underlay";
+            "street fallback: Esri/Maxar satellite underlay · upload invited";
           if (window.directionBtn) {
             directionBtn.disabled = true;
             directionBtn.textContent = "Swap direction";
           }
+          renderPhotoUploadPanel("missing");
           return;
         }
         const thumb =
@@ -1446,6 +1742,7 @@
           directionBtn.disabled = imgs.length < 2;
           directionBtn.textContent = imgs.length > 1 ? `Swap direction (${imgs.length})` : direction;
         }
+        renderPhotoUploadPanel("replace");
         setTimeout(() => renderSegmentButtons(true), 120);
       }
       function cycleStreetPhoto(delta) {
@@ -1518,6 +1815,7 @@
         map.setPitch(0);
         map.setBearing(0);
         renderSegmentButtons(false);
+        if (window.photoUploadPanel) photoUploadPanel.classList.remove("visible");
         renderSatelliteFallback();
         setTimeout(updateThreeOverlay, 80);
       }
@@ -1966,7 +2264,8 @@
             heading_role: p.heading_role,
             desired_orientation: p.desired_orientation,
             matched_heading_deg: p.matched_heading_deg,
-            registry_photo_id: p.id || p.external_id,
+            db_id: p.db_id || p.id || null,
+            registry_photo_id: p.db_id || p.id || p.external_id,
             validation_status: p.validation_status,
           }));
       }
@@ -2054,6 +2353,23 @@
       streetBtn.onclick = () => selectSegment(state.selectedIndex, true);
       settingsBtn.onclick = () => settings.classList.toggle("visible");
       closeSettings.onclick = () => settings.classList.remove("visible");
+      if (window.photoUploadBtn && window.photoUploadInput) {
+        photoUploadBtn.onclick = () => photoUploadInput.click();
+        photoUploadInput.onchange = async () => {
+          const file = photoUploadInput.files?.[0];
+          photoUploadInput.value = "";
+          if (!file) return;
+          try {
+            await handlePhotoUploadFile(file);
+          } catch (e) {
+            console.error("photo upload failed", e);
+            setUploadStatus(e.message || "Photo upload failed.", "err");
+          }
+        };
+      }
+      if (window.photoUploadDismiss) {
+        photoUploadDismiss.onclick = () => photoUploadPanel.classList.remove("visible");
+      }
       closeDetail.onclick = () => {
         detailCard.classList.remove("visible");
         EquirouteFeedback.close(true);
@@ -2103,9 +2419,10 @@
                 "street_view_nodes",
                 "select=*&order=sequence_index.asc",
               ),
-              supabaseRest("street_photos", "select=*&is_active=eq.true").catch(
-                () => [],
-              ),
+              supabaseRest(
+                "street_photos",
+                "select=*&is_active=eq.true&order=submitted_at.desc",
+              ).catch(() => []),
             ],
           );
           if (!partsRaw.length || !nodesRaw.length)
@@ -2167,6 +2484,8 @@
                 source: p.source,
                 source_image_id: p.source_image_id,
                 image_url: p.image_url,
+                storage_path: p.storage_path,
+                quality_score: p.quality_score,
                 captured_at: p.captured_at,
                 lng: p.lng,
                 lat: p.lat,
