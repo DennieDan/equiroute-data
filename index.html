@@ -2,198 +2,235 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>3D Volumetric Infrastructure Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AccessTwin Role Select</title>
     <style>
+      :root {
+        --bg: #020617;
+        --card: rgba(15, 23, 42, 0.82);
+        --line: rgba(125, 211, 252, 0.28);
+        --txt: #e0f2fe;
+        --muted: #94a3b8;
+        --blue: #38bdf8;
+        --green: #22c55e;
+      }
+      * { box-sizing: border-box; }
       body {
+        min-height: 100vh;
         margin: 0;
-        overflow: hidden;
-        background-color: #ffffff;
+        display: grid;
+        place-items: center;
+        padding: 28px;
+        background:
+          radial-gradient(circle at 20% 10%, rgba(56, 189, 248, 0.20), transparent 30%),
+          radial-gradient(circle at 80% 90%, rgba(34, 197, 94, 0.16), transparent 34%),
+          var(--bg);
+        color: var(--txt);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       }
-      #legend {
-        position: absolute;
-        top: 15px;
-        left: 15px;
-        background: rgba(237, 240, 70, 0.864);
-        color: #000000;
-        padding: 15px;
-        font-family: monospace;
-        border-radius: 6px;
-        border: 1px solid #ddd57e;
-        pointer-events: none;
+      main {
+        width: min(980px, 100%);
       }
-      .color-box {
+      .eyebrow {
+        color: var(--blue);
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-size: 12px;
+      }
+      h1 {
+        margin: 10px 0 10px;
+        font-size: clamp(34px, 6vw, 68px);
+        line-height: 0.95;
+      }
+      p {
+        color: var(--muted);
+        line-height: 1.55;
+        max-width: 760px;
+      }
+      .roles {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+        margin-top: 28px;
+      }
+      .role {
+        min-height: 250px;
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        padding: 24px;
+        background: var(--card);
+        color: inherit;
+        text-align: left;
+        cursor: pointer;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
+        transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+      }
+      .role:hover {
+        transform: translateY(-4px);
+        border-color: rgba(186, 230, 253, 0.78);
+        background: rgba(15, 23, 42, 0.95);
+      }
+      .role b {
+        display: block;
+        font-size: 24px;
+        margin-bottom: 8px;
+      }
+      .role select {
+        width: 100%;
+        margin-top: 16px;
+        padding: 11px 12px;
+        border-radius: 14px;
+        border: 1px solid rgba(125, 211, 252, 0.28);
+        background: rgba(2, 6, 23, 0.72);
+        color: var(--txt);
+        font-weight: 700;
+      }
+      .role .user-label {
+        display: block;
+        margin-top: 14px;
+        color: var(--blue);
+        font-size: 11px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .db-note {
+        margin-top: 18px;
+        font-size: 12px;
+        color: #bae6fd;
+      }
+      .role small {
+        color: var(--muted);
+        line-height: 1.45;
+      }
+      ul {
+        padding-left: 18px;
+        margin: 16px 0 0;
+        color: #cbd5e1;
+        line-height: 1.55;
+      }
+      .tag {
         display: inline-block;
-        width: 12px;
-        height: 12px;
-        margin-right: 8px;
-        border-radius: 2px;
+        margin-top: 18px;
+        border: 1px solid rgba(125, 211, 252, 0.35);
+        border-radius: 999px;
+        padding: 7px 10px;
+        color: #bae6fd;
+        font-weight: 800;
+        font-size: 12px;
+      }
+      @media (max-width: 760px) {
+        .roles { grid-template-columns: 1fr; }
       }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
   </head>
   <body>
-    <div id="legend">
-      <h3>Singapore Infrastructure Layers</h3>
-      <div>
-        <span class="color-box" style="background: #222222"></span>Primary
-        Highways
+    <main>
+      <div class="eyebrow">AccessTwin / EquiRoute</div>
+      <h1>choose your platform</h1>
+      <p>
+        Select a user from the database before entering the Clementi accessibility twin. Public users get a clean feedback/reporting experience; authority users get planning tools, persona-agent simulation, and improvement priorities.
+      </p>
+      <div class="roles">
+        <button class="role" data-role="public">
+          <b>Public user</b>
+          <small>For residents, commuters, and event participants reporting street-level accessibility issues.</small>
+          <ul>
+            <li>browse Earth + street view</li>
+            <li>submit feedback on a footpath or feature</li>
+            <li>upload clear evidence photos when needed</li>
+          </ul>
+          <span class="user-label">Public-facing database user</span>
+          <select id="publicUserSelect" data-user-select="public" aria-label="Public user account"></select>
+          <span class="tag">enter public platform</span>
+        </button>
+        <button class="role" data-role="authority">
+          <b>Authority / planner</b>
+          <small>For agencies, town councils, operators, and internal reviewers deciding what to fix first.</small>
+          <ul>
+            <li>run disability persona agents across street parts</li>
+            <li>see passability, blockers, and recommended improvements</li>
+            <li>review standards/data-source notes and operational layers</li>
+          </ul>
+          <span class="user-label">Authority-facing database user</span>
+          <select id="authorityUserSelect" data-user-select="authority" aria-label="Authority user account"></select>
+          <span class="tag">enter authority dashboard</span>
+        </button>
       </div>
-      <div>
-        <span class="color-box" style="background: #333333"></span>Residential
-        Streets
-      </div>
-      <div>
-        <span class="color-box" style="background: #444444"></span>HDB Service
-        Ways
-      </div>
-      <div>
-        <span class="color-box" style="background: #33ff33"></span>LTA Footpaths
-      </div>
-      <div>
-        <span class="color-box" style="background: #00ffff"></span>Mobility
-        Cycleways
-      </div>
-    </div>
-
+      <p class="db-note" id="dbUserStatus">Loading users from Supabase…</p>
+    </main>
     <script>
-      // --- 1. SCENE SEEDING & VIEWPORT SETUP ---
-      const scene = new THREE.Scene();
-      scene.background = new THREE.Color(0xffffff);
-
-      const camera = new THREE.PerspectiveCamera(
-        60,
-        window.innerWidth / window.innerHeight,
-        0.1,
-        5000,
-      );
-      const renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.shadowMap.enabled = true; // Enable shadows for physical realism
-      document.body.appendChild(renderer.domElement);
-
-      // Add interactive mouse tracking, panning, and zooming controls
-      const controls = new THREE.OrbitControls(camera, renderer.domElement);
-      controls.enableDamping = true;
-      controls.maxPolarAngle = Math.PI / 2 - 0.05; // Prevent camera from passing below ground plane
-
-      // --- 2. TROPICAL LIGHTING CONFIGURATION ---
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
-      scene.add(ambientLight);
-
-      const sunLight = new THREE.DirectionalLight(0xffffff, 0.8);
-      sunLight.position.set(200, 400, 150);
-      sunLight.castShadow = true;
-      scene.add(sunLight);
-
-      camera.position.set(0, 150, 250);
-      controls.target.set(0, 0, 0);
-
-      // --- UPDATED FETCH LAYER WITH AUTO-CENTERING ---
-      fetch("threejs_3d_roads.json")
-        .then((response) => response.json())
-        .then((payload) => {
-          // 1. Render all the physical 3D roads
-          generateVolumetricRoads(payload.mesh_roads);
-
-          // 2. Compute the bounding box of the entire generated scene
-          const boundingBox = new THREE.Box3().setFromObject(scene);
-          const center = new THREE.Vector3();
-          boundingBox.getCenter(center);
-          const size = new THREE.Vector3();
-          boundingBox.getSize(size);
-
-          // 3. Force camera controls to lock onto the exact center of your coordinates
-          controls.target.copy(center);
-
-          // 4. Position the camera safely above and back from the map size dynamically
-          const maxDim = Math.max(size.x, size.y, size.z);
-          camera.position.set(center.x, maxDim * 1.2, center.z + maxDim * 1.2);
-
-          // 5. Update projection matrix and refresh controls
-          camera.lookAt(center);
-          camera.updateProjectionMatrix();
-          controls.update();
-
-          print(
-            `🗺️ Scene centered at: X:${center.x.toFixed(2)}, Z:${center.z.toFixed(2)}. Camera moved safely to capture map.`,
-          );
-        })
-        .catch((err) => console.error("❌ Data loading failed: ", err));
-
-      // --- 4. VOLUMETRIC ROAD GENERATION ENGINE ---
-      function generateVolumetricRoads(meshRoads) {
-        meshRoads.forEach((road) => {
-          if (road.coordinates.length < 2) return;
-
-          // Convert coordinates into a mathematical Three.js spatial track curve
-          const curvePoints = road.coordinates.map(
-            (pt) => new THREE.Vector3(pt[0], pt[1], pt[2]),
-          );
-          const roadPathCurve = new THREE.CatmullRomCurve3(curvePoints);
-
-          // Define a 2D rectangular profile shape for extrusion based on the road's true width
-          const halfWidth = road.width / 2;
-          const thickness = road.thickness;
-
-          const roadProfileShape = new THREE.Shape();
-          roadProfileShape.moveTo(-halfWidth, 0);
-          roadProfileShape.lineTo(halfWidth, 0);
-          roadProfileShape.lineTo(halfWidth, thickness);
-          roadProfileShape.lineTo(-halfWidth, thickness);
-          roadProfileShape.lineTo(-halfWidth, 0);
-
-          // Configure the extrusion parameters matching the linear track curve
-          const extrusionSettings = {
-            steps: road.coordinates.length * 3, // Dense segments for smooth curves
-            bevelEnabled: false,
-            extrudePath: roadPathCurve,
-          };
-
-          // Extrude the 2D cross-section into a physical solid 3D ribbon geometry
-          const geometry = new THREE.ExtrudeGeometry(
-            roadProfileShape,
-            extrusionSettings,
-          );
-
-          // Setup materials. If it's a bridge, give it structural shadows. If a tunnel, make it semi-transparent[cite: 81, 85].
-          const material = new THREE.MeshStandardMaterial({
-            color: new THREE.Color(road.color_hex),
-            roughness: 0.8,
-            metalness: 0.1,
-            transparent: road.is_tunnel,
-            opacity: road.is_tunnel ? 0.3 : 1.0,
+      const SUPABASE_URL = "https://khddsjemkdcgumfvkraa.supabase.co";
+      const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_lqGtwkNAOMV7qsYPKVZr8w_GytZx3Qm";
+      const ROLE_STORAGE_KEY = "accesstwin_role";
+      const USER_STORAGE_KEY = "accesstwin_user";
+      const params = new URLSearchParams(location.search);
+      const fallbackUsers = [
+        { external_id: "public_wheelchair_commuter", display_name: "Nurul, wheelchair commuter", role: "public", organization: "Clementi resident", persona_hint: "wheelchair_user" },
+        { external_id: "public_senior_walker", display_name: "Mr Tan, senior with walker", role: "public", organization: "Clementi resident", persona_hint: "senior_walker" },
+        { external_id: "public_low_vision_commuter", display_name: "Aisha, visually impaired commuter", role: "public", organization: "SMU volunteer tester", persona_hint: "visually_impaired" },
+        { external_id: "authority_lta_planner", display_name: "LTA accessibility planner", role: "authority", organization: "Land Transport Authority", persona_hint: "wheelchair_user" },
+        { external_id: "authority_town_council", display_name: "Town council estate officer", role: "authority", organization: "Clementi Town Council", persona_hint: "senior_walker" },
+        { external_id: "authority_sbs_operator", display_name: "SBS Transit operations reviewer", role: "authority", organization: "SBS Transit", persona_hint: "pma_user" },
+      ];
+      function safeNext() {
+        const raw = params.get("next") || "earth_accessibility.html";
+        let target;
+        try {
+          target = new URL(raw, location.href);
+        } catch (e) {
+          target = new URL("earth_accessibility.html", location.href);
+        }
+        if (target.origin !== location.origin) target = new URL("earth_accessibility.html", location.href);
+        const file = target.pathname.split("/").pop() || "earth_accessibility.html";
+        if (!file.endsWith(".html") || file === "index.html") return "earth_accessibility.html";
+        return file + target.search;
+      }
+      async function loadUsers() {
+        try {
+          const r = await fetch(`${SUPABASE_URL}/rest/v1/app_users?select=external_id,display_name,role,organization,persona_hint,metadata,is_active&is_active=eq.true&order=role.asc,display_name.asc`, {
+            headers: { apikey: SUPABASE_PUBLISHABLE_KEY, Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}` },
           });
-
-          const roadMesh = new THREE.Mesh(geometry, material);
-          roadMesh.castShadow = true;
-          roadMesh.receiveShadow = true;
-
-          // Optional: Attach metadata attributes straight onto the mesh for later interactive features
-          roadMesh.userData = {
-            id: road.id,
-            name: road.name,
-            fclass: road.fclass,
-            direction: road.direction_mode,
-          };
-
-          scene.add(roadMesh);
+          if (!r.ok) throw new Error(`Supabase ${r.status}`);
+          const rows = await r.json();
+          if (!rows?.length) throw new Error("no app_users rows");
+          dbUserStatus.textContent = `Loaded ${rows.length} users from Supabase app_users.`;
+          return rows;
+        } catch (e) {
+          dbUserStatus.textContent = `Using local demo users until Supabase app_users is available (${e.message}).`;
+          return fallbackUsers;
+        }
+      }
+      function populateUsers(users) {
+        document.querySelectorAll("[data-user-select]").forEach((select) => {
+          const role = select.dataset.userSelect;
+          const rows = users.filter((u) => u.role === role);
+          select.innerHTML = rows.map((u) => `<option value="${u.external_id}">${u.display_name}${u.organization ? ` · ${u.organization}` : ""}</option>`).join("");
+          select.onclick = (e) => e.stopPropagation();
+          select.onchange = (e) => e.stopPropagation();
         });
       }
-
-      // --- 5. VISUALIZATION ANIMATION ENGINE LOOP ---
-      function renderLoop() {
-        requestAnimationFrame(renderLoop);
-        controls.update(); // Smooth camera movements
-        renderer.render(scene, camera);
+      function selectedUserFor(role, users) {
+        const select = document.querySelector(`[data-user-select="${role}"]`);
+        const externalId = select?.value;
+        return users.find((u) => u.external_id === externalId && u.role === role) || users.find((u) => u.role === role) || null;
       }
-      renderLoop();
-
-      // Handle responsive window scaling dynamically
-      window.addEventListener("resize", () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
+      loadUsers().then((users) => {
+        populateUsers(users);
+        document.querySelectorAll("[data-role]").forEach((button) => {
+          button.addEventListener("click", () => {
+            const role = button.dataset.role;
+            const user = selectedUserFor(role, users);
+            if (!user) return;
+            localStorage.setItem(ROLE_STORAGE_KEY, role);
+            localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+            const target = new URL(safeNext(), location.href);
+            target.searchParams.set("role", role);
+            target.searchParams.set("user", user.external_id);
+            location.href = target.pathname.split("/").pop() + target.search;
+          });
+        });
       });
     </script>
   </body>

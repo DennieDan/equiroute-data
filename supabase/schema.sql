@@ -53,6 +53,9 @@ create table if not exists public.street_photos (
   lng double precision not null,
   lat double precision not null,
   compass_angle_deg double precision null,
+  matched_heading_deg double precision null,
+  heading_role text null,
+  desired_orientation text null,
   direction_valid boolean not null default false,
   direction_confidence double precision null,
   road_on_right_score double precision null,
@@ -70,6 +73,9 @@ alter table public.street_photos
   add column if not exists external_id text unique,
   add column if not exists street_view_node_id uuid null,
   add column if not exists validation_status text not null default 'needs_review',
+  add column if not exists matched_heading_deg double precision null,
+  add column if not exists heading_role text null,
+  add column if not exists desired_orientation text null,
   add column if not exists selected_reason text null,
   add column if not exists replaces_photo_id uuid null references public.street_photos(id);
 
@@ -131,10 +137,16 @@ create table if not exists public.photo_feature_instances (
   pixel_y double precision null,
   bbox jsonb null,
   detection_method text not null default 'geo_projection',
+  detection_model text null,
+  detection_label text null,
   confidence double precision not null default 0,
   created_at timestamptz not null default now(),
   unique(photo_id, feature_id)
 );
+
+alter table public.photo_feature_instances
+  add column if not exists detection_model text null,
+  add column if not exists detection_label text null;
 
 create table if not exists public.feedback_threads (
   id uuid primary key default gen_random_uuid(),
@@ -166,6 +178,22 @@ create table if not exists public.feedback_comments (
   body text not null,
   created_at timestamptz not null default now()
 );
+
+create table if not exists public.app_users (
+  id uuid primary key default gen_random_uuid(),
+  external_id text unique not null,
+  display_name text not null,
+  role text not null check (role in ('public','authority')),
+  organization text null,
+  persona_hint text null,
+  auth_user_id uuid null,
+  is_active boolean not null default true,
+  metadata jsonb not null default '{}',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists app_users_role_active_idx on public.app_users (role, is_active);
 
 create table if not exists public.persona_journey_runs (
   id uuid primary key default gen_random_uuid(),

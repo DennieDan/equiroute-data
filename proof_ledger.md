@@ -17,6 +17,10 @@ Track every judge-visible claim with evidence before pitch polish.
 
 | Active photo registry schema/read path exists | `supabase/schema.sql`, `scripts/street_view_registry.py`, `earth_accessibility.html` | `python3 -m unittest tests.test_street_view_registry -v`; REST query `street_photos?select=external_id,street_view_node_id,validation_status,selected_reason,replaces_photo_id&limit=0` returned HTTP 200 | 8 tests pass, active photo columns readable | "Each street part can now own one active photo while preserving history/comments when photos are replaced." | built |
 
+| Mapillary candidate harvester exists for active photo curation | `scripts/street_view_registry.py`, `tests/test_street_view_registry.py`, `data/mapillary_candidates.json`, `data/street_view_registry.json` | `python3 -m unittest tests.test_street_view_registry tests.test_seed_accessibility_features -v`; browser smoke on local registry | 30 ~25 m street parts; 40 active photos selected across canonical/opposite directions; 16 street parts have both views | "Street mode uses curated active photos and can swap direction where both pavement-side views exist." | built; Supabase seed SQL ready |
+
+| CV-localized photo feature pins | `scripts/cv_localize_photo_features.py`, `data/photo_feature_instances_cv.json`, `supabase/seed_photo_feature_instances.sql`, `earth_accessibility.html` | OWL-ViT run with `google/owlvit-base-patch32`; browser smoke on `earth_accessibility.html`; unit tests | 229 matched photo-feature instances after 25 m/direction-photo rebuild; frontend can show `CV-localized feature pins` and swap direction when both views exist | "Pins can now come from image-space object detections rather than only map projection." | built; Supabase seed SQL ready |
+
 ## Next proof targets
 
 - Direction-consistent Mapillary/crowd photo corridor: 15–30 active photos, road-on-right.

@@ -1,0 +1,2601 @@
+{
+  "project": "AccessTwin Clementi persona-agent travel simulation",
+  "unit": "25m street_part aggregated from hidden 5m measurement segments",
+  "method": "deterministic proxy scoring from accessibility_world.geojson persona segment scores",
+  "personas": {
+    "wheelchair_user": {
+      "label": "Wheelchair user",
+      "average_score": 80,
+      "passable_parts": 2,
+      "total_parts": 30,
+      "top_blockers": [
+        {
+          "blocker": "vertical_change",
+          "label": "kerb / level change",
+          "count": 28,
+          "improvement": "add/repair kerb ramp treatment and flush transitions"
+        },
+        {
+          "blocker": "surface_roughness",
+          "label": "rough or uneven surface",
+          "count": 24,
+          "improvement": "resurface the path with stable, firm, slip-resistant material"
+        },
+        {
+          "blocker": "cross_slope",
+          "label": "side slope / camber",
+          "count": 3,
+          "improvement": "regrade the pavement to reduce side slope"
+        }
+      ],
+      "priority_street_parts": [
+        {
+          "street_part_id": "street_part_0019",
+          "street_id": "street_0009",
+          "score": 74,
+          "blockers": [
+            "kerb / level change",
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "add/repair kerb ramp treatment and flush transitions"
+        },
+        {
+          "street_part_id": "street_part_0021",
+          "street_id": "street_0011",
+          "score": 74,
+          "blockers": [
+            "kerb / level change",
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "add/repair kerb ramp treatment and flush transitions"
+        },
+        {
+          "street_part_id": "street_part_0003",
+          "street_id": "street_0000",
+          "score": 75,
+          "blockers": [
+            "kerb / level change",
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "add/repair kerb ramp treatment and flush transitions"
+        },
+        {
+          "street_part_id": "street_part_0014",
+          "street_id": "street_0004",
+          "score": 75,
+          "blockers": [
+            "kerb / level change"
+          ],
+          "recommended_improvement": "add/repair kerb ramp treatment and flush transitions"
+        },
+        {
+          "street_part_id": "street_part_0018",
+          "street_id": "street_0008",
+          "score": 75,
+          "blockers": [
+            "kerb / level change",
+            "rough or uneven surface",
+            "side slope / camber"
+          ],
+          "recommended_improvement": "add/repair kerb ramp treatment and flush transitions"
+        }
+      ]
+    },
+    "senior_with_walker": {
+      "label": "Senior with walker",
+      "average_score": 84,
+      "passable_parts": 30,
+      "total_parts": 30,
+      "top_blockers": [
+        {
+          "blocker": "surface_roughness",
+          "label": "rough or uneven surface",
+          "count": 24,
+          "improvement": "resurface the path with stable, firm, slip-resistant material"
+        },
+        {
+          "blocker": "cross_slope",
+          "label": "side slope / camber",
+          "count": 3,
+          "improvement": "regrade the pavement to reduce side slope"
+        }
+      ],
+      "priority_street_parts": [
+        {
+          "street_part_id": "street_part_0003",
+          "street_id": "street_0000",
+          "score": 81,
+          "blockers": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material"
+        },
+        {
+          "street_part_id": "street_part_0014",
+          "street_id": "street_0004",
+          "score": 81,
+          "blockers": [],
+          "recommended_improvement": "keep current path; monitor with field audit"
+        },
+        {
+          "street_part_id": "street_part_0015",
+          "street_id": "street_0005",
+          "score": 81,
+          "blockers": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material"
+        },
+        {
+          "street_part_id": "street_part_0024",
+          "street_id": "street_0012",
+          "score": 81,
+          "blockers": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material"
+        },
+        {
+          "street_part_id": "street_part_0000",
+          "street_id": "street_0000",
+          "score": 82,
+          "blockers": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material"
+        }
+      ]
+    },
+    "visually_impaired": {
+      "label": "Visually impaired commuter",
+      "average_score": 81,
+      "passable_parts": 30,
+      "total_parts": 30,
+      "top_blockers": [],
+      "priority_street_parts": [
+        {
+          "street_part_id": "street_part_0025",
+          "street_id": "street_0013",
+          "score": 77,
+          "blockers": [],
+          "recommended_improvement": "keep current path; monitor with field audit"
+        },
+        {
+          "street_part_id": "street_part_0000",
+          "street_id": "street_0000",
+          "score": 79,
+          "blockers": [],
+          "recommended_improvement": "keep current path; monitor with field audit"
+        },
+        {
+          "street_part_id": "street_part_0001",
+          "street_id": "street_0000",
+          "score": 79,
+          "blockers": [],
+          "recommended_improvement": "keep current path; monitor with field audit"
+        },
+        {
+          "street_part_id": "street_part_0002",
+          "street_id": "street_0000",
+          "score": 79,
+          "blockers": [],
+          "recommended_improvement": "keep current path; monitor with field audit"
+        },
+        {
+          "street_part_id": "street_part_0003",
+          "street_id": "street_0000",
+          "score": 79,
+          "blockers": [],
+          "recommended_improvement": "keep current path; monitor with field audit"
+        }
+      ]
+    },
+    "pma_user": {
+      "label": "PMA / PMD user",
+      "average_score": 92,
+      "passable_parts": 30,
+      "total_parts": 30,
+      "top_blockers": [
+        {
+          "blocker": "surface_roughness",
+          "label": "rough or uneven surface",
+          "count": 24,
+          "improvement": "resurface the path with stable, firm, slip-resistant material"
+        },
+        {
+          "blocker": "cross_slope",
+          "label": "side slope / camber",
+          "count": 3,
+          "improvement": "regrade the pavement to reduce side slope"
+        }
+      ],
+      "priority_street_parts": [
+        {
+          "street_part_id": "street_part_0021",
+          "street_id": "street_0011",
+          "score": 87,
+          "blockers": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material"
+        },
+        {
+          "street_part_id": "street_part_0019",
+          "street_id": "street_0009",
+          "score": 88,
+          "blockers": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material"
+        },
+        {
+          "street_part_id": "street_part_0022",
+          "street_id": "street_0011",
+          "score": 88,
+          "blockers": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material"
+        },
+        {
+          "street_part_id": "street_part_0003",
+          "street_id": "street_0000",
+          "score": 90,
+          "blockers": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material"
+        },
+        {
+          "street_part_id": "street_part_0000",
+          "street_id": "street_0000",
+          "score": 91,
+          "blockers": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material"
+        }
+      ]
+    }
+  },
+  "street_parts": [
+    {
+      "street_part_id": "street_part_0000",
+      "street_id": "street_0000",
+      "name": "street_part_0000",
+      "route_segment_ids": [
+        "seg_00000",
+        "seg_00001",
+        "seg_00002",
+        "seg_00003",
+        "seg_00004",
+        "seg_00005"
+      ],
+      "midpoint": [
+        103.76406671909982,
+        1.3153961383449035
+      ],
+      "length_m": 26.76,
+      "overall_score": 83,
+      "worst_persona": "visually_impaired",
+      "top_blocker": "surface_roughness",
+      "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+      "personas": {
+        "wheelchair_user": {
+          "label": "Wheelchair user",
+          "score": 80,
+          "passable": false,
+          "status": "passable",
+          "blockers": [
+            "vertical_change",
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "kerb / level change",
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "add/repair kerb ramp treatment and flush transitions",
+          "worst_segment_id": "seg_00004"
+        },
+        "senior_with_walker": {
+          "label": "Senior with walker",
+          "score": 82,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00002"
+        },
+        "visually_impaired": {
+          "label": "Visually impaired commuter",
+          "score": 79,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00000"
+        },
+        "pma_user": {
+          "label": "PMA / PMD user",
+          "score": 91,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00002"
+        }
+      }
+    },
+    {
+      "street_part_id": "street_part_0001",
+      "street_id": "street_0000",
+      "name": "street_part_0001",
+      "route_segment_ids": [
+        "seg_00006",
+        "seg_00007",
+        "seg_00008",
+        "seg_00009",
+        "seg_00010",
+        "seg_00011"
+      ],
+      "midpoint": [
+        103.76388210048685,
+        1.315237506163817
+      ],
+      "length_m": 27.66,
+      "overall_score": 85,
+      "worst_persona": "visually_impaired",
+      "top_blocker": "surface_roughness",
+      "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+      "personas": {
+        "wheelchair_user": {
+          "label": "Wheelchair user",
+          "score": 81,
+          "passable": false,
+          "status": "passable",
+          "blockers": [
+            "vertical_change",
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "kerb / level change",
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "add/repair kerb ramp treatment and flush transitions",
+          "worst_segment_id": "seg_00007"
+        },
+        "senior_with_walker": {
+          "label": "Senior with walker",
+          "score": 85,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00009"
+        },
+        "visually_impaired": {
+          "label": "Visually impaired commuter",
+          "score": 79,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00006"
+        },
+        "pma_user": {
+          "label": "PMA / PMD user",
+          "score": 94,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00009"
+        }
+      }
+    },
+    {
+      "street_part_id": "street_part_0002",
+      "street_id": "street_0000",
+      "name": "street_part_0002",
+      "route_segment_ids": [
+        "seg_00012",
+        "seg_00013",
+        "seg_00014",
+        "seg_00015",
+        "seg_00016",
+        "seg_00017"
+      ],
+      "midpoint": [
+        103.76373352608523,
+        1.3150469877887965
+      ],
+      "length_m": 26.08,
+      "overall_score": 84,
+      "worst_persona": "visually_impaired",
+      "top_blocker": "vertical_change",
+      "recommended_improvement": "add/repair kerb ramp treatment and flush transitions",
+      "personas": {
+        "wheelchair_user": {
+          "label": "Wheelchair user",
+          "score": 82,
+          "passable": false,
+          "status": "passable",
+          "blockers": [
+            "vertical_change"
+          ],
+          "blocker_labels": [
+            "kerb / level change"
+          ],
+          "recommended_improvement": "add/repair kerb ramp treatment and flush transitions",
+          "worst_segment_id": "seg_00012"
+        },
+        "senior_with_walker": {
+          "label": "Senior with walker",
+          "score": 82,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00012"
+        },
+        "visually_impaired": {
+          "label": "Visually impaired commuter",
+          "score": 79,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00012"
+        },
+        "pma_user": {
+          "label": "PMA / PMD user",
+          "score": 92,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00012"
+        }
+      }
+    },
+    {
+      "street_part_id": "street_part_0003",
+      "street_id": "street_0000",
+      "name": "street_part_0003",
+      "route_segment_ids": [
+        "seg_00018",
+        "seg_00019",
+        "seg_00020",
+        "seg_00021",
+        "seg_00022",
+        "seg_00023",
+        "seg_00024",
+        "seg_00025"
+      ],
+      "midpoint": [
+        103.76362540472094,
+        1.3148169296086798
+      ],
+      "length_m": 27.49,
+      "overall_score": 81,
+      "worst_persona": "wheelchair_user",
+      "top_blocker": "surface_roughness",
+      "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+      "personas": {
+        "wheelchair_user": {
+          "label": "Wheelchair user",
+          "score": 75,
+          "passable": false,
+          "status": "passable",
+          "blockers": [
+            "vertical_change",
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "kerb / level change",
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "add/repair kerb ramp treatment and flush transitions",
+          "worst_segment_id": "seg_00022"
+        },
+        "senior_with_walker": {
+          "label": "Senior with walker",
+          "score": 81,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00022"
+        },
+        "visually_impaired": {
+          "label": "Visually impaired commuter",
+          "score": 79,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00018"
+        },
+        "pma_user": {
+          "label": "PMA / PMD user",
+          "score": 90,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00022"
+        }
+      }
+    },
+    {
+      "street_part_id": "street_part_0004",
+      "street_id": "street_0000",
+      "name": "street_part_0004",
+      "route_segment_ids": [
+        "seg_00026",
+        "seg_00027",
+        "seg_00028",
+        "seg_00029",
+        "seg_00030",
+        "seg_00031",
+        "seg_00032",
+        "seg_00033",
+        "seg_00034",
+        "seg_00035",
+        "seg_00036"
+      ],
+      "midpoint": [
+        103.76356983844163,
+        1.3146140330033564
+      ],
+      "length_m": 25.76,
+      "overall_score": 84,
+      "worst_persona": "wheelchair_user",
+      "top_blocker": "vertical_change",
+      "recommended_improvement": "add/repair kerb ramp treatment and flush transitions",
+      "personas": {
+        "wheelchair_user": {
+          "label": "Wheelchair user",
+          "score": 79,
+          "passable": false,
+          "status": "passable",
+          "blockers": [
+            "vertical_change"
+          ],
+          "blocker_labels": [
+            "kerb / level change"
+          ],
+          "recommended_improvement": "add/repair kerb ramp treatment and flush transitions",
+          "worst_segment_id": "seg_00035"
+        },
+        "senior_with_walker": {
+          "label": "Senior with walker",
+          "score": 85,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00035"
+        },
+        "visually_impaired": {
+          "label": "Visually impaired commuter",
+          "score": 79,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00026"
+        },
+        "pma_user": {
+          "label": "PMA / PMD user",
+          "score": 95,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00035"
+        }
+      }
+    },
+    {
+      "street_part_id": "street_part_0005",
+      "street_id": "street_0001",
+      "name": "street_part_0005",
+      "route_segment_ids": [
+        "seg_00037",
+        "seg_00038",
+        "seg_00039",
+        "seg_00040",
+        "seg_00041",
+        "seg_00042",
+        "seg_00043"
+      ],
+      "midpoint": [
+        103.76447877998126,
+        1.314598633982029
+      ],
+      "length_m": 25.73,
+      "overall_score": 86,
+      "worst_persona": "wheelchair_user",
+      "top_blocker": "surface_roughness",
+      "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+      "personas": {
+        "wheelchair_user": {
+          "label": "Wheelchair user",
+          "score": 83,
+          "passable": false,
+          "status": "passable",
+          "blockers": [
+            "vertical_change",
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "kerb / level change",
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "add/repair kerb ramp treatment and flush transitions",
+          "worst_segment_id": "seg_00038"
+        },
+        "senior_with_walker": {
+          "label": "Senior with walker",
+          "score": 86,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00043"
+        },
+        "visually_impaired": {
+          "label": "Visually impaired commuter",
+          "score": 84,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00037"
+        },
+        "pma_user": {
+          "label": "PMA / PMD user",
+          "score": 92,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00043"
+        }
+      }
+    },
+    {
+      "street_part_id": "street_part_0006",
+      "street_id": "street_0001",
+      "name": "street_part_0006",
+      "route_segment_ids": [
+        "seg_00044",
+        "seg_00045",
+        "seg_00046",
+        "seg_00047",
+        "seg_00048",
+        "seg_00049"
+      ],
+      "midpoint": [
+        103.76558919594696,
+        1.3137122808675643
+      ],
+      "length_m": 27.27,
+      "overall_score": 84,
+      "worst_persona": "wheelchair_user",
+      "top_blocker": "surface_roughness",
+      "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+      "personas": {
+        "wheelchair_user": {
+          "label": "Wheelchair user",
+          "score": 78,
+          "passable": false,
+          "status": "passable",
+          "blockers": [
+            "vertical_change",
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "kerb / level change",
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "add/repair kerb ramp treatment and flush transitions",
+          "worst_segment_id": "seg_00047"
+        },
+        "senior_with_walker": {
+          "label": "Senior with walker",
+          "score": 84,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00047"
+        },
+        "visually_impaired": {
+          "label": "Visually impaired commuter",
+          "score": 79,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00044"
+        },
+        "pma_user": {
+          "label": "PMA / PMD user",
+          "score": 93,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00047"
+        }
+      }
+    },
+    {
+      "street_part_id": "street_part_0007",
+      "street_id": "street_0001",
+      "name": "street_part_0007",
+      "route_segment_ids": [
+        "seg_00050",
+        "seg_00051",
+        "seg_00052",
+        "seg_00053",
+        "seg_00054",
+        "seg_00055"
+      ],
+      "midpoint": [
+        103.76571574379247,
+        1.313510004402384
+      ],
+      "length_m": 25.96,
+      "overall_score": 83,
+      "worst_persona": "wheelchair_user",
+      "top_blocker": "cross_slope",
+      "recommended_improvement": "regrade the pavement to reduce side slope",
+      "personas": {
+        "wheelchair_user": {
+          "label": "Wheelchair user",
+          "score": 77,
+          "passable": false,
+          "status": "passable",
+          "blockers": [
+            "vertical_change",
+            "cross_slope"
+          ],
+          "blocker_labels": [
+            "kerb / level change",
+            "side slope / camber"
+          ],
+          "recommended_improvement": "add/repair kerb ramp treatment and flush transitions",
+          "worst_segment_id": "seg_00052"
+        },
+        "senior_with_walker": {
+          "label": "Senior with walker",
+          "score": 84,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "cross_slope"
+          ],
+          "blocker_labels": [
+            "side slope / camber"
+          ],
+          "recommended_improvement": "regrade the pavement to reduce side slope",
+          "worst_segment_id": "seg_00052"
+        },
+        "visually_impaired": {
+          "label": "Visually impaired commuter",
+          "score": 79,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00050"
+        },
+        "pma_user": {
+          "label": "PMA / PMD user",
+          "score": 93,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "cross_slope"
+          ],
+          "blocker_labels": [
+            "side slope / camber"
+          ],
+          "recommended_improvement": "regrade the pavement to reduce side slope",
+          "worst_segment_id": "seg_00052"
+        }
+      }
+    },
+    {
+      "street_part_id": "street_part_0008",
+      "street_id": "street_0001",
+      "name": "street_part_0008",
+      "route_segment_ids": [
+        "seg_00056",
+        "seg_00057",
+        "seg_00058",
+        "seg_00059",
+        "seg_00060",
+        "seg_00061"
+      ],
+      "midpoint": [
+        103.76585951050372,
+        1.3133207278720271
+      ],
+      "length_m": 26.88,
+      "overall_score": 82,
+      "worst_persona": "wheelchair_user",
+      "top_blocker": "surface_roughness",
+      "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+      "personas": {
+        "wheelchair_user": {
+          "label": "Wheelchair user",
+          "score": 76,
+          "passable": false,
+          "status": "passable",
+          "blockers": [
+            "vertical_change",
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "kerb / level change",
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "add/repair kerb ramp treatment and flush transitions",
+          "worst_segment_id": "seg_00057"
+        },
+        "senior_with_walker": {
+          "label": "Senior with walker",
+          "score": 82,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00057"
+        },
+        "visually_impaired": {
+          "label": "Visually impaired commuter",
+          "score": 79,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00056"
+        },
+        "pma_user": {
+          "label": "PMA / PMD user",
+          "score": 92,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00057"
+        }
+      }
+    },
+    {
+      "street_part_id": "street_part_0009",
+      "street_id": "street_0001",
+      "name": "street_part_0009",
+      "route_segment_ids": [
+        "seg_00062",
+        "seg_00063",
+        "seg_00064",
+        "seg_00065",
+        "seg_00066",
+        "seg_00067"
+      ],
+      "midpoint": [
+        103.76600446041643,
+        1.3131350213724158
+      ],
+      "length_m": 25.56,
+      "overall_score": 84,
+      "worst_persona": "visually_impaired",
+      "top_blocker": "vertical_change",
+      "recommended_improvement": "add/repair kerb ramp treatment and flush transitions",
+      "personas": {
+        "wheelchair_user": {
+          "label": "Wheelchair user",
+          "score": 81,
+          "passable": false,
+          "status": "passable",
+          "blockers": [
+            "vertical_change"
+          ],
+          "blocker_labels": [
+            "kerb / level change"
+          ],
+          "recommended_improvement": "add/repair kerb ramp treatment and flush transitions",
+          "worst_segment_id": "seg_00065"
+        },
+        "senior_with_walker": {
+          "label": "Senior with walker",
+          "score": 84,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00065"
+        },
+        "visually_impaired": {
+          "label": "Visually impaired commuter",
+          "score": 79,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00062"
+        },
+        "pma_user": {
+          "label": "PMA / PMD user",
+          "score": 93,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00065"
+        }
+      }
+    },
+    {
+      "street_part_id": "street_part_0010",
+      "street_id": "street_0001",
+      "name": "street_part_0010",
+      "route_segment_ids": [
+        "seg_00068",
+        "seg_00069",
+        "seg_00070",
+        "seg_00071",
+        "seg_00072",
+        "seg_00073"
+      ],
+      "midpoint": [
+        103.7661478780462,
+        1.312960058998167
+      ],
+      "length_m": 26.04,
+      "overall_score": 87,
+      "worst_persona": "visually_impaired",
+      "top_blocker": "surface_roughness",
+      "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+      "personas": {
+        "wheelchair_user": {
+          "label": "Wheelchair user",
+          "score": 86,
+          "passable": false,
+          "status": "passable",
+          "blockers": [
+            "vertical_change",
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "kerb / level change",
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "add/repair kerb ramp treatment and flush transitions",
+          "worst_segment_id": "seg_00072"
+        },
+        "senior_with_walker": {
+          "label": "Senior with walker",
+          "score": 88,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00071"
+        },
+        "visually_impaired": {
+          "label": "Visually impaired commuter",
+          "score": 81,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00068"
+        },
+        "pma_user": {
+          "label": "PMA / PMD user",
+          "score": 94,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00071"
+        }
+      }
+    },
+    {
+      "street_part_id": "street_part_0011",
+      "street_id": "street_0002",
+      "name": "street_part_0011",
+      "route_segment_ids": [
+        "seg_00074",
+        "seg_00075",
+        "seg_00076",
+        "seg_00077",
+        "seg_00078",
+        "seg_00079",
+        "seg_00080"
+      ],
+      "midpoint": [
+        103.76461327017232,
+        1.3136099720771188
+      ],
+      "length_m": 26.67,
+      "overall_score": 86,
+      "worst_persona": "wheelchair_user",
+      "top_blocker": "surface_roughness",
+      "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+      "personas": {
+        "wheelchair_user": {
+          "label": "Wheelchair user",
+          "score": 80,
+          "passable": false,
+          "status": "passable",
+          "blockers": [
+            "vertical_change",
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "kerb / level change",
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "add/repair kerb ramp treatment and flush transitions",
+          "worst_segment_id": "seg_00078"
+        },
+        "senior_with_walker": {
+          "label": "Senior with walker",
+          "score": 88,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00078"
+        },
+        "visually_impaired": {
+          "label": "Visually impaired commuter",
+          "score": 83,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00074"
+        },
+        "pma_user": {
+          "label": "PMA / PMD user",
+          "score": 92,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00078"
+        }
+      }
+    },
+    {
+      "street_part_id": "street_part_0012",
+      "street_id": "street_0003",
+      "name": "street_part_0012",
+      "route_segment_ids": [
+        "seg_00081",
+        "seg_00082",
+        "seg_00083",
+        "seg_00084",
+        "seg_00085",
+        "seg_00086",
+        "seg_00087"
+      ],
+      "midpoint": [
+        103.76334983768974,
+        1.3140332078871937
+      ],
+      "length_m": 27.42,
+      "overall_score": 85,
+      "worst_persona": "visually_impaired",
+      "top_blocker": "surface_roughness",
+      "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+      "personas": {
+        "wheelchair_user": {
+          "label": "Wheelchair user",
+          "score": 86,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00082"
+        },
+        "senior_with_walker": {
+          "label": "Senior with walker",
+          "score": 83,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00087"
+        },
+        "visually_impaired": {
+          "label": "Visually impaired commuter",
+          "score": 81,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00084"
+        },
+        "pma_user": {
+          "label": "PMA / PMD user",
+          "score": 91,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00082"
+        }
+      }
+    },
+    {
+      "street_part_id": "street_part_0013",
+      "street_id": "street_0004",
+      "name": "street_part_0013",
+      "route_segment_ids": [
+        "seg_00088",
+        "seg_00089",
+        "seg_00090",
+        "seg_00091",
+        "seg_00092",
+        "seg_00093",
+        "seg_00094",
+        "seg_00095"
+      ],
+      "midpoint": [
+        103.76356030985012,
+        1.3148526526230842
+      ],
+      "length_m": 28.87,
+      "overall_score": 82,
+      "worst_persona": "wheelchair_user",
+      "top_blocker": "cross_slope",
+      "recommended_improvement": "regrade the pavement to reduce side slope",
+      "personas": {
+        "wheelchair_user": {
+          "label": "Wheelchair user",
+          "score": 76,
+          "passable": false,
+          "status": "passable",
+          "blockers": [
+            "vertical_change",
+            "cross_slope",
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "kerb / level change",
+            "side slope / camber",
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "add/repair kerb ramp treatment and flush transitions",
+          "worst_segment_id": "seg_00089"
+        },
+        "senior_with_walker": {
+          "label": "Senior with walker",
+          "score": 82,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "cross_slope",
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "side slope / camber",
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "regrade the pavement to reduce side slope",
+          "worst_segment_id": "seg_00093"
+        },
+        "visually_impaired": {
+          "label": "Visually impaired commuter",
+          "score": 79,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00088"
+        },
+        "pma_user": {
+          "label": "PMA / PMD user",
+          "score": 92,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "cross_slope",
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "side slope / camber",
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "regrade the pavement to reduce side slope",
+          "worst_segment_id": "seg_00093"
+        }
+      }
+    },
+    {
+      "street_part_id": "street_part_0014",
+      "street_id": "street_0004",
+      "name": "street_part_0014",
+      "route_segment_ids": [
+        "seg_00096",
+        "seg_00097",
+        "seg_00098",
+        "seg_00099",
+        "seg_00100",
+        "seg_00101",
+        "seg_00102"
+      ],
+      "midpoint": [
+        103.76381394086175,
+        1.315451073260731
+      ],
+      "length_m": 27.2,
+      "overall_score": 82,
+      "worst_persona": "wheelchair_user",
+      "top_blocker": "vertical_change",
+      "recommended_improvement": "add/repair kerb ramp treatment and flush transitions",
+      "personas": {
+        "wheelchair_user": {
+          "label": "Wheelchair user",
+          "score": 75,
+          "passable": false,
+          "status": "passable",
+          "blockers": [
+            "vertical_change"
+          ],
+          "blocker_labels": [
+            "kerb / level change"
+          ],
+          "recommended_improvement": "add/repair kerb ramp treatment and flush transitions",
+          "worst_segment_id": "seg_00100"
+        },
+        "senior_with_walker": {
+          "label": "Senior with walker",
+          "score": 81,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00100"
+        },
+        "visually_impaired": {
+          "label": "Visually impaired commuter",
+          "score": 79,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00096"
+        },
+        "pma_user": {
+          "label": "PMA / PMD user",
+          "score": 91,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00100"
+        }
+      }
+    },
+    {
+      "street_part_id": "street_part_0015",
+      "street_id": "street_0005",
+      "name": "street_part_0015",
+      "route_segment_ids": [
+        "seg_00103",
+        "seg_00104",
+        "seg_00105",
+        "seg_00106",
+        "seg_00107",
+        "seg_00108",
+        "seg_00109",
+        "seg_00110"
+      ],
+      "midpoint": [
+        103.76382526927625,
+        1.3150948991177833
+      ],
+      "length_m": 28.84,
+      "overall_score": 83,
+      "worst_persona": "visually_impaired",
+      "top_blocker": "surface_roughness",
+      "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+      "personas": {
+        "wheelchair_user": {
+          "label": "Wheelchair user",
+          "score": 80,
+          "passable": false,
+          "status": "passable",
+          "blockers": [
+            "vertical_change",
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "kerb / level change",
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "add/repair kerb ramp treatment and flush transitions",
+          "worst_segment_id": "seg_00103"
+        },
+        "senior_with_walker": {
+          "label": "Senior with walker",
+          "score": 81,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00103"
+        },
+        "visually_impaired": {
+          "label": "Visually impaired commuter",
+          "score": 79,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00103"
+        },
+        "pma_user": {
+          "label": "PMA / PMD user",
+          "score": 91,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00103"
+        }
+      }
+    },
+    {
+      "street_part_id": "street_part_0016",
+      "street_id": "street_0006",
+      "name": "street_part_0016",
+      "route_segment_ids": [
+        "seg_00111",
+        "seg_00112",
+        "seg_00113",
+        "seg_00114",
+        "seg_00115",
+        "seg_00116",
+        "seg_00117"
+      ],
+      "midpoint": [
+        103.76356316773996,
+        1.3141115270905066
+      ],
+      "length_m": 27.78,
+      "overall_score": 85,
+      "worst_persona": "visually_impaired",
+      "top_blocker": "surface_roughness",
+      "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+      "personas": {
+        "wheelchair_user": {
+          "label": "Wheelchair user",
+          "score": 83,
+          "passable": false,
+          "status": "passable",
+          "blockers": [
+            "vertical_change",
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "kerb / level change",
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "add/repair kerb ramp treatment and flush transitions",
+          "worst_segment_id": "seg_00113"
+        },
+        "senior_with_walker": {
+          "label": "Senior with walker",
+          "score": 87,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00113"
+        },
+        "visually_impaired": {
+          "label": "Visually impaired commuter",
+          "score": 80,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00111"
+        },
+        "pma_user": {
+          "label": "PMA / PMD user",
+          "score": 91,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00116"
+        }
+      }
+    },
+    {
+      "street_part_id": "street_part_0017",
+      "street_id": "street_0007",
+      "name": "street_part_0017",
+      "route_segment_ids": [
+        "seg_00118",
+        "seg_00119",
+        "seg_00120",
+        "seg_00121",
+        "seg_00122",
+        "seg_00123",
+        "seg_00124",
+        "seg_00125",
+        "seg_00126"
+      ],
+      "midpoint": [
+        103.76453111606398,
+        1.31568561214487
+      ],
+      "length_m": 25.41,
+      "overall_score": 87,
+      "worst_persona": "wheelchair_user",
+      "top_blocker": "surface_roughness",
+      "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+      "personas": {
+        "wheelchair_user": {
+          "label": "Wheelchair user",
+          "score": 77,
+          "passable": false,
+          "status": "passable",
+          "blockers": [
+            "vertical_change",
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "kerb / level change",
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "add/repair kerb ramp treatment and flush transitions",
+          "worst_segment_id": "seg_00124"
+        },
+        "senior_with_walker": {
+          "label": "Senior with walker",
+          "score": 88,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00122"
+        },
+        "visually_impaired": {
+          "label": "Visually impaired commuter",
+          "score": 90,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00118"
+        },
+        "pma_user": {
+          "label": "PMA / PMD user",
+          "score": 93,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00122"
+        }
+      }
+    },
+    {
+      "street_part_id": "street_part_0018",
+      "street_id": "street_0008",
+      "name": "street_part_0018",
+      "route_segment_ids": [
+        "seg_00127",
+        "seg_00128",
+        "seg_00129",
+        "seg_00130",
+        "seg_00131",
+        "seg_00132",
+        "seg_00133"
+      ],
+      "midpoint": [
+        103.764783148792,
+        1.3155273844805344
+      ],
+      "length_m": 26.57,
+      "overall_score": 86,
+      "worst_persona": "wheelchair_user",
+      "top_blocker": "surface_roughness",
+      "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+      "personas": {
+        "wheelchair_user": {
+          "label": "Wheelchair user",
+          "score": 75,
+          "passable": false,
+          "status": "passable",
+          "blockers": [
+            "vertical_change",
+            "surface_roughness",
+            "cross_slope"
+          ],
+          "blocker_labels": [
+            "kerb / level change",
+            "rough or uneven surface",
+            "side slope / camber"
+          ],
+          "recommended_improvement": "add/repair kerb ramp treatment and flush transitions",
+          "worst_segment_id": "seg_00133"
+        },
+        "senior_with_walker": {
+          "label": "Senior with walker",
+          "score": 86,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness",
+            "cross_slope"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface",
+            "side slope / camber"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00133"
+        },
+        "visually_impaired": {
+          "label": "Visually impaired commuter",
+          "score": 91,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00127"
+        },
+        "pma_user": {
+          "label": "PMA / PMD user",
+          "score": 91,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness",
+            "cross_slope"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface",
+            "side slope / camber"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00133"
+        }
+      }
+    },
+    {
+      "street_part_id": "street_part_0019",
+      "street_id": "street_0009",
+      "name": "street_part_0019",
+      "route_segment_ids": [
+        "seg_00134",
+        "seg_00135",
+        "seg_00136",
+        "seg_00137",
+        "seg_00138",
+        "seg_00139",
+        "seg_00140",
+        "seg_00141",
+        "seg_00142",
+        "seg_00143",
+        "seg_00144",
+        "seg_00145",
+        "seg_00146",
+        "seg_00147"
+      ],
+      "midpoint": [
+        103.76443365955912,
+        1.3155794430732013
+      ],
+      "length_m": 28.27,
+      "overall_score": 83,
+      "worst_persona": "wheelchair_user",
+      "top_blocker": "surface_roughness",
+      "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+      "personas": {
+        "wheelchair_user": {
+          "label": "Wheelchair user",
+          "score": 74,
+          "passable": false,
+          "status": "passable",
+          "blockers": [
+            "vertical_change",
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "kerb / level change",
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "add/repair kerb ramp treatment and flush transitions",
+          "worst_segment_id": "seg_00146"
+        },
+        "senior_with_walker": {
+          "label": "Senior with walker",
+          "score": 83,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00146"
+        },
+        "visually_impaired": {
+          "label": "Visually impaired commuter",
+          "score": 88,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00146"
+        },
+        "pma_user": {
+          "label": "PMA / PMD user",
+          "score": 88,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00146"
+        }
+      }
+    },
+    {
+      "street_part_id": "street_part_0020",
+      "street_id": "street_0010",
+      "name": "street_part_0020",
+      "route_segment_ids": [
+        "seg_00148",
+        "seg_00149",
+        "seg_00150",
+        "seg_00151",
+        "seg_00152",
+        "seg_00153"
+      ],
+      "midpoint": [
+        103.7648716936013,
+        1.3129544500451111
+      ],
+      "length_m": 27.18,
+      "overall_score": 85,
+      "worst_persona": "visually_impaired",
+      "top_blocker": "surface_roughness",
+      "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+      "personas": {
+        "wheelchair_user": {
+          "label": "Wheelchair user",
+          "score": 86,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00151"
+        },
+        "senior_with_walker": {
+          "label": "Senior with walker",
+          "score": 83,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00150"
+        },
+        "visually_impaired": {
+          "label": "Visually impaired commuter",
+          "score": 80,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00150"
+        },
+        "pma_user": {
+          "label": "PMA / PMD user",
+          "score": 91,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00150"
+        }
+      }
+    },
+    {
+      "street_part_id": "street_part_0021",
+      "street_id": "street_0011",
+      "name": "street_part_0021",
+      "route_segment_ids": [
+        "seg_00154",
+        "seg_00155",
+        "seg_00156",
+        "seg_00157",
+        "seg_00158",
+        "seg_00159"
+      ],
+      "midpoint": [
+        103.76575768337707,
+        1.3123400566731498
+      ],
+      "length_m": 28.74,
+      "overall_score": 83,
+      "worst_persona": "wheelchair_user",
+      "top_blocker": "surface_roughness",
+      "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+      "personas": {
+        "wheelchair_user": {
+          "label": "Wheelchair user",
+          "score": 74,
+          "passable": false,
+          "status": "passable",
+          "blockers": [
+            "vertical_change",
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "kerb / level change",
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "add/repair kerb ramp treatment and flush transitions",
+          "worst_segment_id": "seg_00156"
+        },
+        "senior_with_walker": {
+          "label": "Senior with walker",
+          "score": 83,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00156"
+        },
+        "visually_impaired": {
+          "label": "Visually impaired commuter",
+          "score": 87,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00158"
+        },
+        "pma_user": {
+          "label": "PMA / PMD user",
+          "score": 87,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00156"
+        }
+      }
+    },
+    {
+      "street_part_id": "street_part_0022",
+      "street_id": "street_0011",
+      "name": "street_part_0022",
+      "route_segment_ids": [
+        "seg_00160",
+        "seg_00161",
+        "seg_00162",
+        "seg_00163",
+        "seg_00164",
+        "seg_00165"
+      ],
+      "midpoint": [
+        103.76593998048479,
+        1.312521759758032
+      ],
+      "length_m": 27.96,
+      "overall_score": 84,
+      "worst_persona": "wheelchair_user",
+      "top_blocker": "surface_roughness",
+      "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+      "personas": {
+        "wheelchair_user": {
+          "label": "Wheelchair user",
+          "score": 77,
+          "passable": false,
+          "status": "passable",
+          "blockers": [
+            "vertical_change",
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "kerb / level change",
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "add/repair kerb ramp treatment and flush transitions",
+          "worst_segment_id": "seg_00160"
+        },
+        "senior_with_walker": {
+          "label": "Senior with walker",
+          "score": 83,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00160"
+        },
+        "visually_impaired": {
+          "label": "Visually impaired commuter",
+          "score": 86,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00165"
+        },
+        "pma_user": {
+          "label": "PMA / PMD user",
+          "score": 88,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00160"
+        }
+      }
+    },
+    {
+      "street_part_id": "street_part_0023",
+      "street_id": "street_0011",
+      "name": "street_part_0023",
+      "route_segment_ids": [
+        "seg_00166",
+        "seg_00167",
+        "seg_00168",
+        "seg_00169",
+        "seg_00170",
+        "seg_00171"
+      ],
+      "midpoint": [
+        103.76610567404244,
+        1.312686913288905
+      ],
+      "length_m": 25.44,
+      "overall_score": 88,
+      "worst_persona": "visually_impaired",
+      "top_blocker": "surface_roughness",
+      "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+      "personas": {
+        "wheelchair_user": {
+          "label": "Wheelchair user",
+          "score": 87,
+          "passable": false,
+          "status": "passable",
+          "blockers": [
+            "vertical_change",
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "kerb / level change",
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "add/repair kerb ramp treatment and flush transitions",
+          "worst_segment_id": "seg_00171"
+        },
+        "senior_with_walker": {
+          "label": "Senior with walker",
+          "score": 88,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00166"
+        },
+        "visually_impaired": {
+          "label": "Visually impaired commuter",
+          "score": 82,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00166"
+        },
+        "pma_user": {
+          "label": "PMA / PMD user",
+          "score": 94,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00166"
+        }
+      }
+    },
+    {
+      "street_part_id": "street_part_0024",
+      "street_id": "street_0012",
+      "name": "street_part_0024",
+      "route_segment_ids": [
+        "seg_00172",
+        "seg_00173",
+        "seg_00174",
+        "seg_00175",
+        "seg_00176",
+        "seg_00177"
+      ],
+      "midpoint": [
+        103.76538759359981,
+        1.311624609175258
+      ],
+      "length_m": 29.4,
+      "overall_score": 84,
+      "worst_persona": "visually_impaired",
+      "top_blocker": "surface_roughness",
+      "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+      "personas": {
+        "wheelchair_user": {
+          "label": "Wheelchair user",
+          "score": 86,
+          "passable": false,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness",
+            "vertical_change"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface",
+            "kerb / level change"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00172"
+        },
+        "senior_with_walker": {
+          "label": "Senior with walker",
+          "score": 81,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00176"
+        },
+        "visually_impaired": {
+          "label": "Visually impaired commuter",
+          "score": 79,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00172"
+        },
+        "pma_user": {
+          "label": "PMA / PMD user",
+          "score": 91,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00176"
+        }
+      }
+    },
+    {
+      "street_part_id": "street_part_0025",
+      "street_id": "street_0013",
+      "name": "street_part_0025",
+      "route_segment_ids": [
+        "seg_00178",
+        "seg_00179",
+        "seg_00180",
+        "seg_00181",
+        "seg_00182",
+        "seg_00183",
+        "seg_00184",
+        "seg_00185",
+        "seg_00186"
+      ],
+      "midpoint": [
+        103.7653671873933,
+        1.3116387098913633
+      ],
+      "length_m": 29.15,
+      "overall_score": 84,
+      "worst_persona": "visually_impaired",
+      "top_blocker": "surface_roughness",
+      "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+      "personas": {
+        "wheelchair_user": {
+          "label": "Wheelchair user",
+          "score": 84,
+          "passable": false,
+          "status": "passable",
+          "blockers": [
+            "vertical_change",
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "kerb / level change",
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "add/repair kerb ramp treatment and flush transitions",
+          "worst_segment_id": "seg_00185"
+        },
+        "senior_with_walker": {
+          "label": "Senior with walker",
+          "score": 83,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00179"
+        },
+        "visually_impaired": {
+          "label": "Visually impaired commuter",
+          "score": 77,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00182"
+        },
+        "pma_user": {
+          "label": "PMA / PMD user",
+          "score": 91,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00179"
+        }
+      }
+    },
+    {
+      "street_part_id": "street_part_0026",
+      "street_id": "street_0013",
+      "name": "street_part_0026",
+      "route_segment_ids": [
+        "seg_00187",
+        "seg_00188",
+        "seg_00189",
+        "seg_00190",
+        "seg_00191",
+        "seg_00192",
+        "seg_00193"
+      ],
+      "midpoint": [
+        103.76623144642531,
+        1.3124834937219856
+      ],
+      "length_m": 27.58,
+      "overall_score": 83,
+      "worst_persona": "wheelchair_user",
+      "top_blocker": "surface_roughness",
+      "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+      "personas": {
+        "wheelchair_user": {
+          "label": "Wheelchair user",
+          "score": 79,
+          "passable": false,
+          "status": "passable",
+          "blockers": [
+            "vertical_change",
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "kerb / level change",
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "add/repair kerb ramp treatment and flush transitions",
+          "worst_segment_id": "seg_00193"
+        },
+        "senior_with_walker": {
+          "label": "Senior with walker",
+          "score": 83,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00187"
+        },
+        "visually_impaired": {
+          "label": "Visually impaired commuter",
+          "score": 79,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00187"
+        },
+        "pma_user": {
+          "label": "PMA / PMD user",
+          "score": 92,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00187"
+        }
+      }
+    },
+    {
+      "street_part_id": "street_part_0027",
+      "street_id": "street_0014",
+      "name": "street_part_0027",
+      "route_segment_ids": [
+        "seg_00194",
+        "seg_00195",
+        "seg_00196",
+        "seg_00197",
+        "seg_00198",
+        "seg_00199",
+        "seg_00200"
+      ],
+      "midpoint": [
+        103.76604097104284,
+        1.3123836496316421
+      ],
+      "length_m": 25.43,
+      "overall_score": 84,
+      "worst_persona": "wheelchair_user",
+      "top_blocker": "vertical_change",
+      "recommended_improvement": "add/repair kerb ramp treatment and flush transitions",
+      "personas": {
+        "wheelchair_user": {
+          "label": "Wheelchair user",
+          "score": 79,
+          "passable": false,
+          "status": "passable",
+          "blockers": [
+            "vertical_change"
+          ],
+          "blocker_labels": [
+            "kerb / level change"
+          ],
+          "recommended_improvement": "add/repair kerb ramp treatment and flush transitions",
+          "worst_segment_id": "seg_00200"
+        },
+        "senior_with_walker": {
+          "label": "Senior with walker",
+          "score": 85,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00200"
+        },
+        "visually_impaired": {
+          "label": "Visually impaired commuter",
+          "score": 82,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00194"
+        },
+        "pma_user": {
+          "label": "PMA / PMD user",
+          "score": 91,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00195"
+        }
+      }
+    },
+    {
+      "street_part_id": "street_part_0028",
+      "street_id": "street_0015",
+      "name": "street_part_0028",
+      "route_segment_ids": [
+        "seg_00201",
+        "seg_00202",
+        "seg_00203",
+        "seg_00204",
+        "seg_00205",
+        "seg_00206",
+        "seg_00207",
+        "seg_00208"
+      ],
+      "midpoint": [
+        103.76568161155937,
+        1.3130723271447275
+      ],
+      "length_m": 27.72,
+      "overall_score": 87,
+      "worst_persona": "visually_impaired",
+      "top_blocker": "surface_roughness",
+      "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+      "personas": {
+        "wheelchair_user": {
+          "label": "Wheelchair user",
+          "score": 85,
+          "passable": false,
+          "status": "passable",
+          "blockers": [
+            "vertical_change",
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "kerb / level change",
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "add/repair kerb ramp treatment and flush transitions",
+          "worst_segment_id": "seg_00206"
+        },
+        "senior_with_walker": {
+          "label": "Senior with walker",
+          "score": 88,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00202"
+        },
+        "visually_impaired": {
+          "label": "Visually impaired commuter",
+          "score": 83,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00205"
+        },
+        "pma_user": {
+          "label": "PMA / PMD user",
+          "score": 92,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00202"
+        }
+      }
+    },
+    {
+      "street_part_id": "street_part_0029",
+      "street_id": "street_0016",
+      "name": "street_part_0029",
+      "route_segment_ids": [
+        "seg_00209",
+        "seg_00210",
+        "seg_00211",
+        "seg_00212",
+        "seg_00213",
+        "seg_00214",
+        "seg_00215",
+        "seg_00216",
+        "seg_00217",
+        "seg_00218",
+        "seg_00219"
+      ],
+      "midpoint": [
+        103.76562548100162,
+        1.3132654911008046
+      ],
+      "length_m": 26.67,
+      "overall_score": 86,
+      "worst_persona": "visually_impaired",
+      "top_blocker": "surface_roughness",
+      "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+      "personas": {
+        "wheelchair_user": {
+          "label": "Wheelchair user",
+          "score": 84,
+          "passable": false,
+          "status": "passable",
+          "blockers": [
+            "vertical_change",
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "kerb / level change",
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "add/repair kerb ramp treatment and flush transitions",
+          "worst_segment_id": "seg_00217"
+        },
+        "senior_with_walker": {
+          "label": "Senior with walker",
+          "score": 85,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00216"
+        },
+        "visually_impaired": {
+          "label": "Visually impaired commuter",
+          "score": 82,
+          "passable": true,
+          "status": "passable",
+          "blockers": [],
+          "blocker_labels": [],
+          "recommended_improvement": "keep current path; monitor with field audit",
+          "worst_segment_id": "seg_00217"
+        },
+        "pma_user": {
+          "label": "PMA / PMD user",
+          "score": 91,
+          "passable": true,
+          "status": "passable",
+          "blockers": [
+            "surface_roughness"
+          ],
+          "blocker_labels": [
+            "rough or uneven surface"
+          ],
+          "recommended_improvement": "resurface the path with stable, firm, slip-resistant material",
+          "worst_segment_id": "seg_00216"
+        }
+      }
+    }
+  ]
+}

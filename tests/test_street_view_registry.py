@@ -1,13 +1,18 @@
 import math
 import unittest
 
+from scripts.cv_localize_photo_features import assign_feature_detections, box_area_ratio, clamp_box
 from scripts.street_view_registry import (
     angle_diff,
     attach_active_photos,
     build_street_view_nodes,
     build_streets,
     choose_best_photo,
+    choose_best_photos_by_direction,
+    desired_photo_headings,
     group_segments_into_street_parts,
+    harvest_mapillary_candidates,
+    mapillary_images_url,
     registry_to_supabase_seed_sql,
 )
 
@@ -33,19 +38,22 @@ class StreetViewRegistryTest(unittest.TestCase):
         self.assertEqual(angle_diff(10, 350), 20)
         self.assertEqual(angle_diff(90, 90), 0)
 
-    def test_groups_five_meter_segments_into_ten_meter_street_parts(self):
+    def test_groups_five_meter_measurements_into_photo_visible_street_parts(self):
         segments = [
             seg("seg_0", [[103.0, 1.0], [103.000045, 1.0]]),
             seg("seg_1", [[103.000045, 1.0], [103.00009, 1.0]]),
             seg("seg_2", [[103.00009, 1.0], [103.000135, 1.0]]),
+            seg("seg_3", [[103.000135, 1.0], [103.00018, 1.0]]),
+            seg("seg_4", [[103.00018, 1.0], [103.000225, 1.0]]),
+            seg("seg_5", [[103.000225, 1.0], [103.00027, 1.0]]),
         ]
 
-        parts = group_segments_into_street_parts(segments, target_length_m=10)
+        parts = group_segments_into_street_parts(segments, target_length_m=25)
 
         self.assertEqual(len(parts), 2)
-        self.assertEqual(parts[0]["route_segment_ids"], ["seg_0", "seg_1"])
-        self.assertEqual(parts[1]["route_segment_ids"], ["seg_2"])
-        self.assertAlmostEqual(parts[0]["length_m"], 10.0, delta=1.5)
+        self.assertEqual(parts[0]["route_segment_ids"], ["seg_0", "seg_1", "seg_2", "seg_3", "seg_4"])
+        self.assertEqual(parts[1]["route_segment_ids"], ["seg_5"])
+        self.assertAlmostEqual(parts[0]["length_m"], 25.0, delta=2.0)
 
     def test_best_photo_prefers_correct_heading_over_newer_wrong_direction(self):
         candidates = [
@@ -74,6 +82,49 @@ class StreetViewRegistryTest(unittest.TestCase):
 
         self.assertEqual(chosen["source_image_id"], "older-correct")
         self.assertTrue(chosen["direction_valid"])
+
+    def test_two_way_roads_accept_opposite_heading_for_other_pavement_side(self):
+        self.assertEqual(desired_photo_headings(90)[1]["heading_deg"], 270)
+        candidates = [
+            {
+                "id": "opposite-side-pavement",
+                "computed_compass_angle": 270,
+                "computed_geometry": {"coordinates": [103.0, 1.0]},
+                "captured_at": "2026-07-01T00:00:00Z",
+                "is_pano": False,
+            }
+        ]
+
+        chosen = choose_best_photo(candidates, [103.0, 1.0], desired_heading_deg=90)
+
+        self.assertIsNotNone(chosen)
+        self.assertEqual(chosen["source_image_id"], "opposite-side-pavement")
+        self.assertTrue(chosen["direction_valid"])
+        self.assertEqual(chosen["heading_role"], "opposite")
+        self.assertEqual(chosen["desired_orientation"], "road_left_pavement_right")
+
+    def test_selects_one_active_photo_per_available_direction(self):
+        candidates = [
+            {
+                "id": "canonical",
+                "computed_compass_angle": 90,
+                "computed_geometry": {"coordinates": [103.0, 1.0]},
+                "captured_at": "2026-07-01T00:00:00Z",
+                "is_pano": False,
+            },
+            {
+                "id": "opposite",
+                "computed_compass_angle": 270,
+                "computed_geometry": {"coordinates": [103.0, 1.0]},
+                "captured_at": "2026-07-01T00:00:00Z",
+                "is_pano": False,
+            },
+        ]
+
+        photos = choose_best_photos_by_direction(candidates, [103.0, 1.0], desired_heading_deg=90)
+
+        self.assertEqual([p["heading_role"] for p in photos], ["canonical", "opposite"])
+        self.assertEqual([p["desired_orientation"] for p in photos], ["road_right", "road_left_pavement_right"])
 
     def test_builds_prev_next_node_graph_for_curated_corridor(self):
         segments = [
@@ -151,6 +202,39 @@ class StreetViewRegistryTest(unittest.TestCase):
         self.assertEqual(nodes[0]["active_photo_id"], photos[0]["id"])
         self.assertEqual(nodes[0]["coverage_status"], "active")
 
+    def test_mapillary_url_requests_metadata_without_printing_token(self):
+        url = mapillary_images_url(103.123456789, 1.234567891, "tok/with spaces", radius_m=35, limit=7)
+
+        self.assertIn("https://graph.mapillary.com/images?", url)
+        self.assertIn("thumb_2048_url", url)
+        self.assertIn("computed_geometry", url)
+        self.assertIn("computed_compass_angle", url)
+        self.assertIn("radius=35", url)
+        self.assertIn("limit=7", url)
+        self.assertIn("access_token=tok%2Fwith+spaces", url)
+
+    def test_harvest_mapillary_candidates_keys_rows_by_street_part(self):
+        import scripts.street_view_registry as svr
+
+        original = svr.fetch_mapillary_images
+        calls = []
+        try:
+            def fake_fetch(lng, lat, token, radius_m=45, limit=12, timeout_s=20):
+                calls.append((round(lng, 6), round(lat, 6), token, radius_m, limit))
+                return [
+                    {"id": "same", "computed_geometry": {"coordinates": [lng, lat]}, "computed_compass_angle": 90},
+                    {"id": "same", "computed_geometry": {"coordinates": [lng, lat]}, "computed_compass_angle": 90},
+                ]
+            svr.fetch_mapillary_images = fake_fetch
+            parts = [{"id": "street_part_0000", "midpoint": [103.0, 1.0]}]
+            rows = harvest_mapillary_candidates(parts, "secret-token", radius_m=20, limit_per_part=3, sleep_s=0)
+        finally:
+            svr.fetch_mapillary_images = original
+
+        self.assertEqual(calls, [(103.0, 1.0, "secret-token", 20, 3)])
+        self.assertEqual(len(rows["street_part_0000"]), 1)
+        self.assertEqual(rows["street_part_0000"][0]["id"], "same")
+
     def test_registry_exports_supabase_seed_sql_for_streets_parts_nodes_and_photos(self):
         segments = [
             seg("seg_0", [[103.0, 1.0], [103.000045, 1.0]]),
@@ -173,9 +257,43 @@ class StreetViewRegistryTest(unittest.TestCase):
         self.assertIn("insert into public.street_view_nodes", sql)
         self.assertIn("street_view_node_0000", sql)
         self.assertIn("insert into public.street_photos", sql)
-        self.assertIn("photo_mapillary_mly-seed", sql)
+        self.assertIn("photo_mapillary_street_part_0000_mly-seed", sql)
         self.assertIn("active_photo_id =", sql)
         self.assertIn("on conflict (external_id) do update", sql)
+
+
+class PhotoFeatureCvMatchingTest(unittest.TestCase):
+    def test_assigns_each_detection_to_only_one_feature(self):
+        features = [
+            {"external_id": "covered_linkway_a", "kind": "covered_linkway", "distance_to_photo_m": 5},
+            {"external_id": "covered_linkway_b", "kind": "covered_linkway", "distance_to_photo_m": 8},
+        ]
+        detections = [
+            {"label": "covered walkway", "score": 0.52, "bbox": {"x1": 100, "y1": 420, "x2": 300, "y2": 560}},
+        ]
+
+        assignments = assign_feature_detections(features, detections, min_score=0.1, image_width=1000, image_height=800)
+
+        self.assertEqual(len(assignments), 1)
+        self.assertEqual(assignments[0][0]["external_id"], "covered_linkway_a")
+
+    def test_rejects_giant_generic_boxes_for_ground_features(self):
+        feature = {"external_id": "tactile_guidance_seg_1", "kind": "tactile_guidance", "distance_to_photo_m": 3}
+        detections = [
+            {"label": "sidewalk", "score": 0.4, "bbox": {"x1": 0, "y1": 0, "x2": 1000, "y2": 800}},
+            {"label": "yellow tactile paving", "score": 0.3, "bbox": {"x1": 420, "y1": 600, "x2": 620, "y2": 730}},
+        ]
+
+        assignments = assign_feature_detections([feature], detections, min_score=0.1, image_width=1000, image_height=800)
+
+        self.assertEqual(len(assignments), 1)
+        self.assertEqual(assignments[0][1]["label"], "yellow tactile paving")
+
+    def test_clamps_boxes_to_image_bounds_before_export(self):
+        box = clamp_box({"x1": -4, "y1": 20, "x2": 1200, "y2": 900}, image_width=1000, image_height=800)
+
+        self.assertEqual(box, {"x1": 0.0, "y1": 20.0, "x2": 1000, "y2": 800})
+        self.assertAlmostEqual(box_area_ratio(box, 1000, 800), 0.975)
 
 
 if __name__ == "__main__":

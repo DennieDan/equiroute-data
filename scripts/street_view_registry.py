@@ -2,9 +2,10 @@
 """Build AccessTwin street-view node graph and photo registry.
 
 This is the lightweight Google-Street-View-like layer for the hack demo. It
-converts raw 5 m route segments into stable 8-10 m street parts, then creates a
-prev/next street-view node graph. Mapillary/crowd photos can be attached later;
-the graph itself is deterministic and safe to commit.
+converts raw 5 m measurement segments into stable ~25 m photo-visible street
+parts, then creates a prev/next street-view node graph. Mapillary/crowd photos
+can be attached per direction; the graph itself is deterministic and safe to
+commit.
 """
 
 from __future__ import annotations
@@ -12,6 +13,10 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import os
+import time
+import urllib.parse
+import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
@@ -79,10 +84,10 @@ def merge_scores(features: list[dict[str, Any]]) -> dict[str, Any]:
 
 def group_segments_into_street_parts(
     segments: list[dict[str, Any]],
-    target_length_m: float = 10.0,
+    target_length_m: float = 25.0,
     max_parts: int | None = None,
 ) -> list[dict[str, Any]]:
-    """Group contiguous 5 m route segments into 8-10 m street-photo parts."""
+    """Group contiguous 5 m measurements into ~photo-visible street parts."""
     route_segments = [s for s in segments if s.get("properties", {}).get("kind") == "route_segment"]
     parts: list[dict[str, Any]] = []
     bucket: list[dict[str, Any]] = []
@@ -182,6 +187,111 @@ def build_streets(street_parts: list[dict[str, Any]], turn_threshold_deg: float 
     return streets
 
 
+MAPILLARY_FIELDS = ",".join(
+    [
+        "id",
+        "is_pano",
+        "thumb_2048_url",
+        "thumb_1024_url",
+        "thumb_256_url",
+        "geometry",
+        "computed_geometry",
+        "compass_angle",
+        "computed_compass_angle",
+        "captured_at",
+        "sequence",
+    ]
+)
+
+# Manual visual QA rejects from the demo-corridor photo audit. These are
+# direction-valid by compass, but not useful accessibility evidence because they
+# are road-only, dominated by a bus/blank structure, blurry, or do not show a
+# usable pedestrian path/street-accessibility context.
+REJECTED_MAPILLARY_IMAGE_IDS = {
+    "158305022912618",
+    "474699267149343",
+    "915343820661531",
+    "644176977184642",
+    "149906617428263",
+    "320862360007937",
+    "150551397353401",
+    "245085431176456",
+    "5254710051242737",
+    "340347634774322",
+    "5571605572960452",
+}
+
+
+def mapillary_images_url(lng: float, lat: float, token: str, radius_m: int = 45, limit: int = 12) -> str:
+    params = {
+        "fields": MAPILLARY_FIELDS,
+        "lat": f"{lat:.7f}",
+        "lng": f"{lng:.7f}",
+        "radius": str(radius_m),
+        "limit": str(limit),
+        "access_token": token,
+    }
+    return "https://graph.mapillary.com/images?" + urllib.parse.urlencode(params)
+
+
+def fetch_mapillary_images(
+    lng: float,
+    lat: float,
+    token: str,
+    radius_m: int = 45,
+    limit: int = 12,
+    timeout_s: int = 20,
+) -> list[dict[str, Any]]:
+    """Fetch Mapillary image candidates for one street-part midpoint.
+
+    The caller is responsible for providing a token; this function never logs or
+    stores the token, and the token is not included in returned metadata.
+    """
+    url = mapillary_images_url(lng, lat, token, radius_m=radius_m, limit=limit)
+    with urllib.request.urlopen(url, timeout=timeout_s) as response:
+        payload = json.loads(response.read().decode("utf-8"))
+    rows = payload.get("data", []) if isinstance(payload, dict) else []
+    for row in rows:
+        row.setdefault("source", "mapillary")
+    return rows
+
+
+def harvest_mapillary_candidates(
+    street_parts: list[dict[str, Any]],
+    token: str,
+    radius_m: int = 45,
+    limit_per_part: int = 12,
+    sleep_s: float = 0.12,
+) -> dict[str, list[dict[str, Any]]]:
+    """Harvest candidate photos keyed by street_part external id."""
+    candidates_by_part: dict[str, list[dict[str, Any]]] = {}
+    seen_by_part: dict[str, set[str]] = {}
+    for i, part in enumerate(street_parts, start=1):
+        mid = part.get("midpoint") or [None, None]
+        lng, lat = mid[0], mid[1]
+        if lng is None or lat is None:
+            continue
+        rows = fetch_mapillary_images(
+            float(lng),
+            float(lat),
+            token=token,
+            radius_m=radius_m,
+            limit=limit_per_part,
+        )
+        seen = seen_by_part.setdefault(part["id"], set())
+        clean_rows = []
+        for row in rows:
+            image_id = str(row.get("id") or "")
+            if not image_id or image_id in seen:
+                continue
+            seen.add(image_id)
+            clean_rows.append(row)
+        candidates_by_part[part["id"]] = clean_rows
+        if sleep_s and i < len(street_parts):
+            time.sleep(sleep_s)
+    return candidates_by_part
+
+
 def candidate_coord(candidate: dict[str, Any]) -> list[float] | None:
     geom = candidate.get("computed_geometry") or candidate.get("geometry") or {}
     coords = geom.get("coordinates")
@@ -205,31 +315,50 @@ def captured_ts(candidate: dict[str, Any]) -> float:
         return 0.0
 
 
-def choose_best_photo(
+def desired_photo_headings(part_heading_deg: float) -> list[dict[str, Any]]:
+    """Return candidate camera headings for both pavement sides of a two-way road.
+
+    `road_right` preserves the original direction. `road_left_pavement_right`
+    uses the opposite compass heading so a two-way road with pavement on the
+    other side can still show the pedestrian path on the right of the image.
+    """
+    base = float(part_heading_deg) % 360
+    return [
+        {"heading_deg": base, "orientation": "road_right", "heading_role": "canonical"},
+        {"heading_deg": (base + 180) % 360, "orientation": "road_left_pavement_right", "heading_role": "opposite"},
+    ]
+
+
+def _choose_best_photo_from_options(
     candidates: list[dict[str, Any]],
     midpoint: list[float],
-    desired_heading_deg: float,
+    heading_options: list[dict[str, Any]],
     max_heading_delta: float = 35,
 ) -> dict[str, Any] | None:
-    """Choose best candidate by direction first, then distance/recency/pano."""
-    scored: list[tuple[float, dict[str, Any], bool, float, float]] = []
+    scored: list[tuple[float, dict[str, Any], bool, float, float, dict[str, Any]]] = []
     for cand in candidates:
+        if str(cand.get("id")) in REJECTED_MAPILLARY_IMAGE_IDS:
+            continue
         coord = candidate_coord(cand)
         heading = candidate_heading(cand)
         if coord is None or heading is None:
             continue
-        delta = abs(angle_diff(heading, desired_heading_deg))
+        best_option = min(heading_options, key=lambda opt: abs(angle_diff(heading, opt["heading_deg"])))
+        delta = abs(angle_diff(heading, best_option["heading_deg"]))
         direction_valid = delta <= max_heading_delta
         dist = haversine_m(coord, midpoint)
         recency_bonus = min(captured_ts(cand) / 1_000_000_000, 3)
         pano_bonus = 4 if cand.get("is_pano") else 0
-        score = (1000 if direction_valid else 0) - delta * 8 - dist * 2 + recency_bonus + pano_bonus
-        scored.append((score, cand, direction_valid, delta, dist))
+        opposite_penalty = 8 if best_option["heading_role"] == "opposite" else 0
+        score = (1000 if direction_valid else 0) - delta * 8 - dist * 2 + recency_bonus + pano_bonus - opposite_penalty
+        scored.append((score, cand, direction_valid, delta, dist, best_option))
     if not scored:
         return None
-    score, cand, direction_valid, delta, dist = max(scored, key=lambda x: x[0])
+    score, cand, direction_valid, delta, dist, best_option = max(scored, key=lambda x: x[0])
     coord = candidate_coord(cand) or midpoint
-    heading = candidate_heading(cand) or desired_heading_deg
+    heading = candidate_heading(cand) or best_option["heading_deg"]
+    metadata = dict(cand)
+    metadata["selected_heading_option"] = best_option
     return {
         "id": f"photo_{cand.get('id', 'candidate')}",
         "source": "mapillary",
@@ -239,12 +368,53 @@ def choose_best_photo(
         "lng": coord[0],
         "lat": coord[1],
         "compass_angle_deg": heading,
+        "matched_heading_deg": best_option["heading_deg"],
+        "heading_role": best_option["heading_role"],
+        "desired_orientation": best_option["orientation"],
         "direction_valid": direction_valid,
         "direction_confidence": round(max(0, 1 - delta / max_heading_delta), 3) if direction_valid else 0,
         "distance_to_midpoint_m": round(dist, 2),
         "is_pano": bool(cand.get("is_pano")),
-        "metadata": cand,
+        "metadata": metadata,
     }
+
+
+def choose_best_photo(
+    candidates: list[dict[str, Any]],
+    midpoint: list[float],
+    desired_heading_deg: float,
+    max_heading_delta: float = 35,
+    allow_opposite_heading: bool = True,
+) -> dict[str, Any] | None:
+    """Choose best candidate by direction first, then distance/recency/pano.
+
+    For two-way roads we evaluate both headings: the canonical road-on-right
+    heading and the opposite heading where the road may be left and pavement
+    stays visible on the right.
+    """
+    heading_options = desired_photo_headings(desired_heading_deg) if allow_opposite_heading else [desired_photo_headings(desired_heading_deg)[0]]
+    return _choose_best_photo_from_options(candidates, midpoint, heading_options, max_heading_delta=max_heading_delta)
+
+
+def choose_best_photos_by_direction(
+    candidates: list[dict[str, Any]],
+    midpoint: list[float],
+    desired_heading_deg: float,
+    max_heading_delta: float = 35,
+) -> list[dict[str, Any]]:
+    """Choose up to one active photo for each pavement-side direction."""
+    selected: list[dict[str, Any]] = []
+    used_source_ids: set[str] = set()
+    for option in desired_photo_headings(desired_heading_deg):
+        chosen = _choose_best_photo_from_options(candidates, midpoint, [option], max_heading_delta=max_heading_delta)
+        if not chosen or not chosen.get("direction_valid"):
+            continue
+        source_id = chosen.get("source_image_id")
+        if source_id in used_source_ids:
+            continue
+        used_source_ids.add(str(source_id))
+        selected.append(chosen)
+    return selected
 
 
 def photo_external_id(photo: dict[str, Any]) -> str:
@@ -252,8 +422,10 @@ def photo_external_id(photo: dict[str, Any]) -> str:
         return str(photo["external_id"])
     source = photo.get("source", "photo")
     raw = photo.get("source_image_id") or photo.get("id") or "unknown"
-    safe = "".join(ch if ch.isalnum() or ch in "_-" else "_" for ch in str(raw))
-    return f"photo_{source}_{safe}"
+    part = photo.get("street_part_id")
+    safe_raw = "".join(ch if ch.isalnum() or ch in "_-" else "_" for ch in str(raw))
+    safe_part = "".join(ch if ch.isalnum() or ch in "_-" else "_" for ch in str(part)) if part else None
+    return f"photo_{source}_{safe_part}_{safe_raw}" if safe_part else f"photo_{source}_{safe_raw}"
 
 
 def attach_active_photos(
@@ -261,31 +433,37 @@ def attach_active_photos(
     candidates_by_part: dict[str, list[dict[str, Any]]],
     max_heading_delta: float = 35,
 ) -> list[dict[str, Any]]:
-    """Choose one active photo per street part from Mapillary/crowd candidates.
+    """Choose active photos per street part from Mapillary/crowd candidates.
 
     Comments and feedback stay attached to street_part_id; photos can be replaced
-    over time while preserving discussion history.
+    over time while preserving discussion history. A two-way street part can hold
+    two active photos: one canonical road-on-right and one opposite-side view.
     """
     photos: list[dict[str, Any]] = []
+    used_source_image_ids: set[str] = set()
     for part in street_parts:
-        candidates = candidates_by_part.get(part["id"], [])
-        chosen = choose_best_photo(
+        candidates = [
+            c
+            for c in candidates_by_part.get(part["id"], [])
+            if str(c.get("id")) not in used_source_image_ids
+        ]
+        chosen_photos = choose_best_photos_by_direction(
             candidates,
             midpoint=part["midpoint"],
             desired_heading_deg=part["direction_bearing_deg"],
             max_heading_delta=max_heading_delta,
         )
-        if not chosen:
-            continue
-        chosen["external_id"] = photo_external_id(chosen)
-        chosen["id"] = chosen["external_id"]
-        chosen["street_part_id"] = part["id"]
-        chosen["street_id"] = part.get("street_id")
-        chosen["is_active"] = True
-        chosen["validation_status"] = "direction_valid" if chosen.get("direction_valid") else "needs_review"
-        chosen["selected_reason"] = "best_direction_distance_recency_candidate"
-        chosen["replaces_photo_id"] = None
-        photos.append(chosen)
+        for chosen in chosen_photos:
+            chosen["street_part_id"] = part["id"]
+            chosen["street_id"] = part.get("street_id")
+            chosen["external_id"] = photo_external_id(chosen)
+            chosen["id"] = chosen["external_id"]
+            chosen["is_active"] = True
+            chosen["validation_status"] = "direction_valid" if chosen.get("direction_valid") else "needs_review"
+            chosen["selected_reason"] = "best_direction_distance_recency_candidate"
+            chosen["replaces_photo_id"] = None
+            used_source_image_ids.add(str(chosen.get("source_image_id")))
+            photos.append(chosen)
     return photos
 
 
@@ -327,11 +505,27 @@ def jsonb_literal(value: Any) -> str:
     return sql_literal(json.dumps(value, separators=(",", ":"))) + "::jsonb"
 
 
+def timestamptz_expr(value: Any) -> str:
+    if value in (None, ""):
+        return "null"
+    if isinstance(value, (int, float)):
+        # Mapillary API returns milliseconds since epoch.
+        return f"to_timestamp({float(value) / 1000.0})"
+    text = str(value)
+    if text.isdigit():
+        return f"to_timestamp({int(text) / 1000.0})"
+    return sql_literal(text)
+
+
 def registry_to_supabase_seed_sql(registry: dict[str, Any]) -> str:
     """Export a street-view registry as idempotent Supabase seed SQL."""
     lines = [
         "-- Generated AccessTwin demo-corridor seed data.",
         "begin;",
+        "update public.street_view_nodes set active_photo_id=null, coverage_status='missing' where external_id like 'street_view_node_%';",
+        "update public.street_parts set active_photo_id=null where external_id like 'street_part_%';",
+        "delete from public.photo_feature_instances where photo_id in (select id from public.street_photos where source='mapillary' and external_id like 'photo_mapillary_%');",
+        "delete from public.street_photos where source='mapillary' and external_id like 'photo_mapillary_%';",
     ]
     for street in registry.get("streets", []):
         mid = street.get("midpoint", [None, None])
@@ -364,16 +558,18 @@ def registry_to_supabase_seed_sql(registry: dict[str, Any]) -> str:
         lines.append(
             "insert into public.street_photos "
             "(external_id, street_part_id, source, source_image_id, image_url, captured_at, lng, lat, compass_angle_deg, "
-            "direction_valid, direction_confidence, is_pano, is_active, validation_status, selected_reason, metadata) values ("
+            "matched_heading_deg, heading_role, desired_orientation, direction_valid, direction_confidence, is_pano, is_active, validation_status, selected_reason, metadata) values ("
             f"{sql_literal(photo['external_id'])}, (select id from public.street_parts where external_id={sql_literal(photo['street_part_id'])}), "
             f"{sql_literal(photo.get('source', 'mapillary'))}, {sql_literal(photo.get('source_image_id'))}, {sql_literal(photo.get('image_url'))}, "
-            f"{sql_literal(photo.get('captured_at'))}, {photo.get('lng')}, {photo.get('lat')}, {photo.get('compass_angle_deg')}, "
+            f"{timestamptz_expr(photo.get('captured_at'))}, {photo.get('lng')}, {photo.get('lat')}, {photo.get('compass_angle_deg')}, "
+            f"{photo.get('matched_heading_deg') if photo.get('matched_heading_deg') is not None else 'null'}, {sql_literal(photo.get('heading_role'))}, {sql_literal(photo.get('desired_orientation'))}, "
             f"{str(bool(photo.get('direction_valid'))).lower()}, {photo.get('direction_confidence') if photo.get('direction_confidence') is not None else 'null'}, "
             f"{str(bool(photo.get('is_pano'))).lower()}, {str(bool(photo.get('is_active'))).lower()}, "
             f"{sql_literal(photo.get('validation_status', 'needs_review'))}, {sql_literal(photo.get('selected_reason'))}, {jsonb_literal(photo.get('metadata', {}))}) "
             "on conflict (external_id) do update set "
             "street_part_id=excluded.street_part_id, source=excluded.source, source_image_id=excluded.source_image_id, image_url=excluded.image_url, "
             "captured_at=excluded.captured_at, lng=excluded.lng, lat=excluded.lat, compass_angle_deg=excluded.compass_angle_deg, "
+            "matched_heading_deg=excluded.matched_heading_deg, heading_role=excluded.heading_role, desired_orientation=excluded.desired_orientation, "
             "direction_valid=excluded.direction_valid, direction_confidence=excluded.direction_confidence, is_pano=excluded.is_pano, "
             "is_active=excluded.is_active, validation_status=excluded.validation_status, selected_reason=excluded.selected_reason, "
             "metadata=excluded.metadata;"
@@ -418,7 +614,7 @@ def registry_to_supabase_seed_sql(registry: dict[str, Any]) -> str:
 
 def build_registry(
     world: dict[str, Any],
-    target_length_m: float = 10.0,
+    target_length_m: float = 25.0,
     max_parts: int | None = 30,
     photo_candidates_by_part: dict[str, list[dict[str, Any]]] | None = None,
 ) -> dict[str, Any]:
@@ -442,14 +638,39 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--world", type=Path, default=DEFAULT_WORLD)
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
-    parser.add_argument("--target-length-m", type=float, default=10.0)
+    parser.add_argument("--target-length-m", type=float, default=25.0)
     parser.add_argument("--max-parts", type=int, default=30)
     parser.add_argument("--photo-candidates", type=Path, default=None, help="Optional JSON mapping street_part_id -> Mapillary/crowd candidate photos")
+    parser.add_argument("--harvest-mapillary", action="store_true", help="Fetch Mapillary candidates for generated street parts before selecting active photos")
+    parser.add_argument("--mapillary-token-env", default="MAPILLARY_TOKEN", help="Environment variable containing the Mapillary token")
+    parser.add_argument("--mapillary-radius-m", type=int, default=45)
+    parser.add_argument("--mapillary-limit-per-part", type=int, default=12)
+    parser.add_argument("--candidate-out", type=Path, default=None, help="Optional JSON output path for raw candidates keyed by street_part id")
     parser.add_argument("--seed-sql", type=Path, default=None, help="Optional Supabase seed SQL output path")
     args = parser.parse_args()
 
     world = json.loads(args.world.read_text())
     photo_candidates = json.loads(args.photo_candidates.read_text()) if args.photo_candidates else None
+    if args.harvest_mapillary:
+        token = os.environ.get(args.mapillary_token_env, "").strip()
+        if not token:
+            raise SystemExit(f"Missing Mapillary token env var: {args.mapillary_token_env}")
+        preview_parts = group_segments_into_street_parts(
+            world.get("features", []),
+            target_length_m=args.target_length_m,
+            max_parts=args.max_parts,
+        )
+        photo_candidates = harvest_mapillary_candidates(
+            preview_parts,
+            token=token,
+            radius_m=args.mapillary_radius_m,
+            limit_per_part=args.mapillary_limit_per_part,
+        )
+        if args.candidate_out:
+            args.candidate_out.parent.mkdir(parents=True, exist_ok=True)
+            args.candidate_out.write_text(json.dumps(photo_candidates, indent=2))
+            total_candidates = sum(len(v) for v in photo_candidates.values())
+            print(f"wrote {args.candidate_out} with {total_candidates} raw Mapillary candidates")
     registry = build_registry(
         world,
         target_length_m=args.target_length_m,
