@@ -182,7 +182,8 @@
       }
       button,
       select,
-      input {
+      input,
+      .buttonlike {
         border: 1px solid rgba(125, 211, 252, 0.35);
         background: rgba(15, 23, 42, 0.88);
         color: var(--txt);
@@ -323,6 +324,46 @@
         width: 100%;
         font-size: 12px;
         padding: 8px 10px;
+      }
+      .persona-route-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+      #runPersonaRouteBtn {
+        width: 100%;
+        margin-top: 8px;
+      }
+      .persona-route-summary {
+        margin-top: 8px;
+        padding: 8px;
+        border: 1px solid rgba(56, 189, 248, 0.25);
+        border-radius: 12px;
+        background: rgba(8, 47, 73, 0.36);
+      }
+      #roadNameLabels {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 23;
+        display: none;
+      }
+      #roadNameLabels.visible {
+        display: block;
+      }
+      .road-label {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        padding: 2px 7px;
+        border-radius: 999px;
+        color: #e0f2fe;
+        background: rgba(2, 6, 23, 0.58);
+        border: 1px solid rgba(186, 230, 253, 0.24);
+        text-shadow: 0 1px 2px #020617;
+        font-size: 11px;
+        font-weight: 800;
+        white-space: nowrap;
+        box-shadow: 0 6px 18px rgba(2, 6, 23, 0.28);
       }
       .persona-card {
         text-align: left;
@@ -500,6 +541,33 @@
       #settings.visible {
         display: block;
       }
+      #roleMenu {
+        right: 14px;
+        top: 70px;
+        width: min(310px, calc(100vw - 28px));
+        padding: 14px;
+        z-index: 36;
+        display: none;
+      }
+      #roleMenu.visible {
+        display: block;
+      }
+      #roleMenu p {
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.4;
+      }
+      .role-menu-actions {
+        display: grid;
+        gap: 8px;
+        margin-top: 12px;
+      }
+      .role-menu-actions a,
+      .role-menu-actions button {
+        width: 100%;
+        text-align: center;
+        text-decoration: none;
+      }
       #settings textarea {
         width: 100%;
         height: 70px;
@@ -630,6 +698,7 @@
       <div id="photoUploadStatus"></div>
     </section>
     <div id="segmentButtons"></div>
+    <div id="roadNameLabels" aria-hidden="true"></div>
     <div id="topbar" class="hud">
       <div class="brand">EquiRoute Earth</div>
       <span class="pill role-pill" id="roleLabel">Role</span>
@@ -660,6 +729,15 @@
       <h4>References</h4>
       <p id="standardsText"></p>
     </div>
+    <div id="roleMenu" class="hud">
+      <button class="close" id="closeRoleMenu">×</button>
+      <h3>Account</h3>
+      <p id="roleMenuStatus">Loading current role…</p>
+      <div class="role-menu-actions">
+        <a id="profilePageBtn" class="buttonlike" href="profile.html">Open profile</a>
+        <button id="logoutBtn" type="button">Log out</button>
+      </div>
+    </div>
     <div id="miniMap"><div class="label">Earth context</div></div>
     <section id="personaPanel" class="hud authority-only">
       <div class="persona-head">
@@ -669,6 +747,15 @@
       <div class="persona-selector">
         <label for="personaSelect">User type</label>
         <select id="personaSelect" title="Choose user type"></select>
+        <div class="persona-route-grid">
+          <label>Start street part
+            <select id="personaStartSelect" title="Choose route start street part"></select>
+          </label>
+          <label>End street part
+            <select id="personaEndSelect" title="Choose route end street part"></select>
+          </label>
+        </div>
+        <button type="button" id="runPersonaRouteBtn">Run route agent</button>
       </div>
       <div id="personaRecommendation">Loading persona travel simulation…</div>
     </section>
@@ -745,6 +832,9 @@
         detailContext: null,
         personaSimulation: null,
         activePersonaId: "wheelchair_user",
+        activeRouteStartPartId: null,
+        activeRouteEndPartId: null,
+        roadNameData: null,
         currentPhotoUploadContext: null,
       };
       window.__EARTH_ACCESSIBILITY_STATE = state;
@@ -823,12 +913,30 @@
       function setStatus(t) {
         document.getElementById("status").textContent = t;
       }
+      function updateRoleMenu() {
+        if (!window.roleMenuStatus) return;
+        const user = state.appUser || {};
+        const roleLabel = state.role === "authority" ? "Authority" : "Public";
+        const name = user.display_name || user.username || user.external_id || `${state.role} user`;
+        const username = user.username || user.external_id || "demo-user";
+        roleMenuStatus.innerHTML = `<b>Role:</b> ${roleLabel}<br><b>User:</b> ${name}<br><b>Username:</b> ${username}`;
+        if (window.profilePageBtn) {
+          profilePageBtn.href = `profile.html?role=${encodeURIComponent(state.role)}&user=${encodeURIComponent(user.external_id || "")}`;
+        }
+      }
+      function logoutToAuth() {
+        localStorage.removeItem(ROLE_STORAGE_KEY);
+        localStorage.removeItem(USER_STORAGE_KEY);
+        location.href = "index.html";
+      }
       function applyRoleUi() {
         if (window.roleSwitchBtn) {
           roleSwitchBtn.textContent = "Role";
-          roleSwitchBtn.title = "Switch AccessTwin role";
+          roleSwitchBtn.title = "Current role and account";
           roleSwitchBtn.onclick = () => {
-            if (state.role === "authority") settings.classList.toggle("visible");
+            settings?.classList.remove("visible");
+            roleMenu?.classList.toggle("visible");
+            updateRoleMenu();
           };
         }
         if (window.roleLabel) {
@@ -1170,6 +1278,67 @@
         }
         box.appendChild(frag);
       }
+      async function loadRoadNameData() {
+        if (state.roadNameData) return state.roadNameData;
+        try {
+          const data = await fetch("threejs_3d_roads.json").then((r) => r.json());
+          const anchor = data.anchor_center || data.anchor || [103.7716, 1.3062];
+          const latScale = 111320;
+          const lonScale = 111320 * Math.cos((anchor[1] * Math.PI) / 180);
+          const roads = (data.mesh_roads || [])
+            .filter((r) => r.name && r.name !== "Unnamed Road" && r.coordinates?.length)
+            .map((r) => {
+              const coords = r.coordinates.map((c) => [anchor[0] + Number(c[0] || 0) / lonScale, anchor[1] - Number(c[2] || 0) / latScale]);
+              const mid = coords[Math.floor(coords.length / 2)] || coords[0];
+              return { name: r.name, fclass: r.fclass, coords, mid };
+            });
+          state.roadNameData = { anchor, roads };
+        } catch (e) {
+          console.warn("road name labels unavailable", e);
+          state.roadNameData = { roads: [] };
+        }
+        return state.roadNameData;
+      }
+      function nearestRoadName(coord) {
+        const roads = state.roadNameData?.roads || [];
+        if (!coord || !roads.length) return "Clementi, Singapore";
+        let best = null;
+        for (const road of roads) {
+          for (const c of road.coords) {
+            const d = distM(coord, c);
+            if (!best || d < best.d) best = { name: road.name, d };
+          }
+        }
+        return best?.name && best.d < 220 ? best.name : "Clementi";
+      }
+      function streetPartAddress(part, f = null) {
+        const coord = part?.midpoint || (f ? middle(f) : null);
+        const road = nearestRoadName(coord);
+        const suffix = coord ? ` · ${coord[1].toFixed(5)}, ${coord[0].toFixed(5)}` : "";
+        return `Near ${road}, Singapore${suffix}`;
+      }
+      function renderRoadNameLabels() {
+        if (!window.roadNameLabels) return;
+        const visible = state.mode === "earth" && (map.getZoom?.() || 0) >= 17.35;
+        roadNameLabels.classList.toggle("visible", visible);
+        if (!visible) {
+          roadNameLabels.innerHTML = "";
+          return;
+        }
+        const roads = state.roadNameData?.roads || [];
+        const seen = [];
+        const labels = [];
+        for (const road of roads) {
+          const pt = map.coordinateToContainerPoint(new maptalks.Coordinate(...road.mid));
+          if (pt.x < -40 || pt.y < 80 || pt.x > innerWidth + 40 || pt.y > innerHeight + 40) continue;
+          if (seen.some((p) => Math.hypot(p.x - pt.x, p.y - pt.y) < 120 && p.name === road.name)) continue;
+          seen.push({ x: pt.x, y: pt.y, name: road.name });
+          labels.push(`<div class="road-label" style="left:${Math.round(pt.x)}px;top:${Math.round(pt.y)}px">${road.name}</div>`);
+          if (labels.length >= 14) break;
+        }
+        roadNameLabels.innerHTML = labels.join("");
+      }
+
       function addonFor(p) {
         const m = p.metrics || {};
         if (m.near_bus_stop_m != null && m.near_bus_stop_m < 18)
@@ -1469,6 +1638,8 @@
         ].join(" · ");
         initThreeOverlay();
         populateSelect();
+        populatePersonaSelector();
+        renderRoadNameLabels();
         selectSegment(0, false);
         detailCard.classList.remove("visible");
       }
@@ -1595,22 +1766,48 @@
       function personaSummary(personaId = state.activePersonaId) {
         return state.personaSimulation?.personas?.[personaId] || null;
       }
+      function personaPartOptionLabel(part) {
+        const score = part.metrics?.overall_accessibility_score ?? "–";
+        const street = (state.streetRegistry?.streets || []).find((s) => s.id === part.street_id);
+        return `${streetPartDisplayName(part)} · ${Math.round(part.length_m || 0)}m · ${score}/100${street?.name ? " · " + street.name : ""}`;
+      }
       function populatePersonaSelector() {
-        if (!window.personaSelect) return;
         const sim = state.personaSimulation;
-        if (!sim?.personas) return;
-        const options = Object.entries(sim.personas)
-          .map(([pid, p]) => `<option value="${pid}">${p.label}</option>`)
-          .join("");
-        if (personaSelect.innerHTML !== options) personaSelect.innerHTML = options;
-        if (!state.activePersonaId || !sim.personas[state.activePersonaId]) {
-          state.activePersonaId = Object.keys(sim.personas)[0] || null;
+        if (sim?.personas) {
+          const options = Object.entries(sim.personas)
+            .map(([pid, p]) => `<option value="${pid}">${p.label}</option>`)
+            .join("");
+          if (personaSelect.innerHTML !== options) personaSelect.innerHTML = options;
+          if (!state.activePersonaId || !sim.personas[state.activePersonaId]) {
+            state.activePersonaId = Object.keys(sim.personas)[0] || null;
+          }
+          personaSelect.value = state.activePersonaId;
+          personaSelect.onchange = () => {
+            state.activePersonaId = personaSelect.value;
+            renderPersonaForCurrentPart();
+          };
         }
-        personaSelect.value = state.activePersonaId;
-        personaSelect.onchange = () => {
-          state.activePersonaId = personaSelect.value;
-          renderPersonaForCurrentPart();
-        };
+        const parts = state.streetRegistry?.street_parts || [];
+        if (window.personaStartSelect && window.personaEndSelect && parts.length) {
+          const options = parts.map((part) => `<option value="${part.id}">${personaPartOptionLabel(part)}</option>`).join("");
+          if (personaStartSelect.innerHTML !== options) personaStartSelect.innerHTML = options;
+          if (personaEndSelect.innerHTML !== options) personaEndSelect.innerHTML = options;
+          const current = currentStreetPart() || parts[0];
+          state.activeRouteStartPartId ||= current?.id || parts[0]?.id;
+          const startIndex = Math.max(0, parts.findIndex((p) => p.id === state.activeRouteStartPartId));
+          state.activeRouteEndPartId ||= parts[Math.min(parts.length - 1, Math.max(4, startIndex + 4))]?.id || parts.at(-1)?.id;
+          personaStartSelect.value = state.activeRouteStartPartId;
+          personaEndSelect.value = state.activeRouteEndPartId;
+          personaStartSelect.onchange = () => {
+            state.activeRouteStartPartId = personaStartSelect.value;
+            renderPersonaRouteSummary();
+          };
+          personaEndSelect.onchange = () => {
+            state.activeRouteEndPartId = personaEndSelect.value;
+            renderPersonaRouteSummary();
+          };
+        }
+        if (window.runPersonaRouteBtn) runPersonaRouteBtn.onclick = renderPersonaRouteSummary;
       }
       function renderPersonaPanel() {
         if (!window.personaRecommendation) return;
@@ -1621,6 +1818,29 @@
         }
         populatePersonaSelector();
         renderPersonaForCurrentPart();
+      }
+      function routePartsBetween(startId, endId) {
+        const parts = state.streetRegistry?.street_parts || [];
+        const a = parts.findIndex((p) => p.id === startId);
+        const b = parts.findIndex((p) => p.id === endId);
+        if (a < 0 || b < 0) return [];
+        const lo = Math.min(a, b), hi = Math.max(a, b);
+        return parts.slice(lo, hi + 1);
+      }
+      function personaForPart(part, personaId = state.activePersonaId) {
+        return personaPartFor(part.id)?.personas?.[personaId] || null;
+      }
+      function renderPersonaRouteSummary() {
+        const parts = routePartsBetween(state.activeRouteStartPartId, state.activeRouteEndPartId);
+        if (!parts.length) return renderPersonaForCurrentPart();
+        const personaLabel = personaSummary()?.label || "Persona";
+        const scored = parts.map((part) => ({ part, persona: personaForPart(part) })).filter((x) => x.persona);
+        const avg = scored.length ? Math.round(scored.reduce((sum, x) => sum + Number(x.persona.score || 0), 0) / scored.length) : "–";
+        const worst = scored.slice().sort((a, b) => Number(a.persona.score || 999) - Number(b.persona.score || 999))[0];
+        const start = parts[0], end = parts.at(-1);
+        const selectedIdx = segmentIndexForStreetPart(start);
+        if (selectedIdx >= 0 && state.selectedIndex !== selectedIdx) selectSegment(selectedIdx, false);
+        personaRecommendation.innerHTML = `<div class="persona-route-summary"><b>${personaLabel} route</b><br>${streetPartDisplayName(start)} → ${streetPartDisplayName(end)}: ${avg}/100 across ${parts.length} street parts<br>${worst ? `Worst: ${streetPartDisplayName(worst.part)} · ${worst.persona.score}/100 · ${(worst.persona.blocker_labels || []).join(", ") || "no major blocker"}<br>${worst.persona.recommended_improvement}` : "No persona scores for this route yet."}</div>`;
       }
       function renderPersonaForCurrentPart() {
         if (!window.personaRecommendation) return;
@@ -1641,14 +1861,14 @@
             : null;
           personaRecommendation.innerHTML = first
             ? `<b>Priority:</b> ${summary.label} · ${firstPart ? streetPartDisplayName(firstPart) : first.street_part_id} · ${first.score}/100<br>${first.recommended_improvement}`
-            : "Persona agents ready. Choose a footpath to see the score and recommendation.";
+            : "Persona agents ready. Choose start/end street parts, then run the route agent.";
           return;
         }
         const label = persona.label || personaSummary()?.label || "Persona";
         const blockers = persona.blocker_labels?.length
           ? ` · ${persona.blocker_labels.join(", ")}`
           : "";
-        personaRecommendation.innerHTML = `<b>${label}</b> on ${streetPartDisplayName(part)}: ${persona.score}/100${blockers}<br>${persona.recommended_improvement}`;
+        personaRecommendation.innerHTML = `<b>${label}</b> on ${streetPartDisplayName(part)}: ${persona.score}/100${blockers}<br>${persona.recommended_improvement}<br><small>Choose start/end above to run a corridor route agent.</small>`;
       }
       function displayPropsForSegmentFeature(f) {
         const raw = f?.properties || {};
@@ -1665,6 +1885,7 @@
             length_m: part.length_m,
             source_segment_count: part.metrics?.source_segment_count,
           },
+          address: streetPartAddress(part, f),
           street_part_external_id: part.id,
         };
       }
@@ -1684,7 +1905,7 @@
           ? `${baseName} · ${cleanType}`
           : baseName;
         selectedDesc.textContent = p.metrics?.length_m
-          ? `${Math.round(p.metrics.length_m * 10) / 10} m footpath${p.metrics.source_segment_count ? ` · ${p.metrics.source_segment_count} measurements` : ""}`
+          ? `${p.address ? p.address + " · " : ""}${Math.round(p.metrics.length_m * 10) / 10} m footpath${p.metrics.source_segment_count ? ` · ${p.metrics.source_segment_count} measurements` : ""}`
           : `${kindLabel || cleanType}${extras.distanceM != null ? ` · ~${Math.round(extras.distanceM)}m from camera` : ""}`;
         activeScore.textContent =
           p.overall_accessibility_score ?? extras.score ?? "–";
@@ -1938,7 +2159,8 @@
         renderSegmentButtons(false);
         if (window.photoUploadPanel) photoUploadPanel.classList.remove("visible");
         renderSatelliteFallback();
-        setTimeout(updateThreeOverlay, 80);
+        renderRoadNameLabels();
+        setTimeout(() => { updateThreeOverlay(); renderRoadNameLabels(); }, 80);
       }
       function setupMiniMap() {
         if (state.miniMap) return;
@@ -2493,9 +2715,12 @@
       earthBtn.onclick = () => selectSegment(state.selectedIndex, false);
       streetBtn.onclick = () => selectSegment(state.selectedIndex, true);
       settingsBtn.onclick = () => {
+        roleMenu?.classList.remove("visible");
         if (state.role === "authority") settings.classList.toggle("visible");
       };
       closeSettings.onclick = () => settings.classList.remove("visible");
+      if (window.closeRoleMenu) closeRoleMenu.onclick = () => roleMenu.classList.remove("visible");
+      if (window.logoutBtn) logoutBtn.onclick = logoutToAuth;
       if (window.togglePersonaPanelBtn) {
         togglePersonaPanelBtn.onclick = () => togglePersonaPanel();
       }
@@ -2535,11 +2760,13 @@
         if (state.mode === "earth") {
           renderSegmentButtons(false);
           updateThreeOverlay();
+          renderRoadNameLabels();
         }
       });
       window.addEventListener("resize", () => {
         renderSatelliteFallback();
         renderSegmentButtons(state.mode === "street");
+        renderRoadNameLabels();
       });
       async function supabaseRest(table, query = "select=*") {
         const url = `${SUPABASE_URL}/rest/v1/${table}?${query}`;
@@ -2702,13 +2929,14 @@
           .then((r) => (r.ok ? r.json() : null))
           .catch(() => null),
       ])
-        .then(([world, buildings, registry, cvInstances, personaSimulation]) => {
+        .then(async ([world, buildings, registry, cvInstances, personaSimulation]) => {
           state.world = world;
           state.buildings = buildings;
           state.streetRegistry = registry;
           state.photoFeatureInstances = cvInstances?.instances || [];
           state.personaSimulation = personaSimulation;
           renderPersonaPanel();
+          await loadRoadNameData();
           renderBuildings(buildings);
           renderWorld(world);
           const ext = routeLayer.getExtent();
