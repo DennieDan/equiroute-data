@@ -128,9 +128,9 @@
   <body>
     <main>
       <div class="eyebrow">AccessTwin / EquiRoute</div>
-      <h1>choose your platform</h1>
+      <h1>log in to AccessTwin</h1>
       <p>
-        Select a user from the database before entering the Clementi accessibility twin. Public users get a clean feedback/reporting experience; authority users get planning tools, persona-agent simulation, and improvement priorities.
+        Choose whether to log in as a public user or an authority user, then select the matching database account before entering the Clementi accessibility twin.
       </p>
       <div class="roles">
         <button class="role" data-role="public">
@@ -143,7 +143,7 @@
           </ul>
           <span class="user-label">Public-facing database user</span>
           <select id="publicUserSelect" data-user-select="public" aria-label="Public user account"></select>
-          <span class="tag">enter public platform</span>
+          <span class="tag">log in as public</span>
         </button>
         <button class="role" data-role="authority">
           <b>Authority / planner</b>
@@ -155,7 +155,7 @@
           </ul>
           <span class="user-label">Authority-facing database user</span>
           <select id="authorityUserSelect" data-user-select="authority" aria-label="Authority user account"></select>
-          <span class="tag">enter authority dashboard</span>
+          <span class="tag">log in as authority</span>
         </button>
       </div>
       <p class="db-note" id="dbUserStatus">Loading users from Supabase…</p>
@@ -167,12 +167,12 @@
       const USER_STORAGE_KEY = "accesstwin_user";
       const params = new URLSearchParams(location.search);
       const fallbackUsers = [
-        { external_id: "public_wheelchair_commuter", display_name: "Nurul, wheelchair commuter", role: "public", organization: "Clementi resident", persona_hint: "wheelchair_user" },
-        { external_id: "public_senior_walker", display_name: "Mr Tan, senior with walker", role: "public", organization: "Clementi resident", persona_hint: "senior_walker" },
-        { external_id: "public_low_vision_commuter", display_name: "Aisha, visually impaired commuter", role: "public", organization: "SMU volunteer tester", persona_hint: "visually_impaired" },
-        { external_id: "authority_lta_planner", display_name: "LTA accessibility planner", role: "authority", organization: "Land Transport Authority", persona_hint: "wheelchair_user" },
-        { external_id: "authority_town_council", display_name: "Town council estate officer", role: "authority", organization: "Clementi Town Council", persona_hint: "senior_walker" },
-        { external_id: "authority_sbs_operator", display_name: "SBS Transit operations reviewer", role: "authority", organization: "SBS Transit", persona_hint: "pma_user" },
+        { external_id: "public_wheelchair_commuter", username: "nurul.public", display_name: "Nurul, wheelchair commuter", role: "public", organization: "Clementi resident", persona_hint: "wheelchair_user" },
+        { external_id: "public_senior_walker", username: "tan.public", display_name: "Mr Tan, senior with walker", role: "public", organization: "Clementi resident", persona_hint: "senior_walker" },
+        { external_id: "public_low_vision_commuter", username: "aisha.public", display_name: "Aisha, visually impaired commuter", role: "public", organization: "SMU volunteer tester", persona_hint: "visually_impaired" },
+        { external_id: "authority_lta_planner", username: "lta.planner", display_name: "LTA accessibility planner", role: "authority", organization: "Land Transport Authority", persona_hint: "wheelchair_user" },
+        { external_id: "authority_town_council", username: "towncouncil.officer", display_name: "Town council estate officer", role: "authority", organization: "Clementi Town Council", persona_hint: "senior_walker" },
+        { external_id: "authority_sbs_operator", username: "sbs.operator", display_name: "SBS Transit operations reviewer", role: "authority", organization: "SBS Transit", persona_hint: "pma_user" },
       ];
       function safeNext() {
         const raw = params.get("next") || "earth_accessibility.html";
@@ -189,9 +189,14 @@
       }
       async function loadUsers() {
         try {
-          const r = await fetch(`${SUPABASE_URL}/rest/v1/app_users?select=external_id,display_name,role,organization,persona_hint,metadata,is_active&is_active=eq.true&order=role.asc,display_name.asc`, {
+          let r = await fetch(`${SUPABASE_URL}/rest/v1/app_users?select=external_id,username,display_name,role,organization,persona_hint,metadata,is_active&is_active=eq.true&order=role.asc,display_name.asc`, {
             headers: { apikey: SUPABASE_PUBLISHABLE_KEY, Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}` },
           });
+          if (!r.ok) {
+            r = await fetch(`${SUPABASE_URL}/rest/v1/app_users?select=external_id,display_name,role,organization,persona_hint,metadata,is_active&is_active=eq.true&order=role.asc,display_name.asc`, {
+              headers: { apikey: SUPABASE_PUBLISHABLE_KEY, Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}` },
+            });
+          }
           if (!r.ok) throw new Error(`Supabase ${r.status}`);
           const rows = await r.json();
           if (!rows?.length) throw new Error("no app_users rows");

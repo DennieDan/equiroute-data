@@ -75,6 +75,11 @@ create policy "public insert street photo objects" on storage.objects
 drop policy if exists "public read demo users" on public.app_users;
 create policy "public read demo users" on public.app_users for select using (is_active = true);
 
+drop policy if exists "public update demo profiles" on public.app_users;
+create policy "public update demo profiles" on public.app_users
+  for update using (is_active = true)
+  with check (is_active = true and role in ('public','authority'));
+
 -- Demo/anon feedback from the map UI (no auth yet).
 drop policy if exists "public insert feedback threads" on public.feedback_threads;
 create policy "public insert feedback threads" on public.feedback_threads
