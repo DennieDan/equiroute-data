@@ -330,10 +330,6 @@
         grid-template-columns: 1fr 1fr;
         gap: 8px;
       }
-      #runPersonaRouteBtn {
-        width: 100%;
-        margin-top: 8px;
-      }
       .persona-route-summary {
         margin-top: 8px;
         padding: 8px;
@@ -731,6 +727,7 @@
         }
       }
     </style>
+    <link rel="stylesheet" href="harvard.css" />
     <script src="https://unpkg.com/maptalks/dist/maptalks.min.js"></script>
     <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
     <script src="https://unpkg.com/mapillary-js@4.1.2/dist/mapillary.js"></script>
@@ -805,7 +802,6 @@
             <select id="personaEndSelect" title="Choose route end street part"></select>
           </label>
         </div>
-        <button type="button" id="runPersonaRouteBtn">Run route agent</button>
       </div>
       <div id="personaRecommendation">Loading persona travel simulation…</div>
     </section>
@@ -1632,46 +1628,10 @@
           });
         });
         routeLayer.addGeometry(routeGeoms);
-        const poi = state.features.map((f) => {
-          const p = f.properties;
-          const coord =
-            f.geometry.type === "Point"
-              ? f.geometry.coordinates
-              : centroid(f.geometry.coordinates[0]);
-          const label =
-            p.kind === "bus_stop"
-              ? "BUS"
-              : p.kind === "mrt_station"
-                ? "MRT"
-                : p.kind === "covered_linkway"
-                  ? "shelter"
-                  : p.kind === "pedestrian_overhead_bridge"
-                    ? "bridge"
-                    : p.kind === "bollard"
-                      ? "bollard"
-                      : "";
-          return new maptalks.Marker(coord, {
-            symbol: [
-              {
-                markerType: "ellipse",
-                markerFill: p.kind === "bollard" ? COLORS.red : COLORS.orange,
-                markerLineColor: "#fff",
-                markerLineWidth: 1,
-                markerWidth: p.kind === "mrt_station" ? 22 : 14,
-                markerHeight: p.kind === "mrt_station" ? 22 : 14,
-              },
-              {
-                textName: label,
-                textSize: 10,
-                textFill: "#fff",
-                textHaloFill: "#020617",
-                textHaloRadius: 2,
-                textDy: -18,
-              },
-            ],
-          });
-        });
-        poiLayer.addGeometry(poi);
+        // Keep Earth view focused on selectable street parts only. Feature-level
+        // items such as bollards, shelters and tactile cues are shown in Street
+        // View for their associated street part, not as noisy map markers.
+        poiLayer.clear();
         document.getElementById("segCount").textContent =
           state.segments.length.toLocaleString();
         initThreeOverlay();
@@ -1845,7 +1805,6 @@
             renderPersonaRouteSummary();
           };
         }
-        if (window.runPersonaRouteBtn) runPersonaRouteBtn.onclick = renderPersonaRouteSummary;
       }
       function renderPersonaPanel() {
         if (!window.personaRecommendation) return;
@@ -1899,14 +1858,14 @@
             : null;
           personaRecommendation.innerHTML = first
             ? `<b>Priority:</b> ${summary.label} · ${firstPart ? streetPartDisplayName(firstPart) : first.street_part_id} · ${first.score}/100<br>${first.recommended_improvement}`
-            : "Persona agents ready. Choose start/end street parts, then run the route agent.";
+            : "Persona agents ready. Choose start/end street parts to update the route summary.";
           return;
         }
         const label = persona.label || personaSummary()?.label || "Persona";
         const blockers = persona.blocker_labels?.length
           ? ` · ${persona.blocker_labels.join(", ")}`
           : "";
-        personaRecommendation.innerHTML = `<b>${label}</b> on ${streetPartDisplayName(part)}: ${persona.score}/100${blockers}<br>${persona.recommended_improvement}<br><small>Choose start/end above to run a corridor route agent.</small>`;
+        personaRecommendation.innerHTML = `<b>${label}</b> on ${streetPartDisplayName(part)}: ${persona.score}/100${blockers}<br>${persona.recommended_improvement}<br><small>Choose start/end above to update the corridor route summary.</small>`;
       }
       function displayPropsForSegmentFeature(f) {
         const raw = f?.properties || {};
