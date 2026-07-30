@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Computer-vision localization for AccessTwin street photos.
+"""Computer-vision localization for JalanLens street photos.
 
 Default provider is Agnes AI (`agnes-2.5-flash`) because it gives better
 Singapore street-scene understanding than the earlier open-vocabulary OWLv2
@@ -229,7 +229,7 @@ def run_agnes_vision(photo_url: str, image: Image.Image, expected: list[dict[str
         for f in expected
     ]
     prompt = (
-        "You are localizing accessibility features in a Singapore street-level photo for AccessTwin. "
+        "You are localizing accessibility features in a Singapore street-level photo for JalanLens. "
         "Inspect the image directly and detect visible accessibility-relevant objects/features: sheltered/covered walkway, tactile paving, bollard/post, kerb ramp/curb cut, bus stop/shelter, footbridge, station entrance. "
         "Use the candidate list only to link visible objects back to map features when there is a plausible same-kind candidate nearby. "
         "Avoid duplicates: one physical shelter/covered walkway should be one detection even if the candidate list has multiple covered_linkway IDs. "

@@ -1,4 +1,4 @@
--- AccessTwin Supabase schema for hack MVP
+-- JalanLens Supabase schema for hack MVP
 -- Portable to Huawei Cloud RDS/Postgres later.
 
 create extension if not exists pgcrypto;

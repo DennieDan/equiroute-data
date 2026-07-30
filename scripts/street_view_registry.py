@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build AccessTwin street-view node graph and photo registry.
+"""Build JalanLens street-view node graph and photo registry.
 
 This is the lightweight Google-Street-View-like layer for the hack demo. It
 converts raw 5 m measurement segments into stable ~25 m photo-visible street
@@ -520,7 +520,7 @@ def timestamptz_expr(value: Any) -> str:
 def registry_to_supabase_seed_sql(registry: dict[str, Any]) -> str:
     """Export a street-view registry as idempotent Supabase seed SQL."""
     lines = [
-        "-- Generated AccessTwin demo-corridor seed data.",
+        "-- Generated JalanLens demo-corridor seed data.",
         "begin;",
         "update public.street_view_nodes set active_photo_id=null, coverage_status='missing' where external_id like 'street_view_node_%';",
         "update public.street_parts set active_photo_id=null where external_id like 'street_part_%';",

@@ -1,4 +1,4 @@
--- Generated AccessTwin demo-corridor seed data.
+-- Generated JalanLens demo-corridor seed data.
 begin;
 update public.street_view_nodes set active_photo_id=null, coverage_status='missing' where external_id like 'street_view_node_%';
 update public.street_parts set active_photo_id=null where external_id like 'street_part_%';

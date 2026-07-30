@@ -1,4 +1,4 @@
--- AccessTwin demo users for public and authority-facing platforms.
+-- JalanLens demo users for public and authority-facing platforms.
 -- This is intentionally lightweight for the hack MVP: real auth can later map
 -- these profiles to Supabase Auth users via auth_user_id.
 begin;

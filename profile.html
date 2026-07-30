@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AccessTwin Profile</title>
+    <title>JalanLens Profile</title>
     <style>
       :root { --bg:#020617; --card:rgba(15,23,42,.86); --line:rgba(125,211,252,.3); --txt:#e0f2fe; --muted:#94a3b8; --blue:#38bdf8; --green:#22c55e; --red:#fb7185; }
       * { box-sizing: border-box; }
@@ -24,7 +24,7 @@
   </head>
   <body>
     <main>
-      <div class="eyebrow">AccessTwin account</div>
+      <div class="eyebrow">JalanLens account</div>
       <h1>profile</h1>
       <p id="summary">Loading current database user…</p>
       <form id="profileForm">
@@ -45,11 +45,13 @@
     <script>
       const SUPABASE_URL = "https://khddsjemkdcgumfvkraa.supabase.co";
       const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_lqGtwkNAOMV7qsYPKVZr8w_GytZx3Qm";
-      const ROLE_STORAGE_KEY = "accesstwin_role";
-      const USER_STORAGE_KEY = "accesstwin_user";
+      const ROLE_STORAGE_KEY = "jalanlens_role";
+      const USER_STORAGE_KEY = "jalanlens_user";
+      const LEGACY_ROLE_STORAGE_KEY = "access" + "twin_role";
+      const LEGACY_USER_STORAGE_KEY = "access" + "twin_user";
       const params = new URLSearchParams(location.search);
-      const stored = JSON.parse(localStorage.getItem(USER_STORAGE_KEY) || "null");
-      const role = params.get("role") || localStorage.getItem(ROLE_STORAGE_KEY) || stored?.role || "public";
+      const stored = JSON.parse(localStorage.getItem(USER_STORAGE_KEY) || localStorage.getItem(LEGACY_USER_STORAGE_KEY) || "null");
+      const role = params.get("role") || localStorage.getItem(ROLE_STORAGE_KEY) || localStorage.getItem(LEGACY_ROLE_STORAGE_KEY) || stored?.role || "public";
       const externalId = params.get("user") || stored?.external_id || "";
       const headers = (extra = {}) => ({ apikey: SUPABASE_PUBLISHABLE_KEY, Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`, ...extra });
       const setStatus = (msg, kind = "") => { status.textContent = msg; status.className = kind; };
@@ -76,7 +78,7 @@
         localStorage.setItem(ROLE_STORAGE_KEY, user.role);
         displayName.value = user.display_name;
         username.value = user.username;
-        summary.textContent = `${user.role === "authority" ? "Authority" : "Public"} account · ${user.organization || "AccessTwin demo"}`;
+        summary.textContent = `${user.role === "authority" ? "Authority" : "Public"} account · ${user.organization || "JalanLens demo"}`;
         backLink.href = `earth_accessibility.html?role=${encodeURIComponent(user.role)}&user=${encodeURIComponent(user.external_id || "")}`;
         return user;
       }
@@ -113,6 +115,8 @@
       logoutBtn.onclick = () => {
         localStorage.removeItem(ROLE_STORAGE_KEY);
         localStorage.removeItem(USER_STORAGE_KEY);
+        localStorage.removeItem(LEGACY_ROLE_STORAGE_KEY);
+        localStorage.removeItem(LEGACY_USER_STORAGE_KEY);
         location.href = "index.html";
       };
     </script>

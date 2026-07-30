@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Simulate disability persona agents over the AccessTwin street-part map.
+"""Simulate disability persona agents over the JalanLens street-part map.
 
 The frontend works at public ~25 m street-part granularity, while
 `accessibility_world.geojson` keeps hidden ~5 m measurement segments. This script
@@ -156,7 +156,7 @@ def build_simulation(world: dict[str, Any], registry: dict[str, Any]) -> dict[st
             ],
         }
     return {
-        "project": "AccessTwin Clementi persona-agent travel simulation",
+        "project": "JalanLens Clementi persona-agent travel simulation",
         "unit": "25m street_part aggregated from hidden 5m measurement segments",
         "method": "deterministic proxy scoring from accessibility_world.geojson persona segment scores",
         "personas": persona_summaries,

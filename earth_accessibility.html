@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EquiRoute Earth Accessibility</title>
+    <title>JalanLens Earth Accessibility</title>
     <link
       rel="stylesheet"
       href="https://unpkg.com/maptalks/dist/maptalks.css"
@@ -700,7 +700,7 @@
     <div id="segmentButtons"></div>
     <div id="roadNameLabels" aria-hidden="true"></div>
     <div id="topbar" class="hud">
-      <div class="brand">EquiRoute Earth</div>
+      <div class="brand">JalanLens Earth</div>
       <span class="pill role-pill" id="roleLabel">Role</span>
       <span class="pill" id="modeLabel" hidden></span>
       <span class="pill" id="earthSource" hidden></span>
@@ -845,12 +845,16 @@
       // accessibility/OSM lines do not keep separating while the satellite
       // raster is only being over-zoomed.
       const SATELLITE_MAX_NATIVE_ZOOM = 18;
-      const ROLE_STORAGE_KEY = "accesstwin_role";
-      const USER_STORAGE_KEY = "accesstwin_user";
+      const ROLE_STORAGE_KEY = "jalanlens_role";
+      const USER_STORAGE_KEY = "jalanlens_user";
+      const LEGACY_ROLE_STORAGE_KEY = "access" + "twin_role";
+      const LEGACY_USER_STORAGE_KEY = "access" + "twin_user";
+      const TOKEN_STORAGE_KEY = "jalanlens_mapillary_token";
+      const LEGACY_TOKEN_STORAGE_KEY = "equi" + "route_mapillary_token";
       const VALID_ROLES = new Set(["public", "authority"]);
       const params = new URLSearchParams(location.search);
       const requestedRole = params.get("role");
-      const storedRole = localStorage.getItem(ROLE_STORAGE_KEY);
+      const storedRole = localStorage.getItem(ROLE_STORAGE_KEY) || localStorage.getItem(LEGACY_ROLE_STORAGE_KEY);
       const activeRole = VALID_ROLES.has(requestedRole)
         ? requestedRole
         : VALID_ROLES.has(storedRole)
@@ -858,11 +862,11 @@
           : "";
       if (!activeRole) {
         location.replace(`index.html?next=${encodeURIComponent(location.pathname.split("/").pop() + location.search)}`);
-        throw new Error("AccessTwin role required");
+        throw new Error("JalanLens role required");
       }
       state.role = activeRole;
       try {
-        state.appUser = JSON.parse(localStorage.getItem(USER_STORAGE_KEY) || "null");
+        state.appUser = JSON.parse(localStorage.getItem(USER_STORAGE_KEY) || localStorage.getItem(LEGACY_USER_STORAGE_KEY) || "null");
       } catch (e) {
         state.appUser = null;
       }
@@ -903,11 +907,11 @@
         selectedLayer = new maptalks.VectorLayer("selected").addTo(map);
       state.layers = { routeLayer, poiLayer, buildingLayer, selectedLayer };
       function getToken() {
-        return localStorage.getItem("equiroute_mapillary_token") || "";
+        return localStorage.getItem(TOKEN_STORAGE_KEY) || localStorage.getItem(LEGACY_TOKEN_STORAGE_KEY) || "";
       }
       function setToken(t) {
         if ((t || "").trim())
-          localStorage.setItem("equiroute_mapillary_token", t.trim());
+          localStorage.setItem(TOKEN_STORAGE_KEY, t.trim());
         updateSettings();
       }
       function setStatus(t) {
@@ -927,6 +931,8 @@
       function logoutToAuth() {
         localStorage.removeItem(ROLE_STORAGE_KEY);
         localStorage.removeItem(USER_STORAGE_KEY);
+        localStorage.removeItem(LEGACY_ROLE_STORAGE_KEY);
+        localStorage.removeItem(LEGACY_USER_STORAGE_KEY);
         location.href = "index.html";
       }
       function applyRoleUi() {

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AccessTwin Login</title>
+    <title>JalanLens Login</title>
     <style>
       :root {
         --bg: #020617;
@@ -81,7 +81,7 @@
   </head>
   <body>
     <main>
-      <h1>AccessTwin</h1>
+      <h1>JalanLens</h1>
       <div class="roles">
         <section class="role" data-role-card="public">
           <h2>public user</h2>
@@ -116,8 +116,8 @@
 
       const SB_URL = "https://khddsjemkdcgumfvkraa.supabase.co";
       const SB_KEY = "sb_publishable_" + "lqGtwkNAOMV7qsYPKVZr8w_GytZx3Qm";
-      const ROLE_STORAGE_KEY = "accesstwin_role";
-      const USER_STORAGE_KEY = "accesstwin_user";
+      const ROLE_STORAGE_KEY = "jalanlens_role";
+      const USER_STORAGE_KEY = "jalanlens_user";
       const params = new URLSearchParams(location.search);
       const supabase = createClient(SB_URL, SB_KEY);
       let activeRole = "public";

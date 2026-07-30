@@ -1,4 +1,4 @@
--- AccessTwin Supabase RLS starter policies.
+-- JalanLens Supabase RLS starter policies.
 -- Tighten roles once real authority accounts are created.
 
 alter table public.streets enable row level security;
