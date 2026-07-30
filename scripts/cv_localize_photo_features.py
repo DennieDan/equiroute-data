@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Zero-shot CV localization for AccessTwin street photos.
+"""Computer-vision localization for AccessTwin street photos.
 
-Uses OWL-ViT to detect pedestrian/accessibility objects in active Mapillary
-photos, then links detections back to nearby/expected accessibility_features.
+Default provider is Agnes AI (`agnes-2.5-flash`) because it gives better
+Singapore street-scene understanding than the earlier open-vocabulary OWLv2
+boxes. OWLv2 remains available with `--provider owlvit` for offline fallback.
 This produces local JSON, visual QA overlays, and idempotent Supabase seed SQL
 for public.photo_feature_instances.
 """
@@ -12,6 +13,9 @@ import argparse
 import io
 import json
 import math
+import os
+import re
+import sys
 import urllib.request
 from pathlib import Path
 from typing import Any
@@ -19,6 +23,8 @@ from typing import Any
 from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 DEFAULT_REGISTRY = ROOT / "data" / "street_view_registry.json"
 DEFAULT_WORLD = ROOT / "accessibility_world.geojson"
 DEFAULT_OUT = ROOT / "data" / "photo_feature_instances_cv.json"
@@ -168,6 +174,119 @@ def run_owlvit(image: Image.Image, prompts: list[str], model_name: str, processo
     return detections
 
 
+def env_value(name: str, default: str | None = None) -> str | None:
+    """Read env first, then ~/.hermes/.env without sourcing shell fragments."""
+    if os.environ.get(name):
+        return os.environ[name]
+    env_path = Path.home() / ".hermes" / ".env"
+    if env_path.exists():
+        for raw in env_path.read_text().splitlines():
+            if not raw.strip() or raw.lstrip().startswith("#") or "=" not in raw:
+                continue
+            key, value = raw.split("=", 1)
+            if key.strip() == name:
+                return value.strip().strip('"').strip("'")
+    return default
+
+
+def json_from_model_text(text: str) -> dict[str, Any]:
+    text = text.strip()
+    fenced = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", text, re.DOTALL)
+    if fenced:
+        text = fenced.group(1)
+    if not text.startswith("{"):
+        start, end = text.find("{"), text.rfind("}")
+        if start >= 0 and end > start:
+            text = text[start : end + 1]
+    return json.loads(text)
+
+
+def normalize_agnes_box(box: dict[str, Any] | list[Any], width: int, height: int) -> dict[str, float]:
+    if isinstance(box, list):
+        if len(box) >= 4:
+            box = {"x1": box[0], "y1": box[1], "x2": box[2], "y2": box[3]}
+        else:
+            box = {}
+    vals = {k: float(box.get(k, 0)) for k in ("x1", "y1", "x2", "y2")}
+    # Agnes is prompted for normalized 0..1 boxes; accept pixel boxes too for robustness.
+    if max(vals.values() or [0]) <= 1.5:
+        vals = {"x1": vals["x1"] * width, "x2": vals["x2"] * width, "y1": vals["y1"] * height, "y2": vals["y2"] * height}
+    return clamp_box(vals, width, height)
+
+
+def run_agnes_vision(photo_url: str, image: Image.Image, expected: list[dict[str, Any]], model_name: str, min_confidence: float) -> list[dict[str, Any]]:
+    api_key = env_value("AGNES_API_KEY")
+    if not api_key:
+        raise RuntimeError("AGNES_API_KEY is not set; create an Agnes API key and store it outside git")
+    base_url = (env_value("AGNES_BASE_URL", "https://apihub.agnes-ai.com/v1") or "https://apihub.agnes-ai.com/v1").rstrip("/")
+    candidates = [
+        {
+            "feature_external_id": f.get("external_id"),
+            "kind": f.get("kind"),
+            "name": f.get("name") or f.get("kind"),
+            "distance_m": f.get("distance_to_photo_m"),
+        }
+        for f in expected
+    ]
+    prompt = (
+        "You are localizing accessibility features in a Singapore street-level photo for AccessTwin. "
+        "Inspect the image directly and detect visible accessibility-relevant objects/features: sheltered/covered walkway, tactile paving, bollard/post, kerb ramp/curb cut, bus stop/shelter, footbridge, station entrance. "
+        "Use the candidate list only to link visible objects back to map features when there is a plausible same-kind candidate nearby. "
+        "Avoid duplicates: one physical shelter/covered walkway should be one detection even if the candidate list has multiple covered_linkway IDs. "
+        "Return JSON only with key detections. Each detection should include kind, label, confidence 0..1, bbox with normalized coordinates x1,y1,x2,y2 in 0..1, "
+        "and feature_external_id if a candidate same-kind feature is plausible. If useful objects are visible but no candidate ID fits, omit feature_external_id but still include the detection kind. "
+        "If nothing relevant is visible, return {\"detections\":[]}.\n\n"
+        f"Candidate nearby map features:\n{json.dumps(candidates, ensure_ascii=False)}"
+    )
+    payload = {
+        "model": model_name,
+        "messages": [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": prompt},
+                    {"type": "image_url", "image_url": {"url": photo_url}},
+                ],
+            }
+        ],
+        "temperature": 0,
+        "max_tokens": 1200,
+    }
+    request = urllib.request.Request(
+        f"{base_url}/chat/completions",
+        data=json.dumps(payload).encode(),
+        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+    )
+    with urllib.request.urlopen(request, timeout=120) as response:
+        data = json.loads(response.read())
+    content = data["choices"][0]["message"]["content"]
+    parsed = json_from_model_text(content)
+    feature_ids = {f.get("external_id") for f in expected}
+    detections: list[dict[str, Any]] = []
+    for det in parsed.get("detections", []):
+        fid = det.get("feature_external_id")
+        if fid and fid not in feature_ids:
+            fid = None
+        confidence = float(det.get("confidence", 0))
+        if confidence < min_confidence:
+            continue
+        box = normalize_agnes_box(det.get("bbox") or {}, image.width, image.height)
+        if box_area_ratio(box, image.width, image.height) <= 0:
+            continue
+        detections.append(
+            {
+                "feature_external_id": fid,
+                "kind": str(det.get("kind") or ""),
+                "label": str(det.get("label") or det.get("kind") or "visible feature"),
+                "score": round(confidence, 4),
+                "bbox": box,
+                "model": model_name,
+            }
+        )
+    detections.sort(key=lambda d: d["score"], reverse=True)
+    return detections
+
+
 def prompts_for_features(features: list[dict[str, Any]]) -> list[str]:
     prompts = list(GENERAL_PROMPTS)
     for feat in features:
@@ -293,7 +412,8 @@ def main() -> None:
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
     parser.add_argument("--sql-out", type=Path, default=DEFAULT_SQL_OUT)
     parser.add_argument("--overlay-dir", type=Path, default=DEFAULT_OVERLAY_DIR)
-    parser.add_argument("--model", default="google/owlv2-base-patch16-ensemble")
+    parser.add_argument("--model", default="agnes-2.5-flash")
+    parser.add_argument("--provider", choices=["agnes", "owlvit"], default="agnes")
     parser.add_argument("--threshold", type=float, default=0.10)
     parser.add_argument("--feature-match-threshold", type=float, default=0.10)
     parser.add_argument("--nearby-radius-m", type=float, default=35)
@@ -304,20 +424,46 @@ def main() -> None:
     parts = {p["id"]: p for p in registry.get("street_parts", [])}
     photos = registry.get("street_photos", [])[: args.max_photos]
     features = load_accessibility_features(args.world)
-    processor, model = load_model(args.model)
+    processor = model = None
+    if args.provider == "owlvit":
+        processor, model = load_model(args.model)
 
     photo_results = []
     instances = []
     for index, photo in enumerate(photos, start=1):
         part = parts.get(photo.get("street_part_id"), {})
         expected = nearby_features(photo, part, features, args.nearby_radius_m)
-        prompts = prompts_for_features(expected)
         image = download_image(photo["image_url"])
-        detections = run_owlvit(image, prompts, args.model, processor, model, args.threshold)
+        if args.provider == "agnes":
+            detections = run_agnes_vision(photo["image_url"], image, expected, args.model, args.threshold)
+            expected_by_id = {f.get("external_id"): f for f in expected}
+            used_feature_ids: set[str] = set()
+            assignments = []
+            for det in detections:
+                fid = det.get("feature_external_id")
+                feat = expected_by_id.get(fid)
+                if feat is None:
+                    kind = det.get("kind")
+                    feat = next((f for f in expected if f.get("kind") == kind and f.get("external_id") not in used_feature_ids), None)
+                if feat is not None:
+                    if feat.get("external_id"):
+                        used_feature_ids.add(feat["external_id"])
+                    assignments.append((feat, det))
+            detection_method = f"cv:agnes:{args.model}:vision_candidate_json"
+        else:
+            prompts = prompts_for_features(expected)
+            detections = run_owlvit(image, prompts, args.model, processor, model, args.threshold)
+            assignments = assign_feature_detections(expected, detections, args.feature_match_threshold, image.width, image.height)
+            detection_method = f"cv:{args.model}:one_to_one_open_vocab"
         overlay_path = args.overlay_dir / f"{index:02d}_{photo['street_part_id']}_{photo['source_image_id']}.jpg"
         draw_overlay(image, detections, overlay_path)
         matched = []
-        for feat, det in assign_feature_detections(expected, detections, args.feature_match_threshold, image.width, image.height):
+        used_physical_labels: set[tuple[str, str]] = set()
+        for feat, det in assignments:
+            physical_key = (feat.get("kind", ""), det.get("label", "").lower().strip())
+            if args.provider == "agnes" and physical_key in used_physical_labels and feat.get("kind") == "covered_linkway":
+                continue
+            used_physical_labels.add(physical_key)
             box = clamp_box(det["bbox"], image.width, image.height)
             pixel_x, pixel_y = [round(v, 2) for v in box_center(box)]
             inst = {
@@ -330,7 +476,7 @@ def main() -> None:
                 "pixel_x": pixel_x,
                 "pixel_y": pixel_y,
                 "bbox": box,
-                "detection_method": f"cv:{args.model}:one_to_one_open_vocab",
+                "detection_method": detection_method,
                 "detection_model": args.model,
                 "confidence": det["score"],
                 "label": det["label"],
