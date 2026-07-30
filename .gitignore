@@ -68,3 +68,12 @@ OSM_CLEMENTI_MALL/
 htmlcov/
 
 .env
+
+# Hermes local workspace
+.hermes/
+
+# macOS archive metadata
+__MACOSX/
+
+# Generated graph exports
+*.graphml
