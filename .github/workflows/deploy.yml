@@ -24,6 +24,7 @@ jobs:
         run: |
           mkdir -p _site/data _site/web
           cp *.html _site/
+          cp -f harvard.css _site/
           cp accessibility_world.geojson buildings_clementi.geojson _site/
           cp -R data/. _site/data/
           cp -R assets _site/assets
