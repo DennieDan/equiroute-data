@@ -22,43 +22,40 @@
         display: grid;
         place-items: center;
         padding: 28px;
-        background: var(--bg);
+        background:
+          radial-gradient(circle at 20% 10%, rgba(56, 189, 248, 0.16), transparent 30%),
+          radial-gradient(circle at 80% 90%, rgba(34, 197, 94, 0.13), transparent 34%),
+          var(--bg);
         color: var(--txt);
         font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         overflow-x: hidden;
       }
-      body::before,
-      body::after {
+      body::before {
         content: "";
         position: fixed;
-        inset: -28%;
-        z-index: -2;
+        inset: 0;
+        z-index: 1;
         pointer-events: none;
         background:
-          radial-gradient(circle at 18% 20%, rgba(56, 189, 248, 0.34), transparent 26%),
-          radial-gradient(circle at 78% 18%, rgba(129, 140, 248, 0.24), transparent 28%),
-          radial-gradient(circle at 52% 82%, rgba(34, 197, 94, 0.2), transparent 30%),
-          linear-gradient(135deg, rgba(2, 6, 23, 0.9), rgba(12, 74, 110, 0.32), rgba(2, 6, 23, 0.94));
-        filter: blur(2px) saturate(1.2);
-        animation: auroraFlow 18s ease-in-out infinite alternate;
+          radial-gradient(circle at 20% 20%, rgba(56, 189, 248, 0.26), transparent 30%),
+          linear-gradient(180deg, rgba(2, 6, 23, 0.32), rgba(2, 6, 23, 0.72)),
+          rgba(2, 6, 23, 0.38);
+        backdrop-filter: saturate(1.08);
       }
-      body::after {
-        z-index: -1;
-        opacity: 0.42;
-        background:
-          conic-gradient(from 90deg at 50% 50%, transparent, rgba(56, 189, 248, 0.16), transparent, rgba(34, 197, 94, 0.12), transparent);
-        mix-blend-mode: screen;
-        animation: auroraSpin 28s linear infinite;
+      .login-bg-video {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        width: 100vw;
+        height: 100vh;
+        object-fit: cover;
+        filter: saturate(1.08) contrast(1.04) brightness(0.78);
       }
-      @keyframes auroraFlow {
-        0% { transform: translate3d(-3%, -2%, 0) scale(1); }
-        50% { transform: translate3d(4%, 3%, 0) scale(1.08); }
-        100% { transform: translate3d(-1%, 5%, 0) scale(1.03); }
+      main {
+        position: relative;
+        z-index: 2;
+        width: min(760px, 100%);
       }
-      @keyframes auroraSpin {
-        to { transform: rotate(360deg) scale(1.08); }
-      }
-      main { width: min(760px, 100%); }
       h1 { margin: 0 0 24px; text-align: center; font-size: clamp(34px, 7vw, 64px); line-height: 0.95; text-shadow: 0 0 38px rgba(56, 189, 248, 0.35); }
       .roles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
       .role {
@@ -109,6 +106,9 @@
     </style>
   </head>
   <body>
+    <video class="login-bg-video" autoplay muted loop playsinline preload="auto" aria-hidden="true" poster="">
+      <source src="assets/login-singapore-city.mp4" type="video/mp4" />
+    </video>
     <main>
       <h1>JalanLens</h1>
       <div class="roles">
@@ -200,8 +200,8 @@
         localStorage.setItem(ROLE_STORAGE_KEY, user.role);
         localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
         const target = new URL(safeNext(), location.href);
-        target.searchParams.delete("role");
-        target.searchParams.delete("user");
+        target.searchParams.set("role", user.role);
+        target.searchParams.set("user", user.external_id);
         location.href = target.pathname.split("/").pop() + target.search;
       }
 
