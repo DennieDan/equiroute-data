@@ -26,6 +26,7 @@ jobs:
           cp *.html _site/
           cp accessibility_world.geojson buildings_clementi.geojson _site/
           cp -R data/. _site/data/
+          cp -R assets _site/assets
           # shared / optional root scripts
           cp -f feedback-form.js sha256.js _site/ 2>/dev/null || true
 
