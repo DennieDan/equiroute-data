@@ -1,0 +1,379 @@
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Source+Sans+3:wght@400;600;700;800;900&display=swap');
+
+:root {
+  --harvard-crimson: #a51c30;
+  --harvard-black: #1e1e1e;
+  --harvard-ink: #111111;
+  --harvard-paper: #f3f3f1;
+  --harvard-white: #ffffff;
+  --harvard-mist: rgba(243, 243, 241, 0.94);
+  --harvard-border: rgba(30, 30, 30, 0.22);
+  --harvard-muted: #4a5563;
+  --harvard-burgundy: #2b061b;
+  --harvard-slate: #93a1ad;
+  --harvard-serif: 'Libre Baskerville', Baskerville, Georgia, 'Times New Roman', serif;
+  --harvard-sans: 'Source Sans 3', Arial, Helvetica, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  font-family: var(--harvard-sans) !important;
+}
+
+body {
+  color: var(--harvard-ink) !important;
+}
+
+h1, h2, .brand, .hero-title, .section-title, #panelTitle {
+  font-family: var(--harvard-serif) !important;
+  font-weight: 400 !important;
+  letter-spacing: -0.035em !important;
+}
+
+h3, h4, h5, h6, button, select, input, label, .pill, .metric, .eyebrow, .button, .buttonlike {
+  font-family: var(--harvard-sans) !important;
+}
+
+button,
+a.button,
+.buttonlike {
+  border-radius: 0 !important;
+  text-transform: none !important;
+  box-shadow: none !important;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 3px solid rgba(165, 28, 48, 0.34) !important;
+  outline-offset: 2px;
+}
+
+/* Harvard-inspired login */
+body:has(.login-bg-video) {
+  background: var(--harvard-paper) !important;
+  color: var(--harvard-ink) !important;
+  place-items: stretch center !important;
+  align-items: center !important;
+  padding: 0 !important;
+}
+
+body:has(.login-bg-video)::before {
+  background:
+    linear-gradient(180deg, rgba(243, 243, 241, 0.52) 0%, rgba(243, 243, 241, 0.94) 52%, rgba(243, 243, 241, 1) 100%),
+    rgba(255,255,255,0.35) !important;
+  backdrop-filter: saturate(0.96) !important;
+}
+
+.login-bg-video {
+  filter: saturate(0.82) contrast(0.96) brightness(1.12) !important;
+}
+
+body:has(.login-bg-video) main {
+  width: min(920px, calc(100% - 40px)) !important;
+  margin: 0 auto !important;
+  padding: clamp(28px, 7vw, 76px) 0 !important;
+}
+
+body:has(.login-bg-video) main::before {
+  content: 'JALANLENS';
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 58px;
+  padding: 0 22px;
+  margin-bottom: clamp(42px, 8vw, 86px);
+  background: rgba(255, 255, 255, 0.78);
+  border-bottom: 4px solid var(--harvard-crimson);
+  color: var(--harvard-black);
+  font-family: var(--harvard-serif);
+  font-size: 22px;
+  letter-spacing: 0.08em;
+}
+
+body:has(.login-bg-video) main::after {
+  content: none;
+}
+
+body:has(.login-bg-video) h1 {
+  margin: 0 0 clamp(28px, 4vw, 48px) !important;
+  text-align: left !important;
+  color: var(--harvard-black) !important;
+  font-size: clamp(52px, 10vw, 118px) !important;
+  line-height: 0.94 !important;
+  text-shadow: none !important;
+}
+
+.roles {
+  gap: 0 !important;
+  border-top: 4px solid var(--harvard-black);
+  border-bottom: 1px solid var(--harvard-black);
+  background: rgba(243, 243, 241, 0.88);
+}
+
+.role {
+  border: 0 !important;
+  border-right: 1px solid var(--harvard-border) !important;
+  border-radius: 0 !important;
+  padding: clamp(24px, 4vw, 42px) !important;
+  background: rgba(255,255,255,0.72) !important;
+  box-shadow: none !important;
+  text-align: left !important;
+}
+
+.role:last-child { border-right: 0 !important; }
+.role h2 {
+  margin: 0 0 22px !important;
+  color: var(--harvard-black) !important;
+  font-size: clamp(30px, 4vw, 46px) !important;
+  line-height: 1.05;
+}
+.role h2::after {
+  content: '';
+  display: block;
+  width: 64px;
+  height: 4px;
+  margin-top: 18px;
+  background: var(--harvard-crimson);
+}
+
+body:has(.login-bg-video) button,
+body:has(.login-bg-video) a.button {
+  justify-content: space-between !important;
+  min-height: 50px !important;
+  margin-top: 12px !important;
+  border: 1px solid var(--harvard-black) !important;
+  border-radius: 0 !important;
+  padding: 12px 16px !important;
+  background: var(--harvard-black) !important;
+  color: var(--harvard-white) !important;
+  font-weight: 800 !important;
+}
+body:has(.login-bg-video) button::after,
+body:has(.login-bg-video) a.button::after { content: '→'; }
+body:has(.login-bg-video) button.ghost {
+  background: transparent !important;
+  color: var(--harvard-black) !important;
+}
+body:has(.login-bg-video) button.google {
+  border-color: var(--harvard-crimson) !important;
+  background: var(--harvard-white) !important;
+  color: var(--harvard-black) !important;
+}
+body:has(.login-bg-video) button:hover {
+  background: var(--harvard-crimson) !important;
+  border-color: var(--harvard-crimson) !important;
+  color: var(--harvard-white) !important;
+}
+
+#authPanel {
+  margin: 24px 0 0 !important;
+  border: 1px solid var(--harvard-black) !important;
+  border-top: 6px solid var(--harvard-crimson) !important;
+  border-radius: 0 !important;
+  background: rgba(255,255,255,0.92) !important;
+  color: var(--harvard-black) !important;
+  box-shadow: none !important;
+}
+#panelTitle { color: var(--harvard-black) !important; text-align: left !important; }
+label { color: var(--harvard-black) !important; letter-spacing: 0.03em !important; }
+input, select {
+  border: 1px solid var(--harvard-border) !important;
+  border-radius: 0 !important;
+  background: var(--harvard-white) !important;
+  color: var(--harvard-black) !important;
+}
+#status { color: var(--harvard-muted) !important; }
+#status.ok { color: #1f7a35 !important; }
+#status.err { color: var(--harvard-crimson) !important; }
+
+/* Harvard-inspired app HUD */
+body:not(:has(.login-bg-video)) {
+  background: var(--harvard-paper) !important;
+}
+
+.hud, #miniMap, #streetMetadata, #featurePanel, #feedbackPanel, #roleMenu, #settingsPanel, #docPanel {
+  border: 1px solid var(--harvard-border) !important;
+  border-top: 5px solid var(--harvard-crimson) !important;
+  border-radius: 0 !important;
+  background: rgba(243, 243, 241, 0.94) !important;
+  color: var(--harvard-black) !important;
+  box-shadow: 0 16px 44px rgba(0,0,0,0.18) !important;
+  backdrop-filter: blur(10px) saturate(0.9) !important;
+}
+
+#topbar {
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(255,255,255,0.18) !important;
+  background: var(--harvard-black) !important;
+  color: var(--harvard-white) !important;
+  border-radius: 0 !important;
+  padding: 14px 18px !important;
+}
+
+#topbar .brand {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding-right: 18px;
+  border-right: 1px solid rgba(255,255,255,0.25);
+  color: var(--harvard-white) !important;
+  font-size: 24px !important;
+  letter-spacing: -0.04em !important;
+}
+#topbar .brand::before {
+  content: '';
+  width: 18px;
+  height: 28px;
+  margin-right: 12px;
+  background: var(--harvard-crimson);
+  clip-path: polygon(0 0,100% 0,100% 78%,50% 100%,0 78%);
+}
+
+.pill {
+  border: 1px solid rgba(255,255,255,0.22) !important;
+  border-radius: 0 !important;
+  background: rgba(255,255,255,0.08) !important;
+  color: rgba(255,255,255,0.86) !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+}
+
+#topbar button,
+#topbar select,
+#topbar .buttonlike {
+  border: 1px solid rgba(255,255,255,0.28) !important;
+  background: rgba(255,255,255,0.08) !important;
+  color: var(--harvard-white) !important;
+  border-radius: 0 !important;
+}
+#topbar button:hover,
+#topbar button.active {
+  border-color: var(--harvard-white) !important;
+  background: var(--harvard-white) !important;
+  color: var(--harvard-black) !important;
+}
+
+.hud h2, .hud h3, #roleMenu h3, #settingsPanel h3, #featurePanel h3, #feedbackPanel h3 {
+  color: var(--harvard-black) !important;
+  font-family: var(--harvard-serif) !important;
+  font-weight: 400 !important;
+  letter-spacing: -0.035em !important;
+}
+
+.hud p, .hud span, .small, .muted, #statusText, #registryStatus, #photoStatus, #roleMenuStatus {
+  color: var(--harvard-muted) !important;
+}
+
+.score, .metric b, .stat strong, .value {
+  color: var(--harvard-black) !important;
+  font-family: var(--harvard-serif) !important;
+}
+
+.card, .score-card, .feature-card, .thread, .metric, .photo-card, .person-card, .doc-card, section.card {
+  border: 1px solid var(--harvard-border) !important;
+  border-radius: 0 !important;
+  background: rgba(255,255,255,0.78) !important;
+  color: var(--harvard-black) !important;
+  box-shadow: none !important;
+}
+
+button, select, input, textarea, a.button {
+  border-radius: 0 !important;
+}
+
+body:not(:has(.login-bg-video)) button,
+body:not(:has(.login-bg-video)) a.button,
+body:not(:has(.login-bg-video)) .buttonlike {
+  border: 1px solid var(--harvard-black) !important;
+  background: var(--harvard-black) !important;
+  color: var(--harvard-white) !important;
+  font-weight: 800 !important;
+}
+body:not(:has(.login-bg-video)) button:hover,
+body:not(:has(.login-bg-video)) button.active,
+body:not(:has(.login-bg-video)) a.button:hover {
+  border-color: var(--harvard-crimson) !important;
+  background: var(--harvard-crimson) !important;
+  color: var(--harvard-white) !important;
+}
+body:not(:has(.login-bg-video)) button.ghost,
+body:not(:has(.login-bg-video)) button.secondary {
+  background: var(--harvard-white) !important;
+  color: var(--harvard-black) !important;
+}
+
+.seg-btn {
+  border-radius: 999px !important;
+  border: 2px solid var(--harvard-white) !important;
+  background: var(--harvard-crimson) !important;
+  color: var(--harvard-white) !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.24) !important;
+}
+.seg-btn.feature { background: var(--harvard-black) !important; }
+.seg-btn.feature.ramp { background: #4db848 !important; }
+.seg-btn.feature.bus { background: #4e88c7 !important; }
+.seg-btn.feature.shelter { background: #fcb315 !important; color: var(--harvard-black) !important; }
+.seg-btn.feature.tactile { background: #946eb7 !important; }
+
+/* Documentation/profile page */
+body > header:not(#topbar) {
+  background: var(--harvard-black) !important;
+  color: var(--harvard-white) !important;
+  border-bottom: 4px solid var(--harvard-crimson) !important;
+  backdrop-filter: none !important;
+}
+body > header:not(#topbar) .brand {
+  color: var(--harvard-white) !important;
+  font-size: 25px !important;
+}
+body > header:not(#topbar) a.button {
+  border-color: rgba(255,255,255,0.36) !important;
+  background: transparent !important;
+  color: var(--harvard-white) !important;
+}
+main .hero, section.hero {
+  border: 0 !important;
+  border-top: 6px solid var(--harvard-crimson) !important;
+  border-radius: 0 !important;
+  background: var(--harvard-white) !important;
+  color: var(--harvard-black) !important;
+  box-shadow: none !important;
+}
+.eyebrow {
+  color: var(--harvard-crimson) !important;
+  font-weight: 900 !important;
+}
+main h1, main h2, main h3 {
+  color: var(--harvard-black) !important;
+}
+main p, main li, main span {
+  color: var(--harvard-muted) !important;
+}
+.threshold {
+  border: 1px solid var(--harvard-border) !important;
+  border-radius: 0 !important;
+  background: #ffffff !important;
+  color: var(--harvard-black) !important;
+}
+.threshold strong { color: var(--harvard-black) !important; }
+.threshold span { color: var(--harvard-muted) !important; }
+
+code {
+  border-radius: 0 !important;
+  background: #eeeeea !important;
+  color: var(--harvard-black) !important;
+}
+
+@media (max-width: 720px) {
+  .roles { border-bottom: 0; }
+  .role { border-right: 0 !important; border-bottom: 1px solid var(--harvard-border) !important; }
+  body:has(.login-bg-video) main::after { margin-left: 0; margin-top: -54px; }
+  #topbar { flex-wrap: wrap; }
+  #topbar .brand { width: 100%; border-right: 0; }
+}
