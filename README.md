@@ -1,8 +1,8 @@
-# EquiRoute Data / AccessTwin
+# JalanLens Data
 
-AccessTwin / EquiRoute geospatial accessibility demo for Tech4City: a Clementi digital twin with real satellite imagery, ~25 m public footpath street parts, Mapillary street-view photos, direction swapping, Supabase-backed feedback threads, and persona agents that simulate how different people with disabilities experience each street part.
+JalanLens geospatial accessibility demo for Tech4City: a Clementi digital twin with real satellite imagery, ~25 m public footpath street parts, Mapillary street-view photos, direction swapping, Supabase-backed feedback threads, and persona agents that simulate how different people with disabilities experience each street part.
 
-The active demo branch is `abel`. `main` is still the shared base branch; the public AccessTwin street-view work lives on `abel` until merged.
+The active demo branch is `abel`. `main` is still the shared base branch; the public JalanLens street-view work lives on `abel` until merged.
 
 ## Quick start: run the current frontend
 
@@ -47,7 +47,7 @@ Expected current demo state:
 | Path | Purpose |
 | --- | --- |
 | `index.html` | Role-selection/auth landing page for public vs authority platform |
-| `earth_accessibility.html` | Main role-aware AccessTwin frontend: satellite Earth view, street-view mode, scorecards, persona agents, feedback form |
+| `earth_accessibility.html` | Main role-aware JalanLens frontend: satellite Earth view, street-view mode, scorecards, persona agents, feedback form |
 | `accessibility_world.geojson` | Hidden ~5 m measurement layer with proxy accessibility metrics, POIs, and persona segment scores |
 | `data/street_view_registry.json` | Public ~25 m street parts, street-view nodes, curated Mapillary active photos |
 | `data/photo_feature_instances_cv.json` | OWL-ViT/zero-shot photo feature detections matched to active street photos |

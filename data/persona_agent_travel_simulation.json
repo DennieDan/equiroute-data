@@ -1,5 +1,5 @@
 {
-  "project": "AccessTwin Clementi persona-agent travel simulation",
+  "project": "JalanLens Clementi persona-agent travel simulation",
   "unit": "25m street_part aggregated from hidden 5m measurement segments",
   "method": "deterministic proxy scoring from accessibility_world.geojson persona segment scores",
   "personas": {

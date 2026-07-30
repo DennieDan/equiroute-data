@@ -1,4 +1,4 @@
--- AccessTwin Supabase schema for hack MVP
+-- JalanLens Supabase schema for hack MVP
 -- Portable to Huawei Cloud RDS/Postgres later.
 
 create extension if not exists pgcrypto;
@@ -182,6 +182,8 @@ create table if not exists public.feedback_comments (
 create table if not exists public.app_users (
   id uuid primary key default gen_random_uuid(),
   external_id text unique not null,
+  username text unique null,
+  password_hash text null,
   display_name text not null,
   role text not null check (role in ('public','authority')),
   organization text null,
@@ -192,6 +194,9 @@ create table if not exists public.app_users (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.app_users add column if not exists username text unique;
+alter table public.app_users add column if not exists password_hash text;
 
 create index if not exists app_users_role_active_idx on public.app_users (role, is_active);
 

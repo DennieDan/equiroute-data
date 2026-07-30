@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generate persona-based before/after accessibility simulation output.
 
-This is the deterministic simulation layer for the AccessTwin / EquiRoute demo.
+This is the deterministic simulation layer for the JalanLens demo.
 It consumes the current repo-root JSON artifacts:
 
 - sim_output.json: graph edge export from the existing persona_agent notebook
@@ -367,7 +367,7 @@ def generate(sim_output: Path, threejs_roads: Path, output: Path) -> dict[str, A
         )
 
     output_payload = {
-        "project": "AccessTwin / EquiRoute Clementi Mall persona simulation",
+        "project": "JalanLens Clementi Mall persona simulation",
         "route": {
             "name": "Clementi MRT / Clementi Mall accessibility corridor",
             "start": sim.get("start"),
