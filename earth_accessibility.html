@@ -613,6 +613,14 @@
       .role-menu-actions a {
         display: block;
       }
+      .topbar-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        white-space: nowrap;
+        font-size: 13px;
+      }
       #settings textarea {
         width: 100%;
         height: 70px;
@@ -757,22 +765,19 @@
       <div class="spacer"></div>
       <span class="pill" hidden><b id="segCount">–</b> segments</span>
       <span class="pill" hidden><b id="buildingCount">–</b> buildings</span>
+      <a id="docsBtn" class="buttonlike topbar-link" href="documentation.html">Documentation</a>
       <button id="settingsBtn" class="authority-only">⚙</button>
       <button id="roleSwitchBtn" class="role-pill" type="button">Role</button>
     </div>
     <div id="settings" class="hud">
       <button class="close" id="closeSettings">×</button>
       <h3>Settings</h3>
-      <p>
-        Data-source notes and standards references for the public demo.
-      </p>
+      <p>Account and authority controls for this demo.</p>
       <p id="tokenStatus" hidden></p>
       <p id="currentUserStatus"></p>
       <div class="settings-grid authority-only">
         <button id="togglePersonaPanelBtn" type="button">Show persona agents</button>
       </div>
-      <h4>References</h4>
-      <p id="standardsText"></p>
     </div>
     <div id="roleMenu" class="hud">
       <button class="close" id="closeRoleMenu">×</button>
@@ -1669,10 +1674,6 @@
         poiLayer.addGeometry(poi);
         document.getElementById("segCount").textContent =
           state.segments.length.toLocaleString();
-        document.getElementById("standardsText").textContent = [
-          world.standards?.name,
-          ...(world.standards?.basis || []),
-        ].join(" · ");
         initThreeOverlay();
         populateSelect();
         populatePersonaSelector();
