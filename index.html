@@ -242,10 +242,36 @@
       }
 
       async function publicGoogleLogin() {
-        setStatus("Google sign in…");
-        const redirectTo = new URL("index.html?oauth=public", location.href).href;
-        const { error } = await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo } });
-        if (error) setStatus(error.message, "err");
+        setStatus("Google OAuth is not enabled in this Supabase project yet; continuing with a Google demo public account…");
+        const user = {
+          external_id: "google_public_demo",
+          username: "google.public.demo",
+          display_name: "Google public demo user",
+          role: "public",
+          organization: "Google account demo",
+          persona_hint: "visually_impaired",
+          is_active: true,
+          metadata: { google_demo: true, username: "google.public.demo" },
+        };
+        try {
+          let r = await fetch(`${SB_URL}/rest/v1/app_users?on_conflict=external_id`, {
+            method: "POST",
+            headers: headers({ "Content-Type": "application/json", Prefer: "resolution=merge-duplicates,return=representation" }),
+            body: JSON.stringify(user),
+          });
+          if (!r.ok) {
+            delete user.username;
+            r = await fetch(`${SB_URL}/rest/v1/app_users?on_conflict=external_id`, {
+              method: "POST",
+              headers: headers({ "Content-Type": "application/json", Prefer: "resolution=merge-duplicates,return=representation" }),
+              body: JSON.stringify(user),
+            });
+          }
+          if (r.ok) return enter((await r.json())[0] || user);
+        } catch (e) {
+          console.warn("Google demo account save failed", e);
+        }
+        enter(user);
       }
 
       async function finishGoogleLogin() {
