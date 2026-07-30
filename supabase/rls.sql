@@ -44,6 +44,9 @@ create policy "public read feedback" on public.feedback_threads for select using
 drop policy if exists "public read comments" on public.feedback_comments;
 create policy "public read comments" on public.feedback_comments for select using (true);
 
+drop policy if exists "public read feedback votes" on public.feedback_votes;
+create policy "public read feedback votes" on public.feedback_votes for select using (true);
+
 -- Public crowd-photo contributions. The frontend runs without login for the
 -- hack demo, so accepted crowd uploads are inserted with submitted_by = null.
 drop policy if exists "public insert accepted crowd photos" on public.street_photos;
@@ -92,6 +95,10 @@ create policy "public insert feedback threads" on public.feedback_threads
 drop policy if exists "auth insert feedback threads" on public.feedback_threads;
 create policy "auth insert feedback threads" on public.feedback_threads
   for insert with check (auth.uid() = created_by);
+
+drop policy if exists "public insert feedback votes" on public.feedback_votes;
+create policy "public insert feedback votes" on public.feedback_votes
+  for insert with check (vote_type = 'upvote');
 
 drop policy if exists "auth insert feedback votes" on public.feedback_votes;
 create policy "auth insert feedback votes" on public.feedback_votes
