@@ -23,8 +23,7 @@ jobs:
       - name: Stage site (repo root layout)
         run: |
           mkdir -p _site/data _site/web
-          cp earth_accessibility.html _site/
-          cp index.html _site/
+          cp *.html _site/
           cp accessibility_world.geojson buildings_clementi.geojson _site/
           cp -R data/. _site/data/
           # optional legacy root scripts still referenced during transition
