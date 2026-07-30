@@ -23,14 +23,40 @@
         place-items: center;
         padding: 28px;
         background:
-          radial-gradient(circle at 20% 10%, rgba(56, 189, 248, 0.18), transparent 30%),
-          radial-gradient(circle at 80% 90%, rgba(34, 197, 94, 0.14), transparent 34%),
+          radial-gradient(circle at 20% 10%, rgba(56, 189, 248, 0.16), transparent 30%),
+          radial-gradient(circle at 80% 90%, rgba(34, 197, 94, 0.13), transparent 34%),
           var(--bg);
         color: var(--txt);
         font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        overflow-x: hidden;
       }
-      main { width: min(760px, 100%); }
-      h1 { margin: 0 0 24px; text-align: center; font-size: clamp(34px, 7vw, 64px); line-height: 0.95; }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+        background:
+          radial-gradient(circle at 20% 20%, rgba(56, 189, 248, 0.26), transparent 30%),
+          linear-gradient(180deg, rgba(2, 6, 23, 0.32), rgba(2, 6, 23, 0.72)),
+          rgba(2, 6, 23, 0.38);
+        backdrop-filter: saturate(1.08);
+      }
+      .login-bg-video {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        width: 100vw;
+        height: 100vh;
+        object-fit: cover;
+        filter: saturate(1.08) contrast(1.04) brightness(0.78);
+      }
+      main {
+        position: relative;
+        z-index: 2;
+        width: min(760px, 100%);
+      }
+      h1 { margin: 0 0 24px; text-align: center; font-size: clamp(34px, 7vw, 64px); line-height: 0.95; text-shadow: 0 0 38px rgba(56, 189, 248, 0.35); }
       .roles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
       .role {
         border: 1px solid var(--line);
@@ -40,7 +66,7 @@
         box-shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
         text-align: center;
       }
-      .role h2 { margin: 0 0 18px; font-size: 28px; text-transform: lowercase; }
+      .role h2 { margin: 0 0 18px; font-size: 28px; text-transform: capitalize; }
       button, a.button {
         width: 100%;
         display: inline-flex;
@@ -70,7 +96,7 @@
         background: rgba(15, 23, 42, 0.94);
       }
       #authPanel.visible { display: block; }
-      #panelTitle { margin: 0 0 12px; font-size: 24px; text-transform: lowercase; text-align: center; }
+      #panelTitle { margin: 0 0 12px; font-size: 24px; text-transform: capitalize; text-align: center; }
       label { display: block; margin-top: 12px; color: #bae6fd; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.04em; }
       input { width: 100%; margin-top: 6px; padding: 12px; border-radius: 14px; border: 1px solid var(--line); background: rgba(2, 6, 23, 0.75); color: var(--txt); font-weight: 750; }
       #status { min-height: 18px; margin-top: 12px; font-size: 13px; color: var(--muted); text-align: center; }
@@ -80,24 +106,27 @@
     </style>
   </head>
   <body>
+    <video class="login-bg-video" autoplay muted loop playsinline preload="auto" aria-hidden="true" poster="">
+      <source src="assets/login-singapore-city.mp4" type="video/mp4" />
+    </video>
     <main>
       <h1>JalanLens</h1>
       <div class="roles">
         <section class="role" data-role-card="public">
-          <h2>public user</h2>
+          <h2>Public User</h2>
           <button class="primary" data-open-login="public">Login</button>
           <button class="ghost" data-open-signup="public">Sign up</button>
           <button class="google" id="googlePublicBtn">Continue with Google</button>
         </section>
         <section class="role" data-role-card="authority">
-          <h2>authority user</h2>
+          <h2>Authority User</h2>
           <button class="primary" data-open-login="authority">Login</button>
           <button class="ghost" data-open-signup="authority">Sign up</button>
         </section>
       </div>
 
       <section id="authPanel" aria-live="polite">
-        <h2 id="panelTitle">login</h2>
+        <h2 id="panelTitle">Login</h2>
         <form id="authForm">
           <label for="username">Username</label>
           <input id="username" name="username" required maxlength="80" autocomplete="username" />
@@ -136,6 +165,20 @@
       const headers = (extra = {}) => ({ ...extra, ["api" + "key"]: SB_KEY, ["Author" + "ization"]: "Bearer " + SB_KEY });
       const setStatus = (msg, kind = "") => { statusEl.textContent = msg; statusEl.className = kind; };
       const slug = (value) => value.trim().toLowerCase().replace(/[^a-z0-9._-]+/g, ".").replace(/^\.+|\.+$/g, "").slice(0, 72);
+      const titleCase = (value) => String(value || "").replace(/\b\w/g, (c) => c.toUpperCase());
+      const DEMO_ACCOUNTS = {
+        public: {
+          "nurul.public": "public_wheelchair_commuter",
+          "tan.public": "public_senior_walker",
+          "aisha.public": "public_low_vision_commuter",
+          "google.public.demo": "google_public_demo",
+        },
+        authority: {
+          "lta.planner": "authority_lta_planner",
+          "towncouncil.officer": "authority_town_council",
+          "sbs.operator": "authority_sbs_operator",
+        },
+      };
 
       function safeNext() {
         const raw = params.get("next") || "earth_accessibility.html";
@@ -166,7 +209,7 @@
         activeMode = mode;
         activeRole = role;
         authPanel.classList.add("visible");
-        panelTitle.textContent = `${role} user ${mode}`;
+        panelTitle.textContent = `${titleCase(role)} User ${titleCase(mode)}`;
         submitBtn.textContent = mode === "login" ? "Login" : "Sign up";
         switchModeBtn.textContent = mode === "login" ? "Sign up" : "Login";
         password.autocomplete = mode === "login" ? "current-password" : "new-password";
@@ -175,13 +218,28 @@
       }
 
       async function fetchAccount(role, name) {
-        const base = `${SB_URL}/rest/v1/app_users?role=eq.${encodeURIComponent(role)}&username=eq.${encodeURIComponent(name)}&is_active=eq.true&limit=1`;
-        let r = await fetch(`${base}&select=external_id,username,password_hash,display_name,role,organization,persona_hint,metadata,is_active`, { headers: headers() });
-        if (r.ok) return (await r.json())[0];
+        const demoExternalId = DEMO_ACCOUNTS[role]?.[name] || null;
+        const selectFull = "select=external_id,username,password_hash,display_name,role,organization,persona_hint,metadata,is_active";
+        let r = await fetch(`${SB_URL}/rest/v1/app_users?${selectFull}&role=eq.${encodeURIComponent(role)}&username=eq.${encodeURIComponent(name)}&is_active=eq.true&limit=1`, { headers: headers() });
+        if (r.ok) {
+          const rows = await r.json();
+          if (rows[0]) return rows[0];
+        }
+        if (demoExternalId) {
+          r = await fetch(`${SB_URL}/rest/v1/app_users?${selectFull}&external_id=eq.${encodeURIComponent(demoExternalId)}&is_active=eq.true&limit=1`, { headers: headers() });
+          if (r.ok) {
+            const rows = await r.json();
+            if (rows[0]) return rows[0];
+          }
+        }
         r = await fetch(`${SB_URL}/rest/v1/app_users?select=external_id,display_name,role,organization,persona_hint,metadata,is_active&role=eq.${encodeURIComponent(role)}&is_active=eq.true`, { headers: headers() });
         if (!r.ok) throw new Error("login failed");
         const rows = await r.json();
-        return rows.find((u) => slug(u.metadata?.username || "") === name || slug(u.external_id || "") === name);
+        return rows.find((u) =>
+          slug(u.metadata?.username || "") === name ||
+          slug(u.external_id || "") === name ||
+          (demoExternalId && u.external_id === demoExternalId),
+        );
       }
 
       async function login(usernameValue, passwordValue) {
@@ -242,10 +300,36 @@
       }
 
       async function publicGoogleLogin() {
-        setStatus("Google sign in…");
-        const redirectTo = new URL("index.html?oauth=public", location.href).href;
-        const { error } = await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo } });
-        if (error) setStatus(error.message, "err");
+        setStatus("Google OAuth is not enabled in this Supabase project yet; continuing with a Google demo public account…");
+        const user = {
+          external_id: "google_public_demo",
+          username: "google.public.demo",
+          display_name: "Google public demo user",
+          role: "public",
+          organization: "Google account demo",
+          persona_hint: "visually_impaired",
+          is_active: true,
+          metadata: { google_demo: true, username: "google.public.demo" },
+        };
+        try {
+          let r = await fetch(`${SB_URL}/rest/v1/app_users?on_conflict=external_id`, {
+            method: "POST",
+            headers: headers({ "Content-Type": "application/json", Prefer: "resolution=merge-duplicates,return=representation" }),
+            body: JSON.stringify(user),
+          });
+          if (!r.ok) {
+            delete user.username;
+            r = await fetch(`${SB_URL}/rest/v1/app_users?on_conflict=external_id`, {
+              method: "POST",
+              headers: headers({ "Content-Type": "application/json", Prefer: "resolution=merge-duplicates,return=representation" }),
+              body: JSON.stringify(user),
+            });
+          }
+          if (r.ok) return enter((await r.json())[0] || user);
+        } catch (e) {
+          console.warn("Google demo account save failed", e);
+        }
+        enter(user);
       }
 
       async function finishGoogleLogin() {

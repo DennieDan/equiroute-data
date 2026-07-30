@@ -20,17 +20,18 @@ Open the role-selection page first:
 http://127.0.0.1:8011/index.html
 ```
 
-Choose **Public user** for the reporting/feedback platform, or **Authority / planner** for the persona-agent dashboard. Direct role URLs also work:
+Choose **Public user** for the reporting/feedback platform, or **Authority user** for the persona-agent dashboard. The main frontend is gated by the logged-in `jalanlens_user` record in local storage, so do not open direct `?role=` URLs for demos. After login, the app redirects to:
 
 ```text
-http://127.0.0.1:8011/earth_accessibility.html?role=public
-http://127.0.0.1:8011/earth_accessibility.html?role=authority
+http://127.0.0.1:8011/earth_accessibility.html
 ```
 
-The page loads live Supabase street/photo data first and falls back to committed local JSON if Supabase is unavailable. For deterministic local-only testing, use:
+Direct access to `earth_accessibility.html` without a stored login redirects back to `index.html`.
+
+The page loads live Supabase street/photo data first and falls back to committed local JSON if Supabase is unavailable. For deterministic local-only testing, open the login page with a safe `next=` target, then log in:
 
 ```text
-http://127.0.0.1:8011/earth_accessibility.html?role=authority&localRegistry=1
+http://127.0.0.1:8011/index.html?next=earth_accessibility.html%3FlocalRegistry%3D1
 ```
 
 Expected current demo state:

@@ -50,9 +50,14 @@
       const LEGACY_ROLE_STORAGE_KEY = "access" + "twin_role";
       const LEGACY_USER_STORAGE_KEY = "access" + "twin_user";
       const params = new URLSearchParams(location.search);
-      const stored = JSON.parse(localStorage.getItem(USER_STORAGE_KEY) || localStorage.getItem(LEGACY_USER_STORAGE_KEY) || "null");
-      const role = params.get("role") || localStorage.getItem(ROLE_STORAGE_KEY) || localStorage.getItem(LEGACY_ROLE_STORAGE_KEY) || stored?.role || "public";
-      const externalId = params.get("user") || stored?.external_id || "";
+      let stored = null;
+      try {
+        stored = JSON.parse(localStorage.getItem(USER_STORAGE_KEY) || localStorage.getItem(LEGACY_USER_STORAGE_KEY) || "null");
+      } catch (e) {
+        stored = null;
+      }
+      const role = stored?.role || localStorage.getItem(ROLE_STORAGE_KEY) || localStorage.getItem(LEGACY_ROLE_STORAGE_KEY) || "";
+      const externalId = stored?.external_id || "";
       const headers = (extra = {}) => ({ apikey: SUPABASE_PUBLISHABLE_KEY, Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`, ...extra });
       const setStatus = (msg, kind = "") => { status.textContent = msg; status.className = kind; };
       async function sha256(text) {
@@ -61,16 +66,20 @@
         return [...new Uint8Array(hash)].map((b) => b.toString(16).padStart(2, "0")).join("");
       }
       async function loadUser() {
-        let user = stored || { external_id: externalId, role };
-        if (externalId) {
-          try {
-            let r = await fetch(`${SUPABASE_URL}/rest/v1/app_users?select=external_id,username,display_name,role,organization,persona_hint,metadata,is_active&external_id=eq.${encodeURIComponent(externalId)}&limit=1`, { headers: headers() });
-            if (!r.ok) {
-              r = await fetch(`${SUPABASE_URL}/rest/v1/app_users?select=external_id,display_name,role,organization,persona_hint,metadata,is_active&external_id=eq.${encodeURIComponent(externalId)}&limit=1`, { headers: headers() });
-            }
-            if (r.ok) user = (await r.json())[0] || user;
-          } catch (e) {}
+        if (!stored || !externalId || !role) {
+          localStorage.removeItem(ROLE_STORAGE_KEY);
+          localStorage.removeItem(USER_STORAGE_KEY);
+          location.replace("index.html?next=profile.html");
+          throw new Error("JalanLens login required");
         }
+        let user = stored;
+        try {
+          let r = await fetch(`${SUPABASE_URL}/rest/v1/app_users?select=external_id,username,display_name,role,organization,persona_hint,metadata,is_active&external_id=eq.${encodeURIComponent(externalId)}&limit=1`, { headers: headers() });
+          if (!r.ok) {
+            r = await fetch(`${SUPABASE_URL}/rest/v1/app_users?select=external_id,display_name,role,organization,persona_hint,metadata,is_active&external_id=eq.${encodeURIComponent(externalId)}&limit=1`, { headers: headers() });
+          }
+          if (r.ok) user = (await r.json())[0] || user;
+        } catch (e) {}
         user.role ||= role;
         user.username ||= user.external_id || "demo_user";
         user.display_name ||= user.username;
@@ -79,7 +88,7 @@
         displayName.value = user.display_name;
         username.value = user.username;
         summary.textContent = `${user.role === "authority" ? "Authority" : "Public"} account · ${user.organization || "JalanLens demo"}`;
-        backLink.href = `earth_accessibility.html?role=${encodeURIComponent(user.role)}&user=${encodeURIComponent(user.external_id || "")}`;
+        backLink.href = "earth_accessibility.html";
         return user;
       }
       let currentUser = null;
