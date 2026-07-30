@@ -3,17 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>JalanLens Login</title>
+    <title>JalanLens</title>
+    <link rel="stylesheet" href="harvard.css?v=20260731b" />
     <style>
       :root {
-        --bg: #020617;
-        --card: rgba(15, 23, 42, 0.88);
-        --line: rgba(125, 211, 252, 0.28);
-        --txt: #e0f2fe;
-        --muted: #94a3b8;
-        --blue: #38bdf8;
-        --green: #22c55e;
-        --red: #fb7185;
+        --black: #1e1e1e;
+        --crimson: #a51c30;
+        --paper: #f3f3f1;
+        --serif: 'Libre Baskerville', Baskerville, Georgia, serif;
+        --sans: 'Source Sans 3', Arial, Helvetica, sans-serif;
       }
       * { box-sizing: border-box; }
       body {
@@ -21,14 +19,10 @@
         margin: 0;
         display: grid;
         place-items: center;
-        padding: 28px;
-        background:
-          radial-gradient(circle at 20% 10%, rgba(56, 189, 248, 0.16), transparent 30%),
-          radial-gradient(circle at 80% 90%, rgba(34, 197, 94, 0.13), transparent 34%),
-          var(--bg);
-        color: var(--txt);
-        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        overflow-x: hidden;
+        background: var(--paper);
+        color: var(--black);
+        font-family: var(--sans);
+        overflow: hidden;
       }
       body::before {
         content: "";
@@ -37,372 +31,134 @@
         z-index: 1;
         pointer-events: none;
         background:
-          radial-gradient(circle at 20% 20%, rgba(56, 189, 248, 0.26), transparent 30%),
-          linear-gradient(180deg, rgba(2, 6, 23, 0.32), rgba(2, 6, 23, 0.72)),
-          rgba(2, 6, 23, 0.38);
-        backdrop-filter: saturate(1.08);
+          linear-gradient(180deg, rgba(243,243,241,.08), rgba(243,243,241,.34) 58%, rgba(243,243,241,.52)),
+          radial-gradient(circle at 70% 24%, rgba(165,28,48,.18), transparent 28%);
       }
-      .login-bg-video {
+      .hero-bg-video {
         position: fixed;
         inset: 0;
         z-index: 0;
         width: 100vw;
         height: 100vh;
         object-fit: cover;
-        filter: saturate(1.08) contrast(1.04) brightness(0.78);
+        filter: saturate(.86) contrast(.98) brightness(1.06);
       }
       main {
         position: relative;
         z-index: 2;
-        width: min(760px, 100%);
-      }
-      h1 { margin: 0 0 24px; text-align: center; font-size: clamp(34px, 7vw, 64px); line-height: 0.95; text-shadow: 0 0 38px rgba(56, 189, 248, 0.35); }
-      .roles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
-      .role {
-        border: 1px solid var(--line);
-        border-radius: 28px;
-        padding: 24px;
-        background: var(--card);
-        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
+        width: min(1120px, calc(100% - 40px));
+        padding-top: 76px;
         text-align: center;
       }
-      .role h2 { margin: 0 0 18px; font-size: 28px; text-transform: capitalize; }
-      button, a.button {
-        width: 100%;
+      .homepage-title {
+        margin: 0;
+        font-family: var(--serif);
+        font-size: clamp(72px, 15vw, 176px);
+        font-weight: 400;
+        line-height: .86;
+        letter-spacing: -.07em;
+        color: var(--black);
+      }
+      .typing-line {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        min-height: 44px;
-        margin-top: 10px;
-        border: 1px solid rgba(125, 211, 252, 0.36);
-        border-radius: 15px;
-        padding: 11px 13px;
-        background: rgba(2, 6, 23, 0.72);
-        color: var(--txt);
+        min-height: 56px;
+        margin-top: 28px;
+        padding: 14px 20px;
+        border-top: 4px solid var(--black);
+        border-bottom: 1px solid var(--black);
+        background: rgba(255,255,255,.58);
+        color: var(--black);
+        font-size: clamp(20px, 3vw, 34px);
+        font-weight: 800;
+      }
+      #typedText::after {
+        content: '';
+        display: inline-block;
+        width: 3px;
+        height: 1em;
+        margin-left: 5px;
+        vertical-align: -.12em;
+        background: var(--crimson);
+        animation: blink .9s steps(1) infinite;
+      }
+      @keyframes blink { 50% { opacity: 0; } }
+      .home-actions {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 34px;
+      }
+      .home-actions a {
+        min-width: 150px;
+        padding: 14px 18px;
+        border: 1px solid var(--black);
+        background: var(--black);
+        color: #fff;
         font-weight: 900;
-        cursor: pointer;
         text-decoration: none;
       }
-      button.primary { background: linear-gradient(135deg, #075985, #0e7490); border-color: #bae6fd; }
-      button.google { background: #f8fafc; color: #0f172a; border-color: #fff; }
-      button.ghost { background: transparent; }
-      #authPanel {
-        display: none;
-        margin: 18px auto 0;
-        width: min(430px, 100%);
-        border: 1px solid var(--line);
-        border-radius: 24px;
-        padding: 20px;
-        background: rgba(15, 23, 42, 0.94);
+      .home-actions a.secondary { background: transparent; color: var(--black); }
+      @media (max-width: 680px) {
+        .home-actions { flex-direction: column; align-items: stretch; }
+        .typing-line { width: 100%; }
       }
-      #authPanel.visible { display: block; }
-      #panelTitle { margin: 0 0 12px; font-size: 24px; text-transform: capitalize; text-align: center; }
-      label { display: block; margin-top: 12px; color: #bae6fd; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.04em; }
-      input { width: 100%; margin-top: 6px; padding: 12px; border-radius: 14px; border: 1px solid var(--line); background: rgba(2, 6, 23, 0.75); color: var(--txt); font-weight: 750; }
-      #status { min-height: 18px; margin-top: 12px; font-size: 13px; color: var(--muted); text-align: center; }
-      #status.ok { color: var(--green); }
-      #status.err { color: var(--red); }
-      @media (max-width: 720px) { .roles { grid-template-columns: 1fr; } }
     </style>
-    <link rel="stylesheet" href="harvard.css?v=20260731a" />
   </head>
   <body>
-    <header class="login-site-header" aria-label="JalanLens site navigation">
-      <div class="login-menu-mark" aria-hidden="true"></div>
-      <nav class="login-nav" aria-label="Primary">
-        <a href="about.html">About Us</a>
+    <header class="site-nav" aria-label="JalanLens site navigation">
+      <a class="site-logo" href="./" aria-label="JalanLens home" aria-current="page">
+        <img src="assets/jalanlens-logo.svg" alt="" />
+        <span>JalanLens</span>
+      </a>
+      <nav class="site-links" aria-label="Primary">
+        <a href="about/">About Us</a>
+        <a href="login/">Log In</a>
       </nav>
     </header>
-    <video class="login-bg-video" autoplay muted loop playsinline preload="auto" aria-hidden="true" poster="">
-      <source src="assets/login-singapore-city.mp4" type="video/mp4" />
+    <video class="hero-bg-video" autoplay muted loop playsinline preload="auto" poster="assets/jalanlens-scenery-poster.jpg" aria-hidden="true">
+      <source src="assets/jalanlens-scenery-loop.webm" type="video/webm" />
+      <source src="assets/jalanlens-scenery-loop.mp4" type="video/mp4" />
     </video>
     <main>
-      <h1>JalanLens</h1>
-      <div class="roles">
-        <section class="role" data-role-card="public">
-          <h2>Public User</h2>
-          <button class="primary" data-open-login="public">Login</button>
-          <button class="ghost" data-open-signup="public">Sign up</button>
-          <button class="google" id="googlePublicBtn">Continue with Google</button>
-        </section>
-        <section class="role" data-role-card="authority">
-          <h2>Authority User</h2>
-          <button class="primary" data-open-login="authority">Login</button>
-          <button class="ghost" data-open-signup="authority">Sign up</button>
-        </section>
+      <h1 class="homepage-title">JalanLens</h1>
+      <div class="typing-line" aria-live="polite"><span id="typedText"></span></div>
+      <div class="home-actions">
+        <a href="login/">Log In</a>
+        <a class="secondary" href="about/">About Us</a>
       </div>
-
-      <section id="authPanel" aria-live="polite">
-        <h2 id="panelTitle">Login</h2>
-        <form id="authForm">
-          <label for="username">Username</label>
-          <input id="username" name="username" required maxlength="80" autocomplete="username" />
-          <label for="password">Password</label>
-          <input id="password" name="password" type="password" required minlength="4" autocomplete="current-password" />
-          <button class="primary" id="submitBtn" type="submit">Login</button>
-          <button class="ghost" id="switchModeBtn" type="button">Sign up</button>
-          <button class="ghost" id="backBtn" type="button">Back</button>
-        </form>
-        <div id="status"></div>
-      </section>
     </main>
-
-    <script type="module">
-      import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
-      import { sha256 } from "./sha256.js";
-
-      const SB_URL = "https://khddsjemkdcgumfvkraa.supabase.co";
-      const SB_KEY = "sb_publishable_" + "lqGtwkNAOMV7qsYPKVZr8w_GytZx3Qm";
-      const ROLE_STORAGE_KEY = "jalanlens_role";
-      const USER_STORAGE_KEY = "jalanlens_user";
-      const params = new URLSearchParams(location.search);
-      const supabase = createClient(SB_URL, SB_KEY);
-      let activeRole = "public";
-      let activeMode = "login";
-      const authPanel = document.getElementById("authPanel");
-      const panelTitle = document.getElementById("panelTitle");
-      const authForm = document.getElementById("authForm");
-      const username = document.getElementById("username");
-      const password = document.getElementById("password");
-      const submitBtn = document.getElementById("submitBtn");
-      const switchModeBtn = document.getElementById("switchModeBtn");
-      const backBtn = document.getElementById("backBtn");
-      const googlePublicBtn = document.getElementById("googlePublicBtn");
-      const statusEl = document.getElementById("status");
-
-      const headers = (extra = {}) => ({ ...extra, ["api" + "key"]: SB_KEY, ["Author" + "ization"]: "Bearer " + SB_KEY });
-      const setStatus = (msg, kind = "") => { statusEl.textContent = msg; statusEl.className = kind; };
-      const slug = (value) => value.trim().toLowerCase().replace(/[^a-z0-9._-]+/g, ".").replace(/^\.+|\.+$/g, "").slice(0, 72);
-      const titleCase = (value) => String(value || "").replace(/\b\w/g, (c) => c.toUpperCase());
-      const DEMO_ACCOUNTS = {
-        public: {
-          "nurul.public": "public_wheelchair_commuter",
-          "tan.public": "public_senior_walker",
-          "aisha.public": "public_low_vision_commuter",
-          "google.public.demo": "google_public_demo",
-        },
-        authority: {
-          "lta.planner": "authority_lta_planner",
-          "towncouncil.officer": "authority_town_council",
-          "sbs.operator": "authority_sbs_operator",
-        },
-      };
-
-      function safeNext() {
-        const raw = params.get("next") || "earth_accessibility.html";
-        let target;
-        try { target = new URL(raw, location.href); } catch (e) { target = new URL("earth_accessibility.html", location.href); }
-        if (target.origin !== location.origin) target = new URL("earth_accessibility.html", location.href);
-        const file = target.pathname.split("/").pop() || "earth_accessibility.html";
-        if (!file.endsWith(".html") || file === "index.html") return "earth_accessibility.html";
-        return file + target.search;
-      }
-
-      function enter(user) {
-        localStorage.setItem(ROLE_STORAGE_KEY, user.role);
-        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
-        const target = new URL(safeNext(), location.href);
-        target.searchParams.delete("role");
-        target.searchParams.delete("user");
-        location.href = target.pathname.split("/").pop() + target.search;
-      }
-
-      function showPanel(mode, role) {
-        activeMode = mode;
-        activeRole = role;
-        authPanel.classList.add("visible");
-        panelTitle.textContent = `${titleCase(role)} User ${titleCase(mode)}`;
-        submitBtn.textContent = mode === "login" ? "Login" : "Sign up";
-        switchModeBtn.textContent = mode === "login" ? "Sign up" : "Login";
-        password.autocomplete = mode === "login" ? "current-password" : "new-password";
-        setStatus("");
-        username.focus();
-      }
-
-      async function fetchAccount(role, name) {
-        const demoExternalId = DEMO_ACCOUNTS[role]?.[name] || null;
-        const selectFull = "select=external_id,username,password_hash,display_name,role,organization,persona_hint,public_persona_type,demographic_profile,metadata,is_active";
-        let r = await fetch(`${SB_URL}/rest/v1/app_users?${selectFull}&role=eq.${encodeURIComponent(role)}&username=eq.${encodeURIComponent(name)}&is_active=eq.true&limit=1`, { headers: headers() });
-        if (r.ok) {
-          const rows = await r.json();
-          if (rows[0]) return rows[0];
+    <script>
+      const sentences = [
+        "See every street through an accessibility lens.",
+        "Turn footpath evidence into civic action.",
+        "Map safer journeys for every mobility need.",
+        "Combine street view, satellite context, and public feedback.",
+        "Help cities prioritize the routes that matter most."
+      ];
+      const target = document.getElementById("typedText");
+      let sentenceIndex = 0, charIndex = 0, deleting = false;
+      function tick() {
+        const sentence = sentences[sentenceIndex];
+        target.textContent = sentence.slice(0, charIndex);
+        if (!deleting && charIndex < sentence.length) {
+          charIndex += 1;
+          return setTimeout(tick, 42);
         }
-        if (demoExternalId) {
-          r = await fetch(`${SB_URL}/rest/v1/app_users?${selectFull}&external_id=eq.${encodeURIComponent(demoExternalId)}&is_active=eq.true&limit=1`, { headers: headers() });
-          if (r.ok) {
-            const rows = await r.json();
-            if (rows[0]) return rows[0];
-          }
+        if (!deleting && charIndex === sentence.length) {
+          deleting = true;
+          return setTimeout(tick, 1500);
         }
-        r = await fetch(`${SB_URL}/rest/v1/app_users?select=external_id,display_name,role,organization,persona_hint,metadata,is_active&role=eq.${encodeURIComponent(role)}&is_active=eq.true`, { headers: headers() });
-        if (!r.ok) throw new Error("login failed");
-        const rows = await r.json();
-        return rows.find((u) =>
-          slug(u.metadata?.username || "") === name ||
-          slug(u.external_id || "") === name ||
-          (demoExternalId && u.external_id === demoExternalId),
-        );
+        if (deleting && charIndex > 0) {
+          charIndex -= 1;
+          return setTimeout(tick, 22);
+        }
+        deleting = false;
+        sentenceIndex = (sentenceIndex + 1) % sentences.length;
+        setTimeout(tick, 320);
       }
-
-      async function login(usernameValue, passwordValue) {
-        const name = slug(usernameValue);
-        const user = await fetchAccount(activeRole, name);
-        if (!user) throw new Error("account not found");
-        const hashed = await sha256(passwordValue);
-        const storedHash = user.password_hash || user.metadata?.password_hash;
-        const demoPassword = activeRole === "authority" ? "demo-password-authority" : "demo-password-public";
-        if (storedHash) {
-          if (storedHash !== hashed && storedHash !== passwordValue) throw new Error("wrong password");
-        } else if (passwordValue !== demoPassword) {
-          throw new Error("wrong password");
-        }
-        user.username ||= user.metadata?.username;
-        delete user.password_hash;
-        enter(user);
-      }
-
-      async function signup(usernameValue, passwordValue) {
-        const name = slug(usernameValue);
-        if (!name) throw new Error("username required");
-        const hashed = await sha256(passwordValue);
-        const row = {
-          external_id: `${activeRole}_${name.replace(/[^a-z0-9]+/g, "_")}_${Date.now()}`,
-          username: name,
-          password_hash: hashed,
-          display_name: name,
-          role: activeRole,
-          organization: activeRole === "authority" ? "Authority user" : "Public user",
-          persona_hint: activeRole === "public" ? "working_adult_commuter" : null,
-          public_persona_type: activeRole === "public" ? "working_adult_commuter" : null,
-          demographic_profile: activeRole === "public" ? { persona_type: "working_adult_commuter", age_band: "25-64", mobility_needs: [], assistive_device: "none", setup_status: "default_on_signup" } : {},
-          is_active: true,
-          metadata: { self_signup: true, username: name, password_hash: hashed, persona_type: activeRole === "public" ? "working_adult_commuter" : null },
-        };
-        let r = await fetch(`${SB_URL}/rest/v1/app_users`, {
-          method: "POST",
-          headers: headers({ "Content-Type": "application/json", Prefer: "return=representation" }),
-          body: JSON.stringify(row),
-        });
-        if (!r.ok) {
-          const message = await r.text();
-          if (message.includes("password_hash") || message.includes("username") || message.includes("public_persona_type") || message.includes("demographic_profile")) {
-            delete row.password_hash;
-            delete row.username;
-            delete row.public_persona_type;
-            delete row.demographic_profile;
-            r = await fetch(`${SB_URL}/rest/v1/app_users`, {
-              method: "POST",
-              headers: headers({ "Content-Type": "application/json", Prefer: "return=representation" }),
-              body: JSON.stringify(row),
-            });
-          } else {
-            throw new Error(message || "signup failed");
-          }
-        }
-        if (!r.ok) throw new Error((await r.text()) || "signup failed");
-        const user = (await r.json())[0] || row;
-        user.username ||= user.metadata?.username || name;
-        delete user.password_hash;
-        enter(user);
-      }
-
-      async function publicGoogleLogin() {
-        setStatus("Google OAuth is not enabled in this Supabase project yet; continuing with a Google demo public account…");
-        const user = {
-          external_id: "google_public_demo",
-          username: "google.public.demo",
-          display_name: "Google public demo user",
-          role: "public",
-          organization: "Google account demo",
-          persona_hint: "visually_impaired_commuter",
-          public_persona_type: "visually_impaired_commuter",
-          demographic_profile: { persona_type: "visually_impaired_commuter", age_band: "25-64", mobility_needs: ["low vision", "tactile guidance"] },
-          is_active: true,
-          metadata: { google_demo: true, username: "google.public.demo", persona_type: "visually_impaired_commuter" },
-        };
-        try {
-          let r = await fetch(`${SB_URL}/rest/v1/app_users?on_conflict=external_id`, {
-            method: "POST",
-            headers: headers({ "Content-Type": "application/json", Prefer: "resolution=merge-duplicates,return=representation" }),
-            body: JSON.stringify(user),
-          });
-          if (!r.ok) {
-            delete user.username;
-            delete user.public_persona_type;
-            delete user.demographic_profile;
-            r = await fetch(`${SB_URL}/rest/v1/app_users?on_conflict=external_id`, {
-              method: "POST",
-              headers: headers({ "Content-Type": "application/json", Prefer: "resolution=merge-duplicates,return=representation" }),
-              body: JSON.stringify(user),
-            });
-          }
-          if (r.ok) return enter((await r.json())[0] || user);
-        } catch (e) {
-          console.warn("Google demo account save failed", e);
-        }
-        enter(user);
-      }
-
-      async function finishGoogleLogin() {
-        if (params.get("oauth") !== "public") return;
-        const { data, error } = await supabase.auth.getSession();
-        if (error || !data.session?.user) return setStatus(error?.message || "Google sign in failed", "err");
-        const authUser = data.session.user;
-        const email = authUser.email || `${authUser.id}@google.local`;
-        const user = {
-          external_id: `google_${authUser.id}`,
-          username: email.toLowerCase(),
-          display_name: authUser.user_metadata?.full_name || authUser.user_metadata?.name || email,
-          role: "public",
-          organization: "Google account",
-          auth_user_id: authUser.id,
-          persona_hint: "working_adult_commuter",
-          public_persona_type: "working_adult_commuter",
-          demographic_profile: { persona_type: "working_adult_commuter", age_band: "25-64", mobility_needs: [] },
-          is_active: true,
-          metadata: { google_oauth: true, username: email.toLowerCase(), avatar_url: authUser.user_metadata?.avatar_url || null, persona_type: "working_adult_commuter" },
-        };
-        let r = await fetch(`${SB_URL}/rest/v1/app_users?on_conflict=external_id`, {
-          method: "POST",
-          headers: headers({ "Content-Type": "application/json", Prefer: "resolution=merge-duplicates,return=representation" }),
-          body: JSON.stringify(user),
-        });
-        if (!r.ok) {
-          const message = await r.text();
-          if (message.includes("auth_user_id") || message.includes("username") || message.includes("public_persona_type") || message.includes("demographic_profile")) {
-            delete user.auth_user_id;
-            delete user.username;
-            delete user.public_persona_type;
-            delete user.demographic_profile;
-            r = await fetch(`${SB_URL}/rest/v1/app_users?on_conflict=external_id`, {
-              method: "POST",
-              headers: headers({ "Content-Type": "application/json", Prefer: "resolution=merge-duplicates,return=representation" }),
-              body: JSON.stringify(user),
-            });
-          } else {
-            return setStatus(message || "Google account save failed", "err");
-          }
-        }
-        if (!r.ok) return setStatus((await r.text()) || "Google account save failed", "err");
-        enter((await r.json())[0] || user);
-      }
-
-      document.querySelectorAll("[data-open-login]").forEach((button) => button.addEventListener("click", () => showPanel("login", button.dataset.openLogin)));
-      document.querySelectorAll("[data-open-signup]").forEach((button) => button.addEventListener("click", () => showPanel("signup", button.dataset.openSignup)));
-      switchModeBtn.onclick = () => showPanel(activeMode === "login" ? "signup" : "login", activeRole);
-      backBtn.onclick = () => { authPanel.classList.remove("visible"); setStatus(""); };
-      googlePublicBtn.onclick = publicGoogleLogin;
-      authForm.onsubmit = async (event) => {
-        event.preventDefault();
-        setStatus(activeMode === "login" ? "Logging in…" : "Signing up…");
-        try {
-          if (activeMode === "login") await login(username.value, password.value);
-          else await signup(username.value, password.value);
-        } catch (e) {
-          setStatus(e.message || String(e), "err");
-        }
-      };
-      finishGoogleLogin();
+      tick();
     </script>
   </body>
 </html>

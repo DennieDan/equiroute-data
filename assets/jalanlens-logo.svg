@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 64" role="img" aria-labelledby="title desc">
+  <title id="title">JalanLens logo</title>
+  <desc id="desc">A street path framed inside a camera lens, representing accessibility insight along pedestrian routes.</desc>
+  <defs>
+    <linearGradient id="crimson" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d12f45"/>
+      <stop offset="1" stop-color="#7b1024"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" fill-rule="evenodd">
+    <rect x="3" y="7" width="70" height="50" rx="7" stroke="#fff" stroke-width="5" opacity=".94"/>
+    <circle cx="38" cy="32" r="20" fill="url(#crimson)" stroke="#fff" stroke-width="4"/>
+    <path d="M38 15c6 9 9 19 9 34M38 15c-6 9-9 19-9 34" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".92"/>
+    <path d="M14 43c12-3 23-6 33-12 6-4 11-9 16-15" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+    <path d="M12 47c13-1 27-3 41-6" stroke="#fff" stroke-width="2.5" stroke-linecap="round" opacity=".75"/>
+    <text x="88" y="40" fill="#fff" font-family="Libre Baskerville, Georgia, serif" font-size="28" letter-spacing="-1.2" font-weight="700">JalanLens</text>
+  </g>
+</svg>
