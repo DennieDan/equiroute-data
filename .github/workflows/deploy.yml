@@ -27,8 +27,8 @@ jobs:
           cp accessibility_world.geojson buildings_clementi.geojson _site/
           cp -R data/. _site/data/
           cp -R assets _site/assets
-          # optional legacy root scripts still referenced during transition
-          cp -f feedback-form.js _site/ 2>/dev/null || true
+          # shared / optional root scripts
+          cp -f feedback-form.js sha256.js _site/ 2>/dev/null || true
 
       - uses: actions/configure-pages@v6
 
