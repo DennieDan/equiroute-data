@@ -517,23 +517,35 @@
       .seg-btn.warn {
         background: var(--amber);
       }
-      .seg-btn.addon::after {
-        content: attr(data-addon);
+      .seg-btn::after {
+        content: attr(data-label);
         position: absolute;
         left: 18px;
-        top: -16px;
-        background: rgba(2, 6, 23, 0.82);
+        top: -18px;
+        display: none;
+        max-width: 260px;
+        background: rgba(2, 6, 23, 0.9);
         color: white;
-        border: 1px solid rgba(255, 255, 255, 0.22);
+        border: 1px solid rgba(255, 255, 255, 0.24);
         border-radius: 999px;
-        padding: 2px 6px;
-        font-size: 9px;
+        padding: 3px 7px;
+        font-size: 10px;
         white-space: nowrap;
+        pointer-events: none;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.36);
+      }
+      .seg-btn:hover::after,
+      .seg-btn:focus-visible::after {
+        display: block;
+      }
+      .seg-btn:not([data-label])::after,
+      .seg-btn[data-label=""]::after {
+        display: none !important;
       }
       #settings {
-        right: 14px;
-        top: 70px;
-        width: min(390px, calc(100vw - 28px));
+        right: 74px;
+        top: 78px;
+        width: min(360px, calc(100vw - 96px));
         padding: 14px;
         z-index: 35;
         display: none;
@@ -1324,25 +1336,11 @@
         return `Near ${road}, Singapore${suffix}`;
       }
       function renderRoadNameLabels() {
+        // Keep Earth view uncluttered: place/road names are shown only as
+        // hover tooltips on the blue street-part buttons, not as floating labels.
         if (!window.roadNameLabels) return;
-        const visible = state.mode === "earth" && (map.getZoom?.() || 0) >= 17.35;
-        roadNameLabels.classList.toggle("visible", visible);
-        if (!visible) {
-          roadNameLabels.innerHTML = "";
-          return;
-        }
-        const roads = state.roadNameData?.roads || [];
-        const seen = [];
-        const labels = [];
-        for (const road of roads) {
-          const pt = map.coordinateToContainerPoint(new maptalks.Coordinate(...road.mid));
-          if (pt.x < -40 || pt.y < 80 || pt.x > innerWidth + 40 || pt.y > innerHeight + 40) continue;
-          if (seen.some((p) => Math.hypot(p.x - pt.x, p.y - pt.y) < 120 && p.name === road.name)) continue;
-          seen.push({ x: pt.x, y: pt.y, name: road.name });
-          labels.push(`<div class="road-label" style="left:${Math.round(pt.x)}px;top:${Math.round(pt.y)}px">${road.name}</div>`);
-          if (labels.length >= 14) break;
-        }
-        roadNameLabels.innerHTML = labels.join("");
+        roadNameLabels.classList.remove("visible");
+        roadNameLabels.innerHTML = "";
       }
 
       function addonFor(p) {
@@ -1911,10 +1909,10 @@
           ? `${baseName} · ${cleanType}`
           : baseName;
         selectedDesc.textContent = p.metrics?.length_m
-          ? `${p.address ? p.address + " · " : ""}${Math.round(p.metrics.length_m * 10) / 10} m footpath${p.metrics.source_segment_count ? ` · ${p.metrics.source_segment_count} measurements` : ""}`
+          ? `${p.address ? p.address + " · " : ""}${Math.round(p.metrics.length_m * 10) / 10} m footpath${p.metrics.source_segment_count ? ` · ${p.metrics.source_segment_count} source samples` : ""}`
           : `${kindLabel || cleanType}${extras.distanceM != null ? ` · ~${Math.round(extras.distanceM)}m from camera` : ""}`;
-        activeScore.textContent =
-          p.overall_accessibility_score ?? extras.score ?? "–";
+        const detailScore = p.overall_accessibility_score ?? extras.score ?? null;
+        activeScore.textContent = detailScore == null ? "–" : `${detailScore}/100`;
         const m = p.metrics,
           c = p.component_scores;
         if (m && c) {
@@ -1939,12 +1937,12 @@
             .join("");
         } else if (m?.length_m) {
           metricList.innerHTML = [
-            ["Length", `${Math.round(m.length_m * 10) / 10} m`, p.overall_accessibility_score ?? extras.score ?? "–"],
-            ["Measurements", m.source_segment_count || "–", p.overall_accessibility_score ?? extras.score ?? "–"],
+            ["Length", `${Math.round(m.length_m * 10) / 10} m`, "street-part distance"],
+            ["Source samples", m.source_segment_count || "–", "raw path samples combined into this street part"],
           ]
             .map(
               (x) =>
-                `<div class="metric"><span>${x[0]}</span><b>${x[1]}</b><small>${x[2]}/100</small></div>`,
+                `<div class="metric"><span>${x[0]}</span><b>${x[1]}</b><small>${x[2]}</small></div>`,
             )
             .join("");
         } else {
@@ -2221,7 +2219,7 @@
           p = f.properties;
         showDetail(p, kind);
         selectedDesc.textContent = featureComment(p, kind);
-        activeScore.textContent = p.overall_accessibility_score;
+        activeScore.textContent = p.overall_accessibility_score == null ? "–" : `${p.overall_accessibility_score}/100`;
         detailCard.classList.add("visible");
       }
       function normAngle(a) {
@@ -2479,6 +2477,7 @@
             const b = document.createElement("button");
             b.className = `seg-btn feature ${kind.includes("bus") ? "bus" : kind}`;
             b.dataset.addon = kind;
+            b.dataset.label = x.name || capitalizeKind(kind);
             b.style.left = pt.x - 17 + "px";
             b.style.top = pt.y - 17 + "px";
             b.textContent =
@@ -2550,6 +2549,10 @@
             b.classList.add("addon");
             b.dataset.addon = add;
           }
+          const part = streetPartForSegmentId(p.id);
+          b.dataset.label = part
+            ? `${streetPartDisplayName(part)} · ${streetPartAddress(part, f)} · ${p.overall_accessibility_score}/100`
+            : `${p.name} · ${p.overall_accessibility_score}/100`;
           b.style.left = pt.x - 12 + "px";
           b.style.top = pt.y - 12 + "px";
           b.textContent = idx === state.selectedIndex ? "●" : "";
