@@ -62,9 +62,9 @@ body:has(.login-bg-video) {
 
 body:has(.login-bg-video)::before {
   background:
-    linear-gradient(180deg, rgba(243, 243, 241, 0.52) 0%, rgba(243, 243, 241, 0.94) 52%, rgba(243, 243, 241, 1) 100%),
-    rgba(255,255,255,0.35) !important;
-  backdrop-filter: saturate(0.96) !important;
+    linear-gradient(180deg, rgba(243, 243, 241, 0.34) 0%, rgba(243, 243, 241, 0.76) 54%, rgba(243, 243, 241, 0.9) 100%),
+    rgba(255,255,255,0.18) !important;
+  backdrop-filter: saturate(0.98) !important;
 }
 
 .login-bg-video {
@@ -74,23 +74,11 @@ body:has(.login-bg-video)::before {
 body:has(.login-bg-video) main {
   width: min(920px, calc(100% - 40px)) !important;
   margin: 0 auto !important;
-  padding: clamp(28px, 7vw, 76px) 0 !important;
+  padding: clamp(96px, 12vw, 142px) 0 clamp(28px, 7vw, 76px) !important;
 }
 
 body:has(.login-bg-video) main::before {
-  content: 'JALANLENS';
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  min-height: 58px;
-  padding: 0 22px;
-  margin-bottom: clamp(42px, 8vw, 86px);
-  background: rgba(255, 255, 255, 0.78);
-  border-bottom: 4px solid var(--harvard-crimson);
-  color: var(--harvard-black);
-  font-family: var(--harvard-serif);
-  font-size: 22px;
-  letter-spacing: 0.08em;
+  content: none !important;
 }
 
 body:has(.login-bg-video) main::after {
@@ -110,7 +98,7 @@ body:has(.login-bg-video) h1 {
   gap: 0 !important;
   border-top: 4px solid var(--harvard-black);
   border-bottom: 1px solid var(--harvard-black);
-  background: rgba(243, 243, 241, 0.88);
+  background: rgba(243, 243, 241, 0.66);
 }
 
 .role {
@@ -118,7 +106,7 @@ body:has(.login-bg-video) h1 {
   border-right: 1px solid var(--harvard-border) !important;
   border-radius: 0 !important;
   padding: clamp(24px, 4vw, 42px) !important;
-  background: rgba(255,255,255,0.72) !important;
+  background: rgba(255,255,255,0.56) !important;
   box-shadow: none !important;
   text-align: left !important;
 }
@@ -173,7 +161,7 @@ body:has(.login-bg-video) button:hover {
   border: 1px solid var(--harvard-black) !important;
   border-top: 6px solid var(--harvard-crimson) !important;
   border-radius: 0 !important;
-  background: rgba(255,255,255,0.92) !important;
+  background: rgba(255,255,255,0.82) !important;
   color: var(--harvard-black) !important;
   box-shadow: none !important;
 }
@@ -188,6 +176,60 @@ input, select {
 #status { color: var(--harvard-muted) !important; }
 #status.ok { color: #1f7a35 !important; }
 #status.err { color: var(--harvard-crimson) !important; }
+
+
+/* Login page Harvard-style menu bar */
+.login-site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 4;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  min-height: 68px;
+  background: var(--harvard-black);
+  border-bottom: 4px solid var(--harvard-crimson);
+  color: var(--harvard-white);
+}
+.login-menu-mark {
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  border-right: 1px solid rgba(255,255,255,0.18);
+}
+.login-menu-mark::before {
+  content: '';
+  width: 21px;
+  height: 32px;
+  background: var(--harvard-crimson);
+  clip-path: polygon(0 0,100% 0,100% 78%,50% 100%,0 78%);
+}
+.login-nav {
+  display: flex;
+  align-items: stretch;
+  margin-left: auto;
+}
+.login-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 68px;
+  padding: 0 28px;
+  border-left: 1px solid rgba(255,255,255,0.18);
+  color: var(--harvard-white);
+  font-family: var(--harvard-sans);
+  font-size: 16px;
+  font-weight: 900;
+  text-decoration: none;
+}
+.login-nav a::after {
+  content: '→';
+  margin-left: 16px;
+}
+.login-nav a:hover {
+  background: var(--harvard-crimson);
+}
 
 /* Harvard-inspired app HUD */
 body:not(:has(.login-bg-video)) {
