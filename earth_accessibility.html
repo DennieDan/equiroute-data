@@ -431,6 +431,25 @@
         padding: 8px;
         background: rgba(15, 23, 42, 0.52);
       }
+      .feedback-filters {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 6px;
+        margin-top: 8px;
+      }
+      .feedback-filters label {
+        display: grid;
+        gap: 3px;
+        color: var(--muted);
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .feedback-filters select {
+        width: 100%;
+        font-size: 11px;
+        padding: 6px 8px;
+      }
       .feedback-history.visible {
         display: block;
       }
@@ -454,6 +473,23 @@
       .feedback-item b {
         display: block;
         color: #e0f2fe;
+      }
+      .feedback-item b em {
+        display: inline-block;
+        margin-right: 5px;
+        padding: 1px 6px;
+        border-radius: 999px;
+        font-style: normal;
+        font-size: 9px;
+        text-transform: uppercase;
+        background: rgba(56, 189, 248, 0.18);
+        color: #bae6fd;
+        border: 1px solid rgba(56, 189, 248, 0.32);
+      }
+      .feedback-item.agent b em {
+        background: rgba(187, 107, 217, 0.18);
+        color: #f0abfc;
+        border-color: rgba(187, 107, 217, 0.36);
       }
       .feedback-item span {
         display: block;
@@ -504,6 +540,34 @@
         color: var(--muted);
         text-transform: uppercase;
         letter-spacing: 0.05em;
+      }
+      .street-agent-counts {
+        display: none;
+        margin-top: 9px;
+        padding: 8px;
+        border: 1px solid rgba(125, 211, 252, 0.24);
+        border-radius: 12px;
+        background: rgba(2, 6, 23, 0.42);
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .street-agent-counts.visible {
+        display: block;
+      }
+      .street-agent-counts b {
+        color: #e0f2fe;
+      }
+      .street-agent-counts .count-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 5px;
+      }
+      .street-agent-counts .count-pill {
+        border: 1px solid rgba(148, 163, 184, 0.22);
+        border-radius: 999px;
+        padding: 2px 7px;
+        background: rgba(15, 23, 42, 0.72);
       }
       .close {
         margin-left: auto;
@@ -817,6 +881,7 @@
         <button class="close" id="closeDetail">×</button>
       </div>
       <div class="metrics" id="metricList"></div>
+      <div id="streetAgentCounts" class="street-agent-counts"></div>
       <div class="detail-actions">
         <button type="button" id="feedbackBtn">Give feedback</button>
         <div id="feedbackMeta"></div>
@@ -882,6 +947,8 @@
         activeRouteEndPartId: null,
         roadNameData: null,
         currentPhotoUploadContext: null,
+        liveAgentSnapshot: null,
+        agentLayer: null,
       };
       window.__EARTH_ACCESSIBILITY_STATE = state;
       const SATELLITE_TILE =
@@ -950,8 +1017,10 @@
         ).addTo(map),
         poiLayer = new maptalks.VectorLayer("features").addTo(map),
         buildingLayer = new maptalks.VectorLayer("buildings").addTo(map),
-        selectedLayer = new maptalks.VectorLayer("selected").addTo(map);
-      state.layers = { routeLayer, poiLayer, buildingLayer, selectedLayer };
+        selectedLayer = new maptalks.VectorLayer("selected").addTo(map),
+        agentLayer = new maptalks.VectorLayer("live-persona-agents").addTo(map);
+      state.layers = { routeLayer, poiLayer, buildingLayer, selectedLayer, agentLayer };
+      state.agentLayer = agentLayer;
       function getToken() {
         return localStorage.getItem(TOKEN_STORAGE_KEY) || localStorage.getItem(LEGACY_TOKEN_STORAGE_KEY) || "";
       }
@@ -1886,6 +1955,64 @@
           street_part_external_id: part.id,
         };
       }
+      function htmlEscape(value) {
+        return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+      }
+      function renderLiveAgents() {
+        if (!state.agentLayer || !window.maptalks) return;
+        const snapshot = state.liveAgentSnapshot;
+        state.agentLayer.clear();
+        if (!snapshot?.agent_live_states?.length) return;
+        const personaTypes = snapshot.persona_types || {};
+        const geoms = snapshot.agent_live_states.map((agent) => {
+          const color = personaTypes[agent.persona_type_id]?.color || "#38bdf8";
+          const marker = new maptalks.Marker([agent.lng, agent.lat], {
+            symbol: [
+              { markerType: "ellipse", markerWidth: 10, markerHeight: 10, markerFill: "#ffffff", markerLineColor: "#020617", markerLineWidth: 2, markerOpacity: 0.95 },
+              { markerType: "ellipse", markerWidth: 6, markerHeight: 6, markerFill: color, markerLineColor: color, markerLineWidth: 1, markerOpacity: personaTypes[agent.persona_type_id]?.category === "general" ? 0.68 : 0.95 },
+            ],
+          });
+          marker.setInfoWindow({
+            title: agent.display_name || agent.agent_external_id,
+            content: `${(personaTypes[agent.persona_type_id]?.label || agent.persona_type_id).replaceAll("_", " ")}<br>${agent.activity || "moving"}`,
+          });
+          return marker;
+        });
+        state.agentLayer.addGeometry(geoms);
+      }
+
+      function renderStreetAgentCounts() {
+        if (!window.streetAgentCounts) return;
+        const part = currentStreetPart();
+        const snapshot = state.liveAgentSnapshot;
+        const row = (snapshot?.street_part_agent_counts || []).find((r) => r.street_part_external_id === part?.id);
+        if (!row) {
+          streetAgentCounts.classList.remove("visible");
+          streetAgentCounts.innerHTML = "";
+          return;
+        }
+        const personaTypes = snapshot.persona_types || {};
+        const pills = Object.entries(row.persona_counts || {})
+          .sort((a, b) => b[1] - a[1])
+          .map(([pid, count]) => `<span class="count-pill"><b style="color:${personaTypes[pid]?.color || "#bae6fd"}">${count}</b> ${htmlEscape((personaTypes[pid]?.label || pid).replaceAll("_", " "))}</span>`)
+          .join("");
+        streetAgentCounts.classList.add("visible");
+        streetAgentCounts.innerHTML = `<b>Live synthetic agents on this street part</b><div class="count-grid">${pills}</div><small>${row.total_count} total · synthetic, not real-person tracking</small>`;
+      }
+
+      async function loadLiveAgentSnapshot() {
+        try {
+          const r = await fetch("data/live_persona_simulation_snapshot.json");
+          if (!r.ok) throw new Error(`snapshot ${r.status}`);
+          const snapshot = await r.json();
+          state.liveAgentSnapshot = snapshot;
+          renderLiveAgents();
+          renderStreetAgentCounts();
+        } catch (e) {
+          console.warn("live persona snapshot unavailable", e);
+        }
+      }
+
       function showDetail(p, kind = "", extras = {}) {
         detailCard.classList.add("visible");
         const typeLabel = (p.feature_type || p.kind || "feature").replaceAll(
@@ -1946,6 +2073,7 @@
           featureExternalId: extras.featureExternalId || p.external_id || null,
           name: p.name || "",
         });
+        renderStreetAgentCounts();
       }
       function selectSegment(index, street = false) {
         if (!state.segments.length) return;
@@ -2748,6 +2876,7 @@
       };
       EquirouteFeedback.init({
         getDetailContext: () => state.detailContext,
+        getCurrentUser: () => state.appUser,
         supabaseUrl: SUPABASE_URL,
         supabaseKey: SUPABASE_PUBLISHABLE_KEY,
         capitalizeKind,
@@ -2946,6 +3075,8 @@
           map.setPitch(0);
           map.setBearing(0);
           renderSatelliteFallback();
+          await loadLiveAgentSnapshot();
+          setInterval(loadLiveAgentSnapshot, 10000);
           const streetCount = registry?.streets?.length || 0,
             nodeCount = registry?.street_view_nodes?.length || 0,
             src = registry?.source === "supabase"
