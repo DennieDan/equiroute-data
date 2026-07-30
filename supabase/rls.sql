@@ -13,6 +13,16 @@ alter table public.feedback_comments enable row level security;
 alter table public.app_users enable row level security;
 alter table public.persona_journey_runs enable row level security;
 alter table public.authority_recommendations enable row level security;
+alter table public.persona_types enable row level security;
+alter table public.persona_agents enable row level security;
+alter table public.simulation_runs enable row level security;
+alter table public.agent_live_states enable row level security;
+alter table public.agent_events enable row level security;
+alter table public.agent_feedback_threads enable row level security;
+alter table public.street_part_agent_counts enable row level security;
+alter table public.environment_observations enable row level security;
+alter table public.transit_stops enable row level security;
+alter table public.transit_arrivals enable row level security;
 
 -- Public read for map/demo data.
 drop policy if exists "public read streets" on public.streets;
@@ -114,3 +124,35 @@ create policy "auth insert comments" on public.feedback_comments
 
 -- Authority/admin writes should be done through service role or later replaced
 -- with a custom JWT claim policy, e.g. auth.jwt()->>'role' = 'authority'.
+
+-- Synthetic-agent simulation data: public/demo users can read combined map state,
+-- while writes are intended for the service-role worker on the VPS.
+drop policy if exists "public read persona types" on public.persona_types;
+create policy "public read persona types" on public.persona_types for select using (true);
+
+drop policy if exists "public read persona agents" on public.persona_agents;
+create policy "public read persona agents" on public.persona_agents for select using (is_active = true);
+
+drop policy if exists "public read simulation runs" on public.simulation_runs;
+create policy "public read simulation runs" on public.simulation_runs for select using (true);
+
+drop policy if exists "public read live agent states" on public.agent_live_states;
+create policy "public read live agent states" on public.agent_live_states for select using (true);
+
+drop policy if exists "public read agent events" on public.agent_events;
+create policy "public read agent events" on public.agent_events for select using (true);
+
+drop policy if exists "public read agent feedback" on public.agent_feedback_threads;
+create policy "public read agent feedback" on public.agent_feedback_threads for select using (true);
+
+drop policy if exists "public read street agent counts" on public.street_part_agent_counts;
+create policy "public read street agent counts" on public.street_part_agent_counts for select using (true);
+
+drop policy if exists "public read environment observations" on public.environment_observations;
+create policy "public read environment observations" on public.environment_observations for select using (true);
+
+drop policy if exists "public read transit stops" on public.transit_stops;
+create policy "public read transit stops" on public.transit_stops for select using (true);
+
+drop policy if exists "public read transit arrivals" on public.transit_arrivals;
+create policy "public read transit arrivals" on public.transit_arrivals for select using (true);

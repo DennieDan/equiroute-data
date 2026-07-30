@@ -202,8 +202,8 @@
         localStorage.setItem(ROLE_STORAGE_KEY, user.role);
         localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
         const target = new URL(safeNext(), location.href);
-        target.searchParams.set("role", user.role);
-        target.searchParams.set("user", user.external_id);
+        target.searchParams.delete("role");
+        target.searchParams.delete("user");
         location.href = target.pathname.split("/").pop() + target.search;
       }
 
@@ -221,7 +221,7 @@
 
       async function fetchAccount(role, name) {
         const demoExternalId = DEMO_ACCOUNTS[role]?.[name] || null;
-        const selectFull = "select=external_id,username,password_hash,display_name,role,organization,persona_hint,metadata,is_active";
+        const selectFull = "select=external_id,username,password_hash,display_name,role,organization,persona_hint,public_persona_type,demographic_profile,metadata,is_active";
         let r = await fetch(`${SB_URL}/rest/v1/app_users?${selectFull}&role=eq.${encodeURIComponent(role)}&username=eq.${encodeURIComponent(name)}&is_active=eq.true&limit=1`, { headers: headers() });
         if (r.ok) {
           const rows = await r.json();
@@ -272,8 +272,11 @@
           display_name: name,
           role: activeRole,
           organization: activeRole === "authority" ? "Authority user" : "Public user",
+          persona_hint: activeRole === "public" ? "working_adult_commuter" : null,
+          public_persona_type: activeRole === "public" ? "working_adult_commuter" : null,
+          demographic_profile: activeRole === "public" ? { persona_type: "working_adult_commuter", age_band: "25-64", mobility_needs: [], assistive_device: "none", setup_status: "default_on_signup" } : {},
           is_active: true,
-          metadata: { self_signup: true, username: name, password_hash: hashed },
+          metadata: { self_signup: true, username: name, password_hash: hashed, persona_type: activeRole === "public" ? "working_adult_commuter" : null },
         };
         let r = await fetch(`${SB_URL}/rest/v1/app_users`, {
           method: "POST",
@@ -282,9 +285,11 @@
         });
         if (!r.ok) {
           const message = await r.text();
-          if (message.includes("password_hash") || message.includes("username")) {
+          if (message.includes("password_hash") || message.includes("username") || message.includes("public_persona_type") || message.includes("demographic_profile")) {
             delete row.password_hash;
             delete row.username;
+            delete row.public_persona_type;
+            delete row.demographic_profile;
             r = await fetch(`${SB_URL}/rest/v1/app_users`, {
               method: "POST",
               headers: headers({ "Content-Type": "application/json", Prefer: "return=representation" }),
@@ -309,9 +314,11 @@
           display_name: "Google public demo user",
           role: "public",
           organization: "Google account demo",
-          persona_hint: "visually_impaired",
+          persona_hint: "visually_impaired_commuter",
+          public_persona_type: "visually_impaired_commuter",
+          demographic_profile: { persona_type: "visually_impaired_commuter", age_band: "25-64", mobility_needs: ["low vision", "tactile guidance"] },
           is_active: true,
-          metadata: { google_demo: true, username: "google.public.demo" },
+          metadata: { google_demo: true, username: "google.public.demo", persona_type: "visually_impaired_commuter" },
         };
         try {
           let r = await fetch(`${SB_URL}/rest/v1/app_users?on_conflict=external_id`, {
@@ -321,6 +328,8 @@
           });
           if (!r.ok) {
             delete user.username;
+            delete user.public_persona_type;
+            delete user.demographic_profile;
             r = await fetch(`${SB_URL}/rest/v1/app_users?on_conflict=external_id`, {
               method: "POST",
               headers: headers({ "Content-Type": "application/json", Prefer: "resolution=merge-duplicates,return=representation" }),
@@ -347,8 +356,11 @@
           role: "public",
           organization: "Google account",
           auth_user_id: authUser.id,
+          persona_hint: "working_adult_commuter",
+          public_persona_type: "working_adult_commuter",
+          demographic_profile: { persona_type: "working_adult_commuter", age_band: "25-64", mobility_needs: [] },
           is_active: true,
-          metadata: { google_oauth: true, username: email.toLowerCase(), avatar_url: authUser.user_metadata?.avatar_url || null },
+          metadata: { google_oauth: true, username: email.toLowerCase(), avatar_url: authUser.user_metadata?.avatar_url || null, persona_type: "working_adult_commuter" },
         };
         let r = await fetch(`${SB_URL}/rest/v1/app_users?on_conflict=external_id`, {
           method: "POST",
@@ -357,9 +369,11 @@
         });
         if (!r.ok) {
           const message = await r.text();
-          if (message.includes("auth_user_id") || message.includes("username")) {
+          if (message.includes("auth_user_id") || message.includes("username") || message.includes("public_persona_type") || message.includes("demographic_profile")) {
             delete user.auth_user_id;
             delete user.username;
+            delete user.public_persona_type;
+            delete user.demographic_profile;
             r = await fetch(`${SB_URL}/rest/v1/app_users?on_conflict=external_id`, {
               method: "POST",
               headers: headers({ "Content-Type": "application/json", Prefer: "resolution=merge-duplicates,return=representation" }),

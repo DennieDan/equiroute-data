@@ -235,3 +235,163 @@ create index if not exists street_photos_part_active_idx on public.street_photos
 create index if not exists street_nodes_street_idx on public.street_view_nodes (street_id);
 create index if not exists street_nodes_part_idx on public.street_view_nodes (street_part_id);
 create index if not exists feedback_threads_part_idx on public.feedback_threads (street_part_id, status);
+
+-- Live synthetic persona-agent simulation. Agent feedback is stored separately
+-- from real public feedback, then combined in the authority/public dashboard.
+create table if not exists public.persona_types (
+  id uuid primary key default gen_random_uuid(),
+  external_id text unique not null,
+  label text not null,
+  category text not null check (category in ('disabled','access_relevant','general')),
+  color text not null,
+  description text not null,
+  mobility_profile jsonb not null default '{}',
+  schedule_profile jsonb not null default '{}',
+  source_notes jsonb not null default '[]',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.persona_agents (
+  id uuid primary key default gen_random_uuid(),
+  external_id text unique not null,
+  display_name text not null,
+  persona_type_id uuid null references public.persona_types(id) on delete set null,
+  persona_type_external_id text not null,
+  resident_status text not null check (resident_status in ('resident','visitor','worker_student_inbound')),
+  age_band text not null,
+  sex text null,
+  home_subzone text null,
+  baseline_speed_mps double precision not null,
+  routine_seed integer not null,
+  traits jsonb not null default '{}',
+  is_active boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.simulation_runs (
+  id uuid primary key default gen_random_uuid(),
+  external_id text unique not null,
+  status text not null default 'running' check (status in ('running','paused','stopped','replay')),
+  sim_timezone text not null default 'Asia/Singapore',
+  tick_seconds integer not null default 10,
+  config jsonb not null default '{}',
+  started_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.agent_live_states (
+  agent_id uuid primary key references public.persona_agents(id) on delete cascade,
+  simulation_run_id uuid null references public.simulation_runs(id) on delete cascade,
+  sim_time timestamptz not null default now(),
+  activity text not null,
+  lng double precision not null,
+  lat double precision not null,
+  street_part_id uuid null references public.street_parts(id) on delete set null,
+  street_part_external_id text null,
+  street_view_node_id uuid null references public.street_view_nodes(id) on delete set null,
+  current_trip jsonb not null default '{}',
+  route_plan jsonb not null default '{}',
+  state jsonb not null default '{}',
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.agent_events (
+  id uuid primary key default gen_random_uuid(),
+  simulation_run_id uuid null references public.simulation_runs(id) on delete cascade,
+  agent_id uuid null references public.persona_agents(id) on delete set null,
+  agent_external_id text null,
+  persona_type text not null,
+  event_type text not null,
+  street_part_id uuid null references public.street_parts(id) on delete set null,
+  street_part_external_id text null,
+  feature_id uuid null references public.accessibility_features(id) on delete set null,
+  occurred_at timestamptz not null default now(),
+  severity double precision not null default 0,
+  payload jsonb not null default '{}'
+);
+
+create table if not exists public.agent_feedback_threads (
+  id uuid primary key default gen_random_uuid(),
+  agent_id uuid null references public.persona_agents(id) on delete set null,
+  agent_external_id text not null,
+  agent_name text not null,
+  persona_type text not null,
+  event_id uuid null references public.agent_events(id) on delete set null,
+  street_part_id uuid null references public.street_parts(id) on delete cascade,
+  street_part_external_id text null,
+  feature_id uuid null references public.accessibility_features(id) on delete set null,
+  event_type text not null,
+  title text not null,
+  body text not null,
+  status text not null default 'open',
+  priority_score double precision not null default 0,
+  severity double precision not null default 0,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique(agent_external_id, street_part_external_id, event_type, persona_type, created_at)
+);
+
+create table if not exists public.street_part_agent_counts (
+  street_part_id uuid null references public.street_parts(id) on delete cascade,
+  street_part_external_id text not null,
+  simulation_run_id uuid null references public.simulation_runs(id) on delete cascade,
+  bucket_started_at timestamptz not null default date_trunc('minute', now()),
+  persona_counts jsonb not null default '{}',
+  total_count integer not null default 0,
+  weather_snapshot jsonb not null default '{}',
+  transit_snapshot jsonb not null default '{}',
+  primary key (street_part_external_id, bucket_started_at)
+);
+
+create table if not exists public.environment_observations (
+  id uuid primary key default gen_random_uuid(),
+  source text not null,
+  observed_at timestamptz not null,
+  lng double precision null,
+  lat double precision null,
+  kind text not null,
+  value double precision null,
+  unit text null,
+  payload jsonb not null default '{}',
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.transit_stops (
+  id uuid primary key default gen_random_uuid(),
+  external_id text unique not null,
+  stop_type text not null check (stop_type in ('bus_stop','mrt_station','taxi_stand')),
+  name text not null,
+  lng double precision not null,
+  lat double precision not null,
+  metadata jsonb not null default '{}'
+);
+
+create table if not exists public.transit_arrivals (
+  id uuid primary key default gen_random_uuid(),
+  stop_external_id text not null,
+  service_no text null,
+  observed_at timestamptz not null,
+  eta_seconds integer null,
+  load text null,
+  wheelchair_bay_proxy text null,
+  payload jsonb not null default '{}'
+);
+
+alter table public.app_users
+  add column if not exists public_persona_type text null,
+  add column if not exists demographic_profile jsonb not null default '{}';
+
+alter table public.feedback_threads
+  add column if not exists source text not null default 'public',
+  add column if not exists public_user_external_id text null,
+  add column if not exists public_user_name text null,
+  add column if not exists persona_type text null;
+
+create index if not exists persona_agents_type_idx on public.persona_agents (persona_type_external_id, is_active);
+create index if not exists agent_live_states_part_idx on public.agent_live_states (street_part_external_id, updated_at desc);
+create index if not exists agent_events_part_time_idx on public.agent_events (street_part_external_id, occurred_at desc);
+create index if not exists agent_feedback_part_time_idx on public.agent_feedback_threads (street_part_external_id, created_at desc);
+create index if not exists agent_feedback_persona_idx on public.agent_feedback_threads (persona_type, created_at desc);
+create index if not exists public_feedback_source_idx on public.feedback_threads (source, persona_type, created_at desc);

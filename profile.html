@@ -13,7 +13,7 @@
       h1 { margin:8px 0 6px; font-size:clamp(30px,6vw,52px); line-height:.98; }
       p { color:var(--muted); line-height:1.5; }
       label { display:block; margin-top:14px; color:#bae6fd; font-size:12px; font-weight:900; text-transform:uppercase; letter-spacing:.04em; }
-      input { width:100%; margin-top:6px; padding:12px; border-radius:14px; border:1px solid var(--line); background:rgba(2,6,23,.75); color:var(--txt); font-weight:750; }
+      input,select { width:100%; margin-top:6px; padding:12px; border-radius:14px; border:1px solid var(--line); background:rgba(2,6,23,.75); color:var(--txt); font-weight:750; }
       .actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
       button,a { border:1px solid rgba(125,211,252,.35); border-radius:14px; padding:10px 12px; background:rgba(15,23,42,.9); color:var(--txt); font-weight:850; text-decoration:none; cursor:pointer; }
       button.primary { background:linear-gradient(135deg,#075985,#0e7490); border-color:#bae6fd; }
@@ -35,6 +35,25 @@
         <input id="username" name="username" required maxlength="80" autocomplete="username" />
         <label for="password">New password</label>
         <input id="password" name="password" type="password" minlength="4" autocomplete="new-password" placeholder="leave blank to keep current password" />
+        <label for="personaType">Accessibility persona / demographic profile</label>
+        <select id="personaType" name="personaType">
+          <option value="working_adult_commuter">Working adult commuter</option>
+          <option value="older_resident_cane">Older resident with cane</option>
+          <option value="older_resident_walker">Older resident with walker</option>
+          <option value="wheelchair_user_commuter">Wheelchair user commuter</option>
+          <option value="visually_impaired_commuter">Visually impaired commuter</option>
+          <option value="pma_pmd_user">PMA / PMD user</option>
+          <option value="caregiver_with_disabled_person">Caregiver with disabled person</option>
+          <option value="parent_with_stroller">Parent with stroller</option>
+          <option value="primary_school_child">Primary school child</option>
+          <option value="secondary_student">Secondary student</option>
+          <option value="poly_uni_student">Poly / university student</option>
+          <option value="delivery_rider_worker">Delivery / service worker</option>
+        </select>
+        <label for="ageBand">Age band</label>
+        <input id="ageBand" name="ageBand" maxlength="40" placeholder="e.g. 25-64" />
+        <label for="mobilityNeeds">Mobility/accessibility notes</label>
+        <input id="mobilityNeeds" name="mobilityNeeds" maxlength="180" placeholder="e.g. wheelchair, stroller, low vision, prefers sheltered routes" />
         <div class="actions">
           <button class="primary" type="submit">Save profile</button>
           <a id="backLink" href="earth_accessibility.html">Back to platform</a>
@@ -72,7 +91,7 @@
         }
         let user = stored;
         try {
-          let r = await fetch(`${SUPABASE_URL}/rest/v1/app_users?select=external_id,username,display_name,role,organization,persona_hint,metadata,is_active&external_id=eq.${encodeURIComponent(externalId)}&limit=1`, { headers: headers() });
+          let r = await fetch(`${SUPABASE_URL}/rest/v1/app_users?select=external_id,username,display_name,role,organization,persona_hint,public_persona_type,demographic_profile,metadata,is_active&external_id=eq.${encodeURIComponent(externalId)}&limit=1`, { headers: headers() });
           if (!r.ok) {
             r = await fetch(`${SUPABASE_URL}/rest/v1/app_users?select=external_id,display_name,role,organization,persona_hint,metadata,is_active&external_id=eq.${encodeURIComponent(externalId)}&limit=1`, { headers: headers() });
           }
@@ -85,6 +104,10 @@
         localStorage.setItem(ROLE_STORAGE_KEY, user.role);
         displayName.value = user.display_name;
         username.value = user.username;
+        const demoProfile = user.demographic_profile || user.metadata?.demographic_profile || {};
+        personaType.value = user.public_persona_type || user.persona_hint || user.metadata?.persona_type || demoProfile.persona_type || "working_adult_commuter";
+        ageBand.value = demoProfile.age_band || "";
+        mobilityNeeds.value = Array.isArray(demoProfile.mobility_needs) ? demoProfile.mobility_needs.join(", ") : (demoProfile.mobility_needs || "");
         summary.textContent = `${user.role === "authority" ? "Authority" : "Public"} account · ${user.organization || "JalanLens demo"}`;
         backLink.href = "earth_accessibility.html";
         return user;
@@ -95,9 +118,19 @@
         event.preventDefault();
         if (!currentUser?.external_id) return setStatus("No current database user selected. Log in again first.", "err");
         setStatus("Saving profile…");
+        const profile = {
+          persona_type: personaType.value,
+          age_band: ageBand.value.trim(),
+          mobility_needs: mobilityNeeds.value.split(",").map((x) => x.trim()).filter(Boolean),
+          updated_from_profile: true,
+        };
         const next = {
           display_name: displayName.value.trim(),
           username: username.value.trim(),
+          persona_hint: personaType.value,
+          public_persona_type: currentUser.role === "public" ? personaType.value : null,
+          demographic_profile: profile,
+          metadata: { ...(currentUser.metadata || {}), persona_type: personaType.value, demographic_profile: profile },
           updated_at: new Date().toISOString(),
         };
         if (password.value) next.password_hash = await sha256(password.value);
