@@ -200,8 +200,8 @@
         localStorage.setItem(ROLE_STORAGE_KEY, user.role);
         localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
         const target = new URL(safeNext(), location.href);
-        target.searchParams.set("role", user.role);
-        target.searchParams.set("user", user.external_id);
+        target.searchParams.delete("role");
+        target.searchParams.delete("user");
         location.href = target.pathname.split("/").pop() + target.search;
       }
 
