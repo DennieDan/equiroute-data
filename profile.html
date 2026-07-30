@@ -42,7 +42,9 @@
       </form>
       <div id="status"></div>
     </main>
-    <script>
+    <script type="module">
+      import { sha256 } from "./sha256.js";
+
       const SUPABASE_URL = "https://khddsjemkdcgumfvkraa.supabase.co";
       const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_lqGtwkNAOMV7qsYPKVZr8w_GytZx3Qm";
       const ROLE_STORAGE_KEY = "jalanlens_role";
@@ -55,11 +57,6 @@
       const externalId = params.get("user") || stored?.external_id || "";
       const headers = (extra = {}) => ({ apikey: SUPABASE_PUBLISHABLE_KEY, Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`, ...extra });
       const setStatus = (msg, kind = "") => { status.textContent = msg; status.className = kind; };
-      async function sha256(text) {
-        const bytes = new TextEncoder().encode(text);
-        const hash = await crypto.subtle.digest("SHA-256", bytes);
-        return [...new Uint8Array(hash)].map((b) => b.toString(16).padStart(2, "0")).join("");
-      }
       async function loadUser() {
         let user = stored || { external_id: externalId, role };
         if (externalId) {
