@@ -74,9 +74,9 @@
       }
       .hero {
         display: grid;
-        grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.55fr);
-        gap: clamp(28px, 5vw, 72px);
-        align-items: end;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 26px;
+        align-items: start;
         padding: 0 0 44px;
         border-bottom: 4px solid var(--black);
       }
@@ -91,9 +91,13 @@
       }
       .hero p {
         margin: 0;
+        max-width: 760px;
         color: var(--muted);
         font-size: clamp(18px, 2.5vw, 24px);
         line-height: 1.35;
+      }
+      .portrait-wrap img.hagen-photo {
+        object-position: center 42%;
       }
       .team-grid {
         display: grid;
@@ -206,7 +210,7 @@
         </article>
         <article class="person-card">
           <figure>
-            <div class="portrait-wrap"><img src="../assets/team/hagen.svg" alt="Portrait placeholder for Hagen" /></div>
+            <div class="portrait-wrap"><img class="hagen-photo" src="../assets/team/hagen.jpg" alt="Hagen flying a drone outdoors" /></div>
             <figcaption><h2>Hagen</h2><p>SMU Year 2 CS</p></figcaption>
           </figure>
         </article>
@@ -219,7 +223,7 @@
       </section>
 
       <p class="note">
-        Real headshots can replace the current portrait slots by swapping the files in <code>assets/team/</code> while keeping the same filenames.
+        Real headshots can replace the remaining portrait slots by adding image files in <code>assets/team/</code> and updating the matching card image source.
       </p>
     </main>
   </body>
