@@ -124,6 +124,33 @@ class EarthUiControlsNotificationTests(unittest.TestCase):
         self.assertNotIn('border-radius: 14px', notifications_css)
         self.assertNotIn('rgba(15, 23, 42', notifications_css)
 
+    def test_toast_and_settings_follow_harvard_chrome(self):
+        text = self.html()
+        css = (ROOT / "harvard.css").read_text()
+        for snippet in [
+            'id="toastStack"',
+            'className = "toast"',
+            'id="settings" class="hud"',
+            'id="settingsBtn"',
+        ]:
+            self.assertIn(snippet, text)
+        chrome_css = css[css.index('/* Harvard toast + settings chrome: black shell, crimson rule, paper content. */'):css.index('/* Harvard notification menu:')]
+        for snippet in [
+            'body:has(#map) .toast',
+            'html[data-theme="light"] body:has(#map) .toast',
+            'html[data-theme="dark"] body:has(#map) .toast',
+            'border-left: 5px solid var(--harvard-crimson)',
+            'background: #000000 !important;',
+            'body:has(#map) #settings',
+            'border-top: 5px solid var(--harvard-crimson)',
+            'body:has(#map) #settings .settings-section',
+            'background: rgba(255, 255, 255, 0.96) !important;',
+            'color: #111111 !important;',
+        ]:
+            self.assertIn(snippet, chrome_css)
+        self.assertNotIn('border-radius: 14px', chrome_css)
+        self.assertNotIn('background: var(--bg)', chrome_css)
+
     def test_theme_recolors_scorecard_text_and_metric_cards(self):
         css = (ROOT / "harvard.css").read_text()
         for snippet in [

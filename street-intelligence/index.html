@@ -1742,7 +1742,7 @@
         color: #ffffff !important;
       }
     </style>
-    <link rel="stylesheet" href="../harvard.css?v=20260731v" />
+    <link rel="stylesheet" href="../harvard.css?v=20260731w" />
     <script src="https://unpkg.com/maptalks/dist/maptalks.min.js"></script>
     <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
     <script src="https://unpkg.com/mapillary-js@4.1.2/dist/mapillary.js"></script>
@@ -3770,43 +3770,251 @@
           }).format(new Date(nowMs)),
         );
       }
-      function agentActivityFor(agent, nowMs = Date.now()) {
+      const LIVE_PERSONA_TYPE_FALLBACKS = {
+        working_adult_commuter: {
+          label: "Working adult commuter",
+          category: "general",
+          color: "#2F80ED",
+          resident_weight: 0.22,
+          speed_mps: 1.28,
+        },
+        older_resident_cane: {
+          label: "Older resident with cane",
+          category: "disabled",
+          color: "#F2994A",
+          resident_weight: 0.11,
+          speed_mps: 0.72,
+        },
+        older_resident_walker: {
+          label: "Older resident with walker",
+          category: "disabled",
+          color: "#D97904",
+          resident_weight: 0.1,
+          speed_mps: 0.58,
+        },
+        senior_with_walker: {
+          label: "Senior with walker",
+          category: "disabled",
+          color: "#D97904",
+          resident_weight: 0.09,
+          speed_mps: 0.58,
+        },
+        wheelchair_user: {
+          label: "Wheelchair user",
+          category: "disabled",
+          color: "#2F80ED",
+          resident_weight: 0.08,
+          speed_mps: 0.9,
+        },
+        wheelchair_user_commuter: {
+          label: "Wheelchair user commuter",
+          category: "disabled",
+          color: "#2F80ED",
+          resident_weight: 0.06,
+          speed_mps: 0.92,
+        },
+        visually_impaired: {
+          label: "Visually impaired commuter",
+          category: "disabled",
+          color: "#BB6BD9",
+          resident_weight: 0.06,
+          speed_mps: 0.82,
+        },
+        visually_impaired_commuter: {
+          label: "Visually impaired commuter",
+          category: "disabled",
+          color: "#BB6BD9",
+          resident_weight: 0.05,
+          speed_mps: 0.82,
+        },
+        pma_pmd_user: {
+          label: "PMA / PMD user",
+          category: "disabled",
+          color: "#56CCF2",
+          resident_weight: 0.05,
+          speed_mps: 1.15,
+        },
+        caregiver_with_disabled_person: {
+          label: "Caregiver with disabled person",
+          category: "access_relevant",
+          color: "#10B981",
+          resident_weight: 0.05,
+          speed_mps: 0.78,
+        },
+        parent_with_stroller: {
+          label: "Parent with stroller",
+          category: "access_relevant",
+          color: "#27AE60",
+          resident_weight: 0.07,
+          speed_mps: 0.86,
+        },
+        primary_school_child: {
+          label: "Primary school child",
+          category: "access_relevant",
+          color: "#F2C94C",
+          resident_weight: 0.08,
+          speed_mps: 1.05,
+        },
+        secondary_student: {
+          label: "Secondary student",
+          category: "general",
+          color: "#8B5CF6",
+          resident_weight: 0.07,
+          speed_mps: 1.2,
+        },
+        poly_uni_student: {
+          label: "Poly / university student",
+          category: "general",
+          color: "#6366F1",
+          resident_weight: 0.06,
+          speed_mps: 1.25,
+        },
+        delivery_rider_worker: {
+          label: "Delivery / service worker",
+          category: "general",
+          color: "#EF4444",
+          resident_weight: 0.05,
+          speed_mps: 1.55,
+        },
+      };
+      function livePersonaTypes() {
+        const fromPersonaSimulation = Object.fromEntries(
+          Object.entries(state.personaSimulation?.personas || {}).map(
+            ([id, p]) => [
+              id,
+              {
+                ...(LIVE_PERSONA_TYPE_FALLBACKS[id] || {}),
+                external_id: id,
+                label: p.label || LIVE_PERSONA_TYPE_FALLBACKS[id]?.label || formatAgentLabel(id),
+                average_score: p.average_score,
+              },
+            ],
+          ),
+        );
+        const merged = { ...LIVE_PERSONA_TYPE_FALLBACKS, ...fromPersonaSimulation };
+        Object.entries(merged).forEach(([id, value]) => {
+          value.external_id = id;
+          value.color ||= COLORS.blue;
+          value.category ||= id.includes("wheelchair") || id.includes("older") || id.includes("visually") ? "disabled" : "general";
+          value.resident_weight = Number(value.resident_weight || 0.04);
+          value.speed_mps = Number(value.speed_mps || 1);
+        });
+        return merged;
+      }
+      function weightedPersonaForOrdinal(index, personaTypes) {
+        const entries = Object.entries(personaTypes);
+        const total = entries.reduce(
+          (sum, [, persona]) => sum + Number(persona.resident_weight || 0.04),
+          0,
+        );
+        let target = ((index * 37) % 1000) / 1000 * total;
+        for (const [id, persona] of entries) {
+          target -= Number(persona.resident_weight || 0.04);
+          if (target <= 0) return id;
+        }
+        return entries[0]?.[0] || "working_adult_commuter";
+      }
+      function partIndexById(partId) {
+        const parts = state.streetRegistry?.street_parts || [];
+        return Math.max(
+          0,
+          parts.findIndex((part) => part.id === partId || part.external_id === partId),
+        );
+      }
+      function routePartIdsBetweenIndexes(startIndex, endIndex) {
+        const parts = state.streetRegistry?.street_parts || [];
+        if (!parts.length) return [];
+        let a = ((startIndex % parts.length) + parts.length) % parts.length;
+        let b = ((endIndex % parts.length) + parts.length) % parts.length;
+        const forward = (b - a + parts.length) % parts.length;
+        const backward = (a - b + parts.length) % parts.length;
+        const dir = forward <= backward ? 1 : -1;
+        const steps = Math.min(parts.length, Math.min(forward, backward) + 1);
+        const route = [];
+        for (let i = 0; i < steps; i++) {
+          route.push(parts[(a + dir * i + parts.length * 2) % parts.length]?.id);
+        }
+        return route.filter(Boolean);
+      }
+      function scoredDestinationIndex(personaId, hash, purpose = "errand") {
+        const parts = state.streetRegistry?.street_parts || [];
+        if (!parts.length) return 0;
+        const priorities = state.personaSimulation?.personas?.[personaId]?.priority_street_parts || [];
+        if ((purpose === "audit" || purpose === "errand") && priorities.length) {
+          const row = priorities[(hash + purpose.length) % priorities.length];
+          const idx = partIndexById(row.street_part_id);
+          if (idx >= 0) return idx;
+        }
+        const offset = purpose === "work" ? 11 : purpose === "school" ? 7 : purpose === "delivery" ? 17 : 5;
+        return (hash + offset + Math.floor(hash / 13)) % parts.length;
+      }
+      function agentLifeStage(agent, nowMs = Date.now()) {
         const hour = singaporeHour(nowMs);
+        const minuteBucket = Math.floor(nowMs / (15 * 60 * 1000));
         const persona = String(agent.persona_type_id || "");
-        if (hour < 6) return "home / resting";
+        if (hour < 6)
+          return { key: "home", label: "home / resting", speedFactor: 0.15, bucket: Math.floor(nowMs / (60 * 60 * 1000)) };
         if (hour < 10) {
           if (persona.includes("student") || persona.includes("child"))
-            return "choosing route to school";
-          if (persona.includes("stroller")) return "school drop-off";
-          return "morning commute";
+            return { key: "school", label: "choosing route to school", speedFactor: 1, bucket: Math.floor(nowMs / (30 * 60 * 1000)) };
+          if (persona.includes("stroller"))
+            return { key: "school", label: "school drop-off", speedFactor: 0.82, bucket: Math.floor(nowMs / (30 * 60 * 1000)) };
+          return { key: "work", label: "morning commute", speedFactor: 1, bucket: Math.floor(nowMs / (30 * 60 * 1000)) };
         }
         if (hour < 15) {
-          if (persona.includes("older")) return "market or clinic errand";
-          if (persona.includes("delivery")) return "delivery stop";
-          return "work / school / errand";
+          if (persona.includes("older"))
+            return { key: "errand", label: "market or clinic errand", speedFactor: 0.72, bucket: minuteBucket };
+          if (persona.includes("delivery"))
+            return { key: "delivery", label: "delivery stop", speedFactor: 1.18, bucket: minuteBucket };
+          return { key: "errand", label: "work / school / errand", speedFactor: 0.9, bucket: minuteBucket };
         }
-        if (hour < 20) return "choosing return route";
-        return "local evening errand";
+        if (hour < 20)
+          return { key: "return", label: "choosing return route", speedFactor: 0.95, bucket: Math.floor(nowMs / (30 * 60 * 1000)) };
+        return { key: "local", label: "local evening errand", speedFactor: 0.7, bucket: minuteBucket };
       }
-      function liveAgentRouteParts(agent) {
+      function agentActivityFor(agent, nowMs = Date.now()) {
+        return agentLifeStage(agent, nowMs).label;
+      }
+      function dynamicRoutePartIds(agent, nowMs = Date.now()) {
         const parts = state.streetRegistry?.street_parts || [];
         if (!parts.length) return [];
         const h = hashString(
-          agent.agent_external_id ||
-            agent.display_name ||
-            agent.persona_type_id,
+          agent.agent_external_id || agent.display_name || agent.persona_type_id,
         );
-        const span = Math.min(parts.length, 5 + (h % 12));
-        const start = h % parts.length;
-        const dir = h & 1 ? 1 : -1;
-        const route = [];
-        for (let i = 0; i < span; i++)
-          route.push(
-            parts[(start + dir * i + parts.length * 4) % parts.length],
-          );
-        return route.filter(
-          (p) => Array.isArray(p.midpoint) && p.midpoint.length >= 2,
+        const stage = agentLifeStage(agent, nowMs);
+        const home = Number(agent.route_plan?.home_index ?? h % parts.length);
+        const work = Number(
+          agent.route_plan?.work_index ?? scoredDestinationIndex(agent.persona_type_id, h, "work"),
         );
+        const school = Number(
+          agent.route_plan?.school_index ?? scoredDestinationIndex(agent.persona_type_id, h, "school"),
+        );
+        const errand = scoredDestinationIndex(
+          agent.persona_type_id,
+          h + stage.bucket * 7,
+          stage.key === "delivery" ? "delivery" : "errand",
+        );
+        if (stage.key === "home") {
+          return routePartIdsBetweenIndexes(home, home + ((h % 3) - 1));
+        }
+        if (stage.key === "school") return routePartIdsBetweenIndexes(home, school);
+        if (stage.key === "work") return routePartIdsBetweenIndexes(home, work);
+        if (stage.key === "return") return routePartIdsBetweenIndexes(work, home);
+        if (stage.key === "delivery") {
+          const next = scoredDestinationIndex(agent.persona_type_id, h + stage.bucket * 19, "delivery");
+          return routePartIdsBetweenIndexes(errand, next);
+        }
+        if (stage.key === "local") return routePartIdsBetweenIndexes(home, errand);
+        return routePartIdsBetweenIndexes(work, errand);
+      }
+      function liveAgentRouteParts(agent, nowMs = Date.now()) {
+        const byId = new Map(
+          (state.streetRegistry?.street_parts || []).map((part) => [part.id || part.external_id, part]),
+        );
+        const routeIds = dynamicRoutePartIds(agent, nowMs);
+        return routeIds
+          .map((id) => byId.get(id))
+          .filter((p) => p && Array.isArray(p.midpoint) && p.midpoint.length >= 2);
       }
       function streetPartFootpathCoords(part) {
         const coords =
@@ -3826,8 +4034,8 @@
           ? [[Number(part.midpoint[0]), Number(part.midpoint[1])]]
           : [];
       }
-      function liveAgentPathSegments(agent) {
-        const parts = liveAgentRouteParts(agent);
+      function liveAgentPathSegments(agent, nowMs = Date.now()) {
+        const parts = liveAgentRouteParts(agent, nowMs);
         const segments = [];
         let prev = null;
         parts.forEach((part) => {
@@ -3849,7 +4057,7 @@
         return segments;
       }
       function liveAgentPosition(agent, nowMs = Date.now()) {
-        const segments = liveAgentPathSegments(agent);
+        const segments = liveAgentPathSegments(agent, nowMs);
         if (!segments.length)
           return { coord: [Number(agent.lng), Number(agent.lat)], part: null };
         const h = hashString(
@@ -3857,15 +4065,18 @@
             agent.display_name ||
             agent.persona_type_id,
         );
+        const stage = agentLifeStage(agent, nowMs);
         const totalM = segments.reduce((sum, seg) => sum + seg.lengthM, 0);
-        const loopSeconds =
-          Math.max(
-            45,
-            totalM / Math.max(0.45, Number(agent.state?.speed_mps || 1)),
-          ) +
-          (h % 25);
-        let targetM =
-          (((nowMs / 1000 + (h % 997)) % loopSeconds) / loopSeconds) * totalM;
+        const speed = Math.max(
+          0.28,
+          Number(agent.state?.speed_mps || 1) * Number(stage.speedFactor || 1),
+        );
+        const loopSeconds = Math.max(35, totalM / speed) + (h % 25);
+        let phase = ((nowMs / 1000 + (h % 997)) % loopSeconds) / loopSeconds;
+        // Agents make an out-and-back life trip within the current schedule stage
+        // instead of teleporting back to route start after each loop.
+        if (phase > 0.5) phase = 1 - phase;
+        let targetM = phase * 2 * totalM;
         for (const seg of segments) {
           if (targetM <= seg.lengthM) {
             const local = seg.lengthM ? targetM / seg.lengthM : 0;

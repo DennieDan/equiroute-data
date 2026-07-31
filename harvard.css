@@ -1730,6 +1730,121 @@ body:has(#map) #topbar #roleSwitchBtn {
   border-bottom-color: var(--harvard-crimson) !important;
 }
 
+/* Harvard toast + settings chrome: black shell, crimson rule, paper content. */
+body:has(#map) .toast,
+html[data-theme="light"] body:has(#map) .toast,
+html[data-theme="dark"] body:has(#map) .toast {
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  border-left: 5px solid var(--harvard-crimson) !important;
+  border-radius: 0 !important;
+  background: #000000 !important;
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.48) !important;
+  backdrop-filter: none !important;
+}
+body:has(#map) .toast b,
+body:has(#map) .toast div,
+body:has(#map) .toast span,
+html[data-theme="light"] body:has(#map) .toast b,
+html[data-theme="light"] body:has(#map) .toast div,
+html[data-theme="light"] body:has(#map) .toast span,
+html[data-theme="dark"] body:has(#map) .toast b,
+html[data-theme="dark"] body:has(#map) .toast div,
+html[data-theme="dark"] body:has(#map) .toast span {
+  color: #ffffff !important;
+}
+body:has(#map) .toast b,
+html[data-theme="light"] body:has(#map) .toast b,
+html[data-theme="dark"] body:has(#map) .toast b {
+  display: block !important;
+  margin-bottom: 3px !important;
+  font-family: var(--harvard-serif) !important;
+  font-size: 15px !important;
+  font-weight: 400 !important;
+  letter-spacing: -0.02em !important;
+}
+body:has(#map) .toast div,
+html[data-theme="light"] body:has(#map) .toast div,
+html[data-theme="dark"] body:has(#map) .toast div {
+  font-family: var(--harvard-sans) !important;
+  font-size: 12px !important;
+  font-weight: 750 !important;
+  line-height: 1.35 !important;
+  color: rgba(255, 255, 255, 0.78) !important;
+}
+body:has(#map) #settings,
+html[data-theme="light"] body:has(#map) #settings,
+html[data-theme="dark"] body:has(#map) #settings {
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  border-top: 5px solid var(--harvard-crimson) !important;
+  border-radius: 0 !important;
+  background: #000000 !important;
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5) !important;
+  backdrop-filter: none !important;
+}
+body:has(#map) #settings h3,
+html[data-theme="light"] body:has(#map) #settings h3,
+html[data-theme="dark"] body:has(#map) #settings h3 {
+  margin-top: 0 !important;
+  color: #ffffff !important;
+  font-family: var(--harvard-serif) !important;
+  font-weight: 400 !important;
+}
+body:has(#map) #settings > p,
+body:has(#map) #settings #tokenStatus,
+body:has(#map) #settings #currentUserStatus,
+html[data-theme="light"] body:has(#map) #settings > p,
+html[data-theme="light"] body:has(#map) #settings #tokenStatus,
+html[data-theme="light"] body:has(#map) #settings #currentUserStatus,
+html[data-theme="dark"] body:has(#map) #settings > p,
+html[data-theme="dark"] body:has(#map) #settings #tokenStatus,
+html[data-theme="dark"] body:has(#map) #settings #currentUserStatus {
+  color: rgba(255, 255, 255, 0.78) !important;
+}
+body:has(#map) #settings .settings-section,
+html[data-theme="light"] body:has(#map) #settings .settings-section,
+html[data-theme="dark"] body:has(#map) #settings .settings-section {
+  margin-top: 12px !important;
+  padding: 12px !important;
+  border: 1px solid rgba(30, 30, 30, 0.16) !important;
+  border-left: 5px solid var(--harvard-crimson) !important;
+  border-radius: 0 !important;
+  background: rgba(255, 255, 255, 0.96) !important;
+  color: #111111 !important;
+}
+body:has(#map) #settings .settings-section h4,
+body:has(#map) #settings .settings-section h4 *,
+html[data-theme="light"] body:has(#map) #settings .settings-section h4,
+html[data-theme="dark"] body:has(#map) #settings .settings-section h4 {
+  color: #111111 !important;
+  font-family: var(--harvard-serif) !important;
+  font-weight: 400 !important;
+}
+body:has(#map) #settings .settings-section p,
+body:has(#map) #settings .settings-section span,
+body:has(#map) #managedUsersTable,
+html[data-theme="light"] body:has(#map) #settings .settings-section p,
+html[data-theme="light"] body:has(#map) #settings .settings-section span,
+html[data-theme="light"] body:has(#map) #managedUsersTable,
+html[data-theme="dark"] body:has(#map) #settings .settings-section p,
+html[data-theme="dark"] body:has(#map) #settings .settings-section span,
+html[data-theme="dark"] body:has(#map) #managedUsersTable {
+  color: #475569 !important;
+}
+body:has(#map) #settings input,
+body:has(#map) #settings textarea,
+html[data-theme="light"] body:has(#map) #settings input,
+html[data-theme="light"] body:has(#map) #settings textarea,
+html[data-theme="dark"] body:has(#map) #settings input,
+html[data-theme="dark"] body:has(#map) #settings textarea {
+  border-color: rgba(30, 30, 30, 0.26) !important;
+  background: #ffffff !important;
+  color: #111111 !important;
+}
+
 /* Harvard notification menu: black/crimson dropdown chrome with readable paper rows. */
 body:has(#map) #notificationsPanel,
 html[data-theme="light"] body:has(#map) #notificationsPanel,
