@@ -33,8 +33,9 @@
         z-index: 1;
         pointer-events: none;
         background:
-          linear-gradient(180deg, rgba(243,243,241,.08), rgba(243,243,241,.34) 58%, rgba(243,243,241,.52)),
-          radial-gradient(circle at 70% 24%, rgba(165,28,48,.18), transparent 28%);
+          linear-gradient(180deg, rgba(30,30,30,.5) 0%, rgba(30,30,30,.22) 42%, rgba(30,30,30,.58) 100%),
+          radial-gradient(circle at 50% 40%, rgba(165,28,48,.24), transparent 36%),
+          linear-gradient(90deg, rgba(43,6,27,.46), transparent 28%, transparent 72%, rgba(43,6,27,.38));
       }
       .hero-bg-video {
         position: fixed;
@@ -43,7 +44,7 @@
         width: 100vw;
         height: 100vh;
         object-fit: cover;
-        filter: saturate(.86) contrast(.98) brightness(1.06);
+        filter: saturate(.9) contrast(1.04) brightness(.94);
       }
       main {
         position: relative;
@@ -59,8 +60,13 @@
         font-weight: 400;
         line-height: .86;
         letter-spacing: -.07em;
-        color: #111827;
-        text-shadow: 0 2px 0 rgba(255,255,255,.72), 0 18px 42px rgba(15,23,42,.22);
+        color: #fff8e8 !important;
+        -webkit-text-stroke: clamp(1px, .16vw, 2px) rgba(43,6,27,.72);
+        text-shadow:
+          0 3px 0 var(--crimson),
+          0 0 18px rgba(0,0,0,.92),
+          0 12px 38px rgba(0,0,0,.86),
+          0 26px 72px rgba(43,6,27,.7);
       }
       .typing-line {
         position: relative;
@@ -132,15 +138,30 @@
         margin-top: 34px;
       }
       .home-actions a {
-        min-width: 150px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        min-width: 166px;
         padding: 14px 18px;
-        border: 1px solid var(--black);
-        background: var(--black);
+        border: 1px solid rgba(255,255,255,.92);
+        border-top: 4px solid #fff;
+        background: var(--crimson);
         color: #fff;
+        font-family: var(--sans);
         font-weight: 900;
         text-decoration: none;
+        box-shadow: 0 16px 34px rgba(43,6,27,.36);
       }
-      .home-actions a.secondary { background: transparent; color: var(--black); }
+      .home-actions a::after { content: '→'; font-weight: 900; }
+      .home-actions a.secondary { background: var(--crimson); color: #fff; }
+      .home-actions a:hover,
+      .home-actions a:focus-visible {
+        background: #fff;
+        color: var(--crimson);
+        border-color: var(--crimson);
+        border-top-color: var(--crimson);
+      }
       @media (max-width: 680px) {
         .home-actions { flex-direction: column; align-items: stretch; }
         .typing-line { width: 100%; }
