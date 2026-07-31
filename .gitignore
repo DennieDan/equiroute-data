@@ -57,6 +57,7 @@ OSM_CLEMENTI_MALL/
 *.png
 *.jpg
 *.jpeg
+!assets/team/xinyi.jpg
 *.pdf
 *.parquet
 *.pkl
