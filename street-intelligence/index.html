@@ -1203,32 +1203,15 @@
       <p>Account and authority controls for this demo.</p>
       <p id="tokenStatus" hidden></p>
       <p id="currentUserStatus"></p>
-      <div class="settings-grid authority-only">
-        <button id="togglePersonaPanelBtn" type="button">
-          Show persona agents
-        </button>
-      </div>
       <section class="settings-section" id="photoCrowdSection">
         <h4>Photo crowdsourcing</h4>
         <p>
-          Upload better street-part photos here. The review flow is CV first
-          review, then human-in-the-loop approval by selected staff teams before
-          a photo becomes active evidence.
+          Manage street-part photo submissions on the dedicated photo
+          crowdsourcing page.
         </p>
-        <div
-          id="photoProgressRail"
-          class="photo-progress-rail"
-          aria-label="Photo review progress"
-        >
-          <span class="active">Upload</span><span>CV first review</span
-          ><span>Staff review</span><span>Approved</span>
-        </div>
         <div class="photo-upload-actions">
-          <button type="button" id="photoUploadBtn">Upload better photo</button>
           <a class="buttonlike" href="../crowd-photos/">Open dedicated page</a>
-          <input id="photoUploadInput" type="file" accept="image/*" />
         </div>
-        <div id="photoUploadStatus"></div>
       </section>
       <section
         class="settings-section authority-only"
@@ -1813,7 +1796,7 @@
             title: hasPhoto
               ? "Have a better photo?"
               : "No photo available here",
-            body: `${hasPhoto ? "Upload a clearer photo" : "Upload a photo"} for ${streetPartDisplayName(ctx.part)} from Settings → Photo crowdsourcing. Photos go through CV first review, then human-in-the-loop approval by selected company staff.`,
+            body: `${hasPhoto ? "Upload a clearer photo" : "Upload a photo"} for ${streetPartDisplayName(ctx.part)} from the dedicated Photo crowdsourcing page. Photos go through CV first review, then human-in-the-loop approval by selected company staff.`,
             street_part_external_id: ctx.part.id,
           },
           { toast: true, persist: false },
@@ -4085,20 +4068,6 @@
       if (window.logoutBtn) logoutBtn.onclick = logoutToAuth;
       if (window.togglePersonaPanelBtn) {
         togglePersonaPanelBtn.onclick = () => togglePersonaPanel();
-      }
-      if (window.photoUploadBtn && window.photoUploadInput) {
-        photoUploadBtn.onclick = () => photoUploadInput.click();
-        photoUploadInput.onchange = async () => {
-          const file = photoUploadInput.files?.[0];
-          photoUploadInput.value = "";
-          if (!file) return;
-          try {
-            await handlePhotoUploadFile(file);
-          } catch (e) {
-            console.error("photo upload failed", e);
-            setUploadStatus(e.message || "Photo upload failed.", "err");
-          }
-        };
       }
       closeDetail.onclick = () => {
         setScoreCardFlipped(false);

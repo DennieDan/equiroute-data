@@ -8,35 +8,342 @@
     <title>Photo Crowdsourcing | JalanLens</title>
     <link rel="stylesheet" href="../harvard.css?v=20260731n" />
     <style>
-      body { min-height:100vh; margin:0; padding:32px; background:#020617; color:#f8fafc; font-family: var(--harvard-sans); }
-      main { max-width:980px; margin:auto; background:rgba(15,23,42,.94); border:1px solid rgba(125,211,252,.38); border-radius:28px; padding:28px; }
-      .page-logo { width:68px; height:68px; object-fit:contain; display:block; margin-bottom:10px; }
-      h1 { margin:0 0 8px; font-size:clamp(34px,6vw,64px); }
-      p { color:#cbd5e1; line-height:1.55; }
-      .progress { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:22px 0; }
-      .progress span { position:relative; overflow:hidden; border:1px solid rgba(125,211,252,.34); border-radius:999px; padding:12px; text-align:center; font-weight:900; color:#e0f2fe; background:rgba(8,47,73,.5); }
-      .progress span:first-child::after { content:""; position:absolute; inset:0; background:linear-gradient(90deg,transparent,rgba(56,189,248,.35),transparent); animation:sweep 1.4s linear infinite; }
-      @keyframes sweep { from{transform:translateX(-100%)} to{transform:translateX(100%)} }
-      .card-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; }
-      .card { border:1px solid rgba(148,163,184,.26); border-radius:18px; padding:16px; background:rgba(2,6,23,.55); }
-      a { color:#7dd3fc; font-weight:900; }
+      :root {
+        color-scheme: dark;
+        --page-bg: #020617;
+        --panel: rgba(15, 23, 42, 0.96);
+        --panel-soft: rgba(2, 6, 23, 0.58);
+        --line: rgba(148, 163, 184, 0.25);
+        --blue: #7dd3fc;
+        --blue-strong: #38bdf8;
+        --muted: #cbd5e1;
+        --green: #86efac;
+        --red: #fca5a5;
+        --amber: #fde68a;
+      }
+      * { box-sizing: border-box; }
+      body.crowd-photo-page {
+        min-height: 100vh;
+        margin: 0;
+        padding: 30px;
+        background: var(--page-bg) !important;
+        color: #f8fafc !important;
+        font-family: var(--harvard-sans);
+      }
+      main { max-width: 1180px; margin: auto; }
+      .page-shell {
+        overflow: hidden;
+        border: 1px solid rgba(125, 211, 252, 0.38);
+        border-radius: 28px;
+        background: var(--panel);
+      }
+      .page-head { padding: 26px 28px 20px; }
+      .page-logo { width: 62px; height: 62px; object-fit: contain; display: block; margin-bottom: 10px; }
+      .head-row { display: flex; gap: 20px; align-items: flex-end; justify-content: space-between; }
+      .crowd-photo-page h1 { margin: 8px 0; max-width: 100%; overflow-wrap: anywhere; color: #f8fafc !important; font-size: clamp(34px, 6vw, 54px) !important; line-height: 1.05 !important; }
+      .crowd-photo-page h2, .crowd-photo-page h3 { margin-top: 0; color: #f8fafc !important; }
+      .crowd-photo-page p { color: var(--muted) !important; line-height: 1.55; }
+      a { color: var(--blue); font-weight: 900; }
+      .role-badge {
+        flex: none;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 8px 12px;
+        color: var(--blue);
+        font-weight: 900;
+      }
+      .workflow {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1px;
+        background: var(--line);
+        border-block: 1px solid var(--line);
+      }
+      .crowd-photo-page .step-tab {
+        min-height: 76px;
+        border: 0;
+        border-radius: 0;
+        padding: 12px;
+        background: #0f172a;
+        color: #cbd5e1;
+        font: inherit;
+        font-weight: 800;
+        cursor: pointer;
+      }
+      .step-tab span {
+        display: block;
+        width: 25px;
+        height: 25px;
+        margin: 0 auto 5px;
+        border-radius: 50%;
+        background: #334155;
+        line-height: 25px;
+      }
+      .crowd-photo-page .step-tab.active { color: #020617 !important; background: var(--blue) !important; }
+      .step-tab.active span { color: white; background: #0369a1; }
+      .step-panel { display: none; padding: 28px; }
+      .step-panel.active { display: block; }
+      .grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 0.8fr); gap: 18px; }
+      .review-grid { grid-template-columns: minmax(270px, 0.72fr) minmax(0, 1.28fr); }
+      .crowd-photo-page .card {
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 18px;
+        color: #f8fafc !important;
+        background: var(--panel-soft) !important;
+      }
+      label { display: block; margin: 14px 0 7px; color: #e2e8f0; font-weight: 800; }
+      select, textarea, button, .button {
+        width: 100%;
+        border: 1px solid rgba(125, 211, 252, 0.45);
+        border-radius: 12px;
+        padding: 12px 14px;
+        font: inherit;
+      }
+      .crowd-photo-page select, .crowd-photo-page textarea { color: #f8fafc !important; background: #0f172a !important; }
+      textarea { min-height: 95px; resize: vertical; }
+      button, .button {
+        display: inline-block;
+        cursor: pointer;
+        color: #020617;
+        background: var(--blue);
+        text-align: center;
+        font-weight: 900;
+      }
+      button:hover { background: var(--blue-strong); }
+      button:disabled { cursor: not-allowed; opacity: 0.5; }
+      .button-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+      .approve { background: var(--green); border-color: var(--green); }
+      .reject { color: #450a0a; background: var(--red); border-color: var(--red); }
+      #photoUploadInput { position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; }
+      .status { min-height: 24px; margin: 12px 0 0; color: var(--muted); }
+      .status.ok { color: var(--green); }
+      .status.err { color: var(--red); }
+      .status.warn { color: var(--amber); }
+      .scan-meter { height: 12px; overflow: hidden; border-radius: 999px; background: #1e293b; }
+      .scan-meter > span { display: block; width: 0; height: 100%; background: linear-gradient(90deg, #38bdf8, #86efac); transition: width 0.35s ease; }
+      .checks { display: grid; gap: 8px; margin-top: 14px; }
+      .check { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); padding-bottom: 7px; }
+      .submission-list { display: grid; gap: 10px; max-height: 520px; overflow: auto; }
+      .submission {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 74px minmax(0, 1fr);
+        gap: 12px;
+        padding: 10px;
+        color: #f8fafc;
+        background: #0f172a;
+        text-align: left;
+      }
+      .submission.selected { outline: 2px solid var(--blue); }
+      .submission img { width: 74px; height: 58px; border-radius: 9px; object-fit: cover; background: #1e293b; }
+      .submission b, .submission small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .submission small { margin-top: 5px; color: var(--muted); }
+      .badge {
+        display: inline-block;
+        width: auto;
+        margin-top: 6px;
+        border-radius: 999px;
+        padding: 4px 8px;
+        color: #020617;
+        background: var(--amber);
+        font-size: 12px;
+        font-weight: 900;
+      }
+      .badge.approved { background: var(--green); }
+      .badge.rejected { background: var(--red); }
+      .detail-image { width: 100%; max-height: 430px; border-radius: 15px; object-fit: contain; background: #020617; }
+      .meta-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 14px 0; }
+      .meta-grid div { border: 1px solid var(--line); border-radius: 10px; padding: 10px; color: var(--muted); }
+      .meta-grid b { display: block; color: white; margin-top: 3px; }
+      .comments { display: grid; gap: 8px; margin: 14px 0; }
+      .comment { border-left: 3px solid var(--blue); padding: 8px 10px; background: rgba(15, 23, 42, 0.7); }
+      .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
+      .gallery-card { overflow: hidden; padding: 0; }
+      .gallery-card img { width: 100%; height: 165px; object-fit: cover; background: #020617; }
+      .gallery-card div { padding: 14px; }
+      .approved-group { margin-top: 18px; }
+      .approved-group-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+      .approved-group-head h3 { margin: 0; }
+      .current-label { color: var(--green); font-weight: 900; }
+      .candidate-action { margin-top: 12px; }
+      .footpath-toggle, .street-part-toggle {
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: rgba(2, 6, 23, 0.48);
+      }
+      .footpath-toggle { margin-top: 14px; }
+      .street-part-toggle + .street-part-toggle { margin-top: 10px; }
+      .footpath-toggle > summary, .street-part-toggle > summary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 16px 18px;
+        color: #f8fafc;
+        background: #0f172a;
+        cursor: pointer;
+        font-weight: 900;
+        list-style-position: inside;
+      }
+      .footpath-toggle > summary { color: var(--blue); font-size: 18px; }
+      .street-part-toggle > summary { background: rgba(30, 41, 59, 0.9); }
+      .footpath-toggle > summary small, .street-part-toggle > summary small {
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 700;
+      }
+      .footpath-content { padding: 14px; }
+      .street-part-content { padding: 16px; border-top: 1px solid var(--line); }
+      .modal-backdrop {
+        position: fixed;
+        z-index: 1000;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        padding: 20px;
+        background: rgba(2, 6, 23, 0.82);
+      }
+      .confirmation-modal {
+        width: min(920px, 100%);
+        max-height: calc(100vh - 40px);
+        overflow: auto;
+        border: 1px solid rgba(125, 211, 252, 0.55);
+        border-radius: 22px;
+        padding: 22px;
+        color: #f8fafc;
+        background: #0f172a;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+      }
+      .comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 18px 0; }
+      .comparison-card { border: 1px solid var(--line); border-radius: 15px; overflow: hidden; background: #020617; }
+      .comparison-card img { width: 100%; height: 280px; object-fit: contain; background: #000; }
+      .comparison-copy { padding: 12px; }
+      .comparison-copy b { display: block; margin-bottom: 5px; }
+      .no-current-photo { display: grid; place-items: center; height: 280px; padding: 20px; color: var(--muted); text-align: center; }
+      .empty { border: 1px dashed rgba(148, 163, 184, 0.4); border-radius: 15px; padding: 24px; color: var(--muted); text-align: center; }
+      [hidden] { display: none !important; }
+      @media (max-width: 760px) {
+        body { padding: 12px; }
+        .page-head, .step-panel { padding: 20px; }
+        .head-row { display: block; }
+        .role-badge { display: inline-block; margin-top: 8px; }
+        .workflow { grid-template-columns: 1fr 1fr; }
+        .grid, .review-grid { grid-template-columns: 1fr; }
+        .meta-grid { grid-template-columns: 1fr; }
+        .comparison-grid { grid-template-columns: 1fr; }
+      }
     </style>
   </head>
-  <body>
+  <body class="crowd-photo-page">
     <main>
-      <img class="page-logo" src="../assets/jalanlens-logo.png" alt="" />
-      <a href="../street-intelligence/">← Back to Street Intelligence</a>
-      <h1>Photo crowdsourcing</h1>
-      <p>This page manages street-part photo submissions. A computer-vision model performs the first layer of approval, then a human-in-the-loop staff team from the relevant customer company reviews the photo before it becomes active evidence.</p>
-      <div class="progress" aria-label="Photo review progress">
-        <span>Upload</span><span>CV first review</span><span>Staff review</span><span>Approved</span>
-      </div>
-      <div class="card-grid">
-        <section class="card"><h2>1. Upload</h2><p>Users submit a clearer street-part photo from the platform settings or this page.</p></section>
-        <section class="card"><h2>2. CV first review</h2><p>The model checks resolution, exposure, blur, street-view aspect, and evidence usefulness.</p></section>
-        <section class="card"><h2>3. Staff review</h2><p>Selected admins from customer companies receive the photo for human review.</p></section>
-        <section class="card"><h2>4. Active evidence</h2><p>Approved photos become the active street-view evidence for JalanLens users.</p></section>
+      <div class="page-shell">
+        <header class="page-head">
+          <img class="page-logo" src="../assets/jalanlens-logo.png" alt="" />
+          <a href="../street-intelligence/">← Back to Street Intelligence</a>
+          <div class="head-row">
+            <div>
+              <h1>Photo crowdsourcing</h1>
+              <p>Submit current footpath evidence, run the built-in CV scan, and route passing photos to staff for a final decision.</p>
+            </div>
+            <span class="role-badge" id="roleBadge">Loading account…</span>
+          </div>
+        </header>
+
+        <nav class="workflow" aria-label="Photo review workflow">
+          <button class="step-tab active" data-step="upload"><span>1</span>Upload</button>
+          <button class="step-tab" data-step="cv"><span>2</span>CV scan</button>
+          <button class="step-tab" data-step="staff"><span>3</span>Staff review</button>
+          <button class="step-tab" data-step="approved"><span>4</span>Approved</button>
+        </nav>
+
+        <section class="step-panel active" data-panel="upload">
+          <div class="grid">
+            <div class="card">
+              <h2>Upload a footpath photo</h2>
+              <p>Choose the street part shown in the image. Use a clear landscape photo with the walking surface and nearby accessibility features visible.</p>
+              <label for="streetPartSelect">Street part</label>
+              <select id="streetPartSelect" disabled>
+                <option>Loading street parts…</option>
+              </select>
+              <button type="button" id="photoUploadBtn" disabled>Choose photo</button>
+              <input id="photoUploadInput" type="file" accept="image/*" />
+              <div id="photoUploadStatus" class="status" role="status" aria-live="polite"></div>
+            </div>
+            <div class="card">
+              <h2>Your submissions</h2>
+              <p>Photos appear here after they pass CV scanning and are successfully submitted.</p>
+              <div id="mySubmissions" class="submission-list">
+                <div class="empty">No submitted photos yet.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="step-panel" data-panel="cv">
+          <div class="grid">
+            <div class="card">
+              <h2>Computer-vision scan</h2>
+              <p>The current in-repo photo quality model checks image type, file size, resolution, landscape framing, exposure, contrast, and visual detail before anything enters the staff queue.</p>
+              <div class="scan-meter" aria-hidden="true"><span id="scanMeter"></span></div>
+              <div id="cvStatus" class="status">Choose a photo in step 1 to begin.</div>
+              <div id="cvChecks" class="checks"></div>
+            </div>
+            <div class="card">
+              <h2>Pass criteria</h2>
+              <p>A score of 75/100 or higher is required. Rejected files remain on your device and are not sent to staff.</p>
+              <p>Passing files are uploaded as <b>pending staff review</b>. Passing CV does not make a photo active evidence.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="step-panel" data-panel="staff">
+          <div id="staffOnlyNotice" class="empty" hidden>Staff review is available to authority accounts.</div>
+          <div id="staffWorkspace" class="grid review-grid">
+            <div class="card">
+              <h2>Review queue</h2>
+              <button type="button" id="refreshQueueBtn">Refresh submissions</button>
+              <div id="reviewQueueStatus" class="status"></div>
+              <div id="reviewQueue" class="submission-list"></div>
+            </div>
+            <div class="card" id="reviewDetail">
+              <div class="empty">Select a submission to review it.</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="step-panel" data-panel="approved">
+          <h2>Approved photos by street part</h2>
+          <p>Approval and activation are separate. Staff can inspect every approved candidate here, then choose whether to replace the current active evidence.</p>
+          <button type="button" id="refreshApprovedBtn">Refresh approved photos</button>
+          <div id="approvedStatus" class="status"></div>
+          <div id="approvedGallery"></div>
+        </section>
       </div>
     </main>
+
+    <div id="activationModal" class="modal-backdrop" hidden>
+      <section class="confirmation-modal" role="dialog" aria-modal="true" aria-labelledby="activationModalTitle">
+        <h2 id="activationModalTitle">Replace the active photo?</h2>
+        <p id="activationModalDescription">Compare the current evidence with the approved replacement. Supabase will only be updated after you confirm.</p>
+        <div class="comparison-grid">
+          <article class="comparison-card">
+            <div id="currentPhotoPreview"></div>
+            <div class="comparison-copy"><b>Current active photo</b><span id="currentPhotoMeta"></span></div>
+          </article>
+          <article class="comparison-card">
+            <div id="newPhotoPreview"></div>
+            <div class="comparison-copy"><b>New approved photo</b><span id="newPhotoMeta"></span></div>
+          </article>
+        </div>
+        <div class="button-row">
+          <button type="button" id="confirmActivationBtn" class="approve">Confirm replacement</button>
+          <button type="button" id="cancelActivationBtn">Cancel</button>
+        </div>
+        <div id="activationStatus" class="status" role="status" aria-live="polite"></div>
+      </section>
+    </div>
+    <script src="./app.js?v=20260731a"></script>
   </body>
 </html>

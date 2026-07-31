@@ -26,6 +26,8 @@ alter table public.transit_stops enable row level security;
 alter table public.transit_arrivals enable row level security;
 alter table public.app_notifications enable row level security;
 alter table public.photo_review_jobs enable row level security;
+alter table public.photo_review_comments enable row level security;
+alter table public.photo_activation_events enable row level security;
 
 -- Public read for map/demo data.
 drop policy if exists "public read streets" on public.streets;
@@ -60,15 +62,16 @@ create policy "public read comments" on public.feedback_comments for select usin
 drop policy if exists "public read feedback votes" on public.feedback_votes;
 create policy "public read feedback votes" on public.feedback_votes for select using (true);
 
--- Public crowd-photo contributions. The frontend runs without login for the
--- hack demo, so accepted crowd uploads are inserted with submitted_by = null.
+-- Public crowd-photo contributions enter the staff queue only after the
+-- browser CV scan. Approval and activation happen through the review RPC.
 drop policy if exists "public insert accepted crowd photos" on public.street_photos;
-create policy "public insert accepted crowd photos" on public.street_photos
+drop policy if exists "public insert pending crowd photos" on public.street_photos;
+create policy "public insert pending crowd photos" on public.street_photos
   for insert with check (
     submitted_by is null
     and source = 'crowd'
-    and validation_status = 'accepted'
-    and is_active = true
+    and validation_status = 'needs_review'
+    and is_active = false
   );
 
 drop policy if exists "auth insert crowd photos" on public.street_photos;
@@ -194,3 +197,21 @@ drop policy if exists "public update photo review jobs" on public.photo_review_j
 create policy "public update photo review jobs" on public.photo_review_jobs for update using (true);
 
 grant select, insert, update on public.photo_review_jobs to anon, authenticated;
+
+drop policy if exists "public read photo review comments" on public.photo_review_comments;
+create policy "public read photo review comments" on public.photo_review_comments
+  for select using (true);
+
+grant select on public.photo_review_comments to anon, authenticated;
+
+drop policy if exists "public read photo activation events" on public.photo_activation_events;
+create policy "public read photo activation events" on public.photo_activation_events
+  for select using (true);
+
+grant select on public.photo_activation_events to anon, authenticated;
+
+revoke all on function public.review_photo_submission(uuid, text, text, text) from public;
+grant execute on function public.review_photo_submission(uuid, text, text, text) to anon, authenticated;
+
+revoke all on function public.activate_approved_photo(uuid, text) from public;
+grant execute on function public.activate_approved_photo(uuid, text) to anon, authenticated;
