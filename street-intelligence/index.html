@@ -4031,11 +4031,17 @@
       bindHoverDropdown(segmentSelect, 10);
       if (window.themeToggleBtn) themeToggleBtn.onclick = cycleTheme;
       if (window.notificationBellBtn)
-        notificationBellBtn.onclick = () =>
+        notificationBellBtn.onclick = (event) => {
+          event.stopPropagation();
+          settings?.classList.remove("visible");
+          roleMenu?.classList.remove("visible");
           notificationsPanel?.classList.toggle("visible");
+        };
       if (window.clearNotificationsBtn)
         clearNotificationsBtn.onclick = clearNotificationHistory;
-      settingsBtn.onclick = () => {
+      settingsBtn.onclick = (event) => {
+        event.stopPropagation();
+        notificationsPanel?.classList.remove("visible");
         roleMenu?.classList.remove("visible");
         if (state.role === "authority") {
           settings.classList.toggle("visible");
@@ -4045,6 +4051,24 @@
       closeSettings.onclick = () => settings.classList.remove("visible");
       if (window.closeRoleMenu)
         closeRoleMenu.onclick = () => roleMenu.classList.remove("visible");
+      document.addEventListener("click", (event) => {
+        const path = event.composedPath ? event.composedPath() : [];
+        const clickedInNotifications = path.includes(notificationsPanel);
+        const clickedNotificationButton = path.includes(notificationBellBtn);
+        const clickedInSettings = path.includes(settings);
+        const clickedSettingsButton = path.includes(settingsBtn);
+        const clickedInRoleMenu = window.roleMenu && path.includes(roleMenu);
+        const clickedRoleButton = window.roleSwitchBtn && path.includes(roleSwitchBtn);
+        if (!clickedInNotifications && !clickedNotificationButton) {
+          notificationsPanel?.classList.remove("visible");
+        }
+        if (!clickedInSettings && !clickedSettingsButton) {
+          settings?.classList.remove("visible");
+        }
+        if (!clickedInRoleMenu && !clickedRoleButton) {
+          roleMenu?.classList.remove("visible");
+        }
+      });
       if (window.logoutBtn) logoutBtn.onclick = logoutToAuth;
       if (window.togglePersonaPanelBtn) {
         togglePersonaPanelBtn.onclick = () => togglePersonaPanel();
