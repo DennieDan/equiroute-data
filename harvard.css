@@ -742,3 +742,175 @@ body:has(#map) #detailCard .close {
   body:has(#map) #detailCard .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
   body:has(#map) #detailCard #activeScore { min-width: 78px !important; font-size: 18px !important; }
 }
+
+/* Mobile/APK Street View: keep the street photo visible first. */
+@media (max-width: 720px), (max-height: 760px) and (pointer: coarse) {
+  body:has(#map).street-mode #topbar {
+    left: 8px !important;
+    right: 8px !important;
+    top: 8px !important;
+    max-height: 104px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 8px !important;
+    border-top-width: 3px !important;
+    background: rgba(255, 255, 255, 0.92) !important;
+  }
+  body:has(#map).street-mode #topbar .brand {
+    font-size: 15px !important;
+    flex: 0 0 auto !important;
+  }
+  body:has(#map).street-mode #topbar select,
+  body:has(#map).street-mode #topbar button,
+  body:has(#map).street-mode #topbar .buttonlike {
+    min-height: 34px !important;
+    padding: 6px 8px !important;
+    font-size: 12px !important;
+  }
+  body:has(#map).street-mode #segmentSelect {
+    flex: 1 1 170px !important;
+    min-width: 150px !important;
+    max-width: 52vw !important;
+  }
+  body:has(#map).street-mode #directionBtn {
+    max-width: 116px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+  body:has(#map).street-mode #docsBtn,
+  body:has(#map).street-mode #themeToggleBtn,
+  body:has(#map).street-mode #notificationBellBtn,
+  body:has(#map).street-mode #settingsBtn,
+  body:has(#map).street-mode #roleSwitchBtn {
+    display: none !important;
+  }
+  body:has(#map).street-mode #detailCard {
+    left: 8px !important;
+    right: 8px !important;
+    bottom: max(8px, env(safe-area-inset-bottom)) !important;
+    width: auto !important;
+    max-height: min(34dvh, 258px) !important;
+    min-height: 0 !important;
+    transform: none !important;
+    overflow-y: auto !important;
+    padding: 10px 10px 12px !important;
+    border-top-width: 4px !important;
+    border-radius: 18px 18px 10px 10px !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 -10px 36px rgba(15, 23, 42, 0.22) !important;
+  }
+  body:has(#map).street-mode #detailCard .detail-head {
+    gap: 8px !important;
+    padding-bottom: 6px !important;
+  }
+  body:has(#map).street-mode #detailCard .title,
+  body:has(#map).street-mode #detailCard #selectedName {
+    font-size: 15px !important;
+    line-height: 1.1 !important;
+  }
+  body:has(#map).street-mode #detailCard .kindTitle,
+  body:has(#map).street-mode #detailCard #selectedKind {
+    display: none !important;
+  }
+  body:has(#map).street-mode #detailCard .sub,
+  body:has(#map).street-mode #detailCard #selectedDesc {
+    display: -webkit-box !important;
+    -webkit-line-clamp: 1 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    font-size: 11px !important;
+    line-height: 1.25 !important;
+  }
+  body:has(#map).street-mode #detailCard #activeScore {
+    min-width: 64px !important;
+    padding: 6px 8px !important;
+    font-size: 15px !important;
+    text-align: center !important;
+  }
+  body:has(#map).street-mode #detailCard .close {
+    width: 28px !important;
+    height: 28px !important;
+    flex: 0 0 28px !important;
+  }
+  body:has(#map).street-mode #detailCard .metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+    margin-top: 7px !important;
+  }
+  body:has(#map).street-mode #detailCard .metric {
+    min-height: 48px !important;
+    padding: 7px !important;
+    gap: 2px !important;
+    border-top-width: 3px !important;
+  }
+  body:has(#map).street-mode #detailCard .metric b {
+    font-size: 15px !important;
+  }
+  body:has(#map).street-mode #detailCard .metric span,
+  body:has(#map).street-mode #detailCard .metric small {
+    font-size: 9px !important;
+    line-height: 1.05 !important;
+  }
+  body:has(#map).street-mode #streetAgentCounts {
+    display: none !important;
+  }
+  body:has(#map).street-mode #detailCard .detail-actions {
+    margin-top: 7px !important;
+    gap: 6px !important;
+  }
+  body:has(#map).street-mode #feedbackMeta {
+    display: none !important;
+  }
+  body:has(#map).street-mode .feedback-history {
+    max-height: 72px !important;
+    padding: 6px !important;
+    font-size: 10px !important;
+  }
+  body:has(#map).street-mode .feedback-thread-head small,
+  body:has(#map).street-mode .feedback-item span,
+  body:has(#map).street-mode .feedback-item small,
+  body:has(#map).street-mode .feedback-row-translation {
+    display: none !important;
+  }
+  body:has(#map).street-mode .feedback-item {
+    padding: 5px 0 !important;
+  }
+  body:has(#map).street-mode #feedbackForm.open {
+    max-height: 132px !important;
+    overflow-y: auto !important;
+    padding-top: 6px !important;
+  }
+  body:has(#map).street-mode #feedbackForm label,
+  body:has(#map).street-mode #feedbackLanguageHint,
+  body:has(#map).street-mode #feedbackSpeechStatus,
+  body:has(#map).street-mode #feedbackTranslationBox {
+    display: none !important;
+  }
+  body:has(#map).street-mode #feedbackForm textarea {
+    min-height: 54px !important;
+  }
+  body:has(#map).street-mode #miniMap,
+  body:has(#map).street-mode #personaPanel,
+  body:has(#map).street-mode #photoUploadPanel,
+  body:has(#map).street-mode #notificationsPanel {
+    display: none !important;
+  }
+  body:has(#map).street-mode #toastStack {
+    top: 112px !important;
+    right: 8px !important;
+    left: 8px !important;
+    width: auto !important;
+  }
+  body:has(#map).street-mode .seg-btn.feature {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 9px !important;
+  }
+  body:has(#map).street-mode .seg-btn::after {
+    display: none !important;
+  }
+}
