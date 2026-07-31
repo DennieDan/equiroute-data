@@ -17,6 +17,7 @@
   const VOTER_KEY = "jalanlens_feedback_voter_id";
   const LOCAL_LIKES_KEY = "jalanlens_feedback_local_likes";
   const filters = { source: "all", recency: "all", persona: "all" };
+  const REPLY_DRAFT_PREFIX = "jalanlens_reply_draft_";
   const AGNES_BASE_URL = "https://apihub.agnes-ai.com/v1";
   const AGNES_TRANSLATION_MODEL = "agnes-2.5-flash";
   const AGNES_TRANSCRIPTION_MODEL = "agnes-2.5-flash";
@@ -39,6 +40,7 @@
   let speechRecognition = null;
   let speechTranscriptOriginal = "";
   let inputModality = "typed";
+  let refreshInterval = null;
 
   function $(id) { return document.getElementById(id); }
 
@@ -187,6 +189,30 @@
     return (await r.json()).map((row) => ({ ...row, source: "agent_simulation" }));
   }
 
+  async function fetchFeedbackReplies(rows) {
+    const publicIds = rows.filter((r) => r.source !== "agent_simulation" && isUuid(r.id)).map((r) => r.id);
+    const agentIds = rows.filter((r) => r.source === "agent_simulation" && isUuid(r.id)).map((r) => r.id);
+    if (!publicIds.length && !agentIds.length) return new Map();
+    const queries = [];
+    const select = "select=id,parent_source,parent_thread_id,parent_agent_thread_id,author_role,author_external_id,author_name,body,original_language,english_translation,translation_status,input_modality,created_at&order=created_at.asc&limit=500";
+    if (publicIds.length) queries.push(fetch(`${supabaseUrl}/rest/v1/feedback_replies?${select}&parent_thread_id=in.(${publicIds.map(encodeURIComponent).join(",")})`, { headers: headers() }));
+    if (agentIds.length) queries.push(fetch(`${supabaseUrl}/rest/v1/feedback_replies?${select}&parent_agent_thread_id=in.(${agentIds.map(encodeURIComponent).join(",")})`, { headers: headers() }));
+    const settled = await Promise.allSettled(queries);
+    const replies = [];
+    for (const result of settled) {
+      if (result.status !== "fulfilled") continue;
+      if (!result.value.ok) continue;
+      replies.push(...await result.value.json());
+    }
+    const byParent = new Map();
+    for (const reply of replies) {
+      const key = `${reply.parent_source === "agent_simulation" ? "agent_simulation" : "public"}:${reply.parent_source === "agent_simulation" ? reply.parent_agent_thread_id : reply.parent_thread_id}`;
+      if (!byParent.has(key)) byParent.set(key, []);
+      byParent.get(key).push(reply);
+    }
+    return byParent;
+  }
+
   function friendlyDate(value) {
     if (!value) return "recent";
     const d = new Date(value);
@@ -196,6 +222,27 @@
 
   function publicLabelText(value) {
     return String(value || "").replace(/Footpath\s+(\d{4})\b/g, (_, n) => `Footpath ${Number(n) + 1}`);
+  }
+
+  function sourceLabel(source) {
+    if (source === "authority") return "Authority";
+    if (source === "agent_simulation") return "Agent";
+    if (source === "agent") return "Agent";
+    if (source === "system") return "System";
+    return "Public";
+  }
+
+  function authorRole() {
+    const user = getCurrentUser?.() || {};
+    return user.role === "authority" ? "authority" : "public";
+  }
+
+  function threadKey(row) {
+    return `${row.source === "agent_simulation" ? "agent_simulation" : "public"}:${row.id}`;
+  }
+
+  function isUuid(value) {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value || ""));
   }
 
   function recencyCutoff() {
@@ -225,7 +272,7 @@
     wrap.id = "feedbackFilters";
     wrap.className = "feedback-filters";
     wrap.innerHTML = `
-      <label>Source <select id="feedbackSourceFilter"><option value="all">All</option><option value="public">Public</option><option value="agent_simulation">Agents</option></select></label>
+      <label>Source <select id="feedbackSourceFilter"><option value="all">All</option><option value="public">Public</option><option value="authority">Authority</option><option value="agent_simulation">Agents</option></select></label>
       <label>Recency <select id="feedbackRecencyFilter"><option value="all">All time</option><option value="today">Today</option><option value="3d">Past 3 days</option><option value="week">Past week</option></select></label>
       <label>Persona <select id="feedbackPersonaFilter"><option value="all">All personas</option></select></label>
     `;
@@ -240,6 +287,7 @@
   }
 
   let lastRows = [];
+  let lastRepliesByParent = new Map();
 
   function updatePersonaFilter(rows) {
     ensureFilters();
@@ -250,7 +298,7 @@
     filters.persona = els.personaFilter.value;
   }
 
-  function renderRows(rows) {
+  function renderRows(rows, repliesByParent = new Map()) {
     ensureFilters();
     updatePersonaFilter(rows);
     const visibleRows = applyFilters(rows);
@@ -260,27 +308,48 @@
     }
     const liked = localLikes();
     const sourceCounts = rows.reduce((acc, row) => { acc[row.source] = (acc[row.source] || 0) + 1; return acc; }, {});
-    const header = `<div class="feedback-thread-head"><b>Feedback threads</b><small>${visibleRows.length} shown · public ${sourceCounts.public || 0} · agents ${sourceCounts.agent_simulation || 0}</small></div>`;
+    const header = `<div class="feedback-thread-head"><b>Feedback threads</b><small>${visibleRows.length} shown · public ${sourceCounts.public || 0} · authority ${sourceCounts.authority || 0} · agents ${sourceCounts.agent_simulation || 0}</small></div>`;
     const items = visibleRows.map((row) => {
       const date = friendlyDate(row.created_at);
       const count = Math.max(0, Math.round(Number(row.priority_score || 0)));
       const isLiked = liked.has(row.id);
       const isAgent = row.source === "agent_simulation";
-      const who = isAgent ? `${row.agent_name || "Agent"} · ${row.agent_external_id || "agent"}` : `${row.public_user_name || "Public user"}`;
+      const isAuthority = row.source === "authority";
+      const who = isAgent ? `${row.agent_name || "Agent"} · ${row.agent_external_id || "agent"}` : `${row.public_user_name || (isAuthority ? "Authority user" : "Public user")}`;
       const persona = row.persona_type ? ` · ${row.persona_type.replaceAll("_", " ")}` : "";
-      const badge = isAgent ? "agent" : "public";
+      const badge = isAgent ? "agent" : (isAuthority ? "authority" : "public");
       const translation = row.english_translation && row.english_translation !== row.body
         ? `<div class="feedback-row-translation"><b>English:</b> ${escapeHtml(publicLabelText(row.english_translation))}</div>`
         : "";
-      return `<div class="feedback-item ${escapeHtml(badge)}" data-thread-id="${escapeHtml(row.id)}"><b><em>${escapeHtml(badge)}</em> ${escapeHtml(publicLabelText(row.title))}</b><span>${escapeHtml(publicLabelText(row.body))}</span>${translation}<div class="feedback-social-row"><button type="button" class="feedback-like${isLiked ? " liked" : ""}" data-thread-id="${escapeHtml(row.id)}" data-count="${count}">${isLiked ? "♥" : "♡"} ${count}</button><small>${escapeHtml(who)}${escapeHtml(persona)} · ${escapeHtml(row.input_modality || "typed")} · ${escapeHtml(row.original_language ? languageLabels[row.original_language] || row.original_language : "")}${row.original_language ? " · " : ""}${escapeHtml(date)}</small></div></div>`;
+      const parentKey = threadKey(row);
+      const replies = repliesByParent.get(parentKey) || [];
+      const replyItems = replies.map((reply) => {
+        const role = reply.author_role || "public";
+        const rTranslation = reply.english_translation && reply.english_translation !== reply.body
+          ? `<div class="feedback-row-translation"><b>English:</b> ${escapeHtml(publicLabelText(reply.english_translation))}</div>`
+          : "";
+        return `<div class="feedback-reply ${escapeHtml(role)}"><b><em>${escapeHtml(sourceLabel(role))}</em> ${escapeHtml(reply.author_name || sourceLabel(role))}</b><span>${escapeHtml(publicLabelText(reply.body))}</span>${rTranslation}<small>${escapeHtml(reply.input_modality || "typed")} · ${escapeHtml(reply.original_language ? languageLabels[reply.original_language] || reply.original_language : "")} ${reply.original_language ? "· " : ""}${escapeHtml(friendlyDate(reply.created_at))}</small></div>`;
+      }).join("");
+      const canPersistReply = isUuid(row.id);
+      const replyBox = `<div class="feedback-replies" data-parent-key="${escapeHtml(parentKey)}">${replyItems || ""}</div><div class="feedback-reply-box" data-parent-key="${escapeHtml(parentKey)}" hidden><textarea rows="2" maxlength="1200" placeholder="${authorRole() === "authority" ? "Reply as authority…" : "Reply to this feedback…"}"></textarea><div class="feedback-actions"><button type="button" class="feedback-reply-submit" data-parent-key="${escapeHtml(parentKey)}" ${canPersistReply ? "" : "disabled"}>Reply</button><button type="button" class="feedback-reply-cancel" data-parent-key="${escapeHtml(parentKey)}">Cancel</button></div><small class="feedback-reply-status"></small></div>`;
+      return `<div class="feedback-item ${escapeHtml(badge)}" data-thread-id="${escapeHtml(row.id)}" data-thread-source="${escapeHtml(row.source)}"><b><em>${escapeHtml(sourceLabel(row.source))}</em> ${escapeHtml(publicLabelText(row.title))}</b><span>${escapeHtml(publicLabelText(row.body))}</span>${translation}<div class="feedback-social-row"><button type="button" class="feedback-like${isLiked ? " liked" : ""}" data-thread-id="${escapeHtml(row.id)}" data-count="${count}">${isLiked ? "♥" : "♡"} ${count}</button><button type="button" class="feedback-reply-open" data-parent-key="${escapeHtml(parentKey)}">Reply</button><small>${escapeHtml(who)}${escapeHtml(persona)} · ${escapeHtml(row.input_modality || "typed")} · ${escapeHtml(row.original_language ? languageLabels[row.original_language] || row.original_language : "")}${row.original_language ? " · " : ""}${escapeHtml(date)}</small></div>${replyBox}</div>`;
     }).join("");
     setHistory(`${header}${items}`, true);
     els.history.querySelectorAll(".feedback-like").forEach((button) => {
       button.onclick = () => likeThread(button.dataset.threadId, button);
     });
+    els.history.querySelectorAll(".feedback-reply-open").forEach((button) => {
+      button.onclick = () => toggleReplyBox(button.dataset.parentKey, true);
+    });
+    els.history.querySelectorAll(".feedback-reply-cancel").forEach((button) => {
+      button.onclick = () => toggleReplyBox(button.dataset.parentKey, false);
+    });
+    els.history.querySelectorAll(".feedback-reply-submit").forEach((button) => {
+      button.onclick = () => submitReply(button.dataset.parentKey, button);
+    });
   }
 
-  function renderLastRows() { renderRows(lastRows); }
+  function renderLastRows() { renderRows(lastRows, lastRepliesByParent); }
 
   async function likeThread(threadId, button) {
     const liked = localLikes();
@@ -300,6 +369,69 @@
       });
     } catch (e) {
       // Agent-feedback likes may not map to feedback_votes yet; keep local optimistic state.
+    } finally {
+      button.disabled = false;
+    }
+  }
+
+  function toggleReplyBox(parentKey, open) {
+    const box = els.history?.querySelector(`.feedback-reply-box[data-parent-key="${CSS.escape(parentKey)}"]`);
+    if (!box) return;
+    box.hidden = !open;
+    if (open) box.querySelector("textarea")?.focus();
+  }
+
+  async function translateTextForStorage(text) {
+    const lang = detectFeedbackLanguage(text);
+    if (!text || lang === "en") return { language: lang, english: "", status: "not_required", provider: null, model: null };
+    try {
+      const english = await translateFeedback(text, lang);
+      return { language: lang, english, status: english ? "translated" : "error", provider: translationState.provider || "browser_fallback", model: translationState.model || null };
+    } catch (err) {
+      return { language: lang, english: "", status: "error", provider: translationState.provider || "browser_fallback", model: translationState.model || null, error: err.message || String(err) };
+    }
+  }
+
+  async function submitReply(parentKey, button) {
+    const [source, id] = String(parentKey || "").split(":");
+    const box = els.history?.querySelector(`.feedback-reply-box[data-parent-key="${CSS.escape(parentKey)}"]`);
+    const textarea = box?.querySelector("textarea");
+    const status = box?.querySelector(".feedback-reply-status");
+    const body = textarea?.value.trim() || "";
+    if (!body || !isUuid(id)) return;
+    const user = getCurrentUser?.() || {};
+    const role = authorRole();
+    button.disabled = true;
+    if (status) status.textContent = "Posting reply…";
+    try {
+      const tr = await translateTextForStorage(body);
+      const payload = {
+        parent_source: source === "agent_simulation" ? "agent_simulation" : "public",
+        parent_thread_id: source === "agent_simulation" ? null : id,
+        parent_agent_thread_id: source === "agent_simulation" ? id : null,
+        author_role: role,
+        author_external_id: user.external_id || voterId(),
+        author_name: user.display_name || user.username || (role === "authority" ? "Authority user" : "Public user"),
+        body,
+        original_language: tr.language || "en",
+        original_text: body,
+        english_translation: tr.language !== "en" ? tr.english || null : null,
+        translation_status: tr.status || "not_required",
+        translation_provider: tr.provider,
+        translation_model: tr.model,
+        input_modality: "typed",
+      };
+      const r = await fetch(`${supabaseUrl}/rest/v1/feedback_replies`, {
+        method: "POST",
+        headers: headers({ "Content-Type": "application/json", Prefer: "return=representation" }),
+        body: JSON.stringify(payload),
+      });
+      if (!r.ok) throw new Error(`Supabase reply ${r.status}: ${await r.text()}`);
+      textarea.value = "";
+      if (status) status.textContent = "Reply posted.";
+      await loadHistory();
+    } catch (err) {
+      if (status) status.textContent = err.message || String(err);
     } finally {
       button.disabled = false;
     }
@@ -329,13 +461,14 @@
         .map((row, index) => ({ ...row, id: row.id || `local-agent-${ctx.streetPartExternalId}-${index}`, source: "agent_simulation" }));
       const agentRows = agentResult.status === "fulfilled" && agentResult.value.length ? agentResult.value : localAgentRows;
       lastRows = [...publicRows, ...agentRows].sort((a, b) => String(b.created_at || "").localeCompare(String(a.created_at || "")));
+      lastRepliesByParent = await fetchFeedbackReplies(lastRows);
       onFeedbackRowsLoaded(lastRows, ctx);
       if (!lastRows.length) {
         const errors = [publicResult, agentResult].filter((r) => r.status === "rejected").map((r) => r.reason?.message || String(r.reason));
         setHistory(`<div class="feedback-thread-head"><b>Feedback threads</b><small>0 posts</small></div><div class="feedback-item"><span>No reports yet.${errors.length ? " Some live tables may not be migrated yet." : " Be the first to post feedback for this footpath."}</span></div>`, true);
         return;
       }
-      renderRows(lastRows);
+      renderRows(lastRows, lastRepliesByParent);
     } catch (err) {
       if (requestId !== historyRequestId) return;
       setHistory(`Could not load feedback threads: ${escapeHtml(err.message || String(err))}`, true);
@@ -395,6 +528,56 @@
     return String(data.choices?.[0]?.message?.content || "").trim();
   }
 
+  function myMemoryLang(lang) {
+    if (lang === "zh-Hant") return "zh-TW";
+    if (lang === "zh-Hans") return "zh-CN";
+    return lang;
+  }
+
+  function localTranslationFallback(text, lang) {
+    const value = String(text || "").trim();
+    const phrases = [
+      [/坡道|斜坡/i, "ramp"], [/坏|壞|rosak/i, "is damaged"], [/危险|危險|bahaya/i, "dangerous"], [/路|jalan|சாலை/i, "path/road"], [/轮椅|輪椅|kerusi roda/i, "wheelchair"], [/blocked|halang|阻/i, "blocked"], [/சாலை உடைந்துள்ளது/i, "The road is damaged"],
+    ];
+    const parts = phrases.filter(([re]) => re.test(value)).map(([, en]) => en);
+    if (parts.length) return `Approximate translation: ${parts.join(" · ")}. Original: ${value}`;
+    return `Translation pending. Original ${languageLabels[lang] || lang}: ${value}`;
+  }
+
+  async function translateFeedbackWithPublicFallback(text, lang) {
+    const apiLang = myMemoryLang(lang);
+    const url = "https://api.mymemory.translated.net/get?" + new URLSearchParams({ q: text, langpair: `${apiLang}|en` });
+    const r = await fetch(url);
+    if (!r.ok) throw new Error(`public translation ${r.status}`);
+    const data = await r.json();
+    const translated = String(data.responseData?.translatedText || "").trim();
+    if (!translated || translated.length < 3 || translated.toLowerCase() === String(text).trim().toLowerCase()) throw new Error("public translation unavailable");
+    return translated;
+  }
+
+  async function translateFeedback(text, lang) {
+    if (agnesApiKey()) {
+      try {
+        const english = await translateFeedbackWithAgnes(text, lang);
+        translationState.provider = "agnes";
+        translationState.model = AGNES_TRANSLATION_MODEL;
+        return english;
+      } catch (err) {
+        console.warn("Agnes translation unavailable; using public fallback", err);
+      }
+    }
+    try {
+      const english = await translateFeedbackWithPublicFallback(text, lang);
+      translationState.provider = "mymemory";
+      translationState.model = "public-web-translation";
+      return english;
+    } catch (err) {
+      translationState.provider = "local_fallback";
+      translationState.model = "jalanlens-keyword-fallback";
+      return localTranslationFallback(text, lang);
+    }
+  }
+
   function renderTranslationBox() {
     if (!els?.translationBox || !els.translationText) return;
     const lang = translationState.language || "en";
@@ -406,7 +589,7 @@
     }
     const label = languageLabels[lang] || lang;
     if (translationState.status === "translating") {
-      els.translationText.textContent = `Detected ${label}. Translating to English with Agnes AI…`;
+      els.translationText.textContent = `Detected ${label}. Translating to English…`;
     } else if (translationState.status === "error") {
       els.translationText.textContent = `Detected ${label}. English translation unavailable: ${translationState.error || "Agnes AI request failed."}`;
     } else {
@@ -421,10 +604,10 @@
     renderTranslationBox();
     if (!body || lang === "en") return translationState;
     try {
-      const english = await translateFeedbackWithAgnes(body, lang);
-      translationState = { language: lang, english, status: "translated", provider: "agnes", model: AGNES_TRANSLATION_MODEL };
+      const english = await translateFeedback(body, lang);
+      translationState = { language: lang, english, status: "translated", provider: translationState.provider || "browser_fallback", model: translationState.model || null };
     } catch (err) {
-      translationState = { language: lang, english: "", status: "error", provider: "agnes", model: AGNES_TRANSLATION_MODEL, error: err.message || String(err) };
+      translationState = { language: lang, english: "", status: "error", provider: translationState.provider || "browser_fallback", model: translationState.model || null, error: err.message || String(err) };
     }
     renderTranslationBox();
     return translationState;
@@ -485,13 +668,28 @@
       mediaRecorder.stop();
       return;
     }
+    if (speechRecognition && !mediaRecorder) {
+      try { speechRecognition.stop(); } catch (e) {}
+      speechRecognition = null;
+      els.speechBtn.classList.remove("recording");
+      els.speechLabel.textContent = "Start speech to text";
+      els.speechStatus.textContent = speechTranscriptOriginal ? "Browser speech transcript captured." : "Speech capture stopped.";
+      await refreshTranslationNow();
+      return;
+    }
     inputModality = "speech";
     audioChunks = [];
     speechTranscriptOriginal = els.body.value.trim();
     els.speechBtn.classList.add("recording");
     els.speechLabel.textContent = "Stop transcribing";
-    els.speechStatus.textContent = "Listening… mic is active and pulsing.";
+    els.speechStatus.textContent = "Listening… browser speech-to-text is active.";
     speechRecognition = startBrowserSpeechRecognition();
+    if (!global.JALANLENS_USE_AGNES_SPEECH || !agnesApiKey() || !navigator.mediaDevices?.getUserMedia || !global.isSecureContext) {
+      els.speechStatus.textContent = speechRecognition
+        ? "Using browser speech-to-text. Tap Stop when done."
+        : "Speech-to-text needs microphone permission in a secure browser.";
+      return;
+    }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaRecorder = new MediaRecorder(stream);
@@ -514,13 +712,21 @@
           els.speechStatus.textContent = speechTranscriptOriginal ? "Agnes transcription unavailable; using browser speech transcript." : (err.message || "Speech transcription failed.");
         }
         await refreshTranslationNow();
+        mediaRecorder = null;
       };
       mediaRecorder.start();
     } catch (err) {
+      if (speechRecognition) {
+        els.speechBtn.classList.add("recording");
+        els.speechLabel.textContent = "Stop transcribing";
+        els.speechStatus.textContent = "Using browser speech-to-text fallback. Tap Stop when done.";
+        mediaRecorder = null;
+        return;
+      }
       els.speechBtn.classList.remove("recording");
       els.speechLabel.textContent = "Start speech to text";
       els.speechStatus.textContent = err.message || "Microphone permission denied.";
-      if (speechRecognition) { try { speechRecognition.stop(); } catch (e) {} }
+      mediaRecorder = null;
     }
   }
 
@@ -540,12 +746,12 @@
       original_text: body,
       english_translation: englishTranslation || null,
       translation_status: translation.status || (translation.language === "en" ? "not_required" : "error"),
-      translation_provider: "agnes",
-      translation_model: AGNES_TRANSLATION_MODEL,
+      translation_provider: translation.provider || null,
+      translation_model: translation.model || null,
       speech_transcript_original: inputModality === "speech" ? (speechTranscriptOriginal || body) : null,
       input_modality: inputModality,
       created_by: null,
-      source: "public",
+      source: user.role === "authority" ? "authority" : "public",
       public_user_external_id: user.external_id || null,
       public_user_name: publicUserName(),
       persona_type: currentPersonaType() || null,
@@ -629,6 +835,10 @@
     }
     bindEvents();
     ensureFilters();
+    if (refreshInterval) clearInterval(refreshInterval);
+    refreshInterval = setInterval(() => {
+      if (els?.history?.classList.contains("visible")) loadHistory();
+    }, 12000);
     return api;
   }
 

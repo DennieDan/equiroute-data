@@ -19,6 +19,7 @@ alter table public.simulation_runs enable row level security;
 alter table public.agent_live_states enable row level security;
 alter table public.agent_events enable row level security;
 alter table public.agent_feedback_threads enable row level security;
+alter table public.feedback_replies enable row level security;
 alter table public.street_part_agent_counts enable row level security;
 alter table public.environment_observations enable row level security;
 alter table public.transit_stops enable row level security;
@@ -123,6 +124,15 @@ create policy "auth delete own feedback votes" on public.feedback_votes
 drop policy if exists "auth insert comments" on public.feedback_comments;
 create policy "auth insert comments" on public.feedback_comments
   for insert with check (auth.uid() = user_id and role = 'public');
+
+drop policy if exists "public read feedback replies" on public.feedback_replies;
+create policy "public read feedback replies" on public.feedback_replies for select using (true);
+
+drop policy if exists "public insert feedback replies" on public.feedback_replies;
+create policy "public insert feedback replies" on public.feedback_replies
+  for insert with check (author_role in ('public','authority','agent','system'));
+
+grant select, insert on public.feedback_replies to anon, authenticated;
 
 -- Authority/admin writes should be done through service role or later replaced
 -- with a custom JWT claim policy, e.g. auth.jwt()->>'role' = 'authority'.

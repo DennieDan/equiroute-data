@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">JalanLens</string>
-    <string name="public_dashboard_url">http://equiroute.online/login/?mobile=apk</string>
+    <string name="public_dashboard_url">https://equiroute.online/login/?mobile=apk</string>
 </resources>
