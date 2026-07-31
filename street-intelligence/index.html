@@ -1842,7 +1842,7 @@
             <h4>Agent simulation</h4>
             <p>Monitor persona agents and prepare simulation configuration.</p>
             <span id="settingsAgentStatus" class="settings-live-status"
-              >Loading simulation snapshot…</span
+              >Loading life simulation…</span
             >
           </div>
           <button type="button" id="openAgentManagementBtn">
@@ -1901,7 +1901,7 @@
           <h2>Agent management</h2>
           <div id="agentPanelStatus" class="agent-panel-status">
             <span class="agent-panel-status-dot" aria-hidden="true"></span>
-            <span id="agentPanelStatusText">Loading simulation snapshot…</span>
+            <span id="agentPanelStatusText">Loading life simulation…</span>
           </div>
         </div>
         <div class="agent-panel-header-actions">
@@ -2035,7 +2035,7 @@
         </section>
       </div>
       <footer class="agent-panel-footer">
-        <span id="agentPanelSource">Local simulation snapshot</span>
+        <span id="agentPanelSource">Dynamic life simulation</span>
         <span id="agentMapFilterPill" class="agent-map-filter-pill">
           Map filtered
           <button type="button" id="clearAgentMapFilterBtn">Show all</button>
@@ -4238,6 +4238,121 @@
         streetAgentCounts.innerHTML = `<b>Live synthetic agents on this street part</b><div class="count-grid">${pills}</div><small>${row.total_count} currently here</small>`;
       }
 
+      function buildDynamicAgentFeedback(agents, personaTypes, nowMs = Date.now()) {
+        const simParts = state.personaSimulation?.street_parts || [];
+        const fallbackParts = state.streetRegistry?.street_parts || [];
+        const candidates = simParts.length
+          ? simParts
+          : fallbackParts.map((part) => ({
+              street_part_id: part.id,
+              overall_score: part.metrics?.overall_accessibility_score || 80,
+              recommended_improvement: "field audit recommended",
+              top_blocker: "accessibility friction",
+              personas: {},
+            }));
+        return candidates
+          .slice()
+          .sort(
+            (a, b) =>
+              Number(a.overall_score || 100) - Number(b.overall_score || 100),
+          )
+          .slice(0, 36)
+          .map((part, index) => {
+            const agent = agents[(index * 17) % Math.max(1, agents.length)] || {};
+            const persona = personaTypes[agent.persona_type_id] || {};
+            const personaPart = part.personas?.[agent.persona_type_id] || {};
+            const blockers =
+              personaPart.blocker_labels ||
+              personaPart.blockers ||
+              (part.top_blocker ? [part.top_blocker] : []);
+            const severity = Math.max(
+              0.35,
+              Math.min(
+                0.98,
+                (100 - Number(personaPart.score || part.overall_score || 78)) / 35,
+              ),
+            );
+            const title = blockers.length
+              ? `${persona.label || formatAgentLabel(agent.persona_type_id)} flagged ${formatAgentLabel(blockers[0])}`
+              : `${persona.label || "Agent"} accessibility friction`;
+            return {
+              external_id: `life_event_${agent.agent_external_id || index}_${part.street_part_id || part.id}`,
+              agent_external_id: agent.agent_external_id,
+              agent_name: agent.display_name,
+              persona_type_id: agent.persona_type_id,
+              event_type: "life_route_friction",
+              title,
+              body:
+                personaPart.recommended_improvement ||
+                part.recommended_improvement ||
+                "Agent route encountered accessibility friction during a scheduled daily trip.",
+              street_part_external_id: part.street_part_id || part.id,
+              severity,
+              priority_score: Math.round(severity * 100),
+              status: "open",
+              created_at: new Date(nowMs - index * 11 * 60 * 1000).toISOString(),
+            };
+          });
+      }
+      function buildDynamicLiveAgentSnapshot(nowMs = Date.now()) {
+        const parts = state.streetRegistry?.street_parts || [];
+        const personaTypes = livePersonaTypes();
+        const draft = ensureAgentManagementDraft();
+        const seed = Number(draft.seed || 42);
+        const count = Math.max(1, Math.min(1000, Number(draft.agentCount || 300)));
+        const agents = [];
+        for (let i = 0; i < count; i++) {
+          const ordinal = i + 1;
+          const personaId = weightedPersonaForOrdinal(ordinal + seed, personaTypes);
+          const persona = personaTypes[personaId] || {};
+          const agentId = `life_agent_${seed}_${String(ordinal).padStart(4, "0")}`;
+          const h = hashString(`${agentId}:${personaId}`);
+          const homeIndex = parts.length ? h % parts.length : 0;
+          const workIndex = parts.length
+            ? scoredDestinationIndex(personaId, h + 17, "work")
+            : 0;
+          const schoolIndex = parts.length
+            ? scoredDestinationIndex(personaId, h + 29, "school")
+            : 0;
+          const baseSpeed = Number(persona.speed_mps || 1) * (0.9 + (h % 21) / 100);
+          const agent = {
+            agent_external_id: agentId,
+            display_name: `${persona.label || formatAgentLabel(personaId)} ${String(ordinal).padStart(3, "0")}`,
+            persona_type_id: personaId,
+            state: {
+              speed_mps: Number(baseSpeed.toFixed(2)),
+              crowd_pressure: Number(Math.min(0.98, ((h % 9) + singaporeHour(nowMs) / 3) / 12).toFixed(2)),
+              route_outcome: "living_schedule",
+            },
+            route_plan: {
+              home_index: homeIndex,
+              work_index: workIndex,
+              school_index: schoolIndex,
+              schedule: "dynamic_singapore_day",
+              generated_in_browser: true,
+            },
+          };
+          const position = liveAgentPosition(agent, nowMs);
+          agent.lng = Number(position.coord[0].toFixed(7));
+          agent.lat = Number(position.coord[1].toFixed(7));
+          agent.street_part_external_id = position.part?.id || parts[homeIndex]?.id || null;
+          agent.activity = agentActivityFor(agent, nowMs);
+          agents.push(agent);
+        }
+        return {
+          project: "JalanLens live persona life simulation",
+          tick_index: Math.floor(nowMs / Math.max(1, Number(draft.tickSeconds || 10)) / 1000),
+          generated_at: new Date(nowMs).toISOString(),
+          model_provider: {
+            name: "browser_life_rules",
+            model: "deterministic_daily_schedule",
+            reason: "Authority dashboard now generates agents from street-part geometry, persona weights, Singapore time, and per-agent life schedules instead of reading a static snapshot file.",
+          },
+          persona_types: personaTypes,
+          agent_live_states: agents,
+          agent_feedback_threads: buildDynamicAgentFeedback(agents, personaTypes, nowMs),
+        };
+      }
       async function loadLiveAgentSnapshot() {
         if (state.role !== "authority") {
           state.liveAgentSnapshot = null;
@@ -4246,20 +4361,10 @@
           renderStreetAgentCounts();
           return;
         }
-        try {
-          const r = await fetch(
-            `../data/live_persona_simulation_snapshot.json?t=${Date.now()}`,
-          );
-          if (!r.ok) throw new Error(`snapshot ${r.status}`);
-          const snapshot = await r.json();
-          state.liveAgentSnapshot = snapshot;
-          renderLiveAgents();
-          renderStreetAgentCounts();
-          renderAgentManagementPanel();
-        } catch (e) {
-          console.warn("live persona snapshot unavailable", e);
-          renderAgentManagementPanel();
-        }
+        state.liveAgentSnapshot = buildDynamicLiveAgentSnapshot();
+        renderLiveAgents();
+        renderStreetAgentCounts();
+        renderAgentManagementPanel();
       }
 
       const AGENT_DRAFT_STORAGE_KEY = "jalanlens_agent_simulation_draft";
@@ -4349,7 +4454,7 @@
           {
             source: "system",
             title: "Agent configuration draft saved",
-            body: "The draft is stored on this device. The running snapshot has not been changed.",
+            body: "The draft is stored on this device. The active life simulation will use it on the next rebuild.",
           },
           { toast: true, persist: false },
         );
@@ -4361,7 +4466,7 @@
         const age = agentSnapshotAge();
         const text = snapshot
           ? `${agents.length} agents · ${age.label}`
-          : "Simulation snapshot unavailable";
+          : "Life simulation unavailable";
         if (window.agentPanelStatus) {
           agentPanelStatus.classList.remove("fresh", "stale");
           agentPanelStatus.classList.add(age.freshness);
@@ -4376,8 +4481,8 @@
         if (window.agentPanelSource) {
           const provider = snapshot?.model_provider?.name;
           agentPanelSource.textContent = provider
-            ? `Rules-based snapshot · ${provider} feedback wording`
-            : "Local simulation snapshot";
+            ? `Dynamic life simulation · ${provider}`
+            : "Dynamic life simulation";
         }
       }
 
@@ -4463,7 +4568,7 @@
         const feedback = snapshot?.agent_feedback_threads || [];
         if (!snapshot) {
           agentOverviewContent.innerHTML =
-            '<div class="agent-empty">No live simulation snapshot is available yet.</div>';
+            '<div class="agent-empty">No live life simulation is available yet.</div>';
           return;
         }
         const counts = agentPersonaCounts();
@@ -4727,7 +4832,7 @@
         const savedLabel = draft.savedAt
           ? `Draft last saved ${new Date(draft.savedAt).toLocaleString("en-SG")}`
           : "No configuration draft saved yet";
-        agentRunContent.innerHTML = `<section class="agent-section"><div class="agent-section-head"><h3>Snapshot source</h3><span class="agent-section-note">Read-only</span></div><div class="agent-profile-grid"><div class="agent-profile-item"><small>Tick index</small><b>${escapeHtml(snapshot?.tick_index ?? "–")}</b></div><div class="agent-profile-item"><small>Generated</small><b>${escapeHtml(snapshot?.generated_at ? new Date(snapshot.generated_at).toLocaleString("en-SG") : "Unavailable")}</b></div><div class="agent-profile-item"><small>Agent count</small><b>${snapshot?.agent_live_states?.length || 0}</b></div><div class="agent-profile-item"><small>Model provider</small><b>${escapeHtml(formatAgentLabel(snapshot?.model_provider?.name || "Deterministic"))}</b></div></div></section><section class="agent-section"><div class="agent-section-head"><h3>Next-run configuration</h3><span class="agent-section-note">${escapeHtml(savedLabel)}</span></div><div class="agent-config-grid"><label class="agent-field" for="agentDraftCount">Agent count<input id="agentDraftCount" type="number" min="1" max="5000" step="1" value="${escapeHtml(draft.agentCount)}"></label><label class="agent-field" for="agentDraftTick">Tick interval (seconds)<input id="agentDraftTick" type="number" min="1" max="3600" step="1" value="${escapeHtml(draft.tickSeconds)}"></label><label class="agent-field" for="agentDraftSeed">Deterministic seed<input id="agentDraftSeed" type="number" min="1" max="2147483647" step="1" value="${escapeHtml(draft.seed)}"></label><label class="agent-field">Timezone<input type="text" value="Asia/Singapore" disabled></label></div><div class="agent-config-note">These settings are deliberately draft-only. The current worker still reads its run configuration from command-line or environment values, so saving here will not pause, restart or change the live snapshot.</div><div class="agent-inline-actions"><button type="button" id="saveAgentRunDraftBtn">Save run draft</button><button type="button" id="discardAgentRunDraftBtn">Discard draft</button></div></section>`;
+        agentRunContent.innerHTML = `<section class="agent-section"><div class="agent-section-head"><h3>Life simulation source</h3><span class="agent-section-note">Read-only</span></div><div class="agent-profile-grid"><div class="agent-profile-item"><small>Tick index</small><b>${escapeHtml(snapshot?.tick_index ?? "–")}</b></div><div class="agent-profile-item"><small>Generated</small><b>${escapeHtml(snapshot?.generated_at ? new Date(snapshot.generated_at).toLocaleString("en-SG") : "Unavailable")}</b></div><div class="agent-profile-item"><small>Agent count</small><b>${snapshot?.agent_live_states?.length || 0}</b></div><div class="agent-profile-item"><small>Model provider</small><b>${escapeHtml(formatAgentLabel(snapshot?.model_provider?.name || "Deterministic"))}</b></div></div></section><section class="agent-section"><div class="agent-section-head"><h3>Next-run configuration</h3><span class="agent-section-note">${escapeHtml(savedLabel)}</span></div><div class="agent-config-grid"><label class="agent-field" for="agentDraftCount">Agent count<input id="agentDraftCount" type="number" min="1" max="5000" step="1" value="${escapeHtml(draft.agentCount)}"></label><label class="agent-field" for="agentDraftTick">Tick interval (seconds)<input id="agentDraftTick" type="number" min="1" max="3600" step="1" value="${escapeHtml(draft.tickSeconds)}"></label><label class="agent-field" for="agentDraftSeed">Deterministic seed<input id="agentDraftSeed" type="number" min="1" max="2147483647" step="1" value="${escapeHtml(draft.seed)}"></label><label class="agent-field">Timezone<input type="text" value="Asia/Singapore" disabled></label></div><div class="agent-config-note">These settings are stored as a local draft. The authority dashboard rebuilds the in-browser life simulation from these values, Singapore time, persona weights, and street-part geometry; no static agent snapshot is fetched.</div><div class="agent-inline-actions"><button type="button" id="saveAgentRunDraftBtn">Save run draft</button><button type="button" id="discardAgentRunDraftBtn">Discard draft</button></div></section>`;
         if (window.saveAgentRunDraftBtn)
           saveAgentRunDraftBtn.onclick = () => {
             draft.agentCount = Math.max(
