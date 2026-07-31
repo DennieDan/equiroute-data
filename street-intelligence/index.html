@@ -236,7 +236,9 @@
       }
       .topbar-hover-select {
         opacity: 0.78;
-        transition: opacity 0.15s ease, transform 0.15s ease;
+        transition:
+          opacity 0.15s ease,
+          transform 0.15s ease;
       }
       .topbar-hover-select:hover,
       .topbar-hover-select:focus {
@@ -279,15 +281,33 @@
         border-radius: 14px;
         background: var(--bg);
         color: var(--txt);
-        box-shadow: 0 14px 44px rgba(0,0,0,.34);
-        animation: toastIn .18s ease-out;
+        box-shadow: 0 14px 44px rgba(0, 0, 0, 0.34);
+        animation: toastIn 0.18s ease-out;
         opacity: 1;
       }
       .toast.fade-out {
-        animation: toastOut .55s ease-in forwards;
+        animation: toastOut 0.55s ease-in forwards;
       }
-      @keyframes toastIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
-      @keyframes toastOut { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(-8px); } }
+      @keyframes toastIn {
+        from {
+          opacity: 0;
+          transform: translateY(-6px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      @keyframes toastOut {
+        from {
+          opacity: 1;
+          transform: none;
+        }
+        to {
+          opacity: 0;
+          transform: translateY(-8px);
+        }
+      }
       #notificationsPanel {
         right: 14px;
         top: 72px;
@@ -298,13 +318,39 @@
         z-index: 61;
         display: none;
       }
-      #notificationsPanel.visible { display: block; }
-      .notification-head { display: flex; align-items: center; gap: 8px; justify-content: space-between; }
-      .notification-list { display: grid; gap: 8px; margin-top: 10px; }
-      .notification-item { text-align: left; border-radius: 14px; border: 1px solid rgba(148,163,184,.24); padding: 9px; background: rgba(15,23,42,.62); width: 100%; }
-      .notification-item b { display: block; }
-      .notification-item small { display: block; color: var(--muted); margin-top: 3px; }
-      .status { display: none; }
+      #notificationsPanel.visible {
+        display: block;
+      }
+      .notification-head {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        justify-content: space-between;
+      }
+      .notification-list {
+        display: grid;
+        gap: 8px;
+        margin-top: 10px;
+      }
+      .notification-item {
+        text-align: left;
+        border-radius: 14px;
+        border: 1px solid rgba(148, 163, 184, 0.24);
+        padding: 9px;
+        background: rgba(15, 23, 42, 0.62);
+        width: 100%;
+      }
+      .notification-item b {
+        display: block;
+      }
+      .notification-item small {
+        display: block;
+        color: var(--muted);
+        margin-top: 3px;
+      }
+      .status {
+        display: none;
+      }
       #miniMap {
         position: absolute;
         right: 14px;
@@ -472,7 +518,11 @@
         border-color: rgba(148, 163, 184, 0.28);
       }
       .persona-card.active {
-        background: linear-gradient(135deg, rgba(14, 116, 144, 0.92), rgba(30, 64, 175, 0.86));
+        background: linear-gradient(
+          135deg,
+          rgba(14, 116, 144, 0.92),
+          rgba(30, 64, 175, 0.86)
+        );
         border-color: #bae6fd;
       }
       .persona-card small,
@@ -547,9 +597,18 @@
         background: #ef4444;
       }
       @keyframes micPulse {
-        0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.72); transform: scale(1); }
-        70% { box-shadow: 0 0 0 12px rgba(239, 68, 68, 0); transform: scale(1.18); }
-        100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); transform: scale(1); }
+        0% {
+          box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.72);
+          transform: scale(1);
+        }
+        70% {
+          box-shadow: 0 0 0 12px rgba(239, 68, 68, 0);
+          transform: scale(1.18);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+          transform: scale(1);
+        }
       }
       #feedbackTranslationBox {
         display: none;
@@ -952,10 +1011,22 @@
         content: "";
         position: absolute;
         inset: 0;
-        background: linear-gradient(90deg, transparent, rgba(56,189,248,.35), transparent);
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(56, 189, 248, 0.35),
+          transparent
+        );
         animation: progressSweep 1.4s linear infinite;
       }
-      @keyframes progressSweep { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+      @keyframes progressSweep {
+        from {
+          transform: translateX(-100%);
+        }
+        to {
+          transform: translateX(100%);
+        }
+      }
       .managed-user-form {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1060,7 +1131,10 @@
         }
       }
     </style>
-    <link rel="stylesheet" href="../harvard.css?v=20260731-mobile-street-photo-2" />
+    <link
+      rel="stylesheet"
+      href="../harvard.css?v=20260731-mobile-street-photo-2"
+    />
     <script src="https://unpkg.com/maptalks/dist/maptalks.min.js"></script>
     <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
     <script src="https://unpkg.com/mapillary-js@4.1.2/dist/mapillary.js"></script>
@@ -1073,21 +1147,41 @@
     <div id="segmentButtons"></div>
     <div id="roadNameLabels" aria-hidden="true"></div>
     <div id="topbar" class="hud">
-      <div class="brand"><img src="../assets/jalanlens-logo.png" alt="" /><span>JalanLens</span></div>
+      <div class="brand">
+        <img src="../assets/jalanlens-logo.png" alt="" /><span>JalanLens</span>
+      </div>
       <span class="pill role-pill" id="roleLabel">Role</span>
       <span class="pill" id="modeLabel" hidden></span>
       <span class="pill" id="earthSource" hidden></span>
-      <select id="viewModeSelect" class="topbar-hover-select" title="Choose view mode">
+      <select
+        id="viewModeSelect"
+        class="topbar-hover-select"
+        title="Choose view mode"
+      >
         <option value="earth">Earth View</option>
         <option value="street">Street View</option>
       </select>
-      <select id="segmentSelect" class="topbar-hover-select street-only-control" title="Choose a footpath street part"></select>
-      <button id="directionBtn" class="street-only-control" title="Swap pavement-side direction" disabled>Swap direction</button>
-      <button id="prevBtn" class="street-only-control">←</button><button id="nextBtn" class="street-only-control">→</button>
+      <select
+        id="segmentSelect"
+        class="topbar-hover-select street-only-control"
+        title="Choose a footpath street part"
+      ></select>
+      <button
+        id="directionBtn"
+        class="street-only-control"
+        title="Swap pavement-side direction"
+        disabled
+      >
+        Swap direction
+      </button>
+      <button id="prevBtn" class="street-only-control">←</button
+      ><button id="nextBtn" class="street-only-control">→</button>
       <div class="spacer"></div>
       <span class="pill" hidden><b id="segCount">–</b> segments</span>
       <span class="pill" hidden><b id="buildingCount">–</b> buildings</span>
-      <a id="docsBtn" class="buttonlike topbar-link" href="../documentation">Documentation</a>
+      <a id="docsBtn" class="buttonlike topbar-link" href="../documentation"
+        >Documentation</a
+      >
       <button id="themeToggleBtn" title="Display theme: system">◐</button>
       <button id="notificationBellBtn" title="Notifications">🔔</button>
       <button id="settingsBtn" class="authority-only">⚙</button>
@@ -1100,13 +1194,24 @@
       <p id="tokenStatus" hidden></p>
       <p id="currentUserStatus"></p>
       <div class="settings-grid authority-only">
-        <button id="togglePersonaPanelBtn" type="button">Show persona agents</button>
+        <button id="togglePersonaPanelBtn" type="button">
+          Show persona agents
+        </button>
       </div>
       <section class="settings-section" id="photoCrowdSection">
         <h4>Photo crowdsourcing</h4>
-        <p>Upload better street-part photos here. The review flow is CV first review, then human-in-the-loop approval by selected staff teams before a photo becomes active evidence.</p>
-        <div id="photoProgressRail" class="photo-progress-rail" aria-label="Photo review progress">
-          <span class="active">Upload</span><span>CV first review</span><span>Staff review</span><span>Approved</span>
+        <p>
+          Upload better street-part photos here. The review flow is CV first
+          review, then human-in-the-loop approval by selected staff teams before
+          a photo becomes active evidence.
+        </p>
+        <div
+          id="photoProgressRail"
+          class="photo-progress-rail"
+          aria-label="Photo review progress"
+        >
+          <span class="active">Upload</span><span>CV first review</span
+          ><span>Staff review</span><span>Approved</span>
         </div>
         <div class="photo-upload-actions">
           <button type="button" id="photoUploadBtn">Upload better photo</button>
@@ -1115,9 +1220,15 @@
         </div>
         <div id="photoUploadStatus"></div>
       </section>
-      <section class="settings-section authority-only" id="accountManagementSection">
+      <section
+        class="settings-section authority-only"
+        id="accountManagementSection"
+      >
         <h4>Account management</h4>
-        <p>Company admins manage users in their own company: username/password access first, then users can edit profile details after login.</p>
+        <p>
+          Company admins manage users in their own company: username/password
+          access first, then users can edit profile details after login.
+        </p>
         <div class="managed-user-form">
           <input id="managedEmployeeId" placeholder="employee_id" />
           <input id="managedFullName" placeholder="full_name" />
@@ -1126,7 +1237,9 @@
           <input id="managedSalutation" placeholder="salutation" />
           <input id="managedPurpose" placeholder="platform_purpose" />
         </div>
-        <button type="button" id="createManagedUserBtn">Create managed user</button>
+        <button type="button" id="createManagedUserBtn">
+          Create managed user
+        </button>
         <div id="managedUsersTable">Loading managed users…</div>
       </section>
     </div>
@@ -1135,7 +1248,9 @@
       <h3>Account</h3>
       <p id="roleMenuStatus">Loading current role…</p>
       <div class="role-menu-actions">
-        <a id="profilePageBtn" class="buttonlike" href="../profile/">Open profile</a>
+        <a id="profilePageBtn" class="buttonlike" href="../profile/"
+          >Open profile</a
+        >
         <button id="logoutBtn" type="button">Log out</button>
       </div>
     </div>
@@ -1149,11 +1264,19 @@
         <label for="personaSelect">User type</label>
         <select id="personaSelect" title="Choose user type"></select>
         <div class="persona-route-grid">
-          <label>Start street part
-            <select id="personaStartSelect" title="Choose route start street part"></select>
+          <label
+            >Start street part
+            <select
+              id="personaStartSelect"
+              title="Choose route start street part"
+            ></select>
           </label>
-          <label>End street part
-            <select id="personaEndSelect" title="Choose route end street part"></select>
+          <label
+            >End street part
+            <select
+              id="personaEndSelect"
+              title="Choose route end street part"
+            ></select>
           </label>
         </div>
       </div>
@@ -1188,7 +1311,9 @@
         />
         <label for="feedbackBody">Details</label>
         <div id="feedbackLanguageHint" class="feedback-language-hint">
-          Supports English, Traditional Chinese, Simplified Chinese, Malay, Tamil, Bengali, and Gujarati. Non-English feedback is translated to English before saving.
+          Supports English, Traditional Chinese, Simplified Chinese, Malay,
+          Tamil, Bengali, and Gujarati. Non-English feedback is translated to
+          English before saving.
         </div>
         <textarea
           id="feedbackBody"
@@ -1198,7 +1323,10 @@
           placeholder="Describe the accessibility issue or suggestion."
         ></textarea>
         <div class="feedback-speech-row">
-          <button type="button" id="feedbackSpeechBtn"><span class="mic-pulse" aria-hidden="true"></span><span id="feedbackSpeechLabel">Start speech to text</span></button>
+          <button type="button" id="feedbackSpeechBtn">
+            <span class="mic-pulse" aria-hidden="true"></span
+            ><span id="feedbackSpeechLabel">Start speech to text</span>
+          </button>
           <small id="feedbackSpeechStatus">Browser speech-to-text ready.</small>
         </div>
         <div id="feedbackTranslationBox" aria-live="polite">
@@ -1216,9 +1344,13 @@
     <section id="notificationsPanel" class="hud" aria-live="polite">
       <div class="notification-head">
         <h3>Notifications</h3>
-        <button id="clearNotificationsBtn" type="button">Clear notification history</button>
+        <button id="clearNotificationsBtn" type="button">
+          Clear notification history
+        </button>
       </div>
-      <div id="notificationsList" class="notification-list">No notifications yet.</div>
+      <div id="notificationsList" class="notification-list">
+        No notifications yet.
+      </div>
     </section>
     <div class="status" id="status" aria-hidden="true"></div>
     <script src="../feedback-form.js?v=social-thread-2"></script>
@@ -1261,7 +1393,11 @@
         liveAgentMarkers: new Map(),
         liveAgentAnimationInterval: null,
         notifications: [],
-        dismissedNotificationIds: new Set(JSON.parse(localStorage.getItem("jalanlens_cleared_notifications") || "[]")),
+        dismissedNotificationIds: new Set(
+          JSON.parse(
+            localStorage.getItem("jalanlens_cleared_notifications") || "[]",
+          ),
+        ),
         themeMode: localStorage.getItem("jalanlens_theme") || "system",
       };
       window.__EARTH_ACCESSIBILITY_STATE = state;
@@ -1281,10 +1417,16 @@
       const VALID_ROLES = new Set(["public", "authority"]);
       const params = new URLSearchParams(location.search);
       const isMobileApk = params.get("mobile") === "apk";
-      const storedRole = localStorage.getItem(ROLE_STORAGE_KEY) || localStorage.getItem(LEGACY_ROLE_STORAGE_KEY);
+      const storedRole =
+        localStorage.getItem(ROLE_STORAGE_KEY) ||
+        localStorage.getItem(LEGACY_ROLE_STORAGE_KEY);
       let storedUser = null;
       try {
-        storedUser = JSON.parse(localStorage.getItem(USER_STORAGE_KEY) || localStorage.getItem(LEGACY_USER_STORAGE_KEY) || "null");
+        storedUser = JSON.parse(
+          localStorage.getItem(USER_STORAGE_KEY) ||
+            localStorage.getItem(LEGACY_USER_STORAGE_KEY) ||
+            "null",
+        );
       } catch (e) {
         storedUser = null;
       }
@@ -1296,13 +1438,17 @@
       if (isMobileApk && activeRole === "authority") {
         localStorage.removeItem(ROLE_STORAGE_KEY);
         localStorage.removeItem(USER_STORAGE_KEY);
-        location.replace(`../login/?mobile=apk&next=${encodeURIComponent("street-intelligence/?mobile=apk")}`);
+        location.replace(
+          `../login/?mobile=apk&next=${encodeURIComponent("street-intelligence/?mobile=apk")}`,
+        );
         throw new Error("JalanLens mobile app is public-only");
       }
       if (!storedUser || !storedUser.external_id || !activeRole) {
         localStorage.removeItem(ROLE_STORAGE_KEY);
         localStorage.removeItem(USER_STORAGE_KEY);
-        location.replace(`../?next=${encodeURIComponent("street-intelligence/" + location.search)}`);
+        location.replace(
+          `../?next=${encodeURIComponent("street-intelligence/" + location.search)}`,
+        );
         throw new Error("JalanLens login required");
       }
       state.role = activeRole;
@@ -1310,7 +1456,9 @@
       localStorage.setItem(ROLE_STORAGE_KEY, activeRole);
       localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(state.appUser));
       document.body.classList.add(`${activeRole}-role`);
-      if (window.feedbackBtn) feedbackBtn.textContent = activeRole === "authority" ? "Respond to feedback" : "Give feedback";
+      if (window.feedbackBtn)
+        feedbackBtn.textContent =
+          activeRole === "authority" ? "Respond to feedback" : "Give feedback";
       const SUPABASE_URL = "https://khddsjemkdcgumfvkraa.supabase.co";
       const SUPABASE_PUBLISHABLE_KEY =
         "sb_publishable_lqGtwkNAOMV7qsYPKVZr8w_GytZx3Qm";
@@ -1341,44 +1489,70 @@
         buildingLayer = new maptalks.VectorLayer("buildings").addTo(map),
         selectedLayer = new maptalks.VectorLayer("selected").addTo(map),
         agentLayer = new maptalks.VectorLayer("live-persona-agents").addTo(map);
-      state.layers = { routeLayer, poiLayer, buildingLayer, selectedLayer, agentLayer };
+      state.layers = {
+        routeLayer,
+        poiLayer,
+        buildingLayer,
+        selectedLayer,
+        agentLayer,
+      };
       state.agentLayer = agentLayer;
       function getToken() {
-        return localStorage.getItem(TOKEN_STORAGE_KEY) || localStorage.getItem(LEGACY_TOKEN_STORAGE_KEY) || "";
+        return (
+          localStorage.getItem(TOKEN_STORAGE_KEY) ||
+          localStorage.getItem(LEGACY_TOKEN_STORAGE_KEY) ||
+          ""
+        );
       }
       function setToken(t) {
-        if ((t || "").trim())
-          localStorage.setItem(TOKEN_STORAGE_KEY, t.trim());
+        if ((t || "").trim()) localStorage.setItem(TOKEN_STORAGE_KEY, t.trim());
         updateSettings();
       }
       function escapeHtml(value) {
-        return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+        return String(value ?? "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
       }
       function applyTheme() {
         const mode = state.themeMode || "system";
-        const dark = mode === "dark" || (mode === "system" && matchMedia?.("(prefers-color-scheme: dark)").matches);
+        const dark =
+          mode === "dark" ||
+          (mode === "system" &&
+            matchMedia?.("(prefers-color-scheme: dark)").matches);
         document.body.dataset.theme = dark ? "dark" : "light";
         if (window.themeToggleBtn) {
-          themeToggleBtn.textContent = mode === "light" ? "☀" : mode === "dark" ? "☾" : "◐";
+          themeToggleBtn.textContent =
+            mode === "light" ? "☀" : mode === "dark" ? "☾" : "◐";
           themeToggleBtn.title = `Display theme: ${mode}`;
         }
       }
       function cycleTheme() {
         const order = ["system", "light", "dark"];
-        state.themeMode = order[(order.indexOf(state.themeMode) + 1) % order.length];
+        state.themeMode =
+          order[(order.indexOf(state.themeMode) + 1) % order.length];
         localStorage.setItem("jalanlens_theme", state.themeMode);
         applyTheme();
       }
       function renderNotifications() {
         const list = window.notificationsList;
         if (!list) return;
-        const visible = state.notifications.filter((n) => !state.dismissedNotificationIds.has(n.id));
+        const visible = state.notifications.filter(
+          (n) => !state.dismissedNotificationIds.has(n.id),
+        );
         notificationBellBtn?.classList.toggle("has-unread", visible.length > 0);
         if (!visible.length) {
           list.textContent = "No notifications yet.";
           return;
         }
-        list.innerHTML = visible.map((n) => `<button class="notification-item" data-id="${escapeHtml(n.id)}"><b>${escapeHtml(n.title)}</b><small>${escapeHtml(n.body || "")}</small></button>`).join("");
+        list.innerHTML = visible
+          .map(
+            (n) =>
+              `<button class="notification-item" data-id="${escapeHtml(n.id)}"><b>${escapeHtml(n.title)}</b><small>${escapeHtml(n.body || "")}</small></button>`,
+          )
+          .join("");
         list.querySelectorAll(".notification-item").forEach((button) => {
           button.onclick = () => {
             const n = visible.find((x) => x.id === button.dataset.id);
@@ -1409,9 +1583,14 @@
           console.warn("notification save failed", e);
         }
       }
-      function createNotification(partial, { toast = true, persist = false } = {}) {
+      function createNotification(
+        partial,
+        { toast = true, persist = false } = {},
+      ) {
         const n = {
-          id: partial.id || `local_${Date.now()}_${Math.random().toString(16).slice(2)}`,
+          id:
+            partial.id ||
+            `local_${Date.now()}_${Math.random().toString(16).slice(2)}`,
           source: partial.source || "system",
           title: partial.title || "Notification",
           body: partial.body || "",
@@ -1419,7 +1598,8 @@
           payload: partial.payload || {},
           created_at: partial.created_at || new Date().toISOString(),
         };
-        if (!state.notifications.some((x) => x.id === n.id)) state.notifications.unshift(n);
+        if (!state.notifications.some((x) => x.id === n.id))
+          state.notifications.unshift(n);
         state.notifications = state.notifications.slice(0, 80);
         renderNotifications();
         if (toast) showToast(n);
@@ -1428,19 +1608,36 @@
       }
       async function loadNotifications() {
         try {
-          const rows = await supabaseRest("app_notifications", "select=external_id,source,title,body,street_part_external_id,payload,created_at&order=created_at.desc&limit=80");
-          rows.forEach((r) => createNotification({ id: r.external_id, ...r }, { toast: false, persist: false }));
+          const rows = await supabaseRest(
+            "app_notifications",
+            "select=external_id,source,title,body,street_part_external_id,payload,created_at&order=created_at.desc&limit=80",
+          );
+          rows.forEach((r) =>
+            createNotification(
+              { id: r.external_id, ...r },
+              { toast: false, persist: false },
+            ),
+          );
         } catch (e) {
           console.warn("notification load failed", e);
         }
       }
       function clearNotificationHistory() {
-        state.notifications.forEach((n) => state.dismissedNotificationIds.add(n.id));
-        localStorage.setItem("jalanlens_cleared_notifications", JSON.stringify([...state.dismissedNotificationIds].slice(-200)));
+        state.notifications.forEach((n) =>
+          state.dismissedNotificationIds.add(n.id),
+        );
+        localStorage.setItem(
+          "jalanlens_cleared_notifications",
+          JSON.stringify([...state.dismissedNotificationIds].slice(-200)),
+        );
         renderNotifications();
       }
       function openNotificationTarget(n) {
-        const part = (state.streetRegistry?.street_parts || []).find((p) => p.id === n.street_part_external_id || p.external_id === n.street_part_external_id);
+        const part = (state.streetRegistry?.street_parts || []).find(
+          (p) =>
+            p.id === n.street_part_external_id ||
+            p.external_id === n.street_part_external_id,
+        );
         const idx = segmentIndexForStreetPart(part);
         if (idx >= 0) selectSegment(idx, true);
         notificationsPanel?.classList.remove("visible");
@@ -1448,14 +1645,21 @@
       function setStatus(t) {
         const statusEl = document.getElementById("status");
         if (statusEl) statusEl.textContent = t || "";
-        createNotification({ source: "system", title: "JalanLens data loaded", body: t || "" }, { toast: true, persist: true });
+        createNotification(
+          { source: "system", title: "JalanLens data loaded", body: t || "" },
+          { toast: true, persist: true },
+        );
       }
       applyTheme();
       function updateRoleMenu() {
         if (!window.roleMenuStatus) return;
         const user = state.appUser || {};
         const roleLabel = state.role === "authority" ? "Authority" : "Public";
-        const name = user.display_name || user.username || user.external_id || `${state.role} user`;
+        const name =
+          user.display_name ||
+          user.username ||
+          user.external_id ||
+          `${state.role} user`;
         const username = user.username || user.external_id || "demo-user";
         roleMenuStatus.innerHTML = `<b>Role:</b> ${roleLabel}<br><b>User:</b> ${name}<br><b>Username:</b> ${username}`;
         if (window.profilePageBtn) {
@@ -1480,7 +1684,10 @@
           };
         }
         if (window.roleLabel) {
-          roleLabel.textContent = state.role === "authority" ? "Authority dashboard" : "Public feedback";
+          roleLabel.textContent =
+            state.role === "authority"
+              ? "Authority dashboard"
+              : "Public feedback";
         }
         if (window.modeLabel) {
           modeLabel.hidden = false;
@@ -1513,20 +1720,29 @@
           }),
           body: JSON.stringify(payload),
         });
-        if (!r.ok) throw new Error(`Supabase insert ${table} ${r.status}: ${await r.text()}`);
+        if (!r.ok)
+          throw new Error(
+            `Supabase insert ${table} ${r.status}: ${await r.text()}`,
+          );
         const rows = await r.json();
         return rows[0] || null;
       }
       async function uploadStreetPhotoFile(file, storagePath) {
-        const r = await fetch(`${SUPABASE_URL}/storage/v1/object/street-photos/${storagePath}`, {
-          method: "POST",
-          headers: supabaseHeaders({
-            "Content-Type": file.type || "image/jpeg",
-            "x-upsert": "true",
-          }),
-          body: file,
-        });
-        if (!r.ok) throw new Error(`Supabase Storage upload ${r.status}: ${await r.text()}`);
+        const r = await fetch(
+          `${SUPABASE_URL}/storage/v1/object/street-photos/${storagePath}`,
+          {
+            method: "POST",
+            headers: supabaseHeaders({
+              "Content-Type": file.type || "image/jpeg",
+              "x-upsert": "true",
+            }),
+            body: file,
+          },
+        );
+        if (!r.ok)
+          throw new Error(
+            `Supabase Storage upload ${r.status}: ${await r.text()}`,
+          );
         return `${SUPABASE_URL}/storage/v1/object/public/street-photos/${storagePath}`;
       }
       function currentActivePhoto() {
@@ -1543,12 +1759,17 @@
         if (!ctx?.part) return;
         const hasPhoto = !!ctx.existing;
         state.currentPhotoUploadContext = ctx;
-        createNotification({
-          source: "system",
-          title: hasPhoto ? "Have a better photo?" : "No photo available here",
-          body: `${hasPhoto ? "Upload a clearer photo" : "Upload a photo"} for ${streetPartDisplayName(ctx.part)} from Settings → Photo crowdsourcing. Photos go through CV first review, then human-in-the-loop approval by selected company staff.`,
-          street_part_external_id: ctx.part.id,
-        }, { toast: true, persist: false });
+        createNotification(
+          {
+            source: "system",
+            title: hasPhoto
+              ? "Have a better photo?"
+              : "No photo available here",
+            body: `${hasPhoto ? "Upload a clearer photo" : "Upload a photo"} for ${streetPartDisplayName(ctx.part)} from Settings → Photo crowdsourcing. Photos go through CV first review, then human-in-the-loop approval by selected company staff.`,
+            street_part_external_id: ctx.part.id,
+          },
+          { toast: true, persist: false },
+        );
       }
       function renderPhotoUploadPanel(kindOverride = null) {
         if (state.mode !== "street") return;
@@ -1573,26 +1794,40 @@
       }
       async function analyzeUploadedStreetPhoto(file) {
         if (!file?.type?.startsWith("image/")) {
-          return { ok: false, score: 0, message: "Please upload an image file." };
+          return {
+            ok: false,
+            score: 0,
+            message: "Please upload an image file.",
+          };
         }
         if (file.size > 8 * 1024 * 1024) {
-          return { ok: false, score: 0, message: "Photo is too large. Please keep uploads below 8 MB." };
+          return {
+            ok: false,
+            score: 0,
+            message: "Photo is too large. Please keep uploads below 8 MB.",
+          };
         }
         const img = await loadImageForCv(file);
-        const minDimensionOk = img.naturalWidth >= 900 && img.naturalHeight >= 500;
+        const minDimensionOk =
+          img.naturalWidth >= 900 && img.naturalHeight >= 500;
         const aspect = img.naturalWidth / Math.max(1, img.naturalHeight);
         const aspectOk = aspect >= 1.05 && aspect <= 2.4;
         const canvas = document.createElement("canvas");
-        const w = 256, h = 144;
+        const w = 256,
+          h = 144;
         canvas.width = w;
         canvas.height = h;
         const ctx = canvas.getContext("2d", { willReadFrequently: true });
         ctx.drawImage(img, 0, 0, w, h);
         const data = ctx.getImageData(0, 0, w, h).data;
-        let sum = 0, sumSq = 0, edge = 0, saturated = 0;
+        let sum = 0,
+          sumSq = 0,
+          edge = 0,
+          saturated = 0;
         const lum = new Float32Array(w * h);
         for (let i = 0, j = 0; i < data.length; i += 4, j++) {
-          const y = 0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2];
+          const y =
+            0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2];
           lum[j] = y;
           sum += y;
           sumSq += y * y;
@@ -1601,14 +1836,19 @@
         for (let y = 1; y < h; y++) {
           for (let x = 1; x < w; x++) {
             const idx = y * w + x;
-            edge += Math.abs(lum[idx] - lum[idx - 1]) + Math.abs(lum[idx] - lum[idx - w]);
+            edge +=
+              Math.abs(lum[idx] - lum[idx - 1]) +
+              Math.abs(lum[idx] - lum[idx - w]);
           }
         }
         const n = w * h;
         const brightness = sum / n;
-        const contrast = Math.sqrt(Math.max(0, sumSq / n - brightness * brightness));
+        const contrast = Math.sqrt(
+          Math.max(0, sumSq / n - brightness * brightness),
+        );
         const edgeScore = edge / n;
-        const exposureOk = brightness >= 42 && brightness <= 220 && saturated / n < 0.28;
+        const exposureOk =
+          brightness >= 42 && brightness <= 220 && saturated / n < 0.28;
         const contrastOk = contrast >= 18;
         const detailOk = edgeScore >= 12;
         let score = 0;
@@ -1622,7 +1862,9 @@
           aspectOk ? "street-view aspect ok" : "unusual crop/aspect",
           exposureOk ? "exposure ok" : "too dark/bright or blown out",
           contrastOk ? "contrast ok" : "too flat/blank",
-          detailOk ? "detail/edge evidence ok" : "too blurry or lacks street detail",
+          detailOk
+            ? "detail/edge evidence ok"
+            : "too blurry or lacks street detail",
         ];
         const ok = score >= 75;
         return {
@@ -1642,7 +1884,8 @@
         return {
           id: row?.external_id || `crowd_${Date.now()}`,
           db_id: row?.id || null,
-          external_id: row?.external_id || `crowd_${partExternalId}_${Date.now()}`,
+          external_id:
+            row?.external_id || `crowd_${partExternalId}_${Date.now()}`,
           street_part_id: partExternalId,
           street_view_node_id: nodeExternalId,
           source: "crowd",
@@ -1650,11 +1893,17 @@
           thumb_2048_url: row?.image_url || publicUrl,
           lng: row?.lng ?? ctx.node?.lng ?? ctx.part?.midpoint?.[0],
           lat: row?.lat ?? ctx.node?.lat ?? ctx.part?.midpoint?.[1],
-          compass_angle_deg: row?.compass_angle_deg ?? ctx.node?.canonical_heading_deg ?? 0,
-          heading_role: row?.heading_role || ctx.existing?.heading_role || "canonical",
-          desired_orientation: row?.desired_orientation || ctx.part?.desired_orientation || "road_right",
+          compass_angle_deg:
+            row?.compass_angle_deg ?? ctx.node?.canonical_heading_deg ?? 0,
+          heading_role:
+            row?.heading_role || ctx.existing?.heading_role || "canonical",
+          desired_orientation:
+            row?.desired_orientation ||
+            ctx.part?.desired_orientation ||
+            "road_right",
           direction_valid: true,
-          direction_confidence: row?.direction_confidence ?? Math.min(1, cv.score / 100),
+          direction_confidence:
+            row?.direction_confidence ?? Math.min(1, cv.score / 100),
           is_pano: false,
           is_active: false,
           validation_status: "pending_human_review",
@@ -1665,7 +1914,10 @@
       async function handlePhotoUploadFile(file) {
         const ctx = state.currentPhotoUploadContext || photoUploadContext();
         if (!ctx.part?.db_id) {
-          setUploadStatus("Upload needs the live Supabase registry. Switch off localRegistry fallback and reload.", "err");
+          setUploadStatus(
+            "Upload needs the live Supabase registry. Switch off localRegistry fallback and reload.",
+            "err",
+          );
           return;
         }
         setUploadStatus("Running computer-vision quality check…");
@@ -1675,7 +1927,8 @@
           return;
         }
         setUploadStatus(`${cv.message}. Uploading to database…`, "ok");
-        const safeName = file.name.replace(/[^a-z0-9._-]+/gi, "_").slice(-80) || "photo.jpg";
+        const safeName =
+          file.name.replace(/[^a-z0-9._-]+/gi, "_").slice(-80) || "photo.jpg";
         const externalId = `crowd_${ctx.part.id}_${Date.now()}`;
         const storagePath = `${ctx.part.id}/${externalId}_${safeName}`;
         const publicUrl = await uploadStreetPhotoFile(file, storagePath);
@@ -1699,7 +1952,10 @@
           is_pano: false,
           is_active: false,
           validation_status: "pending_human_review",
-          selected_reason: ctx.kind === "replace" ? "crowd_upload_better_photo_cv_passed" : "crowd_upload_missing_photo_cv_passed",
+          selected_reason:
+            ctx.kind === "replace"
+              ? "crowd_upload_better_photo_cv_passed"
+              : "crowd_upload_missing_photo_cv_passed",
           replaces_photo_id: ctx.existing?.db_id || null,
           metadata: {
             cv_validation: cv,
@@ -1711,13 +1967,25 @@
         await supabaseInsert("photo_review_jobs", {
           photo_id: row?.id || null,
           submitted_by_user_external_id: state.appUser.external_id || null,
-          company_external_id: state.appUser.company_external_id || state.appUser.organization || "jalanlens_demo_company",
+          company_external_id:
+            state.appUser.company_external_id ||
+            state.appUser.organization ||
+            "jalanlens_demo_company",
           street_part_external_id: ctx.part.id,
           review_stage: "staff_review",
           cv_review_status: "passed",
           human_review_status: "pending",
           assigned_staff_external_ids: [],
-          progress_payload: { cv, upload_context: ctx.kind, status_steps: ["Upload", "CV first review", "Staff review", "Approved"] },
+          progress_payload: {
+            cv,
+            upload_context: ctx.kind,
+            status_steps: [
+              "Upload",
+              "CV first review",
+              "Staff review",
+              "Approved",
+            ],
+          },
         }).catch((e) => console.warn("photo review job unavailable", e));
         const normalized = localPhotoFromDbRow(row, ctx, publicUrl, cv);
         state.streetRegistry.street_photos = [
@@ -1726,7 +1994,10 @@
         ];
         state.streetImages = [normalized, ...(state.streetImages || [])];
         state.streetImageIndex = 0;
-        setUploadStatus("Photo passed CV review and is now waiting for human staff approval.", "ok");
+        setUploadStatus(
+          "Photo passed CV review and is now waiting for human staff approval.",
+          "ok",
+        );
         renderStreetPhoto(0);
       }
       function clampSatelliteZoom() {
@@ -1793,7 +2064,13 @@
         const box = document.getElementById("satelliteFallback");
         if (!box) return;
         const center = map.getCenter(),
-          z = Math.max(15, Math.min(SATELLITE_MAX_NATIVE_ZOOM, Math.round(map.getZoom() || 17)));
+          z = Math.max(
+            15,
+            Math.min(
+              SATELLITE_MAX_NATIVE_ZOOM,
+              Math.round(map.getZoom() || 17),
+            ),
+          );
         const w = innerWidth,
           h = innerHeight,
           tile = 256;
@@ -1825,14 +2102,23 @@
       async function loadRoadNameData() {
         if (state.roadNameData) return state.roadNameData;
         try {
-          const data = await fetch("../threejs_3d_roads.json").then((r) => r.json());
-          const anchor = data.anchor_center || data.anchor || [103.7716, 1.3062];
+          const data = await fetch("../threejs_3d_roads.json").then((r) =>
+            r.json(),
+          );
+          const anchor = data.anchor_center ||
+            data.anchor || [103.7716, 1.3062];
           const latScale = 111320;
           const lonScale = 111320 * Math.cos((anchor[1] * Math.PI) / 180);
           const roads = (data.mesh_roads || [])
-            .filter((r) => r.name && r.name !== "Unnamed Road" && r.coordinates?.length)
+            .filter(
+              (r) =>
+                r.name && r.name !== "Unnamed Road" && r.coordinates?.length,
+            )
             .map((r) => {
-              const coords = r.coordinates.map((c) => [anchor[0] + Number(c[0] || 0) / lonScale, anchor[1] - Number(c[2] || 0) / latScale]);
+              const coords = r.coordinates.map((c) => [
+                anchor[0] + Number(c[0] || 0) / lonScale,
+                anchor[1] - Number(c[2] || 0) / latScale,
+              ]);
               const mid = coords[Math.floor(coords.length / 2)] || coords[0];
               return { name: r.name, fclass: r.fclass, coords, mid };
             });
@@ -1858,7 +2144,9 @@
       function streetPartAddress(part, f = null) {
         const coord = part?.midpoint || (f ? middle(f) : null);
         const road = nearestRoadName(coord);
-        const suffix = coord ? ` · ${coord[1].toFixed(5)}, ${coord[0].toFixed(5)}` : "";
+        const suffix = coord
+          ? ` · ${coord[1].toFixed(5)}, ${coord[0].toFixed(5)}`
+          : "";
         return `Near ${road}, Singapore${suffix}`;
       }
       function renderRoadNameLabels() {
@@ -2011,7 +2299,7 @@
             opacity: 0.8,
           }),
         );
-        scene.add(t.route);
+        // scene.add(t.route);
         const glow = new THREE.PointLight(0x38bdf8, 1, 90);
         glow.position.copy(t.pathPoints[0]);
         scene.add(glow);
@@ -2039,10 +2327,6 @@
           scene.add(ramp);
           t.ramps.push(ramp);
         });
-        const a1 = makeAgent(0x22f36e, "wheelchair"),
-          a2 = makeAgent(0x60a5fa, "pma");
-        scene.add(a1, a2);
-        t.agents.push(a1, a2);
       }
       function animateThreeOverlay() {
         const t = state.three;
@@ -2100,7 +2384,9 @@
           (f) => f.properties.kind === "route_segment",
         );
         const routeGeoms = allRoutes.map((f, i) => {
-          const selectable = f.properties.feature_type !== "kerb_line" && (!hasRegistryParts || registryIds.has(f.properties.id));
+          const selectable =
+            f.properties.feature_type !== "kerb_line" &&
+            (!hasRegistryParts || registryIds.has(f.properties.id));
           const selectableIndex = selectable ? state.segments.indexOf(f) : -1;
           return new maptalks.LineString(f.geometry.coordinates, {
             properties: { ...f.properties, index: selectableIndex },
@@ -2147,7 +2433,9 @@
             .map((part) => {
               const idx = segmentIndexForStreetPart(part);
               const score = part.metrics?.overall_accessibility_score ?? "–";
-              const len = Math.round(part.length_m || part.metrics?.length_m || 0);
+              const len = Math.round(
+                part.length_m || part.metrics?.length_m || 0,
+              );
               return `<option value="${idx >= 0 ? idx : 0}">${streetPartDisplayName(part)} · ${len}m · ${score}</option>`;
             })
             .join("");
@@ -2258,7 +2546,9 @@
       }
       function personaPartOptionLabel(part) {
         const score = part.metrics?.overall_accessibility_score ?? "–";
-        const street = (state.streetRegistry?.streets || []).find((s) => s.id === part.street_id);
+        const street = (state.streetRegistry?.streets || []).find(
+          (s) => s.id === part.street_id,
+        );
         return `${streetPartDisplayName(part)} · ${Math.round(part.length_m || 0)}m · ${score}/100${street?.name ? " · " + street.name : ""}`;
       }
       function populatePersonaSelector() {
@@ -2267,7 +2557,8 @@
           const options = Object.entries(sim.personas)
             .map(([pid, p]) => `<option value="${pid}">${p.label}</option>`)
             .join("");
-          if (personaSelect.innerHTML !== options) personaSelect.innerHTML = options;
+          if (personaSelect.innerHTML !== options)
+            personaSelect.innerHTML = options;
           if (!state.activePersonaId || !sim.personas[state.activePersonaId]) {
             state.activePersonaId = Object.keys(sim.personas)[0] || null;
           }
@@ -2278,14 +2569,30 @@
           };
         }
         const parts = state.streetRegistry?.street_parts || [];
-        if (window.personaStartSelect && window.personaEndSelect && parts.length) {
-          const options = parts.map((part) => `<option value="${part.id}">${personaPartOptionLabel(part)}</option>`).join("");
-          if (personaStartSelect.innerHTML !== options) personaStartSelect.innerHTML = options;
-          if (personaEndSelect.innerHTML !== options) personaEndSelect.innerHTML = options;
+        if (
+          window.personaStartSelect &&
+          window.personaEndSelect &&
+          parts.length
+        ) {
+          const options = parts
+            .map(
+              (part) =>
+                `<option value="${part.id}">${personaPartOptionLabel(part)}</option>`,
+            )
+            .join("");
+          if (personaStartSelect.innerHTML !== options)
+            personaStartSelect.innerHTML = options;
+          if (personaEndSelect.innerHTML !== options)
+            personaEndSelect.innerHTML = options;
           const current = currentStreetPart() || parts[0];
           state.activeRouteStartPartId ||= current?.id || parts[0]?.id;
-          const startIndex = Math.max(0, parts.findIndex((p) => p.id === state.activeRouteStartPartId));
-          state.activeRouteEndPartId ||= parts[Math.min(parts.length - 1, Math.max(4, startIndex + 4))]?.id || parts.at(-1)?.id;
+          const startIndex = Math.max(
+            0,
+            parts.findIndex((p) => p.id === state.activeRouteStartPartId),
+          );
+          state.activeRouteEndPartId ||=
+            parts[Math.min(parts.length - 1, Math.max(4, startIndex + 4))]
+              ?.id || parts.at(-1)?.id;
           personaStartSelect.value = state.activeRouteStartPartId;
           personaEndSelect.value = state.activeRouteEndPartId;
           personaStartSelect.onchange = () => {
@@ -2313,22 +2620,40 @@
         const a = parts.findIndex((p) => p.id === startId);
         const b = parts.findIndex((p) => p.id === endId);
         if (a < 0 || b < 0) return [];
-        const lo = Math.min(a, b), hi = Math.max(a, b);
+        const lo = Math.min(a, b),
+          hi = Math.max(a, b);
         return parts.slice(lo, hi + 1);
       }
       function personaForPart(part, personaId = state.activePersonaId) {
         return personaPartFor(part.id)?.personas?.[personaId] || null;
       }
       function renderPersonaRouteSummary() {
-        const parts = routePartsBetween(state.activeRouteStartPartId, state.activeRouteEndPartId);
+        const parts = routePartsBetween(
+          state.activeRouteStartPartId,
+          state.activeRouteEndPartId,
+        );
         if (!parts.length) return renderPersonaForCurrentPart();
         const personaLabel = personaSummary()?.label || "Persona";
-        const scored = parts.map((part) => ({ part, persona: personaForPart(part) })).filter((x) => x.persona);
-        const avg = scored.length ? Math.round(scored.reduce((sum, x) => sum + Number(x.persona.score || 0), 0) / scored.length) : "–";
-        const worst = scored.slice().sort((a, b) => Number(a.persona.score || 999) - Number(b.persona.score || 999))[0];
-        const start = parts[0], end = parts.at(-1);
+        const scored = parts
+          .map((part) => ({ part, persona: personaForPart(part) }))
+          .filter((x) => x.persona);
+        const avg = scored.length
+          ? Math.round(
+              scored.reduce((sum, x) => sum + Number(x.persona.score || 0), 0) /
+                scored.length,
+            )
+          : "–";
+        const worst = scored
+          .slice()
+          .sort(
+            (a, b) =>
+              Number(a.persona.score || 999) - Number(b.persona.score || 999),
+          )[0];
+        const start = parts[0],
+          end = parts.at(-1);
         const selectedIdx = segmentIndexForStreetPart(start);
-        if (selectedIdx >= 0 && state.selectedIndex !== selectedIdx) selectSegment(selectedIdx, false);
+        if (selectedIdx >= 0 && state.selectedIndex !== selectedIdx)
+          selectSegment(selectedIdx, false);
         personaRecommendation.innerHTML = `<div class="persona-route-summary"><b>${personaLabel} route</b><br>${streetPartDisplayName(start)} → ${streetPartDisplayName(end)}: ${avg}/100 across ${parts.length} street parts<br>${worst ? `Worst: ${streetPartDisplayName(worst.part)} · ${worst.persona.score}/100 · ${(worst.persona.blocker_labels || []).join(", ") || "no major blocker"}<br>${worst.persona.recommended_improvement}` : "No persona scores for this route yet."}</div>`;
       }
       function renderPersonaForCurrentPart() {
@@ -2346,7 +2671,9 @@
           const summary = personaSummary();
           const first = summary?.priority_street_parts?.[0];
           const firstPart = first
-            ? (state.streetRegistry?.street_parts || []).find((p) => p.id === first.street_part_id)
+            ? (state.streetRegistry?.street_parts || []).find(
+                (p) => p.id === first.street_part_id,
+              )
             : null;
           personaRecommendation.innerHTML = first
             ? `<b>Priority:</b> ${summary.label} · ${firstPart ? streetPartDisplayName(firstPart) : first.street_part_id} · ${first.score}/100<br>${first.recommended_improvement}`
@@ -2369,7 +2696,8 @@
           kind: "street_part",
           feature_type: "footpath",
           overall_accessibility_score:
-            part.metrics?.overall_accessibility_score ?? raw.overall_accessibility_score,
+            part.metrics?.overall_accessibility_score ??
+            raw.overall_accessibility_score,
           metrics: {
             length_m: part.length_m,
             source_segment_count: part.metrics?.source_segment_count,
@@ -2379,7 +2707,12 @@
         };
       }
       function htmlEscape(value) {
-        return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+        return String(value ?? "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
       }
       function hashString(text) {
         let h = 2166136261;
@@ -2390,14 +2723,21 @@
         return h >>> 0;
       }
       function singaporeHour(nowMs = Date.now()) {
-        return Number(new Intl.DateTimeFormat("en-SG", { hour: "numeric", hour12: false, timeZone: "Asia/Singapore" }).format(new Date(nowMs)));
+        return Number(
+          new Intl.DateTimeFormat("en-SG", {
+            hour: "numeric",
+            hour12: false,
+            timeZone: "Asia/Singapore",
+          }).format(new Date(nowMs)),
+        );
       }
       function agentActivityFor(agent, nowMs = Date.now()) {
         const hour = singaporeHour(nowMs);
         const persona = String(agent.persona_type_id || "");
         if (hour < 6) return "home / resting";
         if (hour < 10) {
-          if (persona.includes("student") || persona.includes("child")) return "choosing route to school";
+          if (persona.includes("student") || persona.includes("child"))
+            return "choosing route to school";
           if (persona.includes("stroller")) return "school drop-off";
           return "morning commute";
         }
@@ -2412,21 +2752,40 @@
       function liveAgentRouteParts(agent) {
         const parts = state.streetRegistry?.street_parts || [];
         if (!parts.length) return [];
-        const h = hashString(agent.agent_external_id || agent.display_name || agent.persona_type_id);
+        const h = hashString(
+          agent.agent_external_id ||
+            agent.display_name ||
+            agent.persona_type_id,
+        );
         const span = Math.min(parts.length, 5 + (h % 12));
         const start = h % parts.length;
         const dir = h & 1 ? 1 : -1;
         const route = [];
-        for (let i = 0; i < span; i++) route.push(parts[(start + dir * i + parts.length * 4) % parts.length]);
-        return route.filter((p) => Array.isArray(p.midpoint) && p.midpoint.length >= 2);
+        for (let i = 0; i < span; i++)
+          route.push(
+            parts[(start + dir * i + parts.length * 4) % parts.length],
+          );
+        return route.filter(
+          (p) => Array.isArray(p.midpoint) && p.midpoint.length >= 2,
+        );
       }
       function streetPartFootpathCoords(part) {
-        const coords = part?.geometry?.type === "LineString" ? part.geometry.coordinates : [];
+        const coords =
+          part?.geometry?.type === "LineString"
+            ? part.geometry.coordinates
+            : [];
         const clean = coords
-          .filter((c) => Array.isArray(c) && Number.isFinite(Number(c[0])) && Number.isFinite(Number(c[1])))
+          .filter(
+            (c) =>
+              Array.isArray(c) &&
+              Number.isFinite(Number(c[0])) &&
+              Number.isFinite(Number(c[1])),
+          )
           .map((c) => [Number(c[0]), Number(c[1])]);
         if (clean.length >= 2) return clean;
-        return Array.isArray(part?.midpoint) ? [[Number(part.midpoint[0]), Number(part.midpoint[1])]] : [];
+        return Array.isArray(part?.midpoint)
+          ? [[Number(part.midpoint[0]), Number(part.midpoint[1])]]
+          : [];
       }
       function liveAgentPathSegments(agent) {
         const parts = liveAgentRouteParts(agent);
@@ -2441,7 +2800,8 @@
             if (backward < forward) coords = coords.slice().reverse();
           }
           for (let i = 0; i < coords.length - 1; i++) {
-            const a = coords[i], b = coords[i + 1];
+            const a = coords[i],
+              b = coords[i + 1];
             const lengthM = distM(a, b);
             if (lengthM > 0.05) segments.push({ a, b, part, lengthM });
           }
@@ -2451,11 +2811,22 @@
       }
       function liveAgentPosition(agent, nowMs = Date.now()) {
         const segments = liveAgentPathSegments(agent);
-        if (!segments.length) return { coord: [Number(agent.lng), Number(agent.lat)], part: null };
-        const h = hashString(agent.agent_external_id || agent.display_name || agent.persona_type_id);
+        if (!segments.length)
+          return { coord: [Number(agent.lng), Number(agent.lat)], part: null };
+        const h = hashString(
+          agent.agent_external_id ||
+            agent.display_name ||
+            agent.persona_type_id,
+        );
         const totalM = segments.reduce((sum, seg) => sum + seg.lengthM, 0);
-        const loopSeconds = Math.max(45, totalM / Math.max(0.45, Number(agent.state?.speed_mps || 1))) + (h % 25);
-        let targetM = (((nowMs / 1000 + (h % 997)) % loopSeconds) / loopSeconds) * totalM;
+        const loopSeconds =
+          Math.max(
+            45,
+            totalM / Math.max(0.45, Number(agent.state?.speed_mps || 1)),
+          ) +
+          (h % 25);
+        let targetM =
+          (((nowMs / 1000 + (h % 997)) % loopSeconds) / loopSeconds) * totalM;
         for (const seg of segments) {
           if (targetM <= seg.lengthM) {
             const local = seg.lengthM ? targetM / seg.lengthM : 0;
@@ -2495,8 +2866,24 @@
           const marker = new maptalks.Marker(liveAgentCoordinate(agent), {
             properties: { agent },
             symbol: [
-              { markerType: "ellipse", markerWidth: 12, markerHeight: 12, markerFill: "#ffffff", markerLineColor: "#020617", markerLineWidth: 2, markerOpacity: 0.96 },
-              { markerType: "ellipse", markerWidth: 7, markerHeight: 7, markerFill: color, markerLineColor: color, markerLineWidth: 1, markerOpacity: persona.category === "general" ? 0.66 : 0.96 },
+              {
+                markerType: "ellipse",
+                markerWidth: 12,
+                markerHeight: 12,
+                markerFill: "#ffffff",
+                markerLineColor: "#020617",
+                markerLineWidth: 2,
+                markerOpacity: 0.96,
+              },
+              {
+                markerType: "ellipse",
+                markerWidth: 7,
+                markerHeight: 7,
+                markerFill: color,
+                markerLineColor: color,
+                markerLineWidth: 1,
+                markerOpacity: persona.category === "general" ? 0.66 : 0.96,
+              },
             ],
           });
           marker.setInfoWindow({
@@ -2515,7 +2902,11 @@
       }
       function animateLiveAgents() {
         const snapshot = state.liveAgentSnapshot;
-        if (!snapshot?.agent_live_states?.length || !state.liveAgentMarkers.size) return;
+        if (
+          !snapshot?.agent_live_states?.length ||
+          !state.liveAgentMarkers.size
+        )
+          return;
         const wallMs = Date.now();
         snapshot.agent_live_states.forEach((agent) => {
           const id = agent.agent_external_id || agent.display_name;
@@ -2527,7 +2918,8 @@
           agent.lng = Number(coord[0].toFixed(7));
           agent.lat = Number(coord[1].toFixed(7));
           agent.activity = agentActivityFor(agent, wallMs);
-          if (position.part?.id) agent.street_part_external_id = position.part.id;
+          if (position.part?.id)
+            agent.street_part_external_id = position.part.id;
         });
         renderStreetAgentCounts();
       }
@@ -2535,7 +2927,10 @@
         syncLiveAgentMarkers();
         animateLiveAgents();
         if (!state.liveAgentAnimationInterval) {
-          state.liveAgentAnimationInterval = setInterval(animateLiveAgents, 1000);
+          state.liveAgentAnimationInterval = setInterval(
+            animateLiveAgents,
+            1000,
+          );
         }
       }
 
@@ -2544,10 +2939,15 @@
         (state.liveAgentSnapshot?.agent_live_states || []).forEach((agent) => {
           if (!agent.street_part_external_id) return;
           if (!grouped.has(agent.street_part_external_id)) {
-            grouped.set(agent.street_part_external_id, { street_part_external_id: agent.street_part_external_id, persona_counts: {}, total_count: 0 });
+            grouped.set(agent.street_part_external_id, {
+              street_part_external_id: agent.street_part_external_id,
+              persona_counts: {},
+              total_count: 0,
+            });
           }
           const row = grouped.get(agent.street_part_external_id);
-          row.persona_counts[agent.persona_type_id] = (row.persona_counts[agent.persona_type_id] || 0) + 1;
+          row.persona_counts[agent.persona_type_id] =
+            (row.persona_counts[agent.persona_type_id] || 0) + 1;
           row.total_count += 1;
         });
         return grouped;
@@ -2565,7 +2965,10 @@
         const personaTypes = snapshot?.persona_types || {};
         const pills = Object.entries(row.persona_counts || {})
           .sort((a, b) => b[1] - a[1])
-          .map(([pid, count]) => `<span class="count-pill"><b style="color:${personaTypes[pid]?.color || "#bae6fd"}">${count}</b> ${htmlEscape((personaTypes[pid]?.label || pid).replaceAll("_", " "))}</span>`)
+          .map(
+            ([pid, count]) =>
+              `<span class="count-pill"><b style="color:${personaTypes[pid]?.color || "#bae6fd"}">${count}</b> ${htmlEscape((personaTypes[pid]?.label || pid).replaceAll("_", " "))}</span>`,
+          )
           .join("");
         streetAgentCounts.classList.add("visible");
         streetAgentCounts.innerHTML = `<b>Live synthetic agents on this street part</b><div class="count-grid">${pills}</div><small>${row.total_count} currently here · synthetic, not real-person tracking</small>`;
@@ -2573,7 +2976,9 @@
 
       async function loadLiveAgentSnapshot() {
         try {
-          const r = await fetch(`../data/live_persona_simulation_snapshot.json?t=${Date.now()}`);
+          const r = await fetch(
+            `../data/live_persona_simulation_snapshot.json?t=${Date.now()}`,
+          );
           if (!r.ok) throw new Error(`snapshot ${r.status}`);
           const snapshot = await r.json();
           state.liveAgentSnapshot = snapshot;
@@ -2591,19 +2996,23 @@
           " ",
         );
         const baseName = p.name || "Feature";
-        const cleanType = typeLabel && typeLabel !== "street part" ? typeLabel : "";
+        const cleanType =
+          typeLabel && typeLabel !== "street part" ? typeLabel : "";
         const kindLabel = capitalizeKind(kind || "");
         // Keep the scorecard clean: the title/description already name the
         // feature type, so do not repeat "Shelter" / "Ramp" as a second line.
         selectedKind.textContent = "";
-        selectedName.textContent = cleanType && !baseName.toLowerCase().includes(cleanType.toLowerCase())
-          ? `${baseName} · ${cleanType}`
-          : baseName;
+        selectedName.textContent =
+          cleanType && !baseName.toLowerCase().includes(cleanType.toLowerCase())
+            ? `${baseName} · ${cleanType}`
+            : baseName;
         selectedDesc.textContent = p.metrics?.length_m
           ? `${p.address ? p.address + " · " : ""}${Math.round(p.metrics.length_m * 10) / 10} m street part`
           : `${kindLabel || cleanType}${extras.distanceM != null ? ` · ~${Math.round(extras.distanceM)}m from camera` : ""}`;
-        const detailScore = p.overall_accessibility_score ?? extras.score ?? null;
-        activeScore.textContent = detailScore == null ? "–" : `${detailScore}/100`;
+        const detailScore =
+          p.overall_accessibility_score ?? extras.score ?? null;
+        activeScore.textContent =
+          detailScore == null ? "–" : `${detailScore}/100`;
         const m = p.metrics,
           c = p.component_scores;
         if (m && c) {
@@ -2667,7 +3076,12 @@
         } else {
           enterEarth();
           map.animateTo(
-            { center: mid, zoom: SATELLITE_MAX_NATIVE_ZOOM, pitch: 0, bearing: 0 },
+            {
+              center: mid,
+              zoom: SATELLITE_MAX_NATIVE_ZOOM,
+              pitch: 0,
+              bearing: 0,
+            },
             { duration: 500 },
           );
           renderSegmentButtons();
@@ -2730,10 +3144,16 @@
         return out;
       }
       function photoDirectionLabel(img) {
-        const role = img?.heading_role || img?.metadata?.selected_heading_option?.heading_role;
-        const orientation = img?.desired_orientation || img?.metadata?.selected_heading_option?.orientation;
-        if (role === "opposite" || orientation === "road_left_pavement_right") return "opposite view · pavement right";
-        if (role === "canonical" || orientation === "road_right") return "canonical view · road right";
+        const role =
+          img?.heading_role ||
+          img?.metadata?.selected_heading_option?.heading_role;
+        const orientation =
+          img?.desired_orientation ||
+          img?.metadata?.selected_heading_option?.orientation;
+        if (role === "opposite" || orientation === "road_left_pavement_right")
+          return "opposite view · pavement right";
+        if (role === "canonical" || orientation === "road_right")
+          return "canonical view · road right";
         return "direction view";
       }
       function renderStreetPhoto(index = 0) {
@@ -2770,7 +3190,8 @@
         earthSource.textContent = `Mapillary ${state.streetImageIndex + 1}/${imgs.length} · ${direction} · ${cvCount ? cvCount + " CV-localized feature pins" : "map-projected feature pins"}`;
         if (window.directionBtn) {
           directionBtn.disabled = imgs.length < 2;
-          directionBtn.textContent = imgs.length > 1 ? `Swap direction (${imgs.length})` : direction;
+          directionBtn.textContent =
+            imgs.length > 1 ? `Swap direction (${imgs.length})` : direction;
         }
         renderPhotoUploadPanel("replace");
         setTimeout(() => renderSegmentButtons(true), 120);
@@ -2794,7 +3215,12 @@
         earthSource.textContent =
           "loading active street-part photo, Earth satellite stays behind";
         map.animateTo(
-          { center: coord, zoom: SATELLITE_MAX_NATIVE_ZOOM, pitch: 78, bearing: brg },
+          {
+            center: coord,
+            zoom: SATELLITE_MAX_NATIVE_ZOOM,
+            pitch: 78,
+            bearing: brg,
+          },
           { duration: 350 },
         );
         setupMiniMap();
@@ -2843,10 +3269,14 @@
         map.setPitch(0);
         map.setBearing(0);
         renderSegmentButtons(false);
-        if (window.photoUploadPanel) photoUploadPanel.classList.remove("visible");
+        if (window.photoUploadPanel)
+          photoUploadPanel.classList.remove("visible");
         renderSatelliteFallback();
         renderRoadNameLabels();
-        setTimeout(() => { updateThreeOverlay(); renderRoadNameLabels(); }, 80);
+        setTimeout(() => {
+          updateThreeOverlay();
+          renderRoadNameLabels();
+        }, 80);
       }
       function setupMiniMap() {
         if (state.miniMap) return;
@@ -2901,7 +3331,10 @@
           p = f.properties;
         showDetail(p, kind);
         selectedDesc.textContent = featureComment(p, kind);
-        activeScore.textContent = p.overall_accessibility_score == null ? "–" : `${p.overall_accessibility_score}/100`;
+        activeScore.textContent =
+          p.overall_accessibility_score == null
+            ? "–"
+            : `${p.overall_accessibility_score}/100`;
         detailCard.classList.add("visible");
       }
       function normAngle(a) {
@@ -3016,8 +3449,11 @@
                 if (
                   existing.name &&
                   it.name &&
-                  String(existing.name).toLowerCase() === String(it.name).toLowerCase() &&
-                  Math.abs(Number(existing.distanceM || 0) - Number(it.distanceM || 0)) < 75
+                  String(existing.name).toLowerCase() ===
+                    String(it.name).toLowerCase() &&
+                  Math.abs(
+                    Number(existing.distanceM || 0) - Number(it.distanceM || 0),
+                  ) < 75
                 ) {
                   return true;
                 }
@@ -3029,8 +3465,10 @@
             : -1;
           if (nearIdx >= 0) {
             const prev = items[nearIdx];
-            const prevQuality = Number(prev.score || 0) - Number(prev.distanceM || 0) / 20;
-            const nextQuality = Number(it.score || 0) - Number(it.distanceM || 0) / 20;
+            const prevQuality =
+              Number(prev.score || 0) - Number(prev.distanceM || 0) / 20;
+            const nextQuality =
+              Number(it.score || 0) - Number(it.distanceM || 0) / 20;
             if (nextQuality > prevQuality) items[nearIdx] = { ...prev, ...it };
             return;
           }
@@ -3181,8 +3619,15 @@
               : `${kind} near this photo · ${Math.round(pt.d)}m away`;
             b.onclick = () => {
               if (x.f) {
-                showDetail(displayPropsForSegmentFeature(x.f), x.kind === "walkway" ? "" : kind);
-                if (x.kind !== "walkway") selectedDesc.textContent = featureComment(x.f.properties, kind);
+                showDetail(
+                  displayPropsForSegmentFeature(x.f),
+                  x.kind === "walkway" ? "" : kind,
+                );
+                if (x.kind !== "walkway")
+                  selectedDesc.textContent = featureComment(
+                    x.f.properties,
+                    kind,
+                  );
                 return;
               }
               showDetail(
@@ -3356,25 +3801,41 @@
         const parts = state.streetRegistry?.street_parts || [];
         if (!parts.length) return false;
         const current = currentStreetPart();
-        const currentIdx = Math.max(0, parts.findIndex((p) => p.id === current?.id));
-        const nextIdx = Math.max(0, Math.min(parts.length - 1, currentIdx + delta));
+        const currentIdx = Math.max(
+          0,
+          parts.findIndex((p) => p.id === current?.id),
+        );
+        const nextIdx = Math.max(
+          0,
+          Math.min(parts.length - 1, currentIdx + delta),
+        );
         const idx = segmentIndexForStreetPart(parts[nextIdx]);
         if (idx < 0) return false;
-        const nodeIdx = (state.streetRegistry?.street_view_nodes || []).findIndex((n) => n.street_part_id === parts[nextIdx].id);
+        const nodeIdx = (
+          state.streetRegistry?.street_view_nodes || []
+        ).findIndex((n) => n.street_part_id === parts[nextIdx].id);
         if (nodeIdx >= 0) state.streetNodeIndex = nodeIdx;
         selectSegment(idx, street);
         return true;
       }
       function updatePersonaToggleButton() {
         if (!window.togglePersonaPanelBtn || !window.personaPanel) return;
-        togglePersonaPanelBtn.textContent = personaPanel.classList.contains("visible")
+        togglePersonaPanelBtn.textContent = personaPanel.classList.contains(
+          "visible",
+        )
           ? "Hide persona agents"
           : "Show persona agents";
       }
       function togglePersonaPanel(force) {
         if (!window.personaPanel) return;
-        const show = typeof force === "boolean" ? force : !personaPanel.classList.contains("visible");
-        personaPanel.classList.toggle("visible", show && state.role === "authority");
+        const show =
+          typeof force === "boolean"
+            ? force
+            : !personaPanel.classList.contains("visible");
+        personaPanel.classList.toggle(
+          "visible",
+          show && state.role === "authority",
+        );
         if (show) renderPersonaPanel();
         updatePersonaToggleButton();
         renderManagedUsers();
@@ -3382,19 +3843,39 @@
       async function renderManagedUsers() {
         if (!window.managedUsersTable || state.role !== "authority") return;
         try {
-          const company = state.appUser.company_external_id || state.appUser.organization || "";
-          const filter = company ? `&company_external_id=eq.${encodeURIComponent(company)}` : "";
-          const rows = await supabaseRest("app_users", `select=external_id,username,full_name,display_name,department,position_title,employee_id,role,organization,platform_purpose,company_external_id&role=eq.authority${filter}&order=display_name.asc&limit=30`);
-          managedUsersTable.innerHTML = rows.length ? rows.map((u) => `<div class="managed-user-row"><b>${escapeHtml(u.full_name || u.display_name || u.username || u.external_id)}</b><small>${escapeHtml(u.employee_id || "no employee id")} · ${escapeHtml(u.department || "department pending")} · ${escapeHtml(u.position_title || "position pending")}</small></div>`).join("") : "No managed company users yet.";
+          const company =
+            state.appUser.company_external_id ||
+            state.appUser.organization ||
+            "";
+          const filter = company
+            ? `&company_external_id=eq.${encodeURIComponent(company)}`
+            : "";
+          const rows = await supabaseRest(
+            "app_users",
+            `select=external_id,username,full_name,display_name,department,position_title,employee_id,role,organization,platform_purpose,company_external_id&role=eq.authority${filter}&order=display_name.asc&limit=30`,
+          );
+          managedUsersTable.innerHTML = rows.length
+            ? rows
+                .map(
+                  (u) =>
+                    `<div class="managed-user-row"><b>${escapeHtml(u.full_name || u.display_name || u.username || u.external_id)}</b><small>${escapeHtml(u.employee_id || "no employee id")} · ${escapeHtml(u.department || "department pending")} · ${escapeHtml(u.position_title || "position pending")}</small></div>`,
+                )
+                .join("")
+            : "No managed company users yet.";
         } catch (e) {
-          managedUsersTable.textContent = "Account list unavailable until the admin schema is migrated.";
+          managedUsersTable.textContent =
+            "Account list unavailable until the admin schema is migrated.";
         }
       }
       async function createManagedUser() {
         if (!window.managedFullName || state.role !== "authority") return;
         const fullName = managedFullName.value.trim();
         if (!fullName) return;
-        const slug = fullName.toLowerCase().replace(/[^a-z0-9]+/g, ".").replace(/^\.|\.$/g, "") || `user.${Date.now()}`;
+        const slug =
+          fullName
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, ".")
+            .replace(/^\.|\.$/g, "") || `user.${Date.now()}`;
         const row = {
           external_id: `managed_${slug}_${Date.now()}`,
           username: slug,
@@ -3402,7 +3883,10 @@
           full_name: fullName,
           role: "authority",
           organization: state.appUser.organization || "",
-          company_external_id: state.appUser.company_external_id || state.appUser.organization || "jalanlens_demo_company",
+          company_external_id:
+            state.appUser.company_external_id ||
+            state.appUser.organization ||
+            "jalanlens_demo_company",
           managed_by_user_external_id: state.appUser.external_id || null,
           employee_id: managedEmployeeId.value.trim() || null,
           department: managedDepartment.value.trim() || null,
@@ -3415,17 +3899,43 @@
         };
         try {
           await supabaseInsert("app_users", row);
-          createNotification({ source: "system", title: "Managed user created", body: `${fullName} can now receive a username/password from the company admin.` }, { toast: true, persist: false });
-          [managedEmployeeId, managedFullName, managedDepartment, managedPosition, managedSalutation, managedPurpose].forEach((el) => { el.value = ""; });
+          createNotification(
+            {
+              source: "system",
+              title: "Managed user created",
+              body: `${fullName} can now receive a username/password from the company admin.`,
+            },
+            { toast: true, persist: false },
+          );
+          [
+            managedEmployeeId,
+            managedFullName,
+            managedDepartment,
+            managedPosition,
+            managedSalutation,
+            managedPurpose,
+          ].forEach((el) => {
+            el.value = "";
+          });
           renderManagedUsers();
         } catch (e) {
-          createNotification({ source: "system", title: "Account management unavailable", body: "Run the admin account schema migration in Supabase first." }, { toast: true, persist: false });
+          createNotification(
+            {
+              source: "system",
+              title: "Account management unavailable",
+              body: "Run the admin account schema migration in Supabase first.",
+            },
+            { toast: true, persist: false },
+          );
         }
       }
-      if (window.createManagedUserBtn) createManagedUserBtn.onclick = createManagedUser;
+      if (window.createManagedUserBtn)
+        createManagedUserBtn.onclick = createManagedUser;
       function bindHoverDropdown(select, maxSize = 8) {
         if (!select) return;
-        const close = () => { select.size = 0; };
+        const close = () => {
+          select.size = 0;
+        };
         select.addEventListener("mouseenter", () => {
           if (select.offsetParent === null) return;
           select.size = Math.min(maxSize, Math.max(2, select.options.length));
@@ -3460,13 +3970,17 @@
           selectSegment(state.selectedIndex + 1, state.mode === "street");
       };
       if (window.viewModeSelect) {
-        viewModeSelect.onchange = () => selectSegment(state.selectedIndex, viewModeSelect.value === "street");
+        viewModeSelect.onchange = () =>
+          selectSegment(state.selectedIndex, viewModeSelect.value === "street");
         bindHoverDropdown(viewModeSelect, 2);
       }
       bindHoverDropdown(segmentSelect, 10);
       if (window.themeToggleBtn) themeToggleBtn.onclick = cycleTheme;
-      if (window.notificationBellBtn) notificationBellBtn.onclick = () => notificationsPanel?.classList.toggle("visible");
-      if (window.clearNotificationsBtn) clearNotificationsBtn.onclick = clearNotificationHistory;
+      if (window.notificationBellBtn)
+        notificationBellBtn.onclick = () =>
+          notificationsPanel?.classList.toggle("visible");
+      if (window.clearNotificationsBtn)
+        clearNotificationsBtn.onclick = clearNotificationHistory;
       settingsBtn.onclick = () => {
         roleMenu?.classList.remove("visible");
         if (state.role === "authority") {
@@ -3475,7 +3989,8 @@
         }
       };
       closeSettings.onclick = () => settings.classList.remove("visible");
-      if (window.closeRoleMenu) closeRoleMenu.onclick = () => roleMenu.classList.remove("visible");
+      if (window.closeRoleMenu)
+        closeRoleMenu.onclick = () => roleMenu.classList.remove("visible");
       if (window.logoutBtn) logoutBtn.onclick = logoutToAuth;
       if (window.togglePersonaPanelBtn) {
         togglePersonaPanelBtn.onclick = () => togglePersonaPanel();
@@ -3507,20 +4022,30 @@
         onFeedbackRowsLoaded: (rows, ctx) => {
           rows.slice(0, 8).forEach((row) => {
             const id = `feedback_${row.source || "public"}_${row.id || row.agent_external_id || row.created_at}`;
-            createNotification({
-              id,
-              source: row.source || "public",
-              title: `${row.source === "agent_simulation" ? "Agent" : "Public"} feedback: ${row.title || "New report"}`,
-              body: row.body || "New feedback received.",
-              street_part_external_id: ctx.streetPartExternalId || row.street_part_external_id || null,
-              payload: { feedback_id: row.id || null, persona_type: row.persona_type || null },
-            }, { toast: false, persist: true });
+            createNotification(
+              {
+                id,
+                source: row.source || "public",
+                title: `${row.source === "agent_simulation" ? "Agent" : "Public"} feedback: ${row.title || "New report"}`,
+                body: row.body || "New feedback received.",
+                street_part_external_id:
+                  ctx.streetPartExternalId ||
+                  row.street_part_external_id ||
+                  null,
+                payload: {
+                  feedback_id: row.id || null,
+                  persona_type: row.persona_type || null,
+                },
+              },
+              { toast: false, persist: true },
+            );
           });
         },
       });
       applyRoleUi();
       if (window.saveMapillaryTokenBtn && window.mapillaryTokenInput) {
-        saveMapillaryTokenBtn.onclick = () => setToken(mapillaryTokenInput.value);
+        saveMapillaryTokenBtn.onclick = () =>
+          setToken(mapillaryTokenInput.value);
       }
       map.on("moving zooming resize viewchange", () => {
         renderSatelliteFallback();
@@ -3605,9 +4130,9 @@
           let localPhotos = [];
           if (!photosRaw.length) {
             try {
-              const localRegistry = await fetch("../data/street_view_registry.json").then((r) =>
-                r.ok ? r.json() : null,
-              );
+              const localRegistry = await fetch(
+                "../data/street_view_registry.json",
+              ).then((r) => (r.ok ? r.json() : null));
               localPhotos = localRegistry?.street_photos || [];
             } catch (localErr) {
               console.warn("local active-photo fallback unavailable", localErr);
@@ -3621,7 +4146,8 @@
                 street_part_id:
                   partByUuid.get(p.street_part_id) || p.street_part_id,
                 street_view_node_id:
-                  nodeByUuid.get(p.street_view_node_id) || p.street_view_node_id,
+                  nodeByUuid.get(p.street_view_node_id) ||
+                  p.street_view_node_id,
                 source: p.source,
                 source_image_id: p.source_image_id,
                 image_url: p.image_url,
@@ -3670,7 +4196,9 @@
           }));
           return {
             schema_version: 2,
-            source: photosRaw.length ? "supabase" : "supabase+local_active_photos",
+            source: photosRaw.length
+              ? "supabase"
+              : "supabase+local_active_photos",
             streets,
             street_parts: streetParts,
             street_view_nodes: nodes,
@@ -3696,37 +4224,46 @@
           .then((r) => (r.ok ? r.json() : null))
           .catch(() => null),
       ])
-        .then(async ([world, buildings, registry, cvInstances, personaSimulation]) => {
-          state.world = world;
-          state.buildings = buildings;
-          state.streetRegistry = registry;
-          state.photoFeatureInstances = cvInstances?.instances || [];
-          state.personaSimulation = personaSimulation;
-          renderPersonaPanel();
-          await loadRoadNameData();
-          renderBuildings(buildings);
-          renderWorld(world);
-          const ext = routeLayer.getExtent();
-          if (ext) map.fitExtent(ext, 0, { animation: false });
-          clampSatelliteZoom();
-          map.setPitch(0);
-          map.setBearing(0);
-          renderSatelliteFallback();
-          await loadLiveAgentSnapshot();
-          setInterval(loadLiveAgentSnapshot, 10000);
-          const streetCount = registry?.streets?.length || 0,
-            nodeCount = registry?.street_view_nodes?.length || 0,
-            src = registry?.source === "supabase"
-              ? "Supabase"
-              : registry?.source === "supabase+local_active_photos"
-                ? "Supabase + local active photos"
-                : "local JSON";
-          setStatus(
-            `Loaded ${(registry?.street_parts?.length || 0).toLocaleString()} street parts, ${streetCount} streets, ${nodeCount} street-view nodes from ${src}`,
-          );
-          await loadNotifications();
-          updateSettings();
-        })
+        .then(
+          async ([
+            world,
+            buildings,
+            registry,
+            cvInstances,
+            personaSimulation,
+          ]) => {
+            state.world = world;
+            state.buildings = buildings;
+            state.streetRegistry = registry;
+            state.photoFeatureInstances = cvInstances?.instances || [];
+            state.personaSimulation = personaSimulation;
+            renderPersonaPanel();
+            await loadRoadNameData();
+            renderBuildings(buildings);
+            renderWorld(world);
+            const ext = routeLayer.getExtent();
+            if (ext) map.fitExtent(ext, 0, { animation: false });
+            clampSatelliteZoom();
+            map.setPitch(0);
+            map.setBearing(0);
+            renderSatelliteFallback();
+            await loadLiveAgentSnapshot();
+            setInterval(loadLiveAgentSnapshot, 10000);
+            const streetCount = registry?.streets?.length || 0,
+              nodeCount = registry?.street_view_nodes?.length || 0,
+              src =
+                registry?.source === "supabase"
+                  ? "Supabase"
+                  : registry?.source === "supabase+local_active_photos"
+                    ? "Supabase + local active photos"
+                    : "local JSON";
+            setStatus(
+              `Loaded ${(registry?.street_parts?.length || 0).toLocaleString()} street parts, ${streetCount} streets, ${nodeCount} street-view nodes from ${src}`,
+            );
+            await loadNotifications();
+            updateSettings();
+          },
+        )
         .catch((e) => setStatus("Failed to load: " + e.message));
     </script>
   </body>
