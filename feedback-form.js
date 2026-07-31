@@ -361,13 +361,10 @@
   function detectFeedbackLanguage(text) {
     const value = String(text || "").trim();
     if (!value) return "en";
-    if (/[80-FF]/.test(value)) return "ta";
-    if (/[	80-	FF]/.test(value)) return "bn";
-    if (/[
-80-
-FF]/.test(value)) return "gu";
-    if (/[00-7F]/.test(value)) return "th";
-    if (/[E00-	FFF]/.test(value)) {
+    if (/[஀-௿]/.test(value)) return "ta";
+    if (/[ঀ-৿]/.test(value)) return "bn";
+    if (/[઀-૿]/.test(value)) return "gu";
+    if (/[一-鿿]/.test(value)) {
       return /[後這個門開關會讓無障礙臺灣繁體國裏]/.test(value) ? "zh-Hant" : "zh-Hans";
     }
     if (/[à-ž]/i.test(value) || /\b(saya|jalan|kerusi roda|terima kasih|tidak|boleh|laluan|bahaya|rosak)\b/i.test(value)) return "ms";
@@ -543,8 +540,8 @@ FF]/.test(value)) return "gu";
       original_text: body,
       english_translation: englishTranslation || null,
       translation_status: translation.status || (translation.language === "en" ? "not_required" : "error"),
-      translation_provider: translation.language !== "en" ? "agnes" : null,
-      translation_model: translation.language !== "en" ? AGNES_TRANSLATION_MODEL : null,
+      translation_provider: "agnes",
+      translation_model: AGNES_TRANSLATION_MODEL,
       speech_transcript_original: inputModality === "speech" ? (speechTranscriptOriginal || body) : null,
       input_modality: inputModality,
       created_by: null,
