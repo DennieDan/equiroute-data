@@ -5,66 +5,247 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/png" href="../assets/favicon.png" />
     <link rel="apple-touch-icon" href="../assets/jalanlens-icon-192.png" />
-    <title>JalanLens Profile</title>
-    <style>
-      :root { --bg:#020617; --profile-card:rgba(15,23,42,.94); --card:var(--profile-card); --line:rgba(125,211,252,.42); --txt:#f8fafc; --muted:#cbd5e1; --blue:#7dd3fc; --green:#4ade80; --red:#fb7185; }
-      * { box-sizing: border-box; }
-      body { min-height:100vh; margin:0; display:grid; place-items:center; padding:28px; background:radial-gradient(circle at 20% 10%,rgba(56,189,248,.2),transparent 30%),radial-gradient(circle at 80% 90%,rgba(34,197,94,.14),transparent 34%),var(--bg); color:var(--txt); font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
-      main { width:min(560px,100%); border:1px solid var(--line); border-radius:28px; padding:24px; background:var(--card); box-shadow:0 24px 80px rgba(0,0,0,.35); }
-      .profile-logo { width:72px; height:72px; object-fit:contain; display:block; margin-bottom:10px; }
-      .eyebrow { color:var(--blue); font-weight:900; letter-spacing:.08em; text-transform:uppercase; font-size:12px; }
-      h1 { margin:8px 0 6px; font-size:clamp(30px,6vw,52px); line-height:.98; }
-      p { color:var(--muted); line-height:1.5; }
-      label { display:block; margin-top:14px; color:#e0f2fe; font-size:12px; font-weight:900; text-transform:uppercase; letter-spacing:.04em; }
-      input,select { width:100%; margin-top:6px; padding:12px; border-radius:14px; border:1px solid var(--line); background:rgba(2,6,23,.75); color:#f8fafc; font-weight:750; }
-      .actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
-      button,a { border:1px solid rgba(125,211,252,.35); border-radius:14px; padding:10px 12px; background:rgba(15,23,42,.9); color:var(--txt); font-weight:850; text-decoration:none; cursor:pointer; }
-      button.primary { background:linear-gradient(135deg,#075985,#0e7490); border-color:#e0f2fe; }
-      #status { margin-top:14px; font-size:13px; color:var(--muted); }
-      #status.ok { color:var(--green); }
-      #status.err { color:var(--red); }
-    </style>
+    <title>Profile | JalanLens</title>
     <link rel="stylesheet" href="../harvard.css?v=20260731h" />
+    <style>
+      :root {
+        --page-bg: #f3f3f1;
+        --ink: #111111;
+        --muted: #4a5563;
+        --line: rgba(30,30,30,0.2);
+        --crimson: #a51c30;
+        --black: #1e1e1e;
+        --white: #ffffff;
+        --serif: 'Libre Baskerville', Baskerville, Georgia, serif;
+        --sans: 'Source Sans 3', Arial, Helvetica, sans-serif;
+      }
+      * { box-sizing: border-box; }
+      body.profile-page {
+        min-height: 100vh;
+        margin: 0;
+        background:
+          linear-gradient(180deg, rgba(243,243,241,0.96), rgba(243,243,241,1)),
+          var(--page-bg);
+        color: var(--ink);
+        font-family: var(--sans);
+      }
+      .profile-shell {
+        width: min(1120px, calc(100% - 40px));
+        margin: 0 auto;
+        padding: 124px 0 72px;
+      }
+      .profile-hero {
+        display: grid;
+        grid-template-columns: minmax(0, 0.95fr) minmax(360px, 0.72fr);
+        gap: clamp(28px, 5vw, 72px);
+        align-items: start;
+      }
+      .profile-intro {
+        padding-bottom: 36px;
+        border-bottom: 4px solid var(--black);
+      }
+      .profile-logo {
+        width: 150px;
+        height: auto;
+        display: block;
+        margin-bottom: 32px;
+      }
+      .eyebrow {
+        margin: 0 0 18px;
+        color: var(--crimson);
+        font-size: 13px;
+        font-weight: 900;
+        letter-spacing: 0.11em;
+        text-transform: uppercase;
+      }
+      h1 {
+        margin: 0;
+        max-width: 760px;
+        font-family: var(--serif);
+        font-size: clamp(64px, 11vw, 126px);
+        font-weight: 400;
+        line-height: 0.88;
+        letter-spacing: -0.065em;
+        color: var(--ink);
+      }
+      #summary {
+        max-width: 680px;
+        margin: 28px 0 0;
+        color: var(--muted);
+        font-size: clamp(18px, 2.2vw, 24px);
+        line-height: 1.35;
+      }
+      .profile-card {
+        border-top: 6px solid var(--crimson);
+        border-bottom: 1px solid var(--black);
+        background: rgba(255,255,255,0.88);
+        padding: clamp(24px, 4vw, 40px);
+        box-shadow: 0 18px 48px rgba(0,0,0,0.12);
+      }
+      .profile-card h2 {
+        margin: 0 0 18px;
+        font-family: var(--serif);
+        font-size: clamp(30px, 4vw, 44px);
+        font-weight: 400;
+        line-height: 1;
+        letter-spacing: -0.04em;
+      }
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px 16px;
+      }
+      .field-full { grid-column: 1 / -1; }
+      label {
+        display: block;
+        margin: 0;
+        color: var(--black);
+        font-size: 12px;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      input, select {
+        width: 100%;
+        margin-top: 7px;
+        padding: 12px 13px;
+        border: 1px solid rgba(30,30,30,0.24);
+        border-left: 4px solid var(--crimson);
+        border-radius: 0;
+        background: #ffffff;
+        color: var(--ink);
+        font: inherit;
+        font-weight: 750;
+      }
+      input::placeholder { color: #64748b; }
+      select { appearance: auto; }
+      input:focus, select:focus {
+        outline: 2px solid rgba(165,28,48,0.22);
+        outline-offset: 2px;
+        border-color: var(--black);
+        border-left-color: var(--crimson);
+      }
+      .actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 22px;
+      }
+      button, a.profile-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        border: 1px solid var(--black);
+        border-radius: 0;
+        padding: 10px 14px;
+        background: var(--black);
+        color: #ffffff;
+        font-weight: 900;
+        text-decoration: none;
+        cursor: pointer;
+        font: inherit;
+      }
+      button.primary {
+        background: var(--crimson);
+        border-color: var(--crimson);
+        grid-column: 1 / -1;
+      }
+      a.profile-button.secondary,
+      button.secondary {
+        background: #ffffff;
+        color: var(--black);
+        border-color: rgba(30,30,30,0.28);
+      }
+      button:hover, a.profile-button:hover {
+        background: var(--crimson);
+        border-color: var(--crimson);
+        color: #ffffff;
+      }
+      #status {
+        min-height: 20px;
+        margin-top: 16px;
+        padding-top: 12px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 750;
+      }
+      #status.ok { color: #166534; }
+      #status.err { color: #b91c1c; }
+      @media (max-width: 860px) {
+        .profile-shell { width: min(100% - 28px, 720px); padding-top: 140px; }
+        .profile-hero { grid-template-columns: 1fr; }
+        .profile-logo { width: 132px; }
+        .form-grid, .actions { grid-template-columns: 1fr; }
+        button.primary { grid-column: auto; }
+      }
+    </style>
   </head>
   <body class="profile-page">
-    <main>
-      <img class="profile-logo" src="../assets/jalanlens-logo.png" alt="" />
-      <div class="eyebrow">JalanLens account</div>
-      <h1>profile</h1>
-      <p id="summary">Loading current database user…</p>
-      <form id="profileForm">
-        <label for="displayName">Display name</label>
-        <input id="displayName" name="displayName" required maxlength="120" />
-        <label for="username">Username</label>
-        <input id="username" name="username" required maxlength="80" autocomplete="username" />
-        <label for="password">New password</label>
-        <input id="password" name="password" type="password" minlength="4" autocomplete="new-password" placeholder="leave blank to keep current password" />
-        <label for="personaType">Accessibility persona / demographic profile</label>
-        <select id="personaType" name="personaType">
-          <option value="working_adult_commuter">Working adult commuter</option>
-          <option value="older_resident_cane">Older resident with cane</option>
-          <option value="older_resident_walker">Older resident with walker</option>
-          <option value="wheelchair_user_commuter">Wheelchair user commuter</option>
-          <option value="visually_impaired_commuter">Visually impaired commuter</option>
-          <option value="pma_pmd_user">PMA / PMD user</option>
-          <option value="caregiver_with_disabled_person">Caregiver with disabled person</option>
-          <option value="parent_with_stroller">Parent with stroller</option>
-          <option value="primary_school_child">Primary school child</option>
-          <option value="secondary_student">Secondary student</option>
-          <option value="poly_uni_student">Poly / university student</option>
-          <option value="delivery_rider_worker">Delivery / service worker</option>
-        </select>
-        <label for="ageBand">Age band</label>
-        <input id="ageBand" name="ageBand" maxlength="40" placeholder="e.g. 25-64" />
-        <label for="mobilityNeeds">Mobility/accessibility notes</label>
-        <input id="mobilityNeeds" name="mobilityNeeds" maxlength="180" placeholder="e.g. wheelchair, stroller, low vision, prefers sheltered routes" />
-        <div class="actions">
-          <button class="primary" type="submit">Save profile</button>
-          <a id="backLink" href="../street-intelligence/">Back to Street Intelligence</a>
-          <button id="logoutBtn" type="button">Log out</button>
+    <header class="site-nav" aria-label="JalanLens site navigation">
+      <a class="site-logo" href="../" aria-label="JalanLens home">
+        <img src="../assets/jalanlens-logo.svg" alt="" />
+        <span>JalanLens</span>
+      </a>
+      <nav class="site-links" aria-label="Primary">
+        <a href="../about/">About Us</a>
+        <a href="../login/">Log In</a>
+      </nav>
+    </header>
+    <main class="profile-shell">
+      <section class="profile-hero" aria-labelledby="profileTitle">
+        <div class="profile-intro">
+          <img class="profile-logo" src="../assets/jalanlens-logo.svg" alt="" />
+          <p class="eyebrow">JalanLens account</p>
+          <h1 id="profileTitle">Profile</h1>
+          <p id="summary">Loading current database user…</p>
         </div>
-      </form>
-      <div id="status"></div>
+        <section class="profile-card" aria-label="Edit account profile">
+          <h2>Account details</h2>
+          <form id="profileForm">
+            <div class="form-grid">
+              <label for="displayName">Display name
+                <input id="displayName" name="displayName" required maxlength="120" />
+              </label>
+              <label for="username">Username
+                <input id="username" name="username" required maxlength="80" autocomplete="username" />
+              </label>
+              <label for="password" class="field-full">New password
+                <input id="password" name="password" type="password" minlength="4" autocomplete="new-password" placeholder="leave blank to keep current password" />
+              </label>
+              <label for="personaType" class="field-full">Accessibility persona / demographic profile
+                <select id="personaType" name="personaType">
+                  <option value="working_adult_commuter">Working adult commuter</option>
+                  <option value="older_resident_cane">Older resident with cane</option>
+                  <option value="older_resident_walker">Older resident with walker</option>
+                  <option value="wheelchair_user_commuter">Wheelchair user commuter</option>
+                  <option value="visually_impaired_commuter">Visually impaired commuter</option>
+                  <option value="pma_pmd_user">PMA / PMD user</option>
+                  <option value="caregiver_with_disabled_person">Caregiver with disabled person</option>
+                  <option value="parent_with_stroller">Parent with stroller</option>
+                  <option value="primary_school_child">Primary school child</option>
+                  <option value="secondary_student">Secondary student</option>
+                  <option value="poly_uni_student">Poly / university student</option>
+                  <option value="delivery_rider_worker">Delivery / service worker</option>
+                </select>
+              </label>
+              <label for="ageBand">Age band
+                <input id="ageBand" name="ageBand" maxlength="40" placeholder="e.g. 25-64" />
+              </label>
+              <label for="mobilityNeeds">Mobility/accessibility notes
+                <input id="mobilityNeeds" name="mobilityNeeds" maxlength="180" placeholder="e.g. wheelchair, stroller, low vision" />
+              </label>
+            </div>
+            <div class="actions">
+              <button class="primary" type="submit">Save profile</button>
+              <a class="profile-button secondary" id="backLink" href="../street-intelligence/">Back to dashboard</a>
+              <button class="secondary" id="logoutBtn" type="button">Log out</button>
+            </div>
+          </form>
+          <div id="status"></div>
+        </section>
+      </section>
     </main>
     <script type="module">
       import { sha256 } from "../sha256.js";
