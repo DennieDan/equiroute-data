@@ -3,12 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="../assets/favicon.png" />
+    <link rel="apple-touch-icon" href="../assets/jalanlens-icon-192.png" />
     <title>JalanLens Profile</title>
     <style>
       :root { --bg:#020617; --profile-card:rgba(15,23,42,.94); --card:var(--profile-card); --line:rgba(125,211,252,.42); --txt:#f8fafc; --muted:#cbd5e1; --blue:#7dd3fc; --green:#4ade80; --red:#fb7185; }
       * { box-sizing: border-box; }
       body { min-height:100vh; margin:0; display:grid; place-items:center; padding:28px; background:radial-gradient(circle at 20% 10%,rgba(56,189,248,.2),transparent 30%),radial-gradient(circle at 80% 90%,rgba(34,197,94,.14),transparent 34%),var(--bg); color:var(--txt); font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
       main { width:min(560px,100%); border:1px solid var(--line); border-radius:28px; padding:24px; background:var(--card); box-shadow:0 24px 80px rgba(0,0,0,.35); }
+      .profile-logo { width:72px; height:72px; object-fit:contain; display:block; margin-bottom:10px; }
       .eyebrow { color:var(--blue); font-weight:900; letter-spacing:.08em; text-transform:uppercase; font-size:12px; }
       h1 { margin:8px 0 6px; font-size:clamp(30px,6vw,52px); line-height:.98; }
       p { color:var(--muted); line-height:1.5; }
@@ -21,10 +24,11 @@
       #status.ok { color:var(--green); }
       #status.err { color:var(--red); }
     </style>
-    <link rel="stylesheet" href="../harvard.css?v=20260731f" />
+    <link rel="stylesheet" href="../harvard.css?v=20260731g" />
   </head>
   <body class="profile-page">
     <main>
+      <img class="profile-logo" src="../assets/jalanlens-logo.png" alt="" />
       <div class="eyebrow">JalanLens account</div>
       <h1>profile</h1>
       <p id="summary">Loading current database user…</p>
