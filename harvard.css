@@ -1335,3 +1335,15 @@ html[data-theme="dark"] body:has(#map) .agent-info-card * {
   text-shadow: none !important;
   filter: none !important;
 }
+
+/* Agent management result rows always sit on a dark surface. */
+body:has(#map) #agentManagementPanel .agent-distribution-row,
+body:has(#map) #agentManagementPanel .agent-distribution-row *,
+body:has(#map) #agentManagementPanel .agent-persona-row,
+body:has(#map) #agentManagementPanel .agent-persona-row *,
+body:has(#map) #agentManagementPanel .agent-row,
+body:has(#map) #agentManagementPanel .agent-row *,
+body:has(#map) #agentManagementPanel .agent-event-row,
+body:has(#map) #agentManagementPanel .agent-event-row * {
+  color: #ffffff !important;
+}

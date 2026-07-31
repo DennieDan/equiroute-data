@@ -4,12 +4,14 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 PLATFORM = ROOT / "street-intelligence" / "index.html"
+THEME = ROOT / "harvard.css"
 
 
 class AgentManagementPanelTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.platform = PLATFORM.read_text()
+        cls.theme = THEME.read_text()
 
     def test_settings_launches_persistent_agent_management_panel(self):
         for token in [
@@ -64,6 +66,23 @@ class AgentManagementPanelTests(unittest.TestCase):
             "closeAgentManagementPanel();",
         ]:
             self.assertIn(token, self.platform)
+
+    def test_dark_result_rows_force_all_text_to_pure_white(self):
+        for selector in [
+            "#agentManagementPanel .agent-distribution-row *",
+            "#agentManagementPanel .agent-persona-row *",
+            "#agentManagementPanel .agent-row *",
+            "#agentManagementPanel .agent-event-row *",
+        ]:
+            self.assertIn(selector, self.theme)
+        self.assertIn("color: #ffffff !important;", self.theme)
+        self.assertIn('id="agentManagementTextOverride"', self.platform)
+        self.assertIn(
+            'href="../harvard.css?v=20260731-agent-white-1"', self.platform
+        )
+        override = self.platform[self.platform.index('id="agentManagementTextOverride"') :]
+        self.assertIn("#agentManagementPanel .agent-row *", override)
+        self.assertIn("color: #ffffff !important;", override)
 
 
 if __name__ == "__main__":
