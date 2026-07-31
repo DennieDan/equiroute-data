@@ -70,6 +70,34 @@ class EarthUiControlsNotificationTests(unittest.TestCase):
         self.assertNotIn('["Length", `${Math.round(m.length_m * 10) / 10} m`, "street-part distance"]', text)
         self.assertNotIn('street-part distance', text)
 
+    def test_notifications_panel_uses_harvard_dropdown_design(self):
+        text = self.html()
+        css = (ROOT / "harvard.css").read_text()
+        for snippet in [
+            'id="notificationsPanel" class="hud"',
+            'class="notification-head"',
+            'class="notification-list"',
+        ]:
+            self.assertIn(snippet, text)
+        notifications_css = css[css.index('/* Harvard notification menu: black/crimson dropdown chrome with readable paper rows. */'):]
+        for snippet in [
+            'body:has(#map) #notificationsPanel',
+            'html[data-theme="light"] body:has(#map) #notificationsPanel',
+            'html[data-theme="dark"] body:has(#map) #notificationsPanel',
+            'background: #000000 !important;',
+            'border-top: 5px solid var(--harvard-crimson)',
+            'border-radius: 0 !important;',
+            'body:has(#map) #notificationsPanel #clearNotificationsBtn',
+            'border-bottom: 4px solid var(--harvard-crimson)',
+            'body:has(#map) #notificationsPanel .notification-item',
+            'border-left: 5px solid var(--harvard-crimson)',
+            'background: #ffffff !important;',
+            'color: #111111 !important;',
+        ]:
+            self.assertIn(snippet, notifications_css)
+        self.assertNotIn('border-radius: 14px', notifications_css)
+        self.assertNotIn('rgba(15, 23, 42', notifications_css)
+
     def test_theme_recolors_scorecard_text_and_metric_cards(self):
         css = (ROOT / "harvard.css").read_text()
         for snippet in [
