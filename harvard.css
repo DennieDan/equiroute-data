@@ -963,3 +963,84 @@ body:has(#map) #detailCard .close {
     display: none !important;
   }
 }
+
+
+/* JalanLens Harvard dashboard select redesign */
+body:has(#map) #topbar select.topbar-hover-select,
+body:has(#map) #topbar #viewModeSelect,
+body:has(#map) #topbar #segmentSelect {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  min-height: 40px !important;
+  max-width: min(360px, 42vw) !important;
+  padding: 9px 38px 9px 14px !important;
+  border: 1px solid rgba(255,255,255,0.34) !important;
+  border-left: 4px solid var(--harvard-crimson) !important;
+  border-radius: 0 !important;
+  background-color: var(--harvard-black) !important;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #ffffff 50%),
+    linear-gradient(135deg, #ffffff 50%, transparent 50%),
+    linear-gradient(to right, rgba(255,255,255,0.2), rgba(255,255,255,0.2)) !important;
+  background-position:
+    calc(100% - 18px) 17px,
+    calc(100% - 12px) 17px,
+    calc(100% - 34px) 8px !important;
+  background-size: 6px 6px, 6px 6px, 1px 24px !important;
+  background-repeat: no-repeat !important;
+  color: #ffffff !important;
+  font-family: var(--harvard-sans) !important;
+  font-size: 14px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.015em !important;
+  opacity: 1 !important;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06), 0 8px 22px rgba(0,0,0,0.2) !important;
+}
+body:has(#map) #topbar select.topbar-hover-select:hover,
+body:has(#map) #topbar select.topbar-hover-select:focus {
+  transform: translateY(-1px) !important;
+  border-color: #ffffff !important;
+  border-left-color: var(--harvard-crimson) !important;
+  background-color: #111111 !important;
+  color: #ffffff !important;
+  outline: 2px solid rgba(255,255,255,0.18) !important;
+  outline-offset: 2px !important;
+}
+body:has(#map) #topbar select.topbar-hover-select option,
+body:has(#map) #topbar #viewModeSelect option,
+body:has(#map) #topbar #segmentSelect option {
+  background: #ffffff !important;
+  color: #111111 !important;
+  font-weight: 800 !important;
+}
+
+body:has(#map) #topbar select.topbar-hover-select option:checked,
+body:has(#map) #topbar #viewModeSelect option:checked,
+body:has(#map) #topbar #segmentSelect option:checked {
+  background: linear-gradient(var(--harvard-crimson), var(--harvard-crimson)) !important;
+  background-color: var(--harvard-crimson) !important;
+  color: #ffffff !important;
+}
+body:has(#map) #topbar select.topbar-hover-select option:hover,
+body:has(#map) #topbar #viewModeSelect option:hover,
+body:has(#map) #topbar #segmentSelect option:hover {
+  background: #eeeeea !important;
+  color: #111111 !important;
+}
+
+body:has(#map) #topbar #viewModeSelect {
+  min-width: 150px !important;
+}
+body:has(#map) #topbar #segmentSelect {
+  min-width: min(340px, 36vw) !important;
+}
+@media (max-width: 760px) {
+  body:has(#map) #topbar select.topbar-hover-select,
+  body:has(#map) #topbar #viewModeSelect,
+  body:has(#map) #topbar #segmentSelect {
+    max-width: 100% !important;
+    min-width: 0 !important;
+    flex: 1 1 150px !important;
+    font-size: 13px !important;
+  }
+}

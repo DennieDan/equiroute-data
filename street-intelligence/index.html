@@ -1060,7 +1060,7 @@
         }
       }
     </style>
-    <link rel="stylesheet" href="../harvard.css?v=20260731-mobile-street-photo-2" />
+    <link rel="stylesheet" href="../harvard.css?v=20260731h" />
     <script src="https://unpkg.com/maptalks/dist/maptalks.min.js"></script>
     <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
     <script src="https://unpkg.com/mapillary-js@4.1.2/dist/mapillary.js"></script>
@@ -3461,7 +3461,9 @@
       };
       if (window.viewModeSelect) {
         viewModeSelect.onchange = () => selectSegment(state.selectedIndex, viewModeSelect.value === "street");
-        bindHoverDropdown(viewModeSelect, 2);
+        // Keep the Earth/Street control as a compact Harvard-style select.
+        // The hover-expanded native list looked visually noisy and made the
+        // selected row use the browser's blue highlight.
       }
       bindHoverDropdown(segmentSelect, 10);
       if (window.themeToggleBtn) themeToggleBtn.onclick = cycleTheme;
