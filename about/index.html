@@ -89,12 +89,41 @@
         line-height: 0.95;
         letter-spacing: -0.055em;
       }
+      .hero .eyebrow,
+      .hero h1,
+      .hero > p {
+        opacity: 0;
+        transform: translate3d(-34px, 22px, 0) scale(0.985);
+        filter: blur(7px);
+        animation: aboutFlyIn 0.9s cubic-bezier(.16, 1, .3, 1) forwards;
+      }
+      .hero .eyebrow { animation-delay: 0.06s; }
+      .hero h1 { animation-delay: 0.18s; }
+      .hero > p { animation-delay: 0.34s; }
       .hero p {
         margin: 0;
         max-width: 760px;
         color: var(--muted);
         font-size: clamp(18px, 2.5vw, 24px);
         line-height: 1.35;
+      }
+      @keyframes aboutFlyIn {
+        0% { opacity: 0; transform: translate3d(-34px, 22px, 0) scale(0.985); filter: blur(7px); }
+        62% { opacity: 1; }
+        100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); filter: blur(0); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .hero .eyebrow,
+        .hero h1,
+        .hero > p {
+          animation: none;
+          opacity: 1;
+          transform: none;
+          filter: none;
+        }
+      }
+      .portrait-wrap img.abel-photo {
+        object-position: center 34%;
       }
       .portrait-wrap img.hagen-photo {
         object-position: center 42%;
@@ -204,7 +233,7 @@
         </article>
         <article class="person-card">
           <figure>
-            <div class="portrait-wrap"><img src="../assets/team/abel.svg" alt="Portrait placeholder for Abel" /></div>
+            <div class="portrait-wrap"><img class="abel-photo" src="../assets/team/abel.jpg" alt="Abel standing on a wood-panelled staircase" /></div>
             <figcaption><h2>Abel</h2><p>SMU Year 1 CS</p></figcaption>
           </figure>
         </article>
