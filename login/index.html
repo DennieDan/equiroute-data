@@ -86,7 +86,36 @@
         text-decoration: none;
       }
       button.primary { background: linear-gradient(135deg, #075985, #0e7490); border-color: #bae6fd; }
-      button.google { background: #f8fafc; color: #0f172a; border-color: #fff; }
+      button.google {
+        position: relative !important;
+        min-height: 48px !important;
+        justify-content: center !important;
+        background: #ffffff !important;
+        color: #1f1f1f !important;
+        border: 1px solid #747775 !important;
+        border-radius: 14px !important;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08) !important;
+        font-family: "Google Sans", Roboto, Arial, sans-serif !important;
+        font-size: 14px !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.01em !important;
+        gap: 12px !important;
+        transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, border-color 0.15s ease !important;
+      }
+      button.google:hover {
+        background: #f8fafd !important;
+        border-color: #5f6368 !important;
+        box-shadow: 0 2px 6px rgba(60, 64, 67, 0.18) !important;
+        transform: translateY(-1px) !important;
+      }
+      button.google:active { background: #f1f3f4 !important; transform: translateY(0) !important; }
+      .google-g {
+        flex: 0 0 auto;
+        width: 20px;
+        height: 20px;
+        display: block;
+      }
+      .google-label { line-height: 20px; }
       button.ghost { background: transparent; }
       #authPanel {
         display: none;
@@ -120,6 +149,23 @@
       }
     </style>
     <link rel="stylesheet" href="../harvard.css?v=20260731g" />
+    <style>
+      body:has(.login-bg-video) button.google {
+        justify-content: center !important;
+        background: #ffffff !important;
+        color: #1f1f1f !important;
+        border: 1px solid #747775 !important;
+        border-radius: 14px !important;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08) !important;
+        font-family: "Google Sans", Roboto, Arial, sans-serif !important;
+      }
+      body:has(.login-bg-video) button.google:hover {
+        background: #f8fafd !important;
+        border-color: #5f6368 !important;
+        box-shadow: 0 2px 6px rgba(60, 64, 67, 0.18) !important;
+      }
+      body:has(.login-bg-video) button.google::after { content: none !important; }
+    </style>
   </head>
   <body>
     <header class="site-nav" aria-label="JalanLens site navigation">
@@ -148,7 +194,15 @@
         <p class="signup-prompt">Don’t have an account?</p>
         <button class="ghost" id="openSignupBtn" type="button">Sign up now</button>
         <div class="or-divider"><span>or</span></div>
-        <button class="google" id="googlePublicBtn" type="button">Continue with Google</button>
+        <button class="google" id="googlePublicBtn" type="button" aria-label="Continue with Google">
+          <svg class="google-g" viewBox="0 0 18 18" aria-hidden="true" focusable="false">
+            <path fill="#4285F4" d="M17.64 9.205c0-.638-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.614z" />
+            <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.181l-2.908-2.258c-.806.54-1.837.859-3.048.859-2.344 0-4.328-1.583-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" />
+            <path fill="#FBBC05" d="M3.964 10.709A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.171.282-1.709V4.959H.957A8.997 8.997 0 0 0 0 9c0 1.452.348 2.824.957 4.041l3.007-2.332z" />
+            <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.582C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.959l3.007 2.332C4.672 5.163 6.656 3.58 9 3.58z" />
+          </svg>
+          <span class="google-label">Continue with Google</span>
+        </button>
       </section>
 
       <div id="authOverlay" class="auth-overlay" aria-hidden="true">
