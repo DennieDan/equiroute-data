@@ -167,15 +167,14 @@
       .approved-group-head h3 { margin: 0; }
       .current-label { color: var(--green); font-weight: 900; }
       .candidate-action { margin-top: 12px; }
-      .footpath-toggle, .street-part-toggle {
+      .footpath-toggle {
         overflow: hidden;
         border: 1px solid var(--line);
         border-radius: 16px;
         background: rgba(2, 6, 23, 0.48);
       }
       .footpath-toggle { margin-top: 14px; }
-      .street-part-toggle + .street-part-toggle { margin-top: 10px; }
-      .footpath-toggle > summary, .street-part-toggle > summary {
+      .footpath-toggle > summary {
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -188,14 +187,12 @@
         list-style-position: inside;
       }
       .footpath-toggle > summary { color: var(--blue); font-size: 18px; }
-      .street-part-toggle > summary { background: rgba(30, 41, 59, 0.9); }
-      .footpath-toggle > summary small, .street-part-toggle > summary small {
+      .footpath-toggle > summary small {
         color: var(--muted);
         font-size: 13px;
         font-weight: 700;
       }
       .footpath-content { padding: 14px; }
-      .street-part-content { padding: 16px; border-top: 1px solid var(--line); }
       .modal-backdrop {
         position: fixed;
         z-index: 1000;
@@ -262,10 +259,10 @@
           <div class="grid">
             <div class="card">
               <h2>Upload a footpath photo</h2>
-              <p>Choose the street part shown in the image. Use a clear landscape photo with the walking surface and nearby accessibility features visible.</p>
-              <label for="streetPartSelect">Street part</label>
+              <p>Choose the Footpath shown in the image. Use a clear landscape photo with the walking surface and nearby accessibility features visible.</p>
+              <label for="streetPartSelect">Footpath</label>
               <select id="streetPartSelect" disabled>
-                <option>Loading street parts…</option>
+                <option>Loading Footpaths…</option>
               </select>
               <button type="button" id="photoUploadBtn" disabled>Choose photo</button>
               <input id="photoUploadInput" type="file" accept="image/*" />
@@ -314,7 +311,7 @@
         </section>
 
         <section class="step-panel" data-panel="approved">
-          <h2>Approved photos by street part</h2>
+          <h2>Approved photos by Footpath</h2>
           <p>Approval and activation are separate. Staff can inspect every approved candidate here, then choose whether to replace the current active evidence.</p>
           <button type="button" id="refreshApprovedBtn">Refresh approved photos</button>
           <div id="approvedStatus" class="status"></div>

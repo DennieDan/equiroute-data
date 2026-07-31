@@ -8,7 +8,6 @@ const state = {
   user: readJson(USER_STORAGE_KEY) || {},
   role: localStorage.getItem(ROLE_STORAGE_KEY) || "public",
   streetParts: [],
-  footpaths: new Map(),
   liveStreetParts: new Map(),
   photos: [],
   jobs: [],
@@ -87,15 +86,8 @@ function escapeHtml(value) {
 }
 
 function prettyPart(value) {
-  return String(value || "Unknown street part")
-    .replace(/^street_part_/, "Street part ")
-    .replaceAll("_", " ");
-}
-
-function prettyFootpath(value) {
-  return String(value || "Unassigned footpath")
-    .replace(/^street_/, "Footpath ")
-    .replaceAll("_", " ");
+  const match = String(value || "").match(/street_part_(\d+)$/);
+  return match ? `Footpath ${Number(match[1]) + 1}` : "Unknown footpath";
 }
 
 function formatDate(value) {
@@ -129,9 +121,6 @@ async function loadStreetParts() {
     if (response.ok) {
       const registry = await response.json();
       local = registry.street_parts || [];
-      (registry.streets || []).forEach((street) =>
-        state.footpaths.set(street.id, street),
-      );
     }
   } catch (error) {
     console.warn("Local street registry unavailable", error);
@@ -158,7 +147,7 @@ async function loadStreetParts() {
   renderOptions();
 
   if (!local.length) {
-    streetPartSelect.innerHTML = "<option>No street parts available</option>";
+    streetPartSelect.innerHTML = "<option>No Footpaths available</option>";
     setStatus(
       photoUploadStatus,
       "The bundled street registry is unavailable. Trying Supabase…",
@@ -167,7 +156,7 @@ async function loadStreetParts() {
   } else {
     setStatus(
       photoUploadStatus,
-      "Street parts loaded. Connecting them to the live submission registry…",
+      "Footpaths loaded. Connecting them to the live submission registry…",
     );
   }
 
@@ -178,7 +167,7 @@ async function loadStreetParts() {
       "select=id,external_id,midpoint_lng,midpoint_lat,desired_orientation&order=external_id.asc",
     );
   } catch (error) {
-    console.warn("Live street parts unavailable", error);
+    console.warn("Live Footpaths unavailable", error);
   }
   live.forEach((part) => {
     state.liveStreetParts.set(part.external_id, part);
@@ -192,7 +181,7 @@ async function loadStreetParts() {
   if (!state.streetParts.length) {
     setStatus(
       photoUploadStatus,
-      "No street parts could be loaded from Supabase or the local registry.",
+      "No Footpaths could be loaded from Supabase or the local registry.",
       "err",
     );
     return;
@@ -200,7 +189,7 @@ async function loadStreetParts() {
   if (!live.length) {
     setStatus(
       photoUploadStatus,
-      "Street parts loaded from the local registry. A live Supabase connection is required when you submit.",
+      "Footpaths loaded from the local registry. A live Supabase connection is required when you submit.",
       "warn",
     );
   }
@@ -332,7 +321,7 @@ async function resolveLivePart(externalId) {
   );
   const part = rows[0];
   if (!part) {
-    throw new Error("This street part is not available in the live Supabase registry.");
+    throw new Error("This Footpath is not available in the live Supabase registry.");
   }
   state.liveStreetParts.set(externalId, part);
   return part;
@@ -359,14 +348,15 @@ async function uploadObject(file, storagePath) {
 async function submitPhoto(file) {
   const externalPartId = streetPartSelect.value;
   const part = await resolveLivePart(externalPartId);
-  setStatus(photoUploadStatus, "Running the CV scan…");
+  const footpathLabel = prettyPart(externalPartId);
+  setStatus(photoUploadStatus, `Running the CV scan for ${footpathLabel}…`);
   selectStep("cv");
   const cv = await analyzePhoto(file);
   renderCv(
     cv,
     cv.ok
-      ? `Passed CV scanning with ${cv.score}/100. Submitting for staff review…`
-      : `Rejected by CV with ${cv.score}/100. This file was not uploaded.`,
+      ? `${footpathLabel} passed CV scanning with ${cv.score}/100. Submitting for staff review…`
+      : `${footpathLabel} was rejected by CV with ${cv.score}/100. This file was not uploaded.`,
   );
   if (!cv.ok) {
     throw new Error("The image did not pass CV scanning. Review the failed checks in step 2.");
@@ -417,8 +407,8 @@ async function submitPhoto(file) {
       status_steps: ["Upload", "CV first review", "Staff review", "Approved"],
     },
   });
-  renderCv(cv, `Submitted successfully. CV passed (${cv.score}/100) and staff review is pending.`);
-  setStatus(photoUploadStatus, "Photo submitted and waiting for staff review.", "ok");
+  renderCv(cv, `${footpathLabel} submitted successfully. CV passed (${cv.score}/100) and staff review is pending.`);
+  setStatus(photoUploadStatus, `${footpathLabel} photo submitted and waiting for staff review.`, "ok");
   await loadMySubmissions();
   selectStep("upload");
 }
@@ -577,107 +567,67 @@ async function decideReview(decision) {
 }
 
 async function loadApprovedPhotos() {
-  setStatus(approvedStatus, "Loading approved photos by street part…");
+  setStatus(approvedStatus, "Loading approved photos by Footpath…");
   try {
     const [approved, active] = await Promise.all([
       rest(
         "street_photos",
-        "select=id,external_id,street_part_id,image_url,quality_score,submitted_at,source,is_active,validation_status,street_parts!street_photos_street_part_id_fkey!inner(external_id,street_id,streets!street_parts_street_id_fkey(external_id,name))&source=eq.crowd&validation_status=eq.accepted&order=submitted_at.desc",
+        "select=id,external_id,street_part_id,image_url,quality_score,submitted_at,source,is_active,validation_status,street_parts!street_photos_street_part_id_fkey!inner(external_id)&source=eq.crowd&validation_status=eq.accepted&order=submitted_at.desc",
       ),
       rest(
         "street_photos",
-        "select=id,external_id,street_part_id,image_url,quality_score,submitted_at,source,is_active,validation_status,street_parts!street_photos_street_part_id_fkey!inner(external_id,street_id,streets!street_parts_street_id_fkey(external_id,name))&is_active=eq.true&order=submitted_at.desc",
+        "select=id,external_id,street_part_id,image_url,quality_score,submitted_at,source,is_active,validation_status,street_parts!street_photos_street_part_id_fkey!inner(external_id)&is_active=eq.true&order=submitted_at.desc",
       ),
     ]);
     state.activePhotos = active;
     const footpathGroups = new Map();
     approved.forEach((photo) => {
       const partId = photo.street_parts?.external_id || photo.street_part_id;
-      const partMeta = state.streetParts.find(
-        (part) => part.external_id === partId,
-      );
-      const linkedStreet = photo.street_parts?.streets;
-      const footpathId =
-        linkedStreet?.external_id ||
-        partMeta?.street_id ||
-        photo.street_parts?.street_id ||
-        "unassigned_footpath";
-      const footpathLabel =
-        linkedStreet?.name ||
-        state.footpaths.get(footpathId)?.name ||
-        prettyFootpath(footpathId);
-      if (!footpathGroups.has(footpathId)) {
-        footpathGroups.set(footpathId, {
-          id: footpathId,
-          label: footpathLabel,
-          parts: new Map(),
-        });
-      }
-      const footpath = footpathGroups.get(footpathId);
-      if (!footpath.parts.has(partId)) footpath.parts.set(partId, []);
-      footpath.parts.get(partId).push(photo);
+      if (!footpathGroups.has(partId)) footpathGroups.set(partId, []);
+      footpathGroups.get(partId).push(photo);
     });
-    const partCount = [...footpathGroups.values()].reduce(
-      (total, footpath) => total + footpath.parts.size,
-      0,
-    );
     approvedGallery.innerHTML = footpathGroups.size
-      ? [...footpathGroups.values()]
-          .sort((a, b) => a.label.localeCompare(b.label))
-          .map(
-            (footpath) => `
+      ? [...footpathGroups.entries()]
+          .sort(([a], [b]) => a.localeCompare(b))
+          .map(([partId, photos]) => {
+            const current = active.find(
+              (photo) => photo.street_part_id === photos[0]?.street_part_id,
+            );
+            return `
               <details class="footpath-toggle">
                 <summary>
-                  <span>Footpath: ${escapeHtml(footpath.label)}</span>
-                  <small>${footpath.parts.size} street part${footpath.parts.size === 1 ? "" : "s"}</small>
+                  <span>${escapeHtml(prettyPart(partId))}</span>
+                  <small>${photos.length} approved image${photos.length === 1 ? "" : "s"} · ${current ? "active selected" : "no active photo"}</small>
                 </summary>
                 <div class="footpath-content">
-                  ${[...footpath.parts.entries()]
-                    .sort(([a], [b]) => a.localeCompare(b))
-                    .map(([partId, photos]) => {
-                      const current = active.find(
-                        (photo) =>
-                          photo.street_part_id === photos[0]?.street_part_id,
-                      );
-                      return `
-                        <details class="street-part-toggle">
-                          <summary>
-                            <span>${escapeHtml(prettyPart(partId))}</span>
-                            <small>${photos.length} approved image${photos.length === 1 ? "" : "s"} · ${current ? "active selected" : "no active photo"}</small>
-                          </summary>
-                          <div class="street-part-content">
-                            <div class="approved-group-head">
-                              <h3>${escapeHtml(prettyPart(partId))}</h3>
-                              <span class="current-label">${current ? "Active photo selected" : "No active photo"}</span>
+                  <div class="approved-group-head">
+                    <h3>${escapeHtml(prettyPart(partId))}</h3>
+                    <span class="current-label">${current ? "Active photo selected" : "No active photo"}</span>
+                  </div>
+                  <div class="gallery">
+                    ${photos
+                      .map(
+                        (photo) => `
+                          <article class="card gallery-card">
+                            <img src="${escapeHtml(photo.image_url)}" alt="Approved footpath evidence" />
+                            <div>
+                              <b>${photo.id === current?.id ? "Current active photo" : "Approved candidate"}</b>
+                              <p>CV score ${escapeHtml(photo.quality_score ?? "—")}/100<br>Approved submission from ${escapeHtml(formatDate(photo.submitted_at))}</p>
+                              ${
+                                photo.id === current?.id
+                                  ? '<span class="badge approved">Active evidence</span>'
+                                  : state.role === "authority"
+                                    ? `<button type="button" class="candidate-action" data-activate-photo-id="${escapeHtml(photo.id)}">View and make active</button>`
+                                    : '<span class="badge approved">Approved</span>'
+                              }
                             </div>
-                            <div class="gallery">
-                              ${photos
-                                .map(
-                                  (photo) => `
-                                    <article class="card gallery-card">
-                                      <img src="${escapeHtml(photo.image_url)}" alt="Approved footpath evidence" />
-                                      <div>
-                                        <b>${photo.id === current?.id ? "Current active photo" : "Approved candidate"}</b>
-                                        <p>CV score ${escapeHtml(photo.quality_score ?? "—")}/100<br>Approved submission from ${escapeHtml(formatDate(photo.submitted_at))}</p>
-                                        ${
-                                          photo.id === current?.id
-                                            ? '<span class="badge approved">Active evidence</span>'
-                                            : state.role === "authority"
-                                              ? `<button type="button" class="candidate-action" data-activate-photo-id="${escapeHtml(photo.id)}">View and make active</button>`
-                                              : '<span class="badge approved">Approved</span>'
-                                        }
-                                      </div>
-                                    </article>`,
-                                )
-                                .join("")}
-                            </div>
-                          </div>
-                        </details>`;
-                    })
-                    .join("")}
+                          </article>`,
+                      )
+                      .join("")}
+                  </div>
                 </div>
-              </details>`,
-          )
+              </details>`;
+          })
           .join("")
       : '<div class="empty">No photos have been approved yet.</div>';
     approvedGallery.querySelectorAll("[data-activate-photo-id]").forEach((button) => {
@@ -685,7 +635,7 @@ async function loadApprovedPhotos() {
     });
     setStatus(
       approvedStatus,
-      `${approved.length} approved photo${approved.length === 1 ? "" : "s"} across ${partCount} street part${partCount === 1 ? "" : "s"} and ${footpathGroups.size} footpath${footpathGroups.size === 1 ? "" : "s"}.`,
+      `${approved.length} approved photo${approved.length === 1 ? "" : "s"} across ${footpathGroups.size} footpath${footpathGroups.size === 1 ? "" : "s"}.`,
       "ok",
     );
   } catch (error) {
@@ -711,7 +661,7 @@ function openActivationModal(photoId, approvedPhotos) {
   state.activationCandidate = candidate;
   currentPhotoPreview.innerHTML = photoPreview(
     current,
-    "This street part does not currently have an active photo.",
+    "This Footpath does not currently have an active photo.",
   );
   newPhotoPreview.innerHTML = photoPreview(candidate, "Replacement photo unavailable.");
   currentPhotoMeta.textContent = current

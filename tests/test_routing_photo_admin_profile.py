@@ -97,13 +97,13 @@ class RoutingPhotoAdminProfileTests(unittest.TestCase):
             "Confirm replacement",
             "footpathGroups",
             "footpath-toggle",
-            "street-part-toggle",
             "street_parts!street_photos_street_part_id_fkey!inner",
-            "streets!street_parts_street_id_fkey",
         ]:
             self.assertIn(token, self.crowd_photos_app)
         self.assertIn("Approve photo", self.crowd_photos_app)
         self.assertNotIn("Approve and make active", self.crowd_photos_app)
+        self.assertNotIn("street-part-toggle", self.crowd_photos_app)
+        self.assertIn("Approved photos by Footpath", self.crowd_photos)
 
     def test_pending_upload_policy_and_atomic_review_activation(self):
         self.assertIn("public insert pending crowd photos", self.rls)
