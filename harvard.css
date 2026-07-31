@@ -1321,7 +1321,6 @@ html[data-theme="dark"] body:has(#map) #detailCard .score-breakdown .metric smal
   border-color: rgba(165, 28, 48, 0.72) !important;
 }
 body:has(#map) .street-screen-nav,
-body:has(#map) .street-screen-nav,
 html[data-theme="light"] body:has(#map) .street-screen-nav,
 html[data-theme="dark"] body:has(#map) .street-screen-nav {
   background: var(--harvard-black) !important;
