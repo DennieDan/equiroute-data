@@ -170,6 +170,8 @@ create table if not exists public.feedback_votes (
   unique(thread_id, user_id)
 );
 
+grant select, insert, delete on public.feedback_votes to anon, authenticated;
+
 create table if not exists public.feedback_comments (
   id uuid primary key default gen_random_uuid(),
   thread_id uuid not null references public.feedback_threads(id) on delete cascade,

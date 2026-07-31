@@ -13,10 +13,12 @@ class EarthUiControlsNotificationTests(unittest.TestCase):
 
     def test_topbar_uses_clean_labels_and_single_view_dropdown(self):
         text = self.html()
-        self.assertIn('<div class="brand"><img src="../assets/jalanlens-logo.png" alt="" /><span>JalanLens</span></div>', text)
+        self.assertIn('class="brand"', text)
+        self.assertIn('src="../assets/jalanlens-logo.png"', text)
+        self.assertIn('<span>JalanLens</span>', text)
         self.assertNotIn('JalanLens Earth', text)
         self.assertNotIn('Earth Satellite', text)
-        self.assertIn('<select id="viewModeSelect"', text)
+        self.assertIn('id="viewModeSelect"', text)
         self.assertIn('<option value="earth">Earth View</option>', text)
         self.assertIn('<option value="street">Street View</option>', text)
         self.assertNotIn('id="earthBtn"', text)
@@ -67,6 +69,27 @@ class EarthUiControlsNotificationTests(unittest.TestCase):
         self.assertIn('m street part', text)
         self.assertNotIn('["Length", `${Math.round(m.length_m * 10) / 10} m`, "street-part distance"]', text)
         self.assertNotIn('street-part distance', text)
+
+    def test_authority_score_card_flips_to_component_breakdown(self):
+        text = self.html()
+        for snippet in [
+            'detail-flip-inner',
+            'id="scoreFlipBtn"',
+            'Score contributors',
+            'id="scoreBreakdownList"',
+            'function componentScoreRows',
+            'setScoreCardFlipped(true)',
+            'state.role === "authority"',
+            'Clear width',
+            'Tactile guidance',
+            'component_scores: raw.component_scores',
+        ]:
+            self.assertIn(snippet, text)
+
+    def test_synthetic_agent_count_removes_explanatory_suffix(self):
+        text = self.html()
+        self.assertIn('currently here</small>', text)
+        self.assertNotIn('synthetic, not real-person tracking', text)
 
     def test_notification_schema_exists(self):
         sql = SCHEMA.read_text()

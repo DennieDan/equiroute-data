@@ -189,6 +189,14 @@
     return (await r.json()).map((row) => ({ ...row, source: "agent_simulation" }));
   }
 
+  async function fetchUserVoteThreadIds(rows) {
+    const ids = rows.filter((row) => row.source !== "agent_simulation" && isUuid(row.id)).map((row) => row.id);
+    if (!ids.length) return new Set();
+    const r = await fetch(`${supabaseUrl}/rest/v1/feedback_votes?select=thread_id&thread_id=in.(${ids.map(encodeURIComponent).join(",")})&user_id=eq.${encodeURIComponent(voterId())}`, { headers: headers() });
+    if (!r.ok) return new Set();
+    return new Set((await r.json()).map((row) => row.thread_id));
+  }
+
   async function fetchFeedbackReplies(rows) {
     const publicIds = rows.filter((r) => r.source !== "agent_simulation" && isUuid(r.id)).map((r) => r.id);
     const agentIds = rows.filter((r) => r.source === "agent_simulation" && isUuid(r.id)).map((r) => r.id);
@@ -312,7 +320,7 @@
     const items = visibleRows.map((row) => {
       const date = friendlyDate(row.created_at);
       const count = Math.max(0, Math.round(Number(row.priority_score || 0)));
-      const isLiked = liked.has(row.id);
+      const isLiked = liked.has(row.id) || row.user_has_vote === true;
       const isAgent = row.source === "agent_simulation";
       const isAuthority = row.source === "authority";
       const who = isAgent ? `${row.agent_name || "Agent"} · ${row.agent_external_id || "agent"}` : `${row.public_user_name || (isAuthority ? "Authority user" : "Public user")}`;
@@ -351,9 +359,13 @@
 
   function renderLastRows() { renderRows(lastRows, lastRepliesByParent); }
 
+  function voteDeleteUrl(threadId) {
+    return `${supabaseUrl}/rest/v1/feedback_votes?thread_id=eq.${encodeURIComponent(threadId)}&user_id=eq.${encodeURIComponent(voterId())}`;
+  }
+
   async function likeThread(threadId, button) {
     const liked = localLikes();
-    const wasLiked = liked.has(threadId);
+    const wasLiked = liked.has(threadId) || button.classList.contains("liked");
     const nextLiked = !wasLiked;
     const current = Number(button.dataset.count || 0);
     const next = Math.max(0, current + (nextLiked ? 1 : -1));
@@ -368,17 +380,17 @@
       if (nextLiked) {
         await fetch(`${supabaseUrl}/rest/v1/feedback_votes`, {
           method: "POST",
-          headers: headers({ "Content-Type": "application/json", Prefer: "return=minimal" }),
+          headers: headers({ "Content-Type": "application/json", Prefer: "resolution=ignore-duplicates,return=minimal" }),
           body: JSON.stringify({ thread_id: threadId, user_id: voterId(), vote_type: "upvote" }),
         });
       } else {
-        await fetch(`${supabaseUrl}/rest/v1/feedback_votes?thread_id=eq.${encodeURIComponent(threadId)}&user_id=eq.${encodeURIComponent(voterId())}`, {
+        await fetch(voteDeleteUrl(threadId), {
           method: "DELETE",
           headers: headers({ Prefer: "return=minimal" }),
         });
       }
     } catch (e) {
-      // Agent-feedback likes may not map to feedback_votes yet; keep local optimistic state.
+      // Keep the visible unlike/like toggle responsive even if the demo backend is offline.
     } finally {
       button.disabled = false;
     }
@@ -465,7 +477,10 @@
         fetchAgentFeedbackRows(streetPartId, ctx.streetPartExternalId, featureId),
       ]);
       if (requestId !== historyRequestId) return;
-      const publicRows = publicResult.status === "fulfilled" ? publicResult.value : [];
+      const publicRowsRaw = publicResult.status === "fulfilled" ? publicResult.value : [];
+      const userVoteIds = await fetchUserVoteThreadIds(publicRowsRaw);
+      if (requestId !== historyRequestId) return;
+      const publicRows = publicRowsRaw.map((row) => ({ ...row, user_has_vote: userVoteIds.has(row.id) }));
       const localAgentRows = (global.__EARTH_ACCESSIBILITY_STATE?.liveAgentSnapshot?.agent_feedback_threads || [])
         .filter((row) => row.street_part_external_id === ctx.streetPartExternalId)
         .map((row, index) => ({ ...row, id: row.id || `local-agent-${ctx.streetPartExternalId}-${index}`, source: "agent_simulation" }));

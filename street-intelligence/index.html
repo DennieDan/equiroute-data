@@ -412,6 +412,18 @@
         font-size: 28px;
         font-weight: 950;
       }
+      #detailCard { perspective: 1200px; }
+      .detail-flip-inner { position: relative; transform-style: preserve-3d; transition: transform 0.55s cubic-bezier(0.2, 0.72, 0.2, 1); }
+      #detailCard.flipped .detail-flip-inner { transform: rotateY(180deg); }
+      .detail-face { backface-visibility: hidden; }
+      .detail-back { position: absolute; inset: 0; overflow-y: auto; transform: rotateY(180deg); padding: 0; }
+      .score-flip { display: grid; justify-items: end; gap: 2px; min-width: 96px; padding: 6px 10px; border-radius: 14px; border: 1px solid rgba(125, 211, 252, 0.34); background: rgba(15, 23, 42, 0.28); color: var(--txt); cursor: pointer; text-align: right; }
+      .score-flip:disabled { cursor: default; opacity: 1; }
+      .score-flip-hint { color: var(--muted); font-size: 9px; font-weight: 850; letter-spacing: 0.05em; text-transform: uppercase; }
+      .public-role .score-flip-hint, .score-flip:disabled .score-flip-hint { display: none; }
+      .score-breakdown { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
+      .score-breakdown .metric b { font-size: 20px; }
+      .score-back-note { display: block; margin-top: 8px; color: var(--muted); }
       .title {
         font-weight: 900;
       }
@@ -1288,62 +1300,80 @@
       <div id="personaRecommendation">Loading persona travel simulation…</div>
     </section>
     <section id="detailCard" class="hud">
-      <div class="detail-head">
-        <div>
-          <div class="title" id="selectedName">Select a segment</div>
-          <div class="kindTitle" id="selectedKind"></div>
-          <div class="sub" id="selectedDesc"></div>
+      <div class="detail-flip-inner">
+        <div class="detail-face detail-front">
+          <div class="detail-head">
+            <div>
+              <div class="title" id="selectedName">Select a segment</div>
+              <div class="kindTitle" id="selectedKind"></div>
+              <div class="sub" id="selectedDesc"></div>
+            </div>
+            <div class="spacer"></div>
+            <button type="button" class="score score-flip" id="scoreFlipBtn" title="Authority: click for score breakdown">
+              <span id="activeScore">–</span>
+              <small class="score-flip-hint">breakdown</small>
+            </button>
+            <button class="close" id="closeDetail">×</button>
+          </div>
+          <div class="metrics" id="metricList"></div>
+          <div id="streetAgentCounts" class="street-agent-counts"></div>
+          <div class="detail-actions">
+            <button type="button" id="feedbackBtn">Give feedback</button>
+            <div id="feedbackMeta"></div>
+          </div>
+          <div id="feedbackHistory" class="feedback-history"></div>
+          <form id="feedbackForm">
+            <label for="feedbackTitle">Title</label>
+            <input
+              id="feedbackTitle"
+              name="title"
+              required
+              maxlength="120"
+              placeholder="What should be fixed?"
+            />
+            <label for="feedbackBody">Details</label>
+            <div id="feedbackLanguageHint" class="feedback-language-hint">
+              Supports English, Traditional Chinese, Simplified Chinese, Malay, Tamil, Bengali, and Gujarati. Non-English feedback is translated to English before saving.
+            </div>
+            <textarea
+              id="feedbackBody"
+              name="body"
+              required
+              maxlength="2000"
+              placeholder="Describe the accessibility issue or suggestion."
+            ></textarea>
+            <div class="feedback-speech-row">
+              <button type="button" id="feedbackSpeechBtn">
+                <span class="mic-pulse" aria-hidden="true"></span
+                ><span id="feedbackSpeechLabel">Start speech to text</span>
+              </button>
+              <small id="feedbackSpeechStatus">Browser speech-to-text ready.</small>
+            </div>
+            <div id="feedbackTranslationBox" aria-live="polite">
+              <b>English translation</b>
+              <div id="feedbackTranslationText"></div>
+            </div>
+            <div class="feedback-actions">
+              <button type="submit" id="feedbackSubmitBtn">Submit</button>
+              <button type="button" id="feedbackCancelBtn">Cancel</button>
+            </div>
+            <div id="feedbackStatus"></div>
+          </form>
         </div>
-        <div class="spacer"></div>
-        <div class="score" id="activeScore">–</div>
-        <button class="close" id="closeDetail">×</button>
+        <div class="detail-face detail-back" aria-hidden="true">
+          <div class="detail-head">
+            <div>
+              <div class="title">Score contributors</div>
+              <div class="sub" id="scoreBackDesc">Component scores behind this accessibility score.</div>
+            </div>
+            <div class="spacer"></div>
+            <button type="button" id="scoreFlipBackBtn">Show summary</button>
+            <button class="close" id="closeDetailBack">×</button>
+          </div>
+          <div class="score-breakdown" id="scoreBreakdownList"></div>
+          <small class="score-back-note">Authority view only · component scores are derived from the street-part accessibility metrics.</small>
+        </div>
       </div>
-      <div class="metrics" id="metricList"></div>
-      <div id="streetAgentCounts" class="street-agent-counts"></div>
-      <div class="detail-actions">
-        <button type="button" id="feedbackBtn">Give feedback</button>
-        <div id="feedbackMeta"></div>
-      </div>
-      <div id="feedbackHistory" class="feedback-history"></div>
-      <form id="feedbackForm">
-        <label for="feedbackTitle">Title</label>
-        <input
-          id="feedbackTitle"
-          name="title"
-          required
-          maxlength="120"
-          placeholder="What should be fixed?"
-        />
-        <label for="feedbackBody">Details</label>
-        <div id="feedbackLanguageHint" class="feedback-language-hint">
-          Supports English, Traditional Chinese, Simplified Chinese, Malay,
-          Tamil, Bengali, and Gujarati. Non-English feedback is translated to
-          English before saving.
-        </div>
-        <textarea
-          id="feedbackBody"
-          name="body"
-          required
-          maxlength="2000"
-          placeholder="Describe the accessibility issue or suggestion."
-        ></textarea>
-        <div class="feedback-speech-row">
-          <button type="button" id="feedbackSpeechBtn">
-            <span class="mic-pulse" aria-hidden="true"></span
-            ><span id="feedbackSpeechLabel">Start speech to text</span>
-          </button>
-          <small id="feedbackSpeechStatus">Browser speech-to-text ready.</small>
-        </div>
-        <div id="feedbackTranslationBox" aria-live="polite">
-          <b>English translation</b>
-          <div id="feedbackTranslationText"></div>
-        </div>
-        <div class="feedback-actions">
-          <button type="submit" id="feedbackSubmitBtn">Submit</button>
-          <button type="button" id="feedbackCancelBtn">Cancel</button>
-        </div>
-        <div id="feedbackStatus"></div>
-      </form>
     </section>
     <div id="toastStack" aria-live="polite" aria-atomic="false"></div>
     <section id="notificationsPanel" class="hud" aria-live="polite">
@@ -2022,6 +2052,42 @@
       );
       function scoreColor(s) {
         return s >= 67 ? COLORS.green : s >= 45 ? COLORS.amber : COLORS.red;
+      }
+      function componentScoreRows(metrics = {}, scores = {}) {
+        const rows = [
+          ["Clear width", scores.clear_width, metrics.clear_width_m ? `${metrics.clear_width_m} m measured` : "Width clearance"],
+          ["Running slope", scores.running_slope, metrics.running_slope_pct != null ? `${metrics.running_slope_pct}% grade` : "Route steepness"],
+          ["Cross slope", scores.cross_slope, metrics.cross_slope_pct != null ? `${metrics.cross_slope_pct}% side slope` : "Side tilt"],
+          ["Surface roughness", scores.surface_roughness, metrics.roughness_mm != null ? `${metrics.roughness_mm} mm roughness` : "Wheel/stroller comfort"],
+          ["Level changes", scores.vertical_change, metrics.vertical_change_mm != null ? `${metrics.vertical_change_mm} mm max change` : "Kerb/step transitions"],
+          ["Obstructions", scores.obstructions, metrics.obstruction_count != null ? `${metrics.obstruction_count} detected` : "Blocked path risk"],
+          ["Shelter", scores.shelter, metrics.covered ? "Covered segment" : "Not covered"],
+          ["Tactile guidance", scores.tactile_guidance, metrics.tactile_guidance ? "Present" : "Unknown / absent"],
+        ];
+        return rows.filter(([, value]) => value != null && value !== "");
+      }
+      function renderScoreBreakdown(p = {}, detailScore = null) {
+        const rows = componentScoreRows(p.metrics || {}, p.component_scores || {});
+        const canFlip = state.role === "authority" && rows.length > 0;
+        if (window.scoreFlipBtn) {
+          scoreFlipBtn.disabled = !canFlip;
+          scoreFlipBtn.title = canFlip ? "Authority: click for component score breakdown" : "Component breakdown unavailable";
+          scoreFlipBtn.setAttribute("aria-expanded", detailCard?.classList.contains("flipped") ? "true" : "false");
+        }
+        if (window.scoreBackDesc) {
+          scoreBackDesc.textContent = `${p.name || "Selected street part"} · overall ${detailScore == null ? "–" : detailScore + "/100"}`;
+        }
+        if (!window.scoreBreakdownList) return;
+        scoreBreakdownList.innerHTML = rows.length
+          ? rows.map(([label, value, note]) => `<div class="metric"><span>${escapeHtml(label)}</span><b style="color:${scoreColor(value)}">${Math.round(value)}/100</b><small>${escapeHtml(note)}</small></div>`).join("")
+          : `<div class="metric"><span>No breakdown</span><b>–</b><small>Component scores are unavailable for this item.</small></div>`;
+      }
+      function setScoreCardFlipped(flipped) {
+        if (state.role !== "authority" || scoreFlipBtn?.disabled) flipped = false;
+        detailCard?.classList.toggle("flipped", flipped);
+        document.querySelector(".detail-front")?.setAttribute("aria-hidden", flipped ? "true" : "false");
+        document.querySelector(".detail-back")?.setAttribute("aria-hidden", flipped ? "false" : "true");
+        scoreFlipBtn?.setAttribute("aria-expanded", flipped ? "true" : "false");
       }
       function middle(f) {
         const c = f.geometry.coordinates;
@@ -2706,9 +2772,12 @@
             part.metrics?.overall_accessibility_score ??
             raw.overall_accessibility_score,
           metrics: {
+            ...(raw.metrics || {}),
+            ...(part.metrics || {}),
             length_m: part.length_m,
             source_segment_count: part.metrics?.source_segment_count,
           },
+          component_scores: raw.component_scores || part.component_scores || null,
           address: streetPartAddress(part, f),
           street_part_external_id: part.id,
         };
@@ -2978,7 +3047,7 @@
           )
           .join("");
         streetAgentCounts.classList.add("visible");
-        streetAgentCounts.innerHTML = `<b>Live synthetic agents on this street part</b><div class="count-grid">${pills}</div><small>${row.total_count} currently here · synthetic, not real-person tracking</small>`;
+        streetAgentCounts.innerHTML = `<b>Live synthetic agents on this street part</b><div class="count-grid">${pills}</div><small>${row.total_count} currently here</small>`;
       }
 
       async function loadLiveAgentSnapshot() {
@@ -2998,6 +3067,7 @@
 
       function showDetail(p, kind = "", extras = {}) {
         detailCard.classList.add("visible");
+        setScoreCardFlipped(false);
         const typeLabel = (p.feature_type || p.kind || "feature").replaceAll(
           "_",
           " ",
@@ -3020,33 +3090,8 @@
           p.overall_accessibility_score ?? extras.score ?? null;
         activeScore.textContent =
           detailScore == null ? "–" : `${detailScore}/100`;
-        const m = p.metrics,
-          c = p.component_scores;
-        if (m && c) {
-          metricList.innerHTML = [
-            ["Width", m.clear_width_m + " m", c.clear_width],
-            ["Slope", m.running_slope_pct + "%", c.running_slope],
-            ["Cross slope", m.cross_slope_pct + "%", c.cross_slope],
-            ["Roughness", m.roughness_mm + " mm", c.surface_roughness],
-            ["Level change", m.vertical_change_mm + " mm", c.vertical_change],
-            ["Obstructions", m.obstruction_count, c.obstructions],
-            ["Shelter", m.covered ? "yes" : "no", c.shelter],
-            [
-              "Tactile",
-              m.tactile_guidance ? "yes" : "unknown",
-              c.tactile_guidance,
-            ],
-          ]
-            .map(
-              (x) =>
-                `<div class="metric"><span>${x[0]}</span><b style="color:${scoreColor(x[2])}">${x[1]}</b><small>${x[2]}/100</small></div>`,
-            )
-            .join("");
-        } else {
-          // Street-part length already appears in the scorecard description;
-          // do not repeat it as a separate metric card.
-          metricList.innerHTML = "";
-        }
+        renderScoreBreakdown(p, detailScore);
+        metricList.innerHTML = "";
         setDetailContext({
           kind: kind || "",
           segmentId: p.id || null,
@@ -4019,9 +4064,13 @@
         };
       }
       closeDetail.onclick = () => {
+        setScoreCardFlipped(false);
         detailCard.classList.remove("visible");
         EquirouteFeedback.close(true);
       };
+      if (window.closeDetailBack) closeDetailBack.onclick = closeDetail.onclick;
+      if (window.scoreFlipBtn) scoreFlipBtn.onclick = () => setScoreCardFlipped(true);
+      if (window.scoreFlipBackBtn) scoreFlipBackBtn.onclick = () => setScoreCardFlipped(false);
       EquirouteFeedback.init({
         getDetailContext: () => state.detailContext,
         getCurrentUser: () => state.appUser,
