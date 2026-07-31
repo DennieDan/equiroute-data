@@ -1194,19 +1194,19 @@
       <a id="docsBtn" class="buttonlike topbar-link" href="../documentation">Documentation</a>
       <button id="themeToggleBtn" title="Display theme: system">◐ System</button>
       <button id="notificationBellBtn" title="Notifications">🔔</button>
-      <button id="settingsBtn" class="authority-only">⚙</button>
+      <button id="settingsBtn" title="Settings">⚙</button>
       <button id="roleSwitchBtn" class="role-pill" type="button">Role</button>
     </div>
     <div id="settings" class="hud">
       <button class="close" id="closeSettings">×</button>
       <h3>Settings</h3>
-      <p>Account and authority controls for this demo.</p>
-      <p id="tokenStatus" hidden></p>
-      <p id="currentUserStatus"></p>
+      <p class="authority-only">Account and authority controls for this demo.</p>
+      <p id="tokenStatus" class="authority-only" hidden></p>
+      <p id="currentUserStatus" class="authority-only"></p>
       <section class="settings-section" id="photoCrowdSection">
         <h4>Photo crowdsourcing</h4>
         <p>
-          Manage street-part photo submissions on the dedicated photo
+          Manage Footpath photo submissions on the dedicated photo
           crowdsourcing page.
         </p>
         <div class="photo-upload-actions">
@@ -4039,10 +4039,12 @@
         event.stopPropagation();
         notificationsPanel?.classList.remove("visible");
         roleMenu?.classList.remove("visible");
-        if (state.role === "authority") {
-          settings.classList.toggle("visible");
-          if (settings.classList.contains("visible")) renderManagedUsers();
-        }
+        settings.classList.toggle("visible");
+        if (
+          state.role === "authority" &&
+          settings.classList.contains("visible")
+        )
+          renderManagedUsers();
       };
       closeSettings.onclick = () => settings.classList.remove("visible");
       if (window.closeRoleMenu)

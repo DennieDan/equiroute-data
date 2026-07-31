@@ -104,6 +104,9 @@ function setStatus(element, message, kind = "") {
 }
 
 function selectStep(step) {
+  if (state.role !== "authority" && (step === "staff" || step === "approved")) {
+    step = "upload";
+  }
   document.querySelectorAll(".step-tab").forEach((tab) => {
     tab.classList.toggle("active", tab.dataset.step === step);
   });
@@ -714,8 +717,18 @@ function applyRole() {
   roleBadge.textContent =
     state.role === "authority" ? "Authority staff" : "Public contributor";
   const authority = state.role === "authority";
-  staffOnlyNotice.hidden = authority;
+  const staffTab = document.querySelector('[data-step="staff"]');
+  const approvedTab = document.querySelector('[data-step="approved"]');
+  const staffPanel = document.querySelector('[data-panel="staff"]');
+  const approvedPanel = document.querySelector('[data-panel="approved"]');
+  staffTab.hidden = !authority;
+  approvedTab.hidden = !authority;
+  staffPanel.hidden = !authority;
+  approvedPanel.hidden = !authority;
+  document.querySelector(".workflow").classList.toggle("public-workflow", !authority);
+  staffOnlyNotice.hidden = true;
   staffWorkspace.hidden = !authority;
+  if (!authority) selectStep("upload");
 }
 
 document.querySelectorAll(".step-tab").forEach((tab) => {

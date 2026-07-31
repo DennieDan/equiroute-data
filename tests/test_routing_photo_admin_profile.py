@@ -38,6 +38,8 @@ class RoutingPhotoAdminProfileTests(unittest.TestCase):
     def test_settings_has_photo_crowdsourcing_and_account_management(self):
         self.assertIn("Photo crowdsourcing", self.platform)
         self.assertIn("Open dedicated page", self.platform)
+        self.assertIn('id="settingsBtn" title="Settings"', self.platform)
+        self.assertNotIn('id="settingsBtn" class="authority-only"', self.platform)
         self.assertNotIn('id="photoProgressRail"', self.platform)
         self.assertNotIn('id="photoUploadBtn"', self.platform)
         self.assertNotIn('id="photoUploadInput"', self.platform)
@@ -104,6 +106,9 @@ class RoutingPhotoAdminProfileTests(unittest.TestCase):
         self.assertNotIn("Approve and make active", self.crowd_photos_app)
         self.assertNotIn("street-part-toggle", self.crowd_photos_app)
         self.assertIn("Approved photos by Footpath", self.crowd_photos)
+        self.assertIn("staffTab.hidden = !authority", self.crowd_photos_app)
+        self.assertIn("approvedTab.hidden = !authority", self.crowd_photos_app)
+        self.assertIn("public-workflow", self.crowd_photos_app)
 
     def test_pending_upload_policy_and_atomic_review_activation(self):
         self.assertIn("public insert pending crowd photos", self.rls)
