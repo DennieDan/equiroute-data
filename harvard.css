@@ -532,3 +532,123 @@ body:has(.login-card) main.login-shell {
   .site-links { width: 100%; }
   .site-links a { flex: 1; justify-content: center; min-height: 52px; padding: 0 16px; }
 }
+
+
+/* JalanLens Earth/street-view contrast repair */
+body:has(#map) .seg-btn {
+  border: 2px solid #ffffff !important;
+  background: #38bdf8 !important;
+  color: #00111d !important;
+  box-shadow: 0 0 0 5px rgba(56, 189, 248, 0.24), 0 8px 22px rgba(0, 0, 0, 0.45) !important;
+}
+body:has(#map) .seg-btn.bad { background: #ff3b52 !important; color: #ffffff !important; }
+body:has(#map) .seg-btn.warn { background: #ffd166 !important; color: #1e1e1e !important; }
+body:has(#map) .seg-btn.feature { background: #38bdf8 !important; color: #00111d !important; }
+body:has(#map) .seg-btn.feature.ramp { background: #22f36e !important; color: #00111d !important; }
+body:has(#map) .seg-btn.feature.bus { background: #fb923c !important; color: #00111d !important; }
+body:has(#map) .seg-btn.feature.shelter { background: #facc15 !important; color: #1e1e1e !important; }
+body:has(#map) .seg-btn.feature.tactile { background: #a78bfa !important; color: #1e1e1e !important; }
+body:has(#map) .seg-btn::after {
+  background: rgba(2, 6, 23, 0.92) !important;
+  color: #ffffff !important;
+  border-color: rgba(255,255,255,0.28) !important;
+}
+body:has(#map) .score-card,
+body:has(#map) .photo-card,
+body:has(#map) #photoUploadPanel,
+body:has(#map) #feedbackPanel,
+body:has(#map) #detailCard .metric,
+body:has(#map) .feature-card,
+body:has(#map) .thread {
+  background: rgba(255,255,255,0.92) !important;
+  color: #111111 !important;
+}
+body:has(#map) .score-card *,
+body:has(#map) .photo-card *,
+body:has(#map) #photoUploadPanel *,
+body:has(#map) #feedbackPanel *,
+body:has(#map) #detailCard .metric *,
+body:has(#map) .feature-card *,
+body:has(#map) .thread * {
+  color: #111111 !important;
+}
+body:has(#map) .score-card small,
+body:has(#map) .score-card span,
+body:has(#map) .photo-card small,
+body:has(#map) .photo-card span,
+body:has(#map) #photoUploadPrompt,
+body:has(#map) #photoUploadStatus,
+body:has(#map) #feedbackMeta,
+body:has(#map) #feedbackStatus,
+body:has(#map) .feedback-item small,
+body:has(#map) .metric span,
+body:has(#map) .muted {
+  color: #475569 !important;
+}
+body:has(#map) #photoUploadStatus.ok,
+body:has(#map) #feedbackStatus.ok { color: #166534 !important; }
+body:has(#map) #photoUploadStatus.err,
+body:has(#map) #feedbackStatus.err { color: #b91c1c !important; }
+body:has(#map) .street-agent-counts {
+  background: rgba(255,255,255,0.92) !important;
+  border-color: rgba(30,30,30,0.22) !important;
+  color: #111111 !important;
+}
+body:has(#map) .street-agent-counts,
+body:has(#map) .street-agent-counts * { color: #111111 !important; }
+body:has(#map) .street-agent-counts small { color: #475569 !important; }
+body:has(#map) .street-agent-counts .count-pill {
+  background: #f8fafc !important;
+  border-color: rgba(30,30,30,0.22) !important;
+  color: #111111 !important;
+}
+body:has(#map) .feedback-history {
+  background: rgba(255,255,255,0.94) !important;
+  border-color: rgba(30,30,30,0.22) !important;
+  color: #111111 !important;
+}
+body:has(#map) .feedback-thread-head b,
+body:has(#map) .feedback-item b,
+body:has(#map) .feedback-item span {
+  color: #111111 !important;
+}
+body:has(#map) .feedback-item {
+  border-bottom-color: rgba(30,30,30,0.16) !important;
+}
+body:has(#map) .feedback-item b em {
+  background: #e0f2fe !important;
+  color: #075985 !important;
+  border-color: #7dd3fc !important;
+}
+body:has(#map) .feedback-item.agent b em {
+  background: #f3e8ff !important;
+  color: #6b21a8 !important;
+  border-color: #d8b4fe !important;
+}
+body:has(#map) #feedbackForm input,
+body:has(#map) #feedbackForm textarea,
+body:has(#map) .feedback-filters select {
+  background: #ffffff !important;
+  color: #111111 !important;
+  border-color: rgba(30,30,30,0.26) !important;
+}
+body:has(#map) #photoUploadPanel button,
+body:has(#map) #feedbackPanel button,
+body:has(#map) .feedback-like {
+  color: #ffffff !important;
+}
+body:has(#map) #photoUploadPanel button.photo-upload-secondary {
+  background: #ffffff !important;
+  color: #111111 !important;
+  border-color: rgba(30,30,30,0.26) !important;
+}
+body:has(#map) .feedback-like {
+  background: #ffffff !important;
+  color: #111111 !important;
+  border-color: rgba(30,30,30,0.26) !important;
+}
+body:has(#map) .feedback-like.liked {
+  background: #e0f2fe !important;
+  color: #075985 !important;
+  border-color: #0284c7 !important;
+}
