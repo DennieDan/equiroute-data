@@ -70,6 +70,31 @@ class EarthUiControlsNotificationTests(unittest.TestCase):
         self.assertNotIn('["Length", `${Math.round(m.length_m * 10) / 10} m`, "street-part distance"]', text)
         self.assertNotIn('street-part distance', text)
 
+    def test_theme_recolors_scorecard_text_and_metric_cards(self):
+        css = (ROOT / "harvard.css").read_text()
+        for snippet in [
+            'body:has(#map) .score-card',
+            'background: var(--panel-strong-bg)',
+            'color: var(--txt)',
+            'body:has(#map) .score-card small',
+            'body:has(#map) #detailCard .metric span',
+            'color: var(--muted)',
+            'body:has(#map) #detailCard .score-flip',
+            'border-left: 5px solid var(--harvard-crimson)',
+            'body:has(#map) #detailCard .score-breakdown',
+            'border-top: 4px solid var(--harvard-crimson)',
+            'background: color-mix(in srgb, var(--harvard-crimson) 10%',
+            'body:has(#map) #detailCard #scoreFlipBackBtn',
+        ]:
+            self.assertIn(snippet, css)
+        forbidden_scorecard_literals = [
+            'body:has(#map) .score-card * {\n  color: #111111',
+            'body:has(#map) #detailCard .metric b {\n  color: #111111',
+            'body:has(#map) #detailCard .metric span {\n  color: #334155',
+        ]
+        for literal in forbidden_scorecard_literals:
+            self.assertNotIn(literal, css)
+
     def test_authority_score_card_flips_to_component_breakdown(self):
         text = self.html()
         for snippet in [

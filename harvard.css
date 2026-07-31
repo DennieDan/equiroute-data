@@ -583,8 +583,9 @@ body:has(#map) #feedbackPanel,
 body:has(#map) #detailCard .metric,
 body:has(#map) .feature-card,
 body:has(#map) .thread {
-  background: rgba(255,255,255,0.92) !important;
-  color: #111111 !important;
+  background: var(--panel-strong-bg) !important;
+  color: var(--txt) !important;
+  border-color: var(--line) !important;
 }
 body:has(#map) .score-card *,
 body:has(#map) .photo-card *,
@@ -593,7 +594,7 @@ body:has(#map) #feedbackPanel *,
 body:has(#map) #detailCard .metric *,
 body:has(#map) .feature-card *,
 body:has(#map) .thread * {
-  color: #111111 !important;
+  color: var(--txt) !important;
 }
 body:has(#map) .score-card small,
 body:has(#map) .score-card span,
@@ -606,7 +607,7 @@ body:has(#map) #feedbackStatus,
 body:has(#map) .feedback-item small,
 body:has(#map) .metric span,
 body:has(#map) .muted {
-  color: #475569 !important;
+  color: var(--muted) !important;
 }
 body:has(#map) #photoUploadStatus.ok,
 body:has(#map) #feedbackStatus.ok { color: #166534 !important; }
@@ -709,83 +710,106 @@ body:has(#map) .feedback-like.liked {
 body:has(#map) #detailCard {
   max-height: calc(100vh - 112px) !important;
   overflow-y: auto !important;
-  background: rgba(255, 255, 255, 0.96) !important;
-  border-top: 5px solid #1e1e1e !important;
-  color: #111111 !important;
+  background: var(--bg) !important;
+  border-top: 5px solid var(--control-fg) !important;
+  color: var(--txt) !important;
 }
 body:has(#map) #detailCard .detail-head {
   padding-bottom: 10px !important;
-  border-bottom: 1px solid rgba(30,30,30,0.16) !important;
+  border-bottom: 1px solid var(--line) !important;
 }
 body:has(#map) #detailCard .title,
 body:has(#map) #detailCard #selectedName {
-  color: #111111 !important;
+  color: var(--txt) !important;
   font-weight: 900 !important;
   letter-spacing: -0.015em !important;
 }
 body:has(#map) #detailCard .sub,
 body:has(#map) #detailCard #selectedDesc,
 body:has(#map) #detailCard .kindTitle {
-  color: #475569 !important;
+  color: var(--muted) !important;
 }
 body:has(#map) #detailCard #activeScore {
   min-width: 92px !important;
   padding: 8px 12px !important;
-  border: 1px solid rgba(30,30,30,0.2) !important;
-  border-left: 5px solid #38bdf8 !important;
-  background: #f8fafc !important;
-  color: #111111 !important;
+  border: 1px solid var(--line) !important;
+  border-left: 5px solid var(--harvard-crimson) !important;
+  background: var(--panel-soft-bg) !important;
+  color: var(--txt) !important;
   font-family: var(--harvard-sans) !important;
   font-size: 22px !important;
   font-weight: 950 !important;
   line-height: 1 !important;
   text-align: right !important;
 }
-body:has(#map) #detailCard .metrics {
+body:has(#map) #detailCard .score-flip {
+  border-color: var(--line) !important;
+  border-left: 5px solid var(--harvard-crimson) !important;
+  background: var(--panel-soft-bg) !important;
+  color: var(--txt) !important;
+}
+body:has(#map) #detailCard .score-flip-hint,
+body:has(#map) #detailCard .score-back-note {
+  color: var(--muted) !important;
+}
+body:has(#map) #detailCard .metrics,
+body:has(#map) #detailCard .score-breakdown {
   gap: 10px !important;
   margin-top: 12px !important;
 }
-body:has(#map) #detailCard .metric {
+body:has(#map) #detailCard .metric,
+body:has(#map) #detailCard .score-breakdown .metric {
   display: grid !important;
   gap: 6px !important;
   min-height: 84px !important;
-  padding: 12px !important;
-  border: 1px solid rgba(30,30,30,0.14) !important;
-  border-top: 4px solid #38bdf8 !important;
-  background: #ffffff !important;
-  color: #111111 !important;
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08) !important;
+  padding: 12px 14px !important;
+  border: 1px solid var(--line) !important;
+  border-top: 4px solid var(--harvard-crimson) !important;
+  border-radius: 0 !important;
+  background: var(--panel-strong-bg) !important;
+  color: var(--txt) !important;
+  box-shadow: none !important;
 }
-body:has(#map) #detailCard .metric span {
-  color: #334155 !important;
+body:has(#map) #detailCard .metric span,
+body:has(#map) #detailCard .score-breakdown .metric span {
+  color: var(--muted) !important;
   font-size: 11px !important;
   font-weight: 900 !important;
   line-height: 1.15 !important;
   text-transform: uppercase !important;
   letter-spacing: 0.06em !important;
 }
-body:has(#map) #detailCard .metric b {
-  color: #111111 !important;
+body:has(#map) #detailCard .metric b,
+body:has(#map) #detailCard .score-breakdown .metric b {
+  color: var(--txt) !important;
   font-family: var(--harvard-sans) !important;
   font-size: 20px !important;
   font-weight: 950 !important;
   line-height: 1.05 !important;
 }
-body:has(#map) #detailCard .metric small {
+body:has(#map) #detailCard .metric small,
+body:has(#map) #detailCard .score-breakdown .metric small {
   justify-self: start !important;
   padding: 3px 8px !important;
-  border-radius: 999px !important;
-  background: #e0f2fe !important;
-  color: #075985 !important;
-  border: 1px solid #7dd3fc !important;
+  border-radius: 0 !important;
+  background: color-mix(in srgb, var(--harvard-crimson) 10%, var(--panel-strong-bg)) !important;
+  color: var(--txt) !important;
+  border: 1px solid color-mix(in srgb, var(--harvard-crimson) 46%, var(--line)) !important;
   font-size: 11px !important;
   font-weight: 900 !important;
   line-height: 1.2 !important;
 }
+body:has(#map) #detailCard #scoreFlipBackBtn,
 body:has(#map) #detailCard .close {
-  background: #ffffff !important;
-  color: #111111 !important;
-  border-color: rgba(30,30,30,0.22) !important;
+  background: var(--control-bg) !important;
+  color: var(--control-fg) !important;
+  border-color: var(--line) !important;
+}
+body:has(#map) #detailCard #scoreFlipBackBtn:hover,
+body:has(#map) #detailCard .close:hover {
+  background: var(--harvard-crimson) !important;
+  border-color: var(--harvard-crimson) !important;
+  color: var(--harvard-white) !important;
 }
 @media (max-width: 720px) {
   body:has(#map) #detailCard .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
