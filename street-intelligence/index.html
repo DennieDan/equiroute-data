@@ -29,8 +29,12 @@
         --control-fg: #eef9ff;
         --option-bg: #020617;
         --option-fg: #eef9ff;
+        --panel-strong-bg: rgba(15, 23, 42, 0.86);
+        --panel-soft-bg: rgba(15, 23, 42, 0.52);
       }
+      html[data-theme="light"],
       body[data-theme="light"] {
+        color-scheme: light;
         --bg: rgba(255, 255, 255, 0.92);
         --line: rgba(15, 23, 42, 0.22);
         --txt: #0f172a;
@@ -39,8 +43,12 @@
         --control-fg: #0f172a;
         --option-bg: #ffffff;
         --option-fg: #0f172a;
+        --panel-strong-bg: rgba(255, 255, 255, 0.94);
+        --panel-soft-bg: rgba(241, 245, 249, 0.86);
       }
+      html[data-theme="dark"],
       body[data-theme="dark"] {
+        color-scheme: dark;
         --bg: rgba(2, 6, 23, 0.86);
         --line: rgba(125, 211, 252, 0.34);
         --txt: #eef9ff;
@@ -49,6 +57,8 @@
         --control-fg: #eef9ff;
         --option-bg: #020617;
         --option-fg: #eef9ff;
+        --panel-strong-bg: rgba(15, 23, 42, 0.86);
+        --panel-soft-bg: rgba(15, 23, 42, 0.52);
       }
       html,
       body {
@@ -1131,10 +1141,7 @@
         }
       }
     </style>
-    <link
-      rel="stylesheet"
-      href="../harvard.css?v=20260731-mobile-street-photo-2"
-    />
+    <link rel="stylesheet" href="../harvard.css?v=20260731i" />
     <script src="https://unpkg.com/maptalks/dist/maptalks.min.js"></script>
     <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
     <script src="https://unpkg.com/mapillary-js@4.1.2/dist/mapillary.js"></script>
@@ -1179,10 +1186,8 @@
       <div class="spacer"></div>
       <span class="pill" hidden><b id="segCount">–</b> segments</span>
       <span class="pill" hidden><b id="buildingCount">–</b> buildings</span>
-      <a id="docsBtn" class="buttonlike topbar-link" href="../documentation"
-        >Documentation</a
-      >
-      <button id="themeToggleBtn" title="Display theme: system">◐</button>
+      <a id="docsBtn" class="buttonlike topbar-link" href="../documentation">Documentation</a>
+      <button id="themeToggleBtn" title="Display theme: system">◐ System</button>
       <button id="notificationBellBtn" title="Notifications">🔔</button>
       <button id="settingsBtn" class="authority-only">⚙</button>
       <button id="roleSwitchBtn" class="role-pill" type="button">Role</button>
@@ -1518,15 +1523,17 @@
       }
       function applyTheme() {
         const mode = state.themeMode || "system";
-        const dark =
-          mode === "dark" ||
-          (mode === "system" &&
-            matchMedia?.("(prefers-color-scheme: dark)").matches);
-        document.body.dataset.theme = dark ? "dark" : "light";
+        const prefersDark = typeof matchMedia === "function" && matchMedia("(prefers-color-scheme: dark)").matches;
+        const dark = mode === "dark" || (mode === "system" && prefersDark);
+        const resolved = dark ? "dark" : "light";
+        document.documentElement.dataset.theme = resolved;
+        document.documentElement.dataset.themeMode = mode;
+        document.body.dataset.theme = resolved;
+        document.body.dataset.themeMode = mode;
         if (window.themeToggleBtn) {
-          themeToggleBtn.textContent =
-            mode === "light" ? "☀" : mode === "dark" ? "☾" : "◐";
-          themeToggleBtn.title = `Display theme: ${mode}`;
+          themeToggleBtn.textContent = mode === "light" ? "☀ Light" : mode === "dark" ? "☾ Dark" : "◐ System";
+          themeToggleBtn.title = `Display theme: ${mode} (${resolved})`;
+          themeToggleBtn.setAttribute("aria-label", `Display theme: ${mode}; resolved ${resolved}`);
         }
       }
       function cycleTheme() {

@@ -974,21 +974,21 @@ body:has(#map) #topbar #segmentSelect {
   min-height: 40px !important;
   max-width: min(360px, 42vw) !important;
   padding: 9px 38px 9px 14px !important;
-  border: 1px solid rgba(255,255,255,0.34) !important;
+  border: 1px solid var(--line) !important;
   border-left: 4px solid var(--harvard-crimson) !important;
   border-radius: 0 !important;
-  background-color: var(--harvard-black) !important;
+  background-color: var(--control-bg) !important;
   background-image:
-    linear-gradient(45deg, transparent 50%, #ffffff 50%),
-    linear-gradient(135deg, #ffffff 50%, transparent 50%),
-    linear-gradient(to right, rgba(255,255,255,0.2), rgba(255,255,255,0.2)) !important;
+    linear-gradient(45deg, transparent 50%, var(--control-fg) 50%),
+    linear-gradient(135deg, var(--control-fg) 50%, transparent 50%),
+    linear-gradient(to right, var(--line), var(--line)) !important;
   background-position:
     calc(100% - 18px) 17px,
     calc(100% - 12px) 17px,
     calc(100% - 34px) 8px !important;
   background-size: 6px 6px, 6px 6px, 1px 24px !important;
   background-repeat: no-repeat !important;
-  color: #ffffff !important;
+  color: var(--control-fg) !important;
   font-family: var(--harvard-sans) !important;
   font-size: 14px !important;
   font-weight: 900 !important;
@@ -999,18 +999,18 @@ body:has(#map) #topbar #segmentSelect {
 body:has(#map) #topbar select.topbar-hover-select:hover,
 body:has(#map) #topbar select.topbar-hover-select:focus {
   transform: translateY(-1px) !important;
-  border-color: #ffffff !important;
+  border-color: var(--control-fg) !important;
   border-left-color: var(--harvard-crimson) !important;
-  background-color: #111111 !important;
-  color: #ffffff !important;
-  outline: 2px solid rgba(255,255,255,0.18) !important;
+  background-color: var(--control-bg) !important;
+  color: var(--control-fg) !important;
+  outline: 2px solid var(--line) !important;
   outline-offset: 2px !important;
 }
 body:has(#map) #topbar select.topbar-hover-select option,
 body:has(#map) #topbar #viewModeSelect option,
 body:has(#map) #topbar #segmentSelect option {
-  background: #ffffff !important;
-  color: #111111 !important;
+  background: var(--option-bg) !important;
+  color: var(--option-fg) !important;
   font-weight: 800 !important;
 }
 
@@ -1043,4 +1043,81 @@ body:has(#map) #topbar #segmentSelect {
     flex: 1 1 150px !important;
     font-size: 13px !important;
   }
+}
+
+html[data-theme="light"] body:has(#map) {
+  background: #f8fafc !important;
+  color: var(--txt) !important;
+}
+html[data-theme="dark"] body:has(#map) {
+  background: #020617 !important;
+  color: var(--txt) !important;
+}
+html[data-theme="light"] body:has(#map) .hud,
+html[data-theme="light"] body:has(#map) #topbar,
+html[data-theme="light"] body:has(#map) #detailCard,
+html[data-theme="light"] body:has(#map) #settings,
+html[data-theme="light"] body:has(#map) #notificationsPanel,
+html[data-theme="light"] body:has(#map) .toast,
+html[data-theme="light"] body:has(#map) .feedback-history,
+html[data-theme="dark"] body:has(#map) .hud,
+html[data-theme="dark"] body:has(#map) #topbar,
+html[data-theme="dark"] body:has(#map) #detailCard,
+html[data-theme="dark"] body:has(#map) #settings,
+html[data-theme="dark"] body:has(#map) #notificationsPanel,
+html[data-theme="dark"] body:has(#map) .toast,
+html[data-theme="dark"] body:has(#map) .feedback-history {
+  background: var(--bg) !important;
+  color: var(--txt) !important;
+  border-color: var(--line) !important;
+}
+html[data-theme="light"] body:has(#map) .pill,
+html[data-theme="light"] body:has(#map) .notification-item,
+html[data-theme="light"] body:has(#map) .persona-card,
+html[data-theme="light"] body:has(#map) .feedback-item,
+html[data-theme="light"] body:has(#map) .feedback-reply,
+html[data-theme="light"] body:has(#map) input,
+html[data-theme="light"] body:has(#map) textarea,
+html[data-theme="dark"] body:has(#map) .pill,
+html[data-theme="dark"] body:has(#map) .notification-item,
+html[data-theme="dark"] body:has(#map) .persona-card,
+html[data-theme="dark"] body:has(#map) .feedback-item,
+html[data-theme="dark"] body:has(#map) .feedback-reply,
+html[data-theme="dark"] body:has(#map) input,
+html[data-theme="dark"] body:has(#map) textarea {
+  background: var(--panel-soft-bg) !important;
+  color: var(--txt) !important;
+  border-color: var(--line) !important;
+}
+html[data-theme="light"] body:has(#map) .sub,
+html[data-theme="light"] body:has(#map) .kindTitle,
+html[data-theme="light"] body:has(#map) small,
+html[data-theme="light"] body:has(#map) label,
+html[data-theme="light"] body:has(#map) #feedbackMeta,
+html[data-theme="light"] body:has(#map) #feedbackStatus,
+html[data-theme="light"] body:has(#map) .persona-note {
+  color: var(--muted) !important;
+}
+html[data-theme="light"] body:has(#map) .feedback-item b,
+html[data-theme="light"] body:has(#map) .feedback-thread-head b,
+html[data-theme="light"] body:has(#map) .title,
+html[data-theme="light"] body:has(#map) .score {
+  color: var(--txt) !important;
+}
+body:has(#map) #topbar button,
+body:has(#map) #topbar .buttonlike {
+  border-color: var(--line) !important;
+  background: var(--control-bg) !important;
+  color: var(--control-fg) !important;
+}
+body:has(#map) #topbar button:hover,
+body:has(#map) #topbar button.active,
+body:has(#map) #topbar .buttonlike:hover {
+  border-color: var(--control-fg) !important;
+  background: var(--control-fg) !important;
+  color: var(--control-bg) !important;
+}
+html[data-theme="light"] body:has(#map) .brand,
+html[data-theme="light"] body:has(#map) .brand span {
+  color: var(--txt) !important;
 }

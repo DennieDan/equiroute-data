@@ -24,17 +24,32 @@ class EarthUiControlsNotificationTests(unittest.TestCase):
 
     def test_street_only_controls_and_contrasting_dropdown_theme(self):
         text = self.html()
+        css = (ROOT / "harvard.css").read_text()
         for required in [
             '.street-only-control',
             '.street-mode .street-only-control',
             'body[data-theme="light"]',
             'body[data-theme="dark"]',
             'id="themeToggleBtn"',
-            '◐',
+            '◐ System',
+            '☀ Light',
+            '☾ Dark',
+            'document.documentElement.dataset.theme',
         ]:
             self.assertIn(required, text)
         self.assertRegex(text, r"select\s*\{[^}]*background:\s*var\(--control-bg\)", text)
         self.assertRegex(text, r"select option\s*\{[^}]*background:\s*var\(--option-bg\)", text)
+        for required_css in [
+            'html[data-theme="light"] body:has(#map)',
+            'html[data-theme="dark"] body:has(#map)',
+            'background-color: var(--control-bg)',
+            'body:has(#map) #topbar button',
+            'body:has(#map) #topbar .buttonlike',
+            'color: var(--control-fg)',
+            'background: var(--option-bg)',
+            'color: var(--option-fg)',
+        ]:
+            self.assertIn(required_css, css)
 
     def test_status_is_toast_notification_not_persistent_5m_segment_box(self):
         text = self.html()
