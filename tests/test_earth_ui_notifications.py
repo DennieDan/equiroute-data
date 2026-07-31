@@ -182,6 +182,19 @@ class EarthUiControlsNotificationTests(unittest.TestCase):
         ]:
             self.assertNotIn(forbidden, dark_black_css)
 
+    def test_dashboard_view_and_footpath_dropdowns_are_black(self):
+        css = (ROOT / "harvard.css").read_text()
+        for snippet in [
+            'body:has(#map) #topbar #viewModeSelect',
+            'body:has(#map) #topbar #segmentSelect',
+            'html[data-theme="light"] body:has(#map) #topbar #viewModeSelect',
+            'html[data-theme="dark"] body:has(#map) #topbar #segmentSelect',
+            'background-color: #000000 !important;',
+            'color: #ffffff !important;',
+            'border-left-color: var(--harvard-crimson) !important;',
+        ]:
+            self.assertIn(snippet, css)
+
     def test_authority_score_card_flips_to_component_breakdown(self):
         text = self.html()
         for snippet in [
