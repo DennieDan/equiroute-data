@@ -654,3 +654,91 @@ body:has(#map) .feedback-like.liked {
   color: #075985 !important;
   border-color: #0284c7 !important;
 }
+
+
+/* JalanLens score-card redesign */
+body:has(#map) #detailCard {
+  max-height: calc(100vh - 112px) !important;
+  overflow-y: auto !important;
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-top: 5px solid #1e1e1e !important;
+  color: #111111 !important;
+}
+body:has(#map) #detailCard .detail-head {
+  padding-bottom: 10px !important;
+  border-bottom: 1px solid rgba(30,30,30,0.16) !important;
+}
+body:has(#map) #detailCard .title,
+body:has(#map) #detailCard #selectedName {
+  color: #111111 !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.015em !important;
+}
+body:has(#map) #detailCard .sub,
+body:has(#map) #detailCard #selectedDesc,
+body:has(#map) #detailCard .kindTitle {
+  color: #475569 !important;
+}
+body:has(#map) #detailCard #activeScore {
+  min-width: 92px !important;
+  padding: 8px 12px !important;
+  border: 1px solid rgba(30,30,30,0.2) !important;
+  border-left: 5px solid #38bdf8 !important;
+  background: #f8fafc !important;
+  color: #111111 !important;
+  font-family: var(--harvard-sans) !important;
+  font-size: 22px !important;
+  font-weight: 950 !important;
+  line-height: 1 !important;
+  text-align: right !important;
+}
+body:has(#map) #detailCard .metrics {
+  gap: 10px !important;
+  margin-top: 12px !important;
+}
+body:has(#map) #detailCard .metric {
+  display: grid !important;
+  gap: 6px !important;
+  min-height: 84px !important;
+  padding: 12px !important;
+  border: 1px solid rgba(30,30,30,0.14) !important;
+  border-top: 4px solid #38bdf8 !important;
+  background: #ffffff !important;
+  color: #111111 !important;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08) !important;
+}
+body:has(#map) #detailCard .metric span {
+  color: #334155 !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  line-height: 1.15 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+}
+body:has(#map) #detailCard .metric b {
+  color: #111111 !important;
+  font-family: var(--harvard-sans) !important;
+  font-size: 20px !important;
+  font-weight: 950 !important;
+  line-height: 1.05 !important;
+}
+body:has(#map) #detailCard .metric small {
+  justify-self: start !important;
+  padding: 3px 8px !important;
+  border-radius: 999px !important;
+  background: #e0f2fe !important;
+  color: #075985 !important;
+  border: 1px solid #7dd3fc !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  line-height: 1.2 !important;
+}
+body:has(#map) #detailCard .close {
+  background: #ffffff !important;
+  color: #111111 !important;
+  border-color: rgba(30,30,30,0.22) !important;
+}
+@media (max-width: 720px) {
+  body:has(#map) #detailCard .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  body:has(#map) #detailCard #activeScore { min-width: 78px !important; font-size: 18px !important; }
+}
