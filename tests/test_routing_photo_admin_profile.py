@@ -37,7 +37,9 @@ class RoutingPhotoAdminProfileTests(unittest.TestCase):
 
     def test_settings_has_photo_crowdsourcing_and_account_management(self):
         self.assertIn("Photo crowdsourcing", self.platform)
-        self.assertIn("Open dedicated page", self.platform)
+        self.assertIn('class="photo-crowd-heading-link" href="../crowd-photos/"', self.platform)
+        self.assertIn('class="heading-arrow" aria-hidden="true">→</span>', self.platform)
+        self.assertNotIn("Open dedicated page", self.platform)
         self.assertIn('id="settingsBtn" title="Settings"', self.platform)
         self.assertNotIn('id="settingsBtn" class="authority-only"', self.platform)
         self.assertNotIn('id="photoProgressRail"', self.platform)
