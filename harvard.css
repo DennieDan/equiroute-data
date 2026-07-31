@@ -261,6 +261,7 @@ body:not(:has(.login-bg-video)) {
 #topbar .brand {
   display: inline-flex;
   align-items: center;
+  gap: 10px;
   min-height: 38px;
   padding-right: 18px;
   border-right: 1px solid rgba(255,255,255,0.25);
@@ -268,13 +269,18 @@ body:not(:has(.login-bg-video)) {
   font-size: 24px !important;
   letter-spacing: -0.04em !important;
 }
-#topbar .brand::before {
-  content: '';
-  width: 18px;
-  height: 28px;
-  margin-right: 12px;
-  background: var(--harvard-crimson);
-  clip-path: polygon(0 0,100% 0,100% 78%,50% 100%,0 78%);
+#topbar .brand img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  display: block;
+  padding: 3px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.96);
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.18);
+}
+#topbar .brand span {
+  color: inherit !important;
 }
 
 .pill {
@@ -438,19 +444,34 @@ code {
 .site-logo {
   display: inline-flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   min-height: 72px;
   padding: 0 24px;
   border-right: 1px solid rgba(255,255,255,0.18);
   color: var(--harvard-white);
   font-family: var(--harvard-serif);
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 700;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.045em;
   text-decoration: none;
 }
-.site-logo img { width: 132px; height: auto; display: block; }
-.site-logo span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.site-logo img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  display: block;
+  padding: 3px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.96);
+}
+.site-logo span {
+  position: static;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip: auto;
+  white-space: nowrap;
+}
 .site-links { display: flex; align-items: stretch; margin-left: auto; }
 .site-links a {
   display: inline-flex;

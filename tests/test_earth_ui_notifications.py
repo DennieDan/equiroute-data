@@ -13,7 +13,7 @@ class EarthUiControlsNotificationTests(unittest.TestCase):
 
     def test_topbar_uses_clean_labels_and_single_view_dropdown(self):
         text = self.html()
-        self.assertIn('<div class="brand">JalanLens</div>', text)
+        self.assertIn('<div class="brand"><img src="../assets/jalanlens-logo.png" alt="" /><span>JalanLens</span></div>', text)
         self.assertNotIn('JalanLens Earth', text)
         self.assertNotIn('Earth Satellite', text)
         self.assertIn('<select id="viewModeSelect"', text)
