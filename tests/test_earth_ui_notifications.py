@@ -87,13 +87,18 @@ class EarthUiControlsNotificationTests(unittest.TestCase):
             'body:has(#map) #detailCard #scoreFlipBackBtn',
         ]:
             self.assertIn(snippet, css)
+        scorecard_css = css[css.index('/* JalanLens score-card redesign */'):css.index('/* Mobile/APK Street View')]
         forbidden_scorecard_literals = [
             'body:has(#map) .score-card * {\n  color: #111111',
             'body:has(#map) #detailCard .metric b {\n  color: #111111',
             'body:has(#map) #detailCard .metric span {\n  color: #334155',
+            'border-left: 5px solid #38bdf8',
+            'border-top: 4px solid #38bdf8',
+            'background: #e0f2fe !important;',
+            'color: #075985 !important;',
         ]
         for literal in forbidden_scorecard_literals:
-            self.assertNotIn(literal, css)
+            self.assertNotIn(literal, scorecard_css)
 
     def test_authority_score_card_flips_to_component_breakdown(self):
         text = self.html()
