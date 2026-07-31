@@ -41,6 +41,15 @@
   let speechTranscriptOriginal = "";
   let inputModality = "typed";
 
+  function micIconSvg() {
+    return '<svg viewBox="0 0 24 24" role="img" focusable="false"><path d="M12 14.5a3.2 3.2 0 0 0 3.2-3.2V6.2a3.2 3.2 0 1 0-6.4 0v5.1a3.2 3.2 0 0 0 3.2 3.2Zm5.6-3.2a.9.9 0 0 0-1.8 0 3.8 3.8 0 0 1-7.6 0 .9.9 0 0 0-1.8 0 5.6 5.6 0 0 0 4.7 5.52v2.08H8.9a.9.9 0 1 0 0 1.8h6.2a.9.9 0 1 0 0-1.8h-2.2v-2.08a5.6 5.6 0 0 0 4.7-5.52Z"/></svg>';
+  }
+
+  function setSpeechIcon(recording = false) {
+    if (!els?.speechLabel) return;
+    els.speechLabel.innerHTML = recording ? "⏹" : micIconSvg();
+  }
+
   function $(id) { return document.getElementById(id); }
 
   function headers(extra = {}) {
@@ -754,7 +763,7 @@
       try { speechRecognition.stop(); } catch (e) {}
       speechRecognition = null;
       els.speechBtn.classList.remove("recording");
-      els.speechLabel.textContent = "🎙";
+      setSpeechIcon(false);
       els.speechStatus.textContent = speechTranscriptOriginal ? "Browser speech transcript captured." : "Speech capture stopped.";
       await refreshTranslationNow();
       return;
@@ -763,7 +772,7 @@
     audioChunks = [];
     speechTranscriptOriginal = els.body.value.trim();
     els.speechBtn.classList.add("recording");
-    els.speechLabel.textContent = "⏹";
+    setSpeechIcon(true);
     els.speechStatus.textContent = "Listening… browser speech-to-text is active.";
     speechRecognition = startBrowserSpeechRecognition();
     if (!global.JALANLENS_USE_AGNES_SPEECH || !agnesApiKey() || !navigator.mediaDevices?.getUserMedia || !global.isSecureContext) {
@@ -780,7 +789,7 @@
         stream.getTracks().forEach((track) => track.stop());
         if (speechRecognition) { try { speechRecognition.stop(); } catch (e) {} }
         els.speechBtn.classList.remove("recording");
-        els.speechLabel.textContent = "🎙";
+        setSpeechIcon(false);
         els.speechStatus.textContent = "Transcribing with Agnes AI…";
         try {
           const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType || "audio/webm" });
@@ -800,13 +809,13 @@
     } catch (err) {
       if (speechRecognition) {
         els.speechBtn.classList.add("recording");
-        els.speechLabel.textContent = "⏹";
+        setSpeechIcon(true);
         els.speechStatus.textContent = "Using browser speech-to-text fallback. Tap Stop when done.";
         mediaRecorder = null;
         return;
       }
       els.speechBtn.classList.remove("recording");
-      els.speechLabel.textContent = "🎙";
+      setSpeechIcon(false);
       els.speechStatus.textContent = err.message || "Microphone permission denied.";
       mediaRecorder = null;
     }
@@ -916,6 +925,7 @@
     }
     bindEvents();
     ensureFilters();
+    setSpeechIcon(false);
     els.form.classList.add("open");
     updateMeta();
     fillTitleFromContext();
