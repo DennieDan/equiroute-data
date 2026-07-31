@@ -1008,7 +1008,7 @@
         }
       }
     </style>
-    <link rel="stylesheet" href="../harvard.css?v=20260731f" />
+    <link rel="stylesheet" href="../harvard.css?v=20260731-mobile-street-photo" />
     <script src="https://unpkg.com/maptalks/dist/maptalks.min.js"></script>
     <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
     <script src="https://unpkg.com/mapillary-js@4.1.2/dist/mapillary.js"></script>
@@ -2360,24 +2360,60 @@
         for (let i = 0; i < span; i++) route.push(parts[(start + dir * i + parts.length * 4) % parts.length]);
         return route.filter((p) => Array.isArray(p.midpoint) && p.midpoint.length >= 2);
       }
-      function liveAgentCoordinate(agent, nowMs = Date.now()) {
-        const route = liveAgentRouteParts(agent);
-        if (!route.length) return [Number(agent.lng), Number(agent.lat)];
-        if (route.length === 1) return route[0].midpoint;
+      function streetPartFootpathCoords(part) {
+        const coords = part?.geometry?.type === "LineString" ? part.geometry.coordinates : [];
+        const clean = coords
+          .filter((c) => Array.isArray(c) && Number.isFinite(Number(c[0])) && Number.isFinite(Number(c[1])))
+          .map((c) => [Number(c[0]), Number(c[1])]);
+        if (clean.length >= 2) return clean;
+        return Array.isArray(part?.midpoint) ? [[Number(part.midpoint[0]), Number(part.midpoint[1])]] : [];
+      }
+      function liveAgentPathSegments(agent) {
+        const parts = liveAgentRouteParts(agent);
+        const segments = [];
+        let prev = null;
+        parts.forEach((part) => {
+          let coords = streetPartFootpathCoords(part);
+          if (coords.length < 2) return;
+          if (prev) {
+            const forward = distM(prev, coords[0]);
+            const backward = distM(prev, coords.at(-1));
+            if (backward < forward) coords = coords.slice().reverse();
+          }
+          for (let i = 0; i < coords.length - 1; i++) {
+            const a = coords[i], b = coords[i + 1];
+            const lengthM = distM(a, b);
+            if (lengthM > 0.05) segments.push({ a, b, part, lengthM });
+          }
+          prev = coords.at(-1);
+        });
+        return segments;
+      }
+      function liveAgentPosition(agent, nowMs = Date.now()) {
+        const segments = liveAgentPathSegments(agent);
+        if (!segments.length) return { coord: [Number(agent.lng), Number(agent.lat)], part: null };
         const h = hashString(agent.agent_external_id || agent.display_name || agent.persona_type_id);
-        const hopSeconds = 10 + (h % 22);
-        const phaseSeconds = nowMs / 1000 + (h % 997);
-        const routePos = (phaseSeconds / hopSeconds) % route.length;
-        const idx = Math.floor(routePos);
-        const next = (idx + 1) % route.length;
-        const local = routePos - idx;
-        const a = route[idx].midpoint, b = route[next].midpoint;
-        const wobble = ((h % 100) / 100 - 0.5) * 0.000035;
-        const pulse = Math.sin(phaseSeconds / 3 + (h % 31)) * 0.000018;
-        return [
-          Number(a[0]) + (Number(b[0]) - Number(a[0])) * local + wobble,
-          Number(a[1]) + (Number(b[1]) - Number(a[1])) * local + pulse,
-        ];
+        const totalM = segments.reduce((sum, seg) => sum + seg.lengthM, 0);
+        const loopSeconds = Math.max(45, totalM / Math.max(0.45, Number(agent.state?.speed_mps || 1))) + (h % 25);
+        let targetM = (((nowMs / 1000 + (h % 997)) % loopSeconds) / loopSeconds) * totalM;
+        for (const seg of segments) {
+          if (targetM <= seg.lengthM) {
+            const local = seg.lengthM ? targetM / seg.lengthM : 0;
+            return {
+              coord: [
+                seg.a[0] + (seg.b[0] - seg.a[0]) * local,
+                seg.a[1] + (seg.b[1] - seg.a[1]) * local,
+              ],
+              part: seg.part,
+            };
+          }
+          targetM -= seg.lengthM;
+        }
+        const last = segments.at(-1);
+        return { coord: last.b, part: last.part };
+      }
+      function liveAgentCoordinate(agent, nowMs = Date.now()) {
+        return liveAgentPosition(agent, nowMs).coord;
       }
       function syncLiveAgentMarkers() {
         if (!state.agentLayer || !window.maptalks) return;
@@ -2425,15 +2461,13 @@
           const id = agent.agent_external_id || agent.display_name;
           const marker = state.liveAgentMarkers.get(id);
           if (!marker) return;
-          const coord = liveAgentCoordinate(agent, wallMs);
+          const position = liveAgentPosition(agent, wallMs);
+          const coord = position.coord;
           marker.setCoordinates(new maptalks.Coordinate(coord[0], coord[1]));
-          const route = liveAgentRouteParts(agent);
-          const routeIndex = route.length ? Math.floor(((wallMs / 1000 + (hashString(id) % 997)) / (10 + (hashString(id) % 22))) % route.length) : -1;
-          const part = routeIndex >= 0 ? route[routeIndex] : null;
           agent.lng = Number(coord[0].toFixed(7));
           agent.lat = Number(coord[1].toFixed(7));
           agent.activity = agentActivityFor(agent, wallMs);
-          if (part?.id) agent.street_part_external_id = part.id;
+          if (position.part?.id) agent.street_part_external_id = position.part.id;
         });
         renderStreetAgentCounts();
       }
