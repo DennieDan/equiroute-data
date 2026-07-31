@@ -47,6 +47,12 @@ class EarthUiControlsNotificationTests(unittest.TestCase):
         self.assertIn('createNotification(', text)
         self.assertIn('street parts', text)
 
+    def test_scorecard_does_not_duplicate_street_part_length_metric(self):
+        text = self.html()
+        self.assertIn('m street part', text)
+        self.assertNotIn('["Length", `${Math.round(m.length_m * 10) / 10} m`, "street-part distance"]', text)
+        self.assertNotIn('street-part distance', text)
+
     def test_notification_schema_exists(self):
         sql = SCHEMA.read_text()
         self.assertIn('create table if not exists public.app_notifications', sql)

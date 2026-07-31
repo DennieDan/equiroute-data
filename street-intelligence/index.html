@@ -2626,16 +2626,9 @@
                 `<div class="metric"><span>${x[0]}</span><b style="color:${scoreColor(x[2])}">${x[1]}</b><small>${x[2]}/100</small></div>`,
             )
             .join("");
-        } else if (m?.length_m) {
-          metricList.innerHTML = [
-            ["Length", `${Math.round(m.length_m * 10) / 10} m`, "street-part distance"],
-          ]
-            .map(
-              (x) =>
-                `<div class="metric"><span>${x[0]}</span><b>${x[1]}</b><small>${x[2]}</small></div>`,
-            )
-            .join("");
         } else {
+          // Street-part length already appears in the scorecard description;
+          // do not repeat it as a separate metric card.
           metricList.innerHTML = "";
         }
         setDetailContext({
