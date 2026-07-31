@@ -198,6 +198,22 @@ class EarthUiControlsNotificationTests(unittest.TestCase):
         ]:
             self.assertIn(snippet, text)
 
+    def test_score_card_drag_requires_left_click_hold_on_card(self):
+        text = self.html()
+        css = (ROOT / "harvard.css").read_text()
+        for snippet in [
+            'card.addEventListener("pointerdown"',
+            'event.button !== 0',
+            'event.buttons !== 1',
+            'card.addEventListener("pointermove"',
+            'card.setPointerCapture?.(event.pointerId)',
+        ]:
+            self.assertIn(snippet, text)
+        self.assertIn('body:has(#map) #detailCard {', css)
+        self.assertIn('cursor: grab !important;', css)
+        self.assertIn('body:has(#map) #detailCard.dragging', css)
+        self.assertIn('cursor: grabbing !important;', css)
+
     def test_synthetic_agent_count_removes_explanatory_suffix(self):
         text = self.html()
         self.assertIn('currently here</small>', text)

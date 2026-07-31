@@ -1591,11 +1591,28 @@ body:has(#map) #detailCard.dragging {
   user-select: none !important;
   box-shadow: 0 28px 70px rgba(0, 0, 0, 0.46) !important;
 }
-body:has(#map) #detailCard .detail-front > .detail-head {
-  cursor: move !important;
+body:has(#map) #detailCard {
+  cursor: grab !important;
+  touch-action: none !important;
 }
-body:has(#map) #detailCard .detail-head button,
-body:has(#map) #detailCard .detail-head a {
+body:has(#map) #detailCard.dragging {
+  cursor: grabbing !important;
+}
+body:has(#map) #detailCard button,
+body:has(#map) #detailCard a,
+body:has(#map) #detailCard input,
+body:has(#map) #detailCard textarea,
+body:has(#map) #detailCard select,
+body:has(#map) #detailCard label,
+body:has(#map) #detailCard #feedbackHistory,
+body:has(#map) #detailCard #feedbackHistory *,
+body:has(#map) #detailCard #feedbackForm,
+body:has(#map) #detailCard #feedbackForm * {
+  cursor: auto !important;
+}
+body:has(#map) #detailCard button,
+body:has(#map) #detailCard a,
+body:has(#map) #detailCard .close {
   cursor: pointer !important;
 }
 body:has(#map) .feedback-history,

@@ -1726,7 +1726,7 @@
         color: #ffffff !important;
       }
     </style>
-    <link rel="stylesheet" href="../harvard.css?v=20260731t" />
+    <link rel="stylesheet" href="../harvard.css?v=20260731u" />
     <script src="https://unpkg.com/maptalks/dist/maptalks.min.js"></script>
     <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
     <script src="https://unpkg.com/mapillary-js@4.1.2/dist/mapillary.js"></script>
@@ -5441,10 +5441,8 @@
         createManagedUserBtn.onclick = createManagedUser;
       function setupDraggableScoreCard() {
         const card = window.detailCard;
-        if (!card) return;
-        const handle = card.querySelector(".detail-front .detail-head");
-        if (!handle || handle.dataset.dragBound === "true") return;
-        handle.dataset.dragBound = "true";
+        if (!card || card.dataset.dragBound === "true") return;
+        card.dataset.dragBound = "true";
         let drag = null;
         const interactive = "button, a, input, textarea, select, label, #feedbackHistory, #feedbackHistory *, #feedbackForm, #feedbackForm *, .score-flip, .close";
         const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
@@ -5457,7 +5455,7 @@
           card.style.transform = "none";
           card.classList.add("dragged");
         }
-        handle.addEventListener("pointerdown", (event) => {
+        card.addEventListener("pointerdown", (event) => {
           if (event.button !== 0 || event.target.closest(interactive)) return;
           const rect = card.getBoundingClientRect();
           drag = { id: event.pointerId, dx: event.clientX - rect.left, dy: event.clientY - rect.top };
@@ -5465,8 +5463,8 @@
           card.classList.add("dragging");
           event.preventDefault();
         });
-        handle.addEventListener("pointermove", (event) => {
-          if (!drag || event.pointerId !== drag.id) return;
+        card.addEventListener("pointermove", (event) => {
+          if (!drag || event.pointerId !== drag.id || event.buttons !== 1) return;
           place(event.clientX - drag.dx, event.clientY - drag.dy);
         });
         const stop = (event) => {
@@ -5475,8 +5473,12 @@
           card.classList.remove("dragging");
           drag = null;
         };
-        handle.addEventListener("pointerup", stop);
-        handle.addEventListener("pointercancel", stop);
+        card.addEventListener("pointerup", stop);
+        card.addEventListener("pointercancel", stop);
+        window.addEventListener("blur", () => {
+          card.classList.remove("dragging");
+          drag = null;
+        });
         window.addEventListener("resize", () => {
           if (!card.classList.contains("dragged")) return;
           const rect = card.getBoundingClientRect();
