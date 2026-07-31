@@ -1321,7 +1321,6 @@ html[data-theme="dark"] body:has(#map) #detailCard .score-breakdown .metric smal
   border-color: rgba(165, 28, 48, 0.72) !important;
 }
 body:has(#map) .street-screen-nav,
-body:has(#map) .street-screen-nav,
 html[data-theme="light"] body:has(#map) .street-screen-nav,
 html[data-theme="dark"] body:has(#map) .street-screen-nav {
   background: var(--harvard-black) !important;
@@ -1462,4 +1461,112 @@ html[data-theme="dark"] body:has(#map) .agent-info-card,
 html[data-theme="dark"] body:has(#map) .agent-info-card * {
   text-shadow: none !important;
   filter: none !important;
+}
+
+
+/* Feedback composer + stable resizable thread well. */
+body:has(#map) #detailCard {
+  contain: layout paint !important;
+}
+body:has(#map) .detail-actions {
+  display: none !important;
+}
+body:has(#map) #feedbackForm.feedback-composer,
+body:has(#map) #feedbackForm.feedback-composer.open {
+  display: grid !important;
+  gap: 7px !important;
+  margin-top: 10px !important;
+  padding-top: 10px !important;
+  border-top: 1px solid var(--line) !important;
+}
+body:has(#map) .feedback-composer-line {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 40px !important;
+  align-items: end !important;
+  gap: 8px !important;
+}
+body:has(#map) #feedbackForm #feedbackBody {
+  min-height: 40px !important;
+  max-height: 92px !important;
+  resize: vertical !important;
+  border-radius: 999px !important;
+  padding: 10px 14px !important;
+  line-height: 1.25 !important;
+}
+body:has(#map) #feedbackSpeechBtn {
+  width: 40px !important;
+  min-width: 40px !important;
+  height: 40px !important;
+  padding: 0 !important;
+  border-radius: 999px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 18px !important;
+}
+body:has(#map) #feedbackSpeechStatus {
+  color: var(--muted) !important;
+  font-size: 11px !important;
+}
+body:has(#map) .feedback-history,
+html[data-theme="light"] body:has(#map) .feedback-history,
+html[data-theme="dark"] body:has(#map) .feedback-history {
+  height: clamp(190px, 27vh, 310px) !important;
+  min-height: 150px !important;
+  max-height: min(46vh, 430px) !important;
+  resize: vertical !important;
+  overflow: auto !important;
+  overscroll-behavior: contain !important;
+  scrollbar-gutter: stable both-edges !important;
+  cursor: ns-resize !important;
+}
+body:has(#map) .feedback-history * { cursor: auto !important; }
+body:has(#map) .feedback-history:hover { overflow-y: auto !important; }
+body:has(#map) .feedback-refresh {
+  width: 28px !important;
+  min-width: 28px !important;
+  height: 28px !important;
+  padding: 0 !important;
+  border-radius: 999px !important;
+  font-size: 16px !important;
+  line-height: 1 !important;
+}
+body:has(#map) .feedback-thread-head {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 2 !important;
+  background: rgba(255, 255, 255, 0.98) !important;
+  padding-bottom: 6px !important;
+}
+body:has(#map) .feedback-thread-title {
+  display: block !important;
+  margin-top: 4px !important;
+  color: #334155 !important;
+  font-size: 12px !important;
+  font-weight: 900 !important;
+}
+body:has(#map) .feedback-reply,
+html[data-theme="light"] body:has(#map) .feedback-reply,
+html[data-theme="dark"] body:has(#map) .feedback-reply {
+  background: #f8fafc !important;
+  color: #111111 !important;
+  border-color: rgba(30,30,30,0.18) !important;
+}
+body:has(#map) .feedback-reply b,
+body:has(#map) .feedback-reply span,
+body:has(#map) .feedback-reply small,
+html[data-theme="dark"] body:has(#map) .feedback-reply b,
+html[data-theme="dark"] body:has(#map) .feedback-reply span,
+html[data-theme="dark"] body:has(#map) .feedback-reply small {
+  color: #111111 !important;
+  text-shadow: none !important;
+}
+body.public-role:has(#map) #feedbackFilters,
+body.public-role:has(#map) .feedback-filters,
+body.public-role:has(#map) #streetAgentCounts,
+body.public-role:has(#map) #personaPanel,
+body.public-role:has(#map) .agent-info-card,
+body.public-role:has(#map) .maptalks-msgBox,
+body.public-role:has(#map) .maptalks-infowindow {
+  display: none !important;
 }
