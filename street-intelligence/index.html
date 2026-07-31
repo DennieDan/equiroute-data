@@ -1001,6 +1001,51 @@
         margin: 0 0 5px;
         font-size: 13px;
       }
+      .photo-crowd-heading-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin: -5px;
+        padding: 5px;
+        border-radius: 8px;
+        color: inherit;
+        text-decoration: none;
+        transition:
+          background-color 0.18s ease,
+          color 0.18s ease;
+      }
+      .photo-crowd-heading-link .heading-arrow {
+        display: inline-block;
+        opacity: 0;
+        transform: translateX(-3px);
+        transition: opacity 0.18s ease;
+      }
+      .photo-crowd-heading-link:hover,
+      .photo-crowd-heading-link:focus-visible {
+        background: #000;
+        color: #fff;
+        outline: none;
+      }
+      .photo-crowd-heading-link:hover .heading-arrow,
+      .photo-crowd-heading-link:focus-visible .heading-arrow {
+        opacity: 1;
+        animation: photo-heading-arrow 0.75s ease-in-out infinite alternate;
+      }
+      @keyframes photo-heading-arrow {
+        from {
+          transform: translateX(-2px);
+        }
+        to {
+          transform: translateX(3px);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .photo-crowd-heading-link:hover .heading-arrow,
+        .photo-crowd-heading-link:focus-visible .heading-arrow {
+          animation: none;
+          transform: none;
+        }
+      }
       .settings-section p {
         margin: 4px 0 8px;
       }
@@ -1204,14 +1249,16 @@
       <p id="tokenStatus" class="authority-only" hidden></p>
       <p id="currentUserStatus" class="authority-only"></p>
       <section class="settings-section" id="photoCrowdSection">
-        <h4>Photo crowdsourcing</h4>
+        <h4>
+          <a class="photo-crowd-heading-link" href="../crowd-photos/">
+            <span>Photo crowdsourcing</span>
+            <span class="heading-arrow" aria-hidden="true">→</span>
+          </a>
+        </h4>
         <p>
           Manage Footpath photo submissions on the dedicated photo
           crowdsourcing page.
         </p>
-        <div class="photo-upload-actions">
-          <a class="buttonlike" href="../crowd-photos/">Open dedicated page</a>
-        </div>
       </section>
       <section
         class="settings-section authority-only"
