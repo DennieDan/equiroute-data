@@ -933,6 +933,403 @@
       #settings.visible {
         display: block;
       }
+      .settings-launch-card {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 12px;
+        align-items: center;
+      }
+      .settings-launch-card p {
+        margin-bottom: 0;
+      }
+      .settings-launch-card button {
+        white-space: nowrap;
+      }
+      .settings-live-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 11px;
+      }
+      .settings-live-status::before,
+      .agent-panel-status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--amber);
+        content: "";
+        flex: 0 0 auto;
+      }
+      .settings-live-status.fresh::before,
+      .agent-panel-status.fresh .agent-panel-status-dot {
+        background: var(--green);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--green) 18%, transparent);
+      }
+      .settings-live-status.stale::before,
+      .agent-panel-status.stale .agent-panel-status-dot {
+        background: var(--amber);
+      }
+      #agentManagementPanel {
+        position: fixed;
+        top: 76px;
+        right: 14px;
+        bottom: 14px;
+        z-index: 39;
+        display: none;
+        flex-direction: column;
+        width: min(480px, calc(100vw - 28px));
+        min-width: 380px;
+        max-width: min(720px, calc(100vw - 28px));
+        padding: 0;
+        overflow: hidden;
+        border-top: 5px solid var(--control-fg);
+        box-shadow: 0 24px 60px rgba(2, 6, 23, 0.34);
+      }
+      #agentManagementPanel.visible {
+        display: flex;
+      }
+      #agentManagementPanel.collapsed {
+        left: auto;
+        bottom: auto;
+        width: 64px !important;
+        min-width: 64px;
+        height: 64px;
+      }
+      #agentManagementPanel.collapsed .agent-panel-resize,
+      #agentManagementPanel.collapsed .agent-panel-heading,
+      #agentManagementPanel.collapsed .agent-panel-close,
+      #agentManagementPanel.collapsed .agent-panel-tabs,
+      #agentManagementPanel.collapsed .agent-panel-content,
+      #agentManagementPanel.collapsed .agent-panel-footer {
+        display: none;
+      }
+      #agentManagementPanel.collapsed .agent-panel-header {
+        flex: 1;
+        padding: 0;
+        border: 0;
+      }
+      #agentManagementPanel.collapsed .agent-panel-header-actions {
+        flex: 1;
+        align-self: stretch;
+      }
+      #agentManagementPanel.collapsed .agent-panel-collapse {
+        flex: 1;
+        width: 100%;
+        height: 100%;
+        border: 0;
+        font-size: 20px;
+      }
+      .agent-panel-resize {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: -5px;
+        z-index: 2;
+        width: 11px;
+        cursor: ew-resize;
+        touch-action: none;
+      }
+      .agent-panel-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 15px 16px 13px;
+        border-bottom: 1px solid var(--line);
+      }
+      .agent-panel-heading {
+        min-width: 0;
+        flex: 1;
+      }
+      .agent-panel-heading h2 {
+        margin: 0;
+        color: var(--txt);
+        font-size: 20px;
+        line-height: 1.15;
+      }
+      .agent-panel-status {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 11px;
+      }
+      .agent-panel-header-actions {
+        display: flex;
+        gap: 6px;
+      }
+      .agent-panel-header-actions button {
+        min-width: 36px;
+        min-height: 34px;
+        padding: 5px 9px;
+      }
+      .agent-panel-tabs {
+        display: flex;
+        flex: 0 0 auto;
+        overflow-x: auto;
+        border-bottom: 1px solid var(--line);
+      }
+      .agent-panel-tab {
+        flex: 1 0 auto;
+        min-height: 40px;
+        border: 0;
+        border-right: 1px solid var(--line);
+        border-bottom: 3px solid transparent;
+        padding: 8px 10px;
+        background: transparent;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 800;
+      }
+      .agent-panel-tab:last-child {
+        border-right: 0;
+      }
+      .agent-panel-tab.active {
+        border-bottom-color: var(--harvard-crimson, #a51c30);
+        color: var(--txt);
+        background: var(--panel-soft-bg);
+      }
+      .agent-panel-content {
+        min-height: 0;
+        flex: 1;
+        overflow: auto;
+        padding: 15px 16px 24px;
+      }
+      .agent-tab-view {
+        display: none;
+      }
+      .agent-tab-view.active {
+        display: block;
+      }
+      .agent-kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+      }
+      .agent-kpi {
+        min-width: 0;
+        border: 1px solid var(--line);
+        border-top: 4px solid var(--harvard-crimson, #a51c30);
+        padding: 10px;
+        background: var(--panel-strong-bg);
+      }
+      .agent-kpi b {
+        display: block;
+        color: var(--txt);
+        font-size: 20px;
+        line-height: 1;
+      }
+      .agent-kpi small {
+        display: block;
+        margin-top: 5px;
+        line-height: 1.15;
+      }
+      .agent-section {
+        margin-top: 18px;
+        padding-top: 14px;
+        border-top: 1px solid var(--line);
+      }
+      .agent-section:first-child {
+        margin-top: 0;
+        padding-top: 0;
+        border-top: 0;
+      }
+      .agent-section-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 9px;
+      }
+      .agent-section h3,
+      .agent-section h4 {
+        margin: 0;
+        color: var(--txt);
+        font-size: 14px;
+      }
+      .agent-section-note,
+      .agent-empty,
+      .agent-list-note {
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.4;
+      }
+      .agent-distribution-list,
+      .agent-event-list,
+      .agent-persona-list,
+      .agent-list {
+        display: grid;
+        gap: 7px;
+      }
+      .agent-distribution-row,
+      .agent-event-row,
+      .agent-persona-row,
+      .agent-row {
+        width: 100%;
+        border: 1px solid var(--line);
+        padding: 9px 10px;
+        background: var(--panel-soft-bg);
+        color: var(--txt);
+        text-align: left;
+      }
+      .agent-distribution-row:hover,
+      .agent-event-row:hover,
+      .agent-persona-row:hover,
+      .agent-persona-row.active,
+      .agent-row:hover {
+        border-color: var(--control-fg);
+        background: var(--panel-strong-bg);
+      }
+      .agent-distribution-main,
+      .agent-row-main,
+      .agent-event-main,
+      .agent-persona-main {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .agent-distribution-main b,
+      .agent-row-main b,
+      .agent-event-main b,
+      .agent-persona-main b {
+        min-width: 0;
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .agent-color-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        flex: 0 0 auto;
+      }
+      .agent-distribution-track {
+        height: 4px;
+        margin-top: 8px;
+        overflow: hidden;
+        background: color-mix(in srgb, var(--muted) 22%, transparent);
+      }
+      .agent-distribution-track span {
+        display: block;
+        height: 100%;
+      }
+      .agent-row small,
+      .agent-event-row small,
+      .agent-persona-row small {
+        display: block;
+        margin-top: 4px;
+      }
+      .agent-severity {
+        flex: 0 0 auto;
+        border: 1px solid currentColor;
+        padding: 2px 6px;
+        color: var(--amber);
+        font-size: 10px;
+        font-weight: 900;
+      }
+      .agent-severity.high {
+        color: var(--red);
+      }
+      .agent-filter-grid,
+      .agent-config-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+      .agent-filter-grid input,
+      .agent-filter-grid select,
+      .agent-config-grid input,
+      .agent-config-grid select {
+        width: 100%;
+        min-width: 0;
+      }
+      .agent-field {
+        display: grid;
+        gap: 4px;
+        color: var(--muted) !important;
+        font-size: 11px;
+      }
+      .agent-persona-layout {
+        display: grid;
+        grid-template-columns: minmax(150px, 0.8fr) minmax(0, 1.2fr);
+        gap: 12px;
+      }
+      .agent-persona-detail {
+        min-width: 0;
+        border: 1px solid var(--line);
+        padding: 13px;
+        background: var(--panel-soft-bg);
+      }
+      .agent-persona-detail h3 {
+        margin: 0 0 5px;
+        color: var(--txt);
+      }
+      .agent-persona-detail p {
+        margin: 5px 0 12px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.4;
+      }
+      .agent-profile-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+        margin: 10px 0;
+      }
+      .agent-profile-item {
+        border-left: 3px solid var(--harvard-crimson, #a51c30);
+        padding: 6px 8px;
+        background: var(--panel-strong-bg);
+      }
+      .agent-profile-item b,
+      .agent-profile-item small {
+        display: block;
+      }
+      .agent-config-note {
+        border-left: 4px solid var(--amber);
+        padding: 9px 11px;
+        background: color-mix(in srgb, var(--amber) 10%, var(--panel-soft-bg));
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.4;
+      }
+      .agent-inline-actions {
+        display: flex;
+        gap: 7px;
+        flex-wrap: wrap;
+        margin-top: 10px;
+      }
+      .agent-inline-actions button {
+        font-size: 12px;
+      }
+      .agent-panel-footer {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        min-height: 38px;
+        border-top: 1px solid var(--line);
+        padding: 8px 16px;
+        color: var(--muted);
+        font-size: 11px;
+      }
+      .agent-map-filter-pill {
+        display: none;
+        align-items: center;
+        gap: 6px;
+      }
+      .agent-map-filter-pill.visible {
+        display: inline-flex;
+      }
+      .agent-map-filter-pill button {
+        padding: 3px 6px;
+        font-size: 10px;
+      }
       #roleMenu {
         right: 14px;
         top: 70px;
@@ -1197,6 +1594,33 @@
         #miniMap {
           display: none !important;
         }
+        #agentManagementPanel {
+          top: 8px;
+          right: 8px;
+          bottom: 8px;
+          width: calc(100vw - 16px) !important;
+          min-width: 0;
+          max-width: none;
+        }
+        #agentManagementPanel.collapsed {
+          top: 78px;
+          right: 8px;
+          width: 56px !important;
+          min-width: 56px;
+          height: 56px;
+        }
+        .agent-panel-resize {
+          display: none;
+        }
+        .agent-kpi-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .agent-persona-layout {
+          grid-template-columns: 1fr;
+        }
+        .settings-launch-card {
+          grid-template-columns: 1fr;
+        }
       }
     </style>
     <link rel="stylesheet" href="../harvard.css?v=20260731n" />
@@ -1270,6 +1694,23 @@
       </section>
       <section
         class="settings-section authority-only"
+        id="agentManagementSettingsSection"
+      >
+        <div class="settings-launch-card">
+          <div>
+            <h4>Agent simulation</h4>
+            <p>Monitor persona agents and prepare simulation configuration.</p>
+            <span id="settingsAgentStatus" class="settings-live-status"
+              >Loading simulation snapshot…</span
+            >
+          </div>
+          <button type="button" id="openAgentManagementBtn">
+            Open panel →
+          </button>
+        </div>
+      </section>
+      <section
+        class="settings-section authority-only"
         id="accountManagementSection"
       >
         <h4>Account management</h4>
@@ -1303,6 +1744,171 @@
       </div>
     </div>
     <div id="miniMap"><div class="label">Earth context</div></div>
+    <aside
+      id="agentManagementPanel"
+      class="hud authority-only"
+      aria-label="Agent simulation management"
+      aria-hidden="true"
+    >
+      <div
+        id="agentPanelResizeHandle"
+        class="agent-panel-resize"
+        aria-hidden="true"
+      ></div>
+      <header class="agent-panel-header">
+        <div class="agent-panel-heading">
+          <h2>Agent management</h2>
+          <div id="agentPanelStatus" class="agent-panel-status">
+            <span class="agent-panel-status-dot" aria-hidden="true"></span>
+            <span id="agentPanelStatusText">Loading simulation snapshot…</span>
+          </div>
+        </div>
+        <div class="agent-panel-header-actions">
+          <button
+            type="button"
+          id="agentPanelCollapseBtn"
+          class="agent-panel-collapse"
+          title="Collapse agent management panel"
+          aria-label="Collapse agent management panel"
+          aria-expanded="true"
+          >
+            —
+          </button>
+          <button
+            type="button"
+            id="agentPanelCloseBtn"
+            class="agent-panel-close"
+            title="Close agent management panel"
+            aria-label="Close agent management panel"
+          >
+            ×
+          </button>
+        </div>
+      </header>
+      <nav class="agent-panel-tabs" aria-label="Agent management sections">
+        <button
+          type="button"
+          class="agent-panel-tab active"
+          data-agent-tab="overview"
+          aria-selected="true"
+        >
+          Overview
+        </button>
+        <button
+          type="button"
+          class="agent-panel-tab"
+          data-agent-tab="personas"
+          aria-selected="false"
+        >
+          Personas
+        </button>
+        <button
+          type="button"
+          class="agent-panel-tab"
+          data-agent-tab="agents"
+          aria-selected="false"
+        >
+          Agents
+        </button>
+        <button
+          type="button"
+          class="agent-panel-tab"
+          data-agent-tab="events"
+          aria-selected="false"
+        >
+          Events
+        </button>
+        <button
+          type="button"
+          class="agent-panel-tab"
+          data-agent-tab="run"
+          aria-selected="false"
+        >
+          Run settings
+        </button>
+      </nav>
+      <div class="agent-panel-content">
+        <section
+          id="agentTabOverview"
+          class="agent-tab-view active"
+          data-agent-view="overview"
+        >
+          <div id="agentOverviewContent" class="agent-empty">
+            Loading agent overview…
+          </div>
+        </section>
+        <section
+          id="agentTabPersonas"
+          class="agent-tab-view"
+          data-agent-view="personas"
+        >
+          <div id="agentPersonasContent" class="agent-empty">
+            Loading personas…
+          </div>
+        </section>
+        <section
+          id="agentTabAgents"
+          class="agent-tab-view"
+          data-agent-view="agents"
+        >
+          <div class="agent-filter-grid">
+            <label class="agent-field" for="agentPersonaFilter"
+              >Persona
+              <select id="agentPersonaFilter">
+                <option value="all">All personas</option>
+              </select>
+            </label>
+            <label class="agent-field" for="agentSearchInput"
+              >Search agents
+              <input
+                id="agentSearchInput"
+                type="search"
+                placeholder="Name or agent ID"
+              />
+            </label>
+          </div>
+          <div id="agentAgentsContent" class="agent-empty">
+            Loading agents…
+          </div>
+        </section>
+        <section
+          id="agentTabEvents"
+          class="agent-tab-view"
+          data-agent-view="events"
+        >
+          <div class="agent-filter-grid">
+            <label class="agent-field" for="agentEventSeverityFilter"
+              >Minimum severity
+              <select id="agentEventSeverityFilter">
+                <option value="0">All events</option>
+                <option value="0.5">Moderate · 0.50+</option>
+                <option value="0.75">High · 0.75+</option>
+                <option value="0.9">Critical · 0.90+</option>
+              </select>
+            </label>
+          </div>
+          <div id="agentEventsContent" class="agent-empty">
+            Loading events…
+          </div>
+        </section>
+        <section
+          id="agentTabRun"
+          class="agent-tab-view"
+          data-agent-view="run"
+        >
+          <div id="agentRunContent" class="agent-empty">
+            Loading run settings…
+          </div>
+        </section>
+      </div>
+      <footer class="agent-panel-footer">
+        <span id="agentPanelSource">Local simulation snapshot</span>
+        <span id="agentMapFilterPill" class="agent-map-filter-pill">
+          Map filtered
+          <button type="button" id="clearAgentMapFilterBtn">Show all</button>
+        </span>
+      </footer>
+    </aside>
     <section id="personaPanel" class="hud authority-only">
       <div class="persona-head">
         <b>Persona agents</b>
@@ -1458,6 +2064,10 @@
         agentLayer: null,
         liveAgentMarkers: new Map(),
         liveAgentAnimationInterval: null,
+        agentManagementTab: "overview",
+        agentManagementPersonaId: null,
+        agentMapPersonaFilter: "all",
+        agentManagementDraft: null,
         notifications: [],
         dismissedNotificationIds: new Set(
           JSON.parse(
@@ -1763,6 +2373,7 @@
         if (state.role !== "authority") {
           settings?.classList.remove("visible");
           personaPanel?.classList.remove("visible");
+          closeAgentManagementPanel();
         }
         updatePersonaToggleButton();
       }
@@ -3052,6 +3663,7 @@
       }
       function renderLiveAgents() {
         syncLiveAgentMarkers();
+        applyAgentMapFilter();
         animateLiveAgents();
         if (!state.liveAgentAnimationInterval) {
           state.liveAgentAnimationInterval = setInterval(
@@ -3111,9 +3723,544 @@
           state.liveAgentSnapshot = snapshot;
           renderLiveAgents();
           renderStreetAgentCounts();
+          renderAgentManagementPanel();
         } catch (e) {
           console.warn("live persona snapshot unavailable", e);
+          renderAgentManagementPanel();
         }
+      }
+
+      const AGENT_DRAFT_STORAGE_KEY = "jalanlens_agent_simulation_draft";
+      const AGENT_PANEL_WIDTH_STORAGE_KEY = "jalanlens_agent_panel_width";
+
+      function formatAgentLabel(value) {
+        return String(value || "")
+          .replaceAll("_", " ")
+          .replace(/\b\w/g, (letter) => letter.toUpperCase());
+      }
+
+      function formatAgentValue(value) {
+        if (typeof value === "number")
+          return Number.isInteger(value) ? String(value) : value.toFixed(2);
+        if (Array.isArray(value)) return value.map(formatAgentLabel).join(", ");
+        return formatAgentLabel(value);
+      }
+
+      function agentSnapshotAge() {
+        const generated = Date.parse(state.liveAgentSnapshot?.generated_at || "");
+        if (!Number.isFinite(generated))
+          return { freshness: "stale", label: "Snapshot time unavailable" };
+        const seconds = Math.max(0, Math.round((Date.now() - generated) / 1000));
+        if (seconds < 10)
+          return { freshness: "fresh", label: "updated just now" };
+        if (seconds < 60)
+          return { freshness: "fresh", label: `updated ${seconds}s ago` };
+        const minutes = Math.round(seconds / 60);
+        if (minutes < 60)
+          return {
+            freshness: minutes <= 2 ? "fresh" : "stale",
+            label: `updated ${minutes}m ago`,
+          };
+        const hours = Math.round(minutes / 60);
+        if (hours < 48)
+          return { freshness: "stale", label: `updated ${hours}h ago` };
+        return {
+          freshness: "stale",
+          label: `updated ${Math.round(hours / 24)}d ago`,
+        };
+      }
+
+      function agentPersonaCounts() {
+        const counts = {};
+        (state.liveAgentSnapshot?.agent_live_states || []).forEach((agent) => {
+          counts[agent.persona_type_id] =
+            (counts[agent.persona_type_id] || 0) + 1;
+        });
+        return counts;
+      }
+
+      function ensureAgentManagementDraft() {
+        if (state.agentManagementDraft) return state.agentManagementDraft;
+        let saved = null;
+        try {
+          saved = JSON.parse(localStorage.getItem(AGENT_DRAFT_STORAGE_KEY) || "null");
+        } catch (e) {
+          saved = null;
+        }
+        const agents = state.liveAgentSnapshot?.agent_live_states || [];
+        const seedMatch = String(agents[0]?.agent_external_id || "").match(
+          /^agent_(\d+)_/,
+        );
+        state.agentManagementDraft = {
+          agentCount: Number(saved?.agentCount || agents.length || 300),
+          tickSeconds: Number(saved?.tickSeconds || 10),
+          seed: Number(saved?.seed || seedMatch?.[1] || 42),
+          personaOverrides: saved?.personaOverrides || {},
+          savedAt: saved?.savedAt || null,
+        };
+        return state.agentManagementDraft;
+      }
+
+      function persistAgentManagementDraft() {
+        const draft = ensureAgentManagementDraft();
+        draft.savedAt = new Date().toISOString();
+        localStorage.setItem(AGENT_DRAFT_STORAGE_KEY, JSON.stringify(draft));
+        renderAgentRunSettings();
+        createNotification(
+          {
+            source: "system",
+            title: "Agent configuration draft saved",
+            body: "The draft is stored on this device. The running snapshot has not been changed.",
+          },
+          { toast: true, persist: false },
+        );
+      }
+
+      function renderAgentManagementStatus() {
+        const snapshot = state.liveAgentSnapshot;
+        const agents = snapshot?.agent_live_states || [];
+        const age = agentSnapshotAge();
+        const text = snapshot
+          ? `${agents.length} agents · ${age.label}`
+          : "Simulation snapshot unavailable";
+        if (window.agentPanelStatus) {
+          agentPanelStatus.classList.remove("fresh", "stale");
+          agentPanelStatus.classList.add(age.freshness);
+        }
+        if (window.agentPanelStatusText) agentPanelStatusText.textContent = text;
+        if (window.settingsAgentStatus) {
+          settingsAgentStatus.classList.remove("fresh", "stale");
+          settingsAgentStatus.classList.add(age.freshness);
+          settingsAgentStatus.textContent = text;
+        }
+        if (window.agentPanelSource) {
+          const provider = snapshot?.model_provider?.name;
+          agentPanelSource.textContent = provider
+            ? `Rules-based snapshot · ${provider} feedback wording`
+            : "Local simulation snapshot";
+        }
+      }
+
+      function setAgentManagementTab(tab) {
+        const valid = new Set(["overview", "personas", "agents", "events", "run"]);
+        state.agentManagementTab = valid.has(tab) ? tab : "overview";
+        document.querySelectorAll("[data-agent-tab]").forEach((button) => {
+          const active = button.dataset.agentTab === state.agentManagementTab;
+          button.classList.toggle("active", active);
+          button.setAttribute("aria-selected", String(active));
+        });
+        document.querySelectorAll("[data-agent-view]").forEach((view) => {
+          view.classList.toggle(
+            "active",
+            view.dataset.agentView === state.agentManagementTab,
+          );
+        });
+        if (state.agentManagementTab === "agents") renderAgentList();
+        if (state.agentManagementTab === "events") renderAgentEvents();
+        if (state.agentManagementTab === "personas") renderAgentPersonas();
+        if (state.agentManagementTab === "run") renderAgentRunSettings();
+      }
+
+      function openAgentManagementPanel(tab = state.agentManagementTab) {
+        if (!window.agentManagementPanel || state.role !== "authority") return;
+        settings?.classList.remove("visible");
+        notificationsPanel?.classList.remove("visible");
+        agentManagementPanel.classList.add("visible");
+        agentManagementPanel.classList.remove("collapsed");
+        agentManagementPanel.setAttribute("aria-hidden", "false");
+        if (window.agentPanelCollapseBtn) {
+          agentPanelCollapseBtn.textContent = "—";
+          agentPanelCollapseBtn.title = "Collapse agent management panel";
+          agentPanelCollapseBtn.setAttribute(
+            "aria-label",
+            "Collapse agent management panel",
+          );
+          agentPanelCollapseBtn.setAttribute("aria-expanded", "true");
+        }
+        setAgentManagementTab(tab);
+        renderAgentManagementPanel();
+      }
+
+      function closeAgentManagementPanel() {
+        if (!window.agentManagementPanel) return;
+        agentManagementPanel.classList.remove("visible", "collapsed");
+        agentManagementPanel.setAttribute("aria-hidden", "true");
+        state.agentMapPersonaFilter = "all";
+        if (window.agentPersonaFilter) agentPersonaFilter.value = "all";
+        applyAgentMapFilter();
+      }
+
+      function toggleAgentManagementCollapse() {
+        if (!window.agentManagementPanel) return;
+        const collapsed = agentManagementPanel.classList.toggle("collapsed");
+        if (window.agentPanelCollapseBtn) {
+          agentPanelCollapseBtn.textContent = collapsed ? "◀" : "—";
+          agentPanelCollapseBtn.title = collapsed
+            ? "Expand agent management panel"
+            : "Collapse agent management panel";
+          agentPanelCollapseBtn.setAttribute("aria-label", agentPanelCollapseBtn.title);
+          agentPanelCollapseBtn.setAttribute(
+            "aria-expanded",
+            String(!collapsed),
+          );
+        }
+      }
+
+      function renderAgentOverview() {
+        if (!window.agentOverviewContent) return;
+        const snapshot = state.liveAgentSnapshot;
+        const agents = snapshot?.agent_live_states || [];
+        const personaTypes = snapshot?.persona_types || {};
+        const feedback = snapshot?.agent_feedback_threads || [];
+        if (!snapshot) {
+          agentOverviewContent.innerHTML =
+            '<div class="agent-empty">No live simulation snapshot is available yet.</div>';
+          return;
+        }
+        const counts = agentPersonaCounts();
+        const accessibilityRelevant = agents.filter((agent) =>
+          ["disabled", "access_relevant"].includes(
+            personaTypes[agent.persona_type_id]?.category,
+          ),
+        ).length;
+        const elevatedCrowd = agents.filter(
+          (agent) => Number(agent.state?.crowd_pressure || 0) >= 0.75,
+        ).length;
+        const openFeedback = feedback.filter(
+          (row) => (row.status || "open") === "open",
+        ).length;
+        const distribution = Object.entries(counts)
+          .sort((a, b) => b[1] - a[1])
+          .map(([personaId, count]) => {
+            const persona = personaTypes[personaId] || {};
+            const pct = agents.length ? Math.round((count / agents.length) * 100) : 0;
+            return `<button type="button" class="agent-distribution-row" data-persona-id="${escapeHtml(personaId)}"><span class="agent-distribution-main"><span class="agent-color-dot" style="background:${escapeHtml(persona.color || COLORS.blue)}"></span><b>${escapeHtml(persona.label || formatAgentLabel(personaId))}</b><span>${count} · ${pct}%</span></span><span class="agent-distribution-track"><span style="width:${pct}%;background:${escapeHtml(persona.color || COLORS.blue)}"></span></span></button>`;
+          })
+          .join("");
+        const recentEvents = feedback
+          .slice()
+          .sort((a, b) => Number(b.severity || 0) - Number(a.severity || 0))
+          .slice(0, 5)
+          .map(
+            (row, index) =>
+              `<button type="button" class="agent-event-row" data-event-index="${index}"><span class="agent-event-main"><b>${escapeHtml(row.title || formatAgentLabel(row.event_type))}</b><span class="agent-severity ${Number(row.severity || 0) >= 0.85 ? "high" : ""}">${Number(row.severity || 0).toFixed(2)}</span></span><small>${escapeHtml(formatAgentLabel(row.street_part_external_id || "Location unavailable"))} · ${escapeHtml(formatAgentLabel(row.status || "open"))}</small></button>`,
+          )
+          .join("");
+        agentOverviewContent.innerHTML = `<div class="agent-kpi-grid"><div class="agent-kpi"><b>${agents.length}</b><small>Active agents</small></div><div class="agent-kpi"><b>${accessibilityRelevant}</b><small>Accessibility-relevant</small></div><div class="agent-kpi"><b>${elevatedCrowd}</b><small>Elevated crowd pressure</small></div><div class="agent-kpi"><b>${openFeedback}</b><small>Open agent reports</small></div></div><section class="agent-section"><div class="agent-section-head"><h3>Persona distribution</h3><span class="agent-section-note">Select to inspect agents</span></div><div class="agent-distribution-list">${distribution || '<div class="agent-empty">No persona counts available.</div>'}</div></section><section class="agent-section"><div class="agent-section-head"><h3>Highest-severity events</h3><button type="button" id="viewAllAgentEventsBtn">View all</button></div><div class="agent-event-list">${recentEvents || '<div class="agent-empty">No agent events in this snapshot.</div>'}</div></section>`;
+        agentOverviewContent
+          .querySelectorAll("[data-persona-id]")
+          .forEach((button) => {
+            button.onclick = () => openPersonaAgents(button.dataset.personaId);
+          });
+        agentOverviewContent
+          .querySelectorAll("[data-event-index]")
+          .forEach((button) => {
+            button.onclick = () => {
+              const rows = feedback
+                .slice()
+                .sort(
+                  (a, b) => Number(b.severity || 0) - Number(a.severity || 0),
+                )
+                .slice(0, 5);
+              locateAgentEvent(rows[Number(button.dataset.eventIndex)]);
+            };
+          });
+        if (window.viewAllAgentEventsBtn)
+          viewAllAgentEventsBtn.onclick = () => setAgentManagementTab("events");
+      }
+
+      function renderAgentPersonaOptions() {
+        if (!window.agentPersonaFilter) return;
+        const personaTypes = state.liveAgentSnapshot?.persona_types || {};
+        const current = agentPersonaFilter.value || state.agentMapPersonaFilter || "all";
+        agentPersonaFilter.innerHTML =
+          '<option value="all">All personas</option>' +
+          Object.entries(personaTypes)
+            .sort((a, b) => String(a[1].label).localeCompare(String(b[1].label)))
+            .map(
+              ([id, persona]) =>
+                `<option value="${escapeHtml(id)}">${escapeHtml(persona.label || formatAgentLabel(id))}</option>`,
+            )
+            .join("");
+        agentPersonaFilter.value = personaTypes[current] ? current : "all";
+      }
+
+      function renderAgentPersonas() {
+        if (!window.agentPersonasContent) return;
+        const personaTypes = state.liveAgentSnapshot?.persona_types || {};
+        const entries = Object.entries(personaTypes).sort((a, b) =>
+          String(a[1].label).localeCompare(String(b[1].label)),
+        );
+        if (!entries.length) {
+          agentPersonasContent.innerHTML =
+            '<div class="agent-empty">No persona definitions are available.</div>';
+          return;
+        }
+        if (!state.agentManagementPersonaId || !personaTypes[state.agentManagementPersonaId])
+          state.agentManagementPersonaId = entries[0][0];
+        const selectedId = state.agentManagementPersonaId;
+        const selected = personaTypes[selectedId];
+        const counts = agentPersonaCounts();
+        const total = state.liveAgentSnapshot?.agent_live_states?.length || 0;
+        const draft = ensureAgentManagementDraft();
+        const override = draft.personaOverrides[selectedId] || {};
+        const currentWeight = total
+          ? Math.round(((counts[selectedId] || 0) / total) * 1000) / 10
+          : 0;
+        const list = entries
+          .map(
+            ([id, persona]) =>
+              `<button type="button" class="agent-persona-row ${id === selectedId ? "active" : ""}" data-persona-detail-id="${escapeHtml(id)}"><span class="agent-persona-main"><span class="agent-color-dot" style="background:${escapeHtml(persona.color || COLORS.blue)}"></span><b>${escapeHtml(persona.label || formatAgentLabel(id))}</b><span>${counts[id] || 0}</span></span><small>${escapeHtml(formatAgentLabel(persona.category))}</small></button>`,
+          )
+          .join("");
+        const mobility = Object.entries(selected.mobility_profile || {})
+          .map(
+            ([key, value]) =>
+              `<div class="agent-profile-item"><small>${escapeHtml(formatAgentLabel(key))}</small><b>${escapeHtml(formatAgentValue(value))}</b></div>`,
+          )
+          .join("");
+        const schedule = Object.entries(selected.schedule_profile || {})
+          .map(
+            ([key, value]) =>
+              `<div class="agent-profile-item"><small>${escapeHtml(formatAgentLabel(key))}</small><b>${escapeHtml(formatAgentValue(value))}</b></div>`,
+          )
+          .join("");
+        agentPersonasContent.innerHTML = `<div class="agent-persona-layout"><div class="agent-persona-list">${list}</div><div class="agent-persona-detail"><h3>${escapeHtml(selected.label || formatAgentLabel(selectedId))}</h3><span class="agent-section-note">${escapeHtml(formatAgentLabel(selected.category))} · ${counts[selectedId] || 0} active agents</span><p>${escapeHtml(selected.description || "No description available.")}</p><h4>Mobility profile</h4><div class="agent-profile-grid">${mobility || '<span class="agent-empty">No mobility properties.</span>'}</div><h4>Schedule</h4><div class="agent-profile-grid">${schedule || '<span class="agent-empty">No scheduled activities.</span>'}</div><section class="agent-section"><div class="agent-section-head"><h4>Population draft</h4><span class="agent-section-note">Current share ${currentWeight}%</span></div><div class="agent-config-grid"><label class="agent-field" for="agentPersonaWeightInput">Target share (%)<input id="agentPersonaWeightInput" type="number" min="0" max="100" step="0.1" value="${escapeHtml(override.weight ?? currentWeight)}"></label><label class="agent-field" for="agentPersonaEnabledInput">Template status<select id="agentPersonaEnabledInput"><option value="true" ${override.enabled === false ? "" : "selected"}>Enabled</option><option value="false" ${override.enabled === false ? "selected" : ""}>Disabled</option></select></label></div><div class="agent-config-note">Draft values are stored on this device and do not alter the running snapshot yet.</div><div class="agent-inline-actions"><button type="button" id="savePersonaDraftBtn">Save persona draft</button><button type="button" id="filterPersonaOnMapBtn">Filter on map</button></div></section></div></div>`;
+        agentPersonasContent
+          .querySelectorAll("[data-persona-detail-id]")
+          .forEach((button) => {
+            button.onclick = () => {
+              state.agentManagementPersonaId = button.dataset.personaDetailId;
+              renderAgentPersonas();
+            };
+          });
+        if (window.savePersonaDraftBtn)
+          savePersonaDraftBtn.onclick = () => {
+            const weight = Math.max(
+              0,
+              Math.min(100, Number(agentPersonaWeightInput.value || 0)),
+            );
+            draft.personaOverrides[selectedId] = {
+              weight,
+              enabled: agentPersonaEnabledInput.value === "true",
+            };
+            persistAgentManagementDraft();
+            renderAgentPersonas();
+          };
+        if (window.filterPersonaOnMapBtn)
+          filterPersonaOnMapBtn.onclick = () => openPersonaAgents(selectedId);
+      }
+
+      function openPersonaAgents(personaId) {
+        state.agentMapPersonaFilter = personaId || "all";
+        if (window.agentPersonaFilter)
+          agentPersonaFilter.value = state.agentMapPersonaFilter;
+        applyAgentMapFilter();
+        setAgentManagementTab("agents");
+      }
+
+      function applyAgentMapFilter() {
+        const filter = state.agentMapPersonaFilter || "all";
+        const agentsById = new Map(
+          (state.liveAgentSnapshot?.agent_live_states || []).map((agent) => [
+            agent.agent_external_id || agent.display_name,
+            agent,
+          ]),
+        );
+        state.liveAgentMarkers.forEach((marker, id) => {
+          const agent = agentsById.get(id);
+          const visible = filter === "all" || agent?.persona_type_id === filter;
+          if (visible) marker.show?.();
+          else marker.hide?.();
+        });
+        if (window.agentMapFilterPill)
+          agentMapFilterPill.classList.toggle("visible", filter !== "all");
+      }
+
+      function renderAgentList() {
+        if (!window.agentAgentsContent) return;
+        renderAgentPersonaOptions();
+        const filter = window.agentPersonaFilter
+          ? agentPersonaFilter.value || "all"
+          : "all";
+        const query = String(window.agentSearchInput?.value || "")
+          .trim()
+          .toLowerCase();
+        const personaTypes = state.liveAgentSnapshot?.persona_types || {};
+        const allAgents = state.liveAgentSnapshot?.agent_live_states || [];
+        const agents = allAgents.filter((agent) => {
+          if (filter !== "all" && agent.persona_type_id !== filter) return false;
+          if (!query) return true;
+          return `${agent.display_name || ""} ${agent.agent_external_id || ""}`
+            .toLowerCase()
+            .includes(query);
+        });
+        const visible = agents.slice(0, 100);
+        const rows = visible
+          .map((agent) => {
+            const persona = personaTypes[agent.persona_type_id] || {};
+            const pressure = Number(agent.state?.crowd_pressure || 0);
+            return `<button type="button" class="agent-row" data-agent-id="${escapeHtml(agent.agent_external_id || agent.display_name)}"><span class="agent-row-main"><span class="agent-color-dot" style="background:${escapeHtml(persona.color || COLORS.blue)}"></span><b>${escapeHtml(agent.display_name || agent.agent_external_id)}</b><span>${Number(agent.state?.speed_mps || 0).toFixed(2)} m/s</span></span><small>${escapeHtml(persona.label || formatAgentLabel(agent.persona_type_id))} · ${escapeHtml(formatAgentLabel(agent.activity || "moving"))} · crowd ${pressure.toFixed(2)}</small></button>`;
+          })
+          .join("");
+        agentAgentsContent.innerHTML = `${rows || '<div class="agent-empty">No agents match these filters.</div>'}${agents.length > visible.length ? `<div class="agent-list-note">Showing the first ${visible.length} of ${agents.length} matching agents. Refine the filters to narrow the list.</div>` : ""}`;
+        agentAgentsContent.querySelectorAll("[data-agent-id]").forEach((button) => {
+          button.onclick = () => locateAgent(button.dataset.agentId);
+        });
+      }
+
+      function locateAgent(agentId) {
+        const agent = (state.liveAgentSnapshot?.agent_live_states || []).find(
+          (row) =>
+            row.agent_external_id === agentId || row.display_name === agentId,
+        );
+        if (!agent) return;
+        const coord = liveAgentCoordinate(agent);
+        map.animateTo(
+          { center: coord, zoom: SATELLITE_MAX_NATIVE_ZOOM, pitch: 0 },
+          { duration: 450 },
+        );
+        const marker = state.liveAgentMarkers.get(
+          agent.agent_external_id || agent.display_name,
+        );
+        marker?.show?.();
+        marker?.openInfoWindow?.();
+      }
+
+      function locateAgentEvent(row) {
+        if (!row?.street_part_external_id) return;
+        const part = (state.streetRegistry?.street_parts || []).find(
+          (candidate) =>
+            candidate.id === row.street_part_external_id ||
+            candidate.external_id === row.street_part_external_id,
+        );
+        const index = segmentIndexForStreetPart(part);
+        if (index >= 0) selectSegment(index, false);
+      }
+
+      function renderAgentEvents() {
+        if (!window.agentEventsContent) return;
+        const minimum = Number(window.agentEventSeverityFilter?.value || 0);
+        const rows = (state.liveAgentSnapshot?.agent_feedback_threads || [])
+          .filter((row) => Number(row.severity || 0) >= minimum)
+          .sort((a, b) => Number(b.severity || 0) - Number(a.severity || 0));
+        agentEventsContent.innerHTML = rows.length
+          ? `<div class="agent-event-list">${rows
+              .map(
+                (row, index) =>
+                  `<button type="button" class="agent-event-row" data-filtered-event-index="${index}"><span class="agent-event-main"><b>${escapeHtml(row.title || formatAgentLabel(row.event_type))}</b><span class="agent-severity ${Number(row.severity || 0) >= 0.85 ? "high" : ""}">${Number(row.severity || 0).toFixed(2)}</span></span><small>${escapeHtml(row.agent_name || row.agent_external_id || "Agent")} · ${escapeHtml(formatAgentLabel(row.street_part_external_id || "Location unavailable"))} · priority ${Math.round(Number(row.priority_score || 0))}</small></button>`,
+              )
+              .join("")}</div>`
+          : '<div class="agent-empty">No events meet this severity threshold.</div>';
+        agentEventsContent
+          .querySelectorAll("[data-filtered-event-index]")
+          .forEach((button) => {
+            button.onclick = () =>
+              locateAgentEvent(rows[Number(button.dataset.filteredEventIndex)]);
+          });
+      }
+
+      function renderAgentRunSettings() {
+        if (!window.agentRunContent) return;
+        const draft = ensureAgentManagementDraft();
+        const snapshot = state.liveAgentSnapshot;
+        const savedLabel = draft.savedAt
+          ? `Draft last saved ${new Date(draft.savedAt).toLocaleString("en-SG")}`
+          : "No configuration draft saved yet";
+        agentRunContent.innerHTML = `<section class="agent-section"><div class="agent-section-head"><h3>Snapshot source</h3><span class="agent-section-note">Read-only</span></div><div class="agent-profile-grid"><div class="agent-profile-item"><small>Tick index</small><b>${escapeHtml(snapshot?.tick_index ?? "–")}</b></div><div class="agent-profile-item"><small>Generated</small><b>${escapeHtml(snapshot?.generated_at ? new Date(snapshot.generated_at).toLocaleString("en-SG") : "Unavailable")}</b></div><div class="agent-profile-item"><small>Agent count</small><b>${snapshot?.agent_live_states?.length || 0}</b></div><div class="agent-profile-item"><small>Model provider</small><b>${escapeHtml(formatAgentLabel(snapshot?.model_provider?.name || "Deterministic"))}</b></div></div></section><section class="agent-section"><div class="agent-section-head"><h3>Next-run configuration</h3><span class="agent-section-note">${escapeHtml(savedLabel)}</span></div><div class="agent-config-grid"><label class="agent-field" for="agentDraftCount">Agent count<input id="agentDraftCount" type="number" min="1" max="5000" step="1" value="${escapeHtml(draft.agentCount)}"></label><label class="agent-field" for="agentDraftTick">Tick interval (seconds)<input id="agentDraftTick" type="number" min="1" max="3600" step="1" value="${escapeHtml(draft.tickSeconds)}"></label><label class="agent-field" for="agentDraftSeed">Deterministic seed<input id="agentDraftSeed" type="number" min="1" max="2147483647" step="1" value="${escapeHtml(draft.seed)}"></label><label class="agent-field">Timezone<input type="text" value="Asia/Singapore" disabled></label></div><div class="agent-config-note">These settings are deliberately draft-only. The current worker still reads its run configuration from command-line or environment values, so saving here will not pause, restart or change the live snapshot.</div><div class="agent-inline-actions"><button type="button" id="saveAgentRunDraftBtn">Save run draft</button><button type="button" id="discardAgentRunDraftBtn">Discard draft</button></div></section>`;
+        if (window.saveAgentRunDraftBtn)
+          saveAgentRunDraftBtn.onclick = () => {
+            draft.agentCount = Math.max(
+              1,
+              Math.min(5000, Math.round(Number(agentDraftCount.value || 1))),
+            );
+            draft.tickSeconds = Math.max(
+              1,
+              Math.min(3600, Math.round(Number(agentDraftTick.value || 10))),
+            );
+            draft.seed = Math.max(
+              1,
+              Math.min(
+                2147483647,
+                Math.round(Number(agentDraftSeed.value || 42)),
+              ),
+            );
+            persistAgentManagementDraft();
+          };
+        if (window.discardAgentRunDraftBtn)
+          discardAgentRunDraftBtn.onclick = () => {
+            localStorage.removeItem(AGENT_DRAFT_STORAGE_KEY);
+            state.agentManagementDraft = null;
+            renderAgentRunSettings();
+          };
+      }
+
+      function renderAgentManagementPanel() {
+        renderAgentManagementStatus();
+        renderAgentOverview();
+        renderAgentPersonaOptions();
+        if (state.agentManagementTab === "personas") renderAgentPersonas();
+        if (state.agentManagementTab === "agents") renderAgentList();
+        if (state.agentManagementTab === "events") renderAgentEvents();
+        if (state.agentManagementTab === "run") renderAgentRunSettings();
+        applyAgentMapFilter();
+      }
+
+      function initializeAgentManagementPanel() {
+        if (!window.agentManagementPanel) return;
+        const storedWidth = Number(
+          localStorage.getItem(AGENT_PANEL_WIDTH_STORAGE_KEY) || 0,
+        );
+        if (storedWidth >= 380)
+          agentManagementPanel.style.width = `${Math.min(720, storedWidth)}px`;
+        document.querySelectorAll("[data-agent-tab]").forEach((button) => {
+          button.onclick = () => setAgentManagementTab(button.dataset.agentTab);
+        });
+        if (window.agentPersonaFilter)
+          agentPersonaFilter.onchange = () => {
+            state.agentMapPersonaFilter = agentPersonaFilter.value;
+            applyAgentMapFilter();
+            renderAgentList();
+          };
+        if (window.agentSearchInput)
+          agentSearchInput.oninput = () => renderAgentList();
+        if (window.agentEventSeverityFilter)
+          agentEventSeverityFilter.onchange = () => renderAgentEvents();
+        if (window.clearAgentMapFilterBtn)
+          clearAgentMapFilterBtn.onclick = () => {
+            state.agentMapPersonaFilter = "all";
+            if (window.agentPersonaFilter) agentPersonaFilter.value = "all";
+            applyAgentMapFilter();
+            renderAgentList();
+          };
+        if (window.agentPanelResizeHandle) {
+          agentPanelResizeHandle.onpointerdown = (event) => {
+            if (agentManagementPanel.classList.contains("collapsed")) return;
+            event.preventDefault();
+            const startX = event.clientX;
+            const startWidth = agentManagementPanel.getBoundingClientRect().width;
+            agentPanelResizeHandle.setPointerCapture?.(event.pointerId);
+            const move = (moveEvent) => {
+              const maximum = Math.min(720, window.innerWidth - 28);
+              const width = Math.max(
+                Math.min(380, maximum),
+                Math.min(maximum, startWidth + startX - moveEvent.clientX),
+              );
+              agentManagementPanel.style.width = `${Math.round(width)}px`;
+            };
+            const finish = () => {
+              document.removeEventListener("pointermove", move);
+              document.removeEventListener("pointerup", finish);
+              localStorage.setItem(
+                AGENT_PANEL_WIDTH_STORAGE_KEY,
+                String(Math.round(agentManagementPanel.getBoundingClientRect().width)),
+              );
+            };
+            document.addEventListener("pointermove", move);
+            document.addEventListener("pointerup", finish, { once: true });
+          };
+        }
+        renderAgentManagementPanel();
       }
 
       function showDetail(p, kind = "", extras = {}) {
@@ -4102,6 +5249,13 @@
           renderManagedUsers();
       };
       closeSettings.onclick = () => settings.classList.remove("visible");
+      if (window.openAgentManagementBtn)
+        openAgentManagementBtn.onclick = () =>
+          openAgentManagementPanel("overview");
+      if (window.agentPanelCloseBtn)
+        agentPanelCloseBtn.onclick = closeAgentManagementPanel;
+      if (window.agentPanelCollapseBtn)
+        agentPanelCollapseBtn.onclick = toggleAgentManagementCollapse;
       if (window.closeRoleMenu)
         closeRoleMenu.onclick = () => roleMenu.classList.remove("visible");
       document.addEventListener("click", (event) => {
@@ -4122,10 +5276,18 @@
           roleMenu?.classList.remove("visible");
         }
       });
+      document.addEventListener("keydown", (event) => {
+        if (
+          event.key === "Escape" &&
+          window.agentManagementPanel?.classList.contains("visible")
+        )
+          closeAgentManagementPanel();
+      });
       if (window.logoutBtn) logoutBtn.onclick = logoutToAuth;
       if (window.togglePersonaPanelBtn) {
         togglePersonaPanelBtn.onclick = () => togglePersonaPanel();
       }
+      initializeAgentManagementPanel();
       closeDetail.onclick = () => {
         setScoreCardFlipped(false);
         detailCard.classList.remove("visible");
