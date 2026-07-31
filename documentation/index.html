@@ -9,38 +9,56 @@
     <style>
       :root {
         --bg: #020617;
-        --card: rgba(15, 23, 42, 0.88);
-        --card2: rgba(8, 47, 73, 0.38);
-        --line: rgba(125, 211, 252, 0.28);
-        --text: #e0f2fe;
-        --muted: #a7c7d8;
+        --ink: #f8fafc;
+        --muted: #cbd5e1;
+        --soft: rgba(226, 232, 240, 0.78);
+        --line: rgba(148, 163, 184, 0.28);
+        --glass: rgba(2, 6, 23, 0.62);
+        --glass-strong: rgba(2, 6, 23, 0.82);
         --blue: #38bdf8;
         --green: #22c55e;
         --amber: #fbbf24;
+        --crimson: #a51c30;
       }
       * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
       body {
         margin: 0;
         min-height: 100vh;
         background:
-          radial-gradient(circle at 18% 8%, rgba(56, 189, 248, 0.24), transparent 28%),
-          radial-gradient(circle at 90% 18%, rgba(34, 197, 94, 0.13), transparent 30%),
-          linear-gradient(135deg, #020617 0%, #061525 55%, #020617 100%);
-        color: var(--text);
+          radial-gradient(circle at 20% 0%, rgba(56, 189, 248, 0.26), transparent 30%),
+          radial-gradient(circle at 82% 18%, rgba(34, 197, 94, 0.14), transparent 32%),
+          linear-gradient(180deg, #020617 0%, #08111f 42%, #020617 100%);
+        color: var(--ink);
         font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         line-height: 1.65;
+        overflow-x: hidden;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: -1;
+        background:
+          linear-gradient(rgba(148, 163, 184, 0.035) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(148, 163, 184, 0.035) 1px, transparent 1px);
+        background-size: 72px 72px;
+        mask-image: linear-gradient(180deg, transparent 0%, black 18%, black 82%, transparent 100%);
       }
       header {
-        position: sticky;
+        position: fixed;
         top: 0;
-        z-index: 5;
+        left: 0;
+        right: 0;
+        z-index: 20;
         display: flex;
         gap: 14px;
         align-items: center;
         padding: 16px clamp(18px, 4vw, 48px);
-        background: rgba(2, 6, 23, 0.82);
-        border-bottom: 1px solid var(--line);
-        backdrop-filter: blur(16px);
+        background: linear-gradient(180deg, rgba(2, 6, 23, 0.86), rgba(2, 6, 23, 0.38));
+        border-bottom: 1px solid rgba(226, 232, 240, 0.12);
+        backdrop-filter: blur(18px);
       }
       .brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 900; letter-spacing: 0.01em; }
       .brand img { width: 42px; height: 42px; object-fit: contain; }
@@ -52,75 +70,185 @@
         min-height: 40px;
         padding: 9px 13px;
         border: 1px solid rgba(125, 211, 252, 0.38);
-        border-radius: 12px;
-        color: var(--text);
-        background: rgba(15, 23, 42, 0.88);
+        border-radius: 999px;
+        color: var(--ink);
+        background: rgba(15, 23, 42, 0.72);
         text-decoration: none;
         font-size: 14px;
         font-weight: 800;
       }
-      main {
-        width: min(1040px, calc(100% - 32px));
-        margin: 0 auto;
-        padding: 42px 0 56px;
+      .story {
+        width: 100%;
       }
-      .hero {
-        padding: clamp(24px, 5vw, 42px);
-        border: 1px solid var(--line);
-        border-radius: 28px;
-        background: linear-gradient(135deg, rgba(8, 47, 73, 0.82), rgba(15, 23, 42, 0.9));
-        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.36);
+      .story-panel {
+        min-height: 100vh;
+        display: grid;
+        align-items: center;
+        padding: clamp(96px, 13vh, 150px) clamp(20px, 7vw, 96px);
+      }
+      .story-inner {
+        width: min(1040px, 100%);
+        margin: 0 auto;
       }
       .eyebrow {
-        color: var(--blue);
+        margin: 0 0 18px;
+        color: #7dd3fc;
         font-size: 13px;
-        font-weight: 900;
-        letter-spacing: 0.12em;
+        font-weight: 950;
+        letter-spacing: 0.16em;
         text-transform: uppercase;
       }
+      h1, h2, h3 { margin: 0; }
       h1 {
-        margin: 10px 0 12px;
-        font-size: clamp(36px, 7vw, 72px);
+        max-width: 980px;
+        font-size: clamp(52px, 10vw, 136px);
+        line-height: 0.9;
+        letter-spacing: -0.07em;
+      }
+      h2 {
+        max-width: 880px;
+        font-size: clamp(36px, 7vw, 88px);
         line-height: 0.95;
+        letter-spacing: -0.055em;
       }
-      h2 { margin: 0 0 12px; font-size: clamp(24px, 4vw, 34px); line-height: 1.15; }
-      h3 { margin: 0 0 8px; font-size: 19px; color: #bae6fd; }
-      p { margin: 0 0 12px; color: var(--muted); font-size: 16px; }
-      .lead { max-width: 760px; color: #dff7ff; font-size: clamp(17px, 2.2vw, 20px); }
-      .grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 18px;
-        margin-top: 22px;
+      h3 { font-size: clamp(21px, 2.4vw, 30px); line-height: 1.1; }
+      p { margin: 0; color: var(--muted); font-size: clamp(17px, 2vw, 21px); }
+      .lead {
+        max-width: 780px;
+        margin-top: 24px;
+        color: #e0f2fe;
+        font-size: clamp(19px, 2.6vw, 28px);
+        line-height: 1.38;
       }
-      section.card {
-        padding: 22px;
-        border: 1px solid var(--line);
-        border-radius: 22px;
-        background: var(--card);
+      .reveal {
+        opacity: 0;
+        transform: translateY(54px);
+        filter: blur(10px);
+        transition: opacity 0.9s ease, transform 0.9s ease, filter 0.9s ease;
       }
-      .full { grid-column: 1 / -1; }
-      ul, ol { margin: 10px 0 0; padding-left: 22px; color: var(--muted); font-size: 16px; }
-      li { margin: 8px 0; }
+      .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+      }
       .metric-grid {
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 12px;
-        margin-top: 16px;
+        gap: 14px;
+        margin-top: 34px;
       }
       .metric {
-        padding: 16px;
+        padding: 20px;
+        min-height: 130px;
         border: 1px solid rgba(125, 211, 252, 0.22);
-        border-radius: 18px;
-        background: var(--card2);
+        border-radius: 24px;
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.74), rgba(8, 47, 73, 0.38));
+        box-shadow: 0 24px 72px rgba(0, 0, 0, 0.22);
       }
-      .metric b { display: block; color: #f0f9ff; font-size: 22px; line-height: 1.15; }
-      .metric span { color: var(--muted); font-size: 13px; }
+      .metric b { display: block; color: #f8fafc; font-size: clamp(26px, 4vw, 46px); line-height: 1; }
+      .metric span { display: block; margin-top: 10px; color: var(--soft); font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; }
+      .vision-story {
+        position: relative;
+        height: 300vh;
+        margin: 0;
+      }
+      .vision-pin {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow: hidden;
+        display: grid;
+        place-items: center;
+        background: #020617;
+      }
+      .vision-pin img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transform: scale(1.06);
+        filter: saturate(1.08) contrast(1.05) brightness(0.82);
+      }
+      .vision-pin::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background:
+          radial-gradient(circle at 52% 44%, transparent 0%, rgba(2, 6, 23, 0.05) 34%, rgba(2, 6, 23, 0.72) 100%),
+          linear-gradient(90deg, rgba(2, 6, 23, 0.9), rgba(2, 6, 23, 0.22) 45%, rgba(2, 6, 23, 0.82));
+      }
+      .vision-pin::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        background: linear-gradient(180deg, rgba(2, 6, 23, 0.9) 0%, transparent 18%, transparent 70%, rgba(2, 6, 23, 0.94) 100%);
+      }
+      .vision-caption {
+        position: relative;
+        z-index: 3;
+        width: min(1080px, calc(100% - 40px));
+        align-self: end;
+        margin-bottom: clamp(30px, 8vh, 90px);
+        color: rgba(248, 250, 252, 0.78);
+        font-size: 12px;
+        font-weight: 900;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+      .vision-copy {
+        position: sticky;
+        z-index: 6;
+        width: min(760px, calc(100% - 40px));
+        margin-left: clamp(20px, 8vw, 112px);
+        padding: clamp(22px, 4vw, 38px);
+        border: 1px solid rgba(226, 232, 240, 0.22);
+        border-radius: 30px;
+        background: rgba(2, 6, 23, 0.66);
+        backdrop-filter: blur(22px);
+        box-shadow: 0 34px 120px rgba(0, 0, 0, 0.46);
+      }
+      .vision-copy h2 { font-size: clamp(34px, 5.8vw, 78px); }
+      .vision-copy p { margin-top: 18px; color: #dbeafe; }
+      .vision-copy.before { top: 18vh; transform: translateY(-48vh); }
+      .vision-copy.center { top: 30vh; margin-left: auto; margin-right: clamp(20px, 8vw, 112px); }
+      .vision-copy.after { top: 18vh; transform: translateY(86vh); background: rgba(248, 250, 252, 0.9); color: #0f172a; }
+      .vision-copy.after p { color: #334155; }
+      .detail-flow {
+        position: relative;
+        z-index: 8;
+        padding: clamp(88px, 12vw, 150px) clamp(20px, 6vw, 78px) clamp(80px, 9vw, 130px);
+        background: linear-gradient(180deg, rgba(2, 6, 23, 0.96), #020617 30%, #07111f 100%);
+      }
+      .detail-heading {
+        width: min(1040px, 100%);
+        margin: 0 auto 30px;
+      }
+      .detail-heading p { max-width: 760px; margin-top: 16px; }
+      .grid {
+        width: min(1040px, 100%);
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+      section.card {
+        padding: clamp(22px, 3.4vw, 34px);
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        background: rgba(15, 23, 42, 0.78);
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.24);
+      }
+      .full { grid-column: 1 / -1; }
+      ul, ol { margin: 14px 0 0; padding-left: 22px; color: var(--muted); font-size: 16px; }
+      li { margin: 8px 0; }
       .thresholds {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 10px;
-        margin-top: 12px;
+        margin-top: 14px;
       }
       .threshold {
         padding: 12px 14px;
@@ -132,21 +260,33 @@
       .threshold span { color: var(--muted); font-size: 14px; }
       .note {
         border-color: rgba(251, 191, 36, 0.34) !important;
-        background: rgba(120, 53, 15, 0.26) !important;
+        background: rgba(120, 53, 15, 0.28) !important;
       }
       code {
-        padding: 2px 6px;
+        padding: 2px 7px;
         border-radius: 8px;
-        background: rgba(2, 6, 23, 0.68);
+        background: rgba(2, 6, 23, 0.76);
         color: #bae6fd;
       }
-      @media (max-width: 780px) {
+      @media (max-width: 840px) {
         header { flex-wrap: wrap; }
-        .grid, .metric-grid, .thresholds { grid-template-columns: 1fr; }
-        main { width: min(100% - 24px, 1040px); padding-top: 24px; }
+        .brand span { font-size: 14px; }
+        .story-panel { min-height: 86vh; padding-left: 18px; padding-right: 18px; }
+        .metric-grid, .grid, .thresholds { grid-template-columns: 1fr; }
+        .vision-story { height: 280vh; }
+        .vision-copy { margin-left: 18px; margin-right: 18px; width: calc(100% - 36px); }
+        .vision-copy.center { margin-left: 18px; margin-right: 18px; }
+        .vision-copy.before { transform: translateY(-40vh); }
+        .vision-copy.after { transform: translateY(78vh); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html { scroll-behavior: auto; }
+        .reveal { opacity: 1; transform: none; filter: none; transition: none; }
+        .vision-pin, .vision-copy { position: relative; top: auto; transform: none !important; }
+        .vision-story { height: auto; display: grid; gap: 16px; padding: 80px 0; }
+        .vision-pin { min-height: 70vh; }
       }
     </style>
-    <link rel="stylesheet" href="../harvard.css?v=20260731g" />
   </head>
   <body>
     <header>
@@ -155,71 +295,113 @@
       <a class="button" id="backLink" href="../street-intelligence/">Back to platform</a>
     </header>
 
-    <main>
-      <section class="hero">
-        <div class="eyebrow">Huawei Tech4City demo notes</div>
-        <h1>How JalanLens measures accessible streets</h1>
-        <p class="lead">
-          This page keeps the standards references and data-source notes out of the settings menu, while making the evidence behind the demo readable for judges, partners, and authority users.
-        </p>
-        <div class="metric-grid" id="summaryMetrics">
-          <div class="metric"><b>—</b><span>street features loaded</span></div>
-          <div class="metric"><b>—</b><span>street parts</span></div>
-          <div class="metric"><b>—</b><span>building footprints</span></div>
-          <div class="metric"><b>—</b><span>reference standard set</span></div>
+    <main class="story">
+      <section class="story-panel intro reveal">
+        <div class="story-inner">
+          <p class="eyebrow">Huawei Tech4City demo notes</p>
+          <h1>How JalanLens measures accessible streets</h1>
+          <p class="lead">
+            JalanLens turns street imagery, map context, public feedback, and accessibility standards into evidence that city teams can act on.
+          </p>
         </div>
       </section>
 
-      <div class="grid">
-        <section class="card full">
-          <h2>Reference standards</h2>
-          <p id="standardsName">Loading standards…</p>
-          <ul id="standardsList"></ul>
-        </section>
-
-        <section class="card">
-          <h2>Scoring thresholds</h2>
-          <p>These thresholds turn street observations into comparable accessibility scores.</p>
-          <div class="thresholds" id="thresholdList"></div>
-        </section>
-
-        <section class="card note">
-          <h2>Prototype caveat</h2>
-          <p id="prototypeNote">
-            The demo uses geospatial proxy measurements where direct field measurements are not yet available.
+      <section class="story-panel reveal">
+        <div class="story-inner">
+          <p class="eyebrow">The problem</p>
+          <h2>Accessibility barriers are often visible, but not organized.</h2>
+          <p class="lead">
+            A missing ramp, narrow footpath, rough surface, blocked tactile paving, or unsafe crossing can decide whether a route is usable. JalanLens makes those observations searchable, comparable, and grounded in real street evidence.
           </p>
-        </section>
+          <div class="metric-grid" id="summaryMetrics">
+            <div class="metric"><b>—</b><span>street features loaded</span></div>
+            <div class="metric"><b>—</b><span>street parts</span></div>
+            <div class="metric"><b>—</b><span>building footprints</span></div>
+            <div class="metric"><b>—</b><span>reference standard set</span></div>
+          </div>
+        </div>
+      </section>
 
-        <section class="card">
-          <h2>Data sources</h2>
-          <ul>
-            <li><code>accessibility_world.geojson</code> — street parts, POIs, accessibility metrics, personas, and standards metadata.</li>
-            <li><code>buildings_clementi.geojson</code> — nearby building footprints for Earth context.</li>
-            <li><code>threejs_3d_roads.json</code> — lightweight 3D road and corridor overlay data.</li>
-            <li><code>data/photo_feature_instances_cv.json</code> — localized street-view accessibility features from the CV workflow.</li>
-          </ul>
-        </section>
+      <section class="vision-story" aria-label="JalanLens accessibility vision">
+        <div class="vision-pin">
+          <img src="../assets/jalanlens-accessibility-vision.png" alt="Inclusive city street with wheelchair, cane, elderly, and stroller users moving through accessible paths" />
+          <div class="vision-caption">JalanLens vision: streets that can be understood before someone is forced to struggle through them.</div>
+        </div>
+        <article class="vision-copy before reveal">
+          <p class="eyebrow">Before the lens</p>
+          <h2>People experience the city one obstacle at a time.</h2>
+          <p>Reports are scattered, inspections are slow, and accessibility decisions often lack visible, street-level context.</p>
+        </article>
+        <article class="vision-copy center reveal">
+          <p class="eyebrow">The JalanLens moment</p>
+          <h2>A shared picture of who can move safely.</h2>
+          <p>The platform connects accessibility scores, street-view evidence, persona routes, and public feedback into one civic operating view.</p>
+        </article>
+        <article class="vision-copy after reveal">
+          <p class="eyebrow">After the lens</p>
+          <h2>Authorities can respond with evidence, not guesses.</h2>
+          <p>Each segment becomes a clear case: what is wrong, who is affected, what evidence supports it, and what response should happen next.</p>
+        </article>
+      </section>
 
-        <section class="card">
-          <h2>What the map shows</h2>
-          <ul>
-            <li>25 m-scale footpath street parts with individual accessibility scorecards.</li>
-            <li>Earth satellite view for area context, plus street-view inspection for ground evidence.</li>
-            <li>Accessibility features such as ramps, shelters, tactile paving, bus stops, and obstacles.</li>
-            <li>Persona route simulation for public-agency review of different mobility needs.</li>
-          </ul>
-        </section>
+      <section class="detail-flow">
+        <div class="detail-heading reveal">
+          <p class="eyebrow">Technical documentation</p>
+          <h2>The evidence layer behind the demo.</h2>
+          <p>These notes keep standards, scoring thresholds, and data-source details out of the map settings menu while making them readable for judges, partners, and authority users.</p>
+        </div>
 
-        <section class="card full">
-          <h2>How to read the scores</h2>
-          <ol>
-            <li>Select a footpath segment from the top bar or map labels.</li>
-            <li>Use the scorecard to compare width, surface quality, slopes, vertical changes, and nearby hazards.</li>
-            <li>Switch to Street View when a segment needs visible ground evidence.</li>
-            <li>Use persona agents to test whether a route is practical for wheelchair users, cane users, older adults, or parents with strollers.</li>
-          </ol>
-        </section>
-      </div>
+        <div class="grid">
+          <section class="card full reveal">
+            <h3>Reference standards</h3>
+            <p id="standardsName">Loading standards…</p>
+            <ul id="standardsList"></ul>
+          </section>
+
+          <section class="card reveal">
+            <h3>Scoring thresholds</h3>
+            <p>These thresholds turn street observations into comparable accessibility scores.</p>
+            <div class="thresholds" id="thresholdList"></div>
+          </section>
+
+          <section class="card note reveal">
+            <h3>Prototype caveat</h3>
+            <p id="prototypeNote">
+              The demo uses geospatial proxy measurements where direct field measurements are not yet available.
+            </p>
+          </section>
+
+          <section class="card reveal">
+            <h3>Data sources</h3>
+            <ul>
+              <li><code>accessibility_world.geojson</code> — street parts, POIs, accessibility metrics, personas, and standards metadata.</li>
+              <li><code>buildings_clementi.geojson</code> — nearby building footprints for Earth context.</li>
+              <li><code>threejs_3d_roads.json</code> — lightweight 3D road and corridor overlay data.</li>
+              <li><code>data/photo_feature_instances_cv.json</code> — localized street-view accessibility features from the CV workflow.</li>
+            </ul>
+          </section>
+
+          <section class="card reveal">
+            <h3>What the map shows</h3>
+            <ul>
+              <li>25 m-scale footpath street parts with individual accessibility scorecards.</li>
+              <li>Earth satellite view for area context, plus street-view inspection for ground evidence.</li>
+              <li>Accessibility features such as ramps, shelters, tactile paving, bus stops, and obstacles.</li>
+              <li>Persona route simulation for public-agency review of different mobility needs.</li>
+            </ul>
+          </section>
+
+          <section class="card full reveal">
+            <h3>How to read the scores</h3>
+            <ol>
+              <li>Select a footpath segment from the top bar or map labels.</li>
+              <li>Use the scorecard to compare width, surface quality, slopes, vertical changes, and nearby hazards.</li>
+              <li>Switch to Street View when a segment needs visible ground evidence.</li>
+              <li>Use persona agents to test whether a route is practical for wheelchair users, cane users, older adults, or parents with strollers.</li>
+            </ol>
+          </section>
+        </div>
+      </section>
     </main>
 
     <script>
@@ -247,8 +429,8 @@
       async function loadDocs() {
         try {
           const [world, buildings] = await Promise.all([
-            fetch("accessibility_world.geojson").then((r) => r.json()),
-            fetch("buildings_clementi.geojson").then((r) => r.json()).catch(() => ({ features: [] })),
+            fetch("../accessibility_world.geojson").then((r) => r.json()),
+            fetch("../buildings_clementi.geojson").then((r) => r.json()).catch(() => ({ features: [] })),
           ]);
           const standards = world.standards || {};
           standardsName.textContent = standards.name || "Accessibility reference set";
@@ -258,20 +440,32 @@
           prototypeNote.textContent = standards.prototype_note || prototypeNote.textContent;
           renderThresholds(standards.thresholds || {});
           const featureCount = world.features?.length || 0;
-          const segmentCount = countRouteSegments(world.features || []);
-          const buildingCount = buildings.features?.length || 0;
+          const routeCount = countRouteSegments(world.features || []);
           summaryMetrics.innerHTML = `
-            <div class="metric"><b>${featureCount.toLocaleString()}</b><span>street features loaded</span></div>
-            <div class="metric"><b>${segmentCount.toLocaleString()}</b><span>street parts</span></div>
-            <div class="metric"><b>${buildingCount.toLocaleString()}</b><span>building footprints</span></div>
+            <div class="metric"><b>${featureCount}</b><span>street features loaded</span></div>
+            <div class="metric"><b>${routeCount}</b><span>street parts</span></div>
+            <div class="metric"><b>${buildings.features?.length || 0}</b><span>building footprints</span></div>
             <div class="metric"><b>${standards.name ? "1" : "—"}</b><span>reference standard set</span></div>
           `;
         } catch (error) {
           standardsName.textContent = "Documentation data could not be loaded.";
           standardsList.innerHTML = `<li>${error.message || error}</li>`;
-          renderThresholds({});
         }
       }
+      function setupReveal() {
+        const revealEls = [...document.querySelectorAll(".reveal")];
+        if (!("IntersectionObserver" in window)) {
+          revealEls.forEach((el) => el.classList.add("visible"));
+          return;
+        }
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) entry.target.classList.add("visible");
+          });
+        }, { threshold: 0.18, rootMargin: "0px 0px -10% 0px" });
+        revealEls.forEach((el) => observer.observe(el));
+      }
+      setupReveal();
       loadDocs();
     </script>
   </body>

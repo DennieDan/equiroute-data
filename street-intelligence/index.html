@@ -3972,7 +3972,9 @@
       if (window.viewModeSelect) {
         viewModeSelect.onchange = () =>
           selectSegment(state.selectedIndex, viewModeSelect.value === "street");
-        bindHoverDropdown(viewModeSelect, 2);
+        // Keep the Earth/Street control as a compact Harvard-style select.
+        // The hover-expanded native list looked visually noisy and made the
+        // selected row use the browser's blue highlight.
       }
       bindHoverDropdown(segmentSelect, 10);
       if (window.themeToggleBtn) themeToggleBtn.onclick = cycleTheme;
