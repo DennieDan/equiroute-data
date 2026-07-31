@@ -953,8 +953,6 @@ body:has(#map) #detailCard .close:hover {
     padding: 6px !important;
     font-size: 10px !important;
   }
-  body:has(#map).street-mode .feedback-thread-head small,
-  body:has(#map).street-mode .feedback-item span,
   body:has(#map).street-mode .feedback-item small,
   body:has(#map).street-mode .feedback-row-translation {
     display: none !important;
@@ -1154,4 +1152,64 @@ body:has(#map) #topbar .buttonlike:hover {
 html[data-theme="light"] body:has(#map) .brand,
 html[data-theme="light"] body:has(#map) .brand span {
   color: var(--txt) !important;
+}
+
+/* Feedback history must stay readable even when the dashboard display is dark.
+   Keep filters/theme controls dark, but render the actual thread content on a
+   light paper surface so titles/bodies such as "Narrow pavement pinch point"
+   never disappear into the overlay. */
+body:has(#map) .feedback-history,
+html[data-theme="light"] body:has(#map) .feedback-history,
+html[data-theme="dark"] body:has(#map) .feedback-history {
+  background: rgba(255, 255, 255, 0.96) !important;
+  color: #111111 !important;
+  border-color: rgba(30, 30, 30, 0.22) !important;
+}
+body:has(#map) .feedback-item,
+html[data-theme="light"] body:has(#map) .feedback-item,
+html[data-theme="dark"] body:has(#map) .feedback-item {
+  background: transparent !important;
+  color: #111111 !important;
+  border-bottom-color: rgba(30, 30, 30, 0.16) !important;
+}
+body:has(#map) .feedback-thread-head b,
+body:has(#map) .feedback-item b,
+body:has(#map) .feedback-item span,
+body:has(#map) .feedback-row-translation,
+html[data-theme="light"] body:has(#map) .feedback-thread-head b,
+html[data-theme="light"] body:has(#map) .feedback-item b,
+html[data-theme="light"] body:has(#map) .feedback-item span,
+html[data-theme="dark"] body:has(#map) .feedback-thread-head b,
+html[data-theme="dark"] body:has(#map) .feedback-item b,
+html[data-theme="dark"] body:has(#map) .feedback-item span {
+  color: #111111 !important;
+}
+body:has(#map) .feedback-thread-head small,
+body:has(#map) .feedback-item small,
+html[data-theme="light"] body:has(#map) .feedback-thread-head small,
+html[data-theme="light"] body:has(#map) .feedback-item small,
+html[data-theme="dark"] body:has(#map) .feedback-thread-head small,
+html[data-theme="dark"] body:has(#map) .feedback-item small {
+  color: #475569 !important;
+}
+body:has(#map) .feedback-item b em,
+html[data-theme="light"] body:has(#map) .feedback-item b em,
+html[data-theme="dark"] body:has(#map) .feedback-item b em {
+  background: #e0f2fe !important;
+  color: #075985 !important;
+  border-color: #7dd3fc !important;
+}
+body:has(#map) .feedback-item.authority b em,
+html[data-theme="light"] body:has(#map) .feedback-item.authority b em,
+html[data-theme="dark"] body:has(#map) .feedback-item.authority b em {
+  background: #dcfce7 !important;
+  color: #166534 !important;
+  border-color: #86efac !important;
+}
+body:has(#map) .feedback-item.agent b em,
+html[data-theme="light"] body:has(#map) .feedback-item.agent b em,
+html[data-theme="dark"] body:has(#map) .feedback-item.agent b em {
+  background: #f3e8ff !important;
+  color: #6b21a8 !important;
+  border-color: #d8b4fe !important;
 }
