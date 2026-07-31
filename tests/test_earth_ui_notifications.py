@@ -214,6 +214,19 @@ class EarthUiControlsNotificationTests(unittest.TestCase):
         self.assertIn('body:has(#map) #detailCard.dragging', css)
         self.assertIn('cursor: grabbing !important;', css)
 
+    def test_score_card_drag_can_enter_screen_edges(self):
+        text = self.html()
+        for snippet in [
+            'const edgeRecoveryPx = 56;',
+            'const minLeft = Math.min(8, edgeRecoveryPx - rect.width);',
+            'const maxLeft = Math.max(8, innerWidth - edgeRecoveryPx);',
+            'const minTop = Math.min(8, edgeRecoveryPx - rect.height);',
+            'const maxTop = Math.max(8, innerHeight - edgeRecoveryPx);',
+        ]:
+            self.assertIn(snippet, text)
+        self.assertNotIn('innerWidth - rect.width - 8', text)
+        self.assertNotIn('innerHeight - rect.height - 8', text)
+
     def test_synthetic_agent_count_removes_explanatory_suffix(self):
         text = self.html()
         self.assertIn('currently here</small>', text)
