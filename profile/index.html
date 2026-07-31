@@ -33,25 +33,23 @@
         font-family: var(--sans);
       }
       .profile-shell {
-        width: min(1120px, calc(100% - 40px));
+        width: min(1040px, calc(100% - 40px));
         margin: 0 auto;
-        padding: 124px 0 72px;
+        padding: 96px 0 72px;
       }
       .profile-hero {
-        display: grid;
-        grid-template-columns: minmax(0, 0.95fr) minmax(360px, 0.72fr);
-        gap: clamp(28px, 5vw, 72px);
-        align-items: start;
+        display: block;
       }
       .profile-intro {
-        padding-bottom: 36px;
+        padding: 0 0 26px;
+        margin-bottom: 26px;
         border-bottom: 4px solid var(--black);
       }
       .profile-logo {
-        width: 150px;
+        width: 104px;
         height: auto;
         display: block;
-        margin-bottom: 32px;
+        margin-bottom: 18px;
       }
       .eyebrow {
         margin: 0 0 18px;
@@ -65,23 +63,25 @@
         margin: 0;
         max-width: 760px;
         font-family: var(--serif);
-        font-size: clamp(64px, 11vw, 126px);
+        font-size: clamp(38px, 5.8vw, 64px);
         font-weight: 400;
-        line-height: 0.88;
-        letter-spacing: -0.065em;
+        line-height: 0.94;
+        letter-spacing: -0.055em;
         color: var(--ink);
       }
       #summary {
         max-width: 680px;
-        margin: 28px 0 0;
+        margin: 18px 0 0;
         color: var(--muted);
-        font-size: clamp(18px, 2.2vw, 24px);
+        font-size: clamp(17px, 2vw, 22px);
         line-height: 1.35;
       }
       .profile-card {
+        width: min(620px, 100%);
+        margin: 0 auto;
         border-top: 6px solid var(--crimson);
         border-bottom: 1px solid var(--black);
-        background: var(--profile-card);
+        background: rgba(255,255,255,0.88);
         padding: clamp(24px, 4vw, 40px);
         box-shadow: 0 18px 48px rgba(0,0,0,0.12);
       }
@@ -99,6 +99,17 @@
         gap: 14px 16px;
       }
       .field-full { grid-column: 1 / -1; }
+      body.authority-profile .public-only { display: none !important; }
+      body.public-profile .authority-note { display: none !important; }
+      .authority-note {
+        margin: 0 0 18px;
+        padding: 12px 14px;
+        border-left: 4px solid var(--crimson);
+        background: #f8fafc;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.4;
+      }
       label {
         display: block;
         margin: 0;
@@ -178,7 +189,6 @@
       #status.err { color: #b91c1c; }
       @media (max-width: 860px) {
         .profile-shell { width: min(100% - 28px, 720px); padding-top: 140px; }
-        .profile-hero { grid-template-columns: 1fr; }
         .profile-logo { width: 132px; }
         .form-grid, .actions { grid-template-columns: 1fr; }
         button.primary { grid-column: auto; }
@@ -206,6 +216,7 @@
         </div>
         <section class="profile-card" aria-label="Edit account profile">
           <h2>Account details</h2>
+          <p class="authority-note">Authority profile keeps only account credentials and organisation details.</p>
           <form id="profileForm">
             <div class="form-grid">
               <label for="displayName">Display name
@@ -217,7 +228,7 @@
               <label for="password" class="field-full">New password
                 <input id="password" name="password" type="password" minlength="4" autocomplete="new-password" placeholder="leave blank to keep current password" />
               </label>
-              <label for="personaType" class="field-full">Accessibility persona / demographic profile
+              <label for="personaType" class="field-full public-only">Accessibility persona / demographic profile
                 <select id="personaType" name="personaType">
                   <option value="working_adult_commuter">Working adult commuter</option>
                   <option value="older_resident_cane">Older resident with cane</option>
@@ -233,10 +244,10 @@
                   <option value="delivery_rider_worker">Delivery / service worker</option>
                 </select>
               </label>
-              <label for="ageBand">Age band
+              <label for="ageBand" class="public-only">Age band
                 <input id="ageBand" name="ageBand" maxlength="40" placeholder="e.g. 25-64" />
               </label>
-              <label for="mobilityNeeds">Mobility/accessibility notes
+              <label for="mobilityNeeds" class="public-only">Mobility/accessibility notes
                 <input id="mobilityNeeds" name="mobilityNeeds" maxlength="180" placeholder="e.g. wheelchair, stroller, low vision" />
               </label>
             </div>
@@ -288,15 +299,24 @@
         user.role ||= role;
         user.username ||= user.external_id || "demo_user";
         user.display_name ||= user.username;
+        document.body.classList.toggle("authority-profile", user.role === "authority");
+        document.body.classList.toggle("public-profile", user.role !== "authority");
+        profileTitle.textContent = user.role === "authority" ? "Authority profile" : "Public profile";
         localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
         localStorage.setItem(ROLE_STORAGE_KEY, user.role);
         displayName.value = user.display_name;
         username.value = user.username;
-        const demoProfile = user.demographic_profile || user.metadata?.demographic_profile || {};
-        personaType.value = user.public_persona_type || user.persona_hint || user.metadata?.persona_type || demoProfile.persona_type || "working_adult_commuter";
-        ageBand.value = demoProfile.age_band || "";
-        mobilityNeeds.value = Array.isArray(demoProfile.mobility_needs) ? demoProfile.mobility_needs.join(", ") : (demoProfile.mobility_needs || "");
-        summary.textContent = `${user.role === "authority" ? "Authority" : "Public"} account · ${user.organization || "JalanLens demo"}`;
+        if (user.role === "public") {
+          const demoProfile = user.demographic_profile || user.metadata?.demographic_profile || {};
+          personaType.value = user.public_persona_type || user.persona_hint || user.metadata?.persona_type || demoProfile.persona_type || "working_adult_commuter";
+          ageBand.value = demoProfile.age_band || "";
+          mobilityNeeds.value = Array.isArray(demoProfile.mobility_needs) ? demoProfile.mobility_needs.join(", ") : (demoProfile.mobility_needs || "");
+        } else {
+          personaType.value = "working_adult_commuter";
+          ageBand.value = "";
+          mobilityNeeds.value = "";
+        }
+        summary.textContent = `${user.role === "authority" ? "Authority dashboard account" : "Public dashboard account"} · ${user.organization || "JalanLens demo"}`;
         backLink.href = "../street-intelligence/";
         return user;
       }
@@ -306,21 +326,25 @@
         event.preventDefault();
         if (!currentUser?.external_id) return setStatus("No current database user selected. Log in again first.", "err");
         setStatus("Saving profile…");
-        const profile = {
-          persona_type: personaType.value,
-          age_band: ageBand.value.trim(),
-          mobility_needs: mobilityNeeds.value.split(",").map((x) => x.trim()).filter(Boolean),
-          updated_from_profile: true,
-        };
         const next = {
           display_name: displayName.value.trim(),
           username: username.value.trim(),
-          persona_hint: personaType.value,
-          public_persona_type: currentUser.role === "public" ? personaType.value : null,
-          demographic_profile: profile,
-          metadata: { ...(currentUser.metadata || {}), persona_type: personaType.value, demographic_profile: profile },
           updated_at: new Date().toISOString(),
         };
+        if (currentUser.role === "public") {
+          const profile = {
+            persona_type: personaType.value,
+            age_band: ageBand.value.trim(),
+            mobility_needs: mobilityNeeds.value.split(",").map((x) => x.trim()).filter(Boolean),
+            updated_from_profile: true,
+          };
+          next.persona_hint = personaType.value;
+          next.public_persona_type = personaType.value;
+          next.demographic_profile = profile;
+          next.metadata = { ...(currentUser.metadata || {}), persona_type: personaType.value, demographic_profile: profile };
+        } else {
+          next.metadata = { ...(currentUser.metadata || {}), authority_profile_updated: true };
+        }
         if (password.value) next.password_hash = await sha256(password.value);
         try {
           const r = await fetch(`${SUPABASE_URL}/rest/v1/app_users?external_id=eq.${encodeURIComponent(currentUser.external_id)}`, {
