@@ -603,17 +603,33 @@
       }
       .road-label {
         position: absolute;
-        transform: translate(-50%, -50%);
-        padding: 2px 7px;
-        border-radius: 999px;
-        color: #e0f2fe;
-        background: rgba(2, 6, 23, 0.58);
-        border: 1px solid rgba(186, 230, 253, 0.24);
-        text-shadow: 0 1px 2px #020617;
-        font-size: 11px;
-        font-weight: 800;
+        height: 26px;
+        transform-origin: 50% 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+      }
+      .road-label-inner {
+        width: 100%;
+        min-width: 86px;
+        overflow: hidden;
+        text-overflow: ellipsis;
         white-space: nowrap;
-        box-shadow: 0 6px 18px rgba(2, 6, 23, 0.28);
+        padding: 3px 10px 4px;
+        border: 1px solid rgba(30, 30, 30, 0.22);
+        border-bottom: 4px solid var(--harvard-crimson);
+        border-radius: 0;
+        background: rgba(243, 243, 241, 0.78);
+        color: #111111;
+        backdrop-filter: blur(8px);
+        box-shadow: 0 10px 26px rgba(2, 6, 23, 0.22);
+        font-family: var(--harvard-serif) !important;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: -0.025em;
+        line-height: 1.1;
+        text-align: center;
       }
       .persona-card {
         text-align: left;
@@ -3085,12 +3101,95 @@
           : "";
         return `Near ${road}, Singapore${suffix}`;
       }
+      function coverageBoundsForRoadLabels() {
+        const pts = [];
+        state.segments.forEach((f) =>
+          (f.geometry?.coordinates || []).forEach((c) => pts.push(c)),
+        );
+        (state.streetRegistry?.street_parts || []).forEach((p) => {
+          (p.geometry?.coordinates || []).forEach((c) => pts.push(c));
+          if (p.midpoint) pts.push(p.midpoint);
+        });
+        if (!pts.length) {
+          return { minLng: 103.759, maxLng: 103.777, minLat: 1.302, maxLat: 1.319 };
+        }
+        const lngs = pts.map((p) => p[0]);
+        const lats = pts.map((p) => p[1]);
+        const marginLng = 0.0026;
+        const marginLat = 0.002;
+        return {
+          minLng: Math.min(...lngs) - marginLng,
+          maxLng: Math.max(...lngs) + marginLng,
+          minLat: Math.min(...lats) - marginLat,
+          maxLat: Math.max(...lats) + marginLat,
+        };
+      }
+      function roadSegmentScreenGeometry(coords) {
+        let best = null;
+        for (let i = 1; i < coords.length; i++) {
+          const a = map.coordinateToContainerPoint(new maptalks.Coordinate(...coords[i - 1]));
+          const b = map.coordinateToContainerPoint(new maptalks.Coordinate(...coords[i]));
+          const length = Math.hypot(b.x - a.x, b.y - a.y);
+          if (length < 34) continue;
+          if (!best || length > best.length) {
+            best = {
+              x: (a.x + b.x) / 2,
+              y: (a.y + b.y) / 2,
+              length,
+              angle:
+                Math.abs((Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI) > 90
+                  ? (Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI + 180
+                  : (Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI,
+            };
+          }
+        }
+        return best;
+      }
+      function roadLabelCandidates() {
+        const roads = state.roadNameData?.roads || [];
+        if (!roads.length) return [];
+        const bounds = coverageBoundsForRoadLabels();
+        const important = new Set([
+          "Clementi Avenue 3",
+          "Commonwealth Avenue West",
+          "Clementi Bus Interchange",
+          "Bridge inside Clementi MRT Station",
+          "Bridge inside Clementi MRT Station that connects to Clementi Mall",
+        ]);
+        const byName = new Map();
+        roads.forEach((road) => {
+          const coords = (road.coords || []).filter(
+            (c) =>
+              c[0] >= bounds.minLng &&
+              c[0] <= bounds.maxLng &&
+              c[1] >= bounds.minLat &&
+              c[1] <= bounds.maxLat,
+          );
+          if (coords.length < 2) return;
+          const geom = roadSegmentScreenGeometry(coords);
+          if (!geom) return;
+          const existing = byName.get(road.name);
+          const priority = (important.has(road.name) ? 10000 : 0) + geom.length;
+          if (!existing || priority > existing.priority) {
+            byName.set(road.name, { ...geom, name: road.name, priority });
+          }
+        });
+        return [...byName.values()]
+          .sort((a, b) => b.priority - a.priority)
+          .slice(0, 10);
+      }
       function renderRoadNameLabels() {
-        // Keep Earth view uncluttered: place/road names are shown only as
-        // hover tooltips on the blue street-part buttons, not as floating labels.
         if (!window.roadNameLabels) return;
-        roadNameLabels.classList.remove("visible");
-        roadNameLabels.innerHTML = "";
+        const labels = state.mode === "earth" ? roadLabelCandidates() : [];
+        roadNameLabels.classList.toggle("visible", state.mode === "earth" && labels.length > 0);
+        roadNameLabels.innerHTML = labels
+          .map((label) => {
+            const roadWidth = label.length * 0.92;
+            const textWidth = label.name.length * 8.4 + 28;
+            const width = Math.max(140, Math.min(430, Math.max(roadWidth, textWidth)));
+            return `<div class="road-label" style="left:${Math.round(label.x - width / 2)}px;top:${Math.round(label.y - 13)}px;width:${Math.round(width)}px;transform:rotate(${label.angle.toFixed(1)}deg)"><span class="road-label-inner">${escapeHtml(label.name)}</span></div>`;
+          })
+          .join("");
       }
 
       function addonFor(p) {
@@ -3327,12 +3426,13 @@
           return new maptalks.LineString(f.geometry.coordinates, {
             properties: { ...f.properties, index: selectableIndex },
             symbol: {
-              lineColor: selectable
-                ? scoreColor(f.properties.overall_accessibility_score)
-                : "#94a3b8",
-              lineWidth: f.properties.feature_type === "kerb_line" ? 1.4 : 4,
-              lineOpacity:
-                f.properties.feature_type === "kerb_line" ? 0.28 : 0.88,
+              // Hidden intentionally: the colored MapTalks route strokes looked
+              // like broken green guide lines in Earth View. Street parts remain
+              // selectable through the DOM buttons and scorecard controls.
+              lineColor: "rgba(0,0,0,0)",
+              lineWidth: 0,
+              lineOpacity: 0,
+              lineDasharray: [],
             },
           }).on("click", () => {
             if (selectable) {
@@ -4596,6 +4696,7 @@
           setTimeout(() => {
             renderSatelliteFallback();
             updateThreeOverlay();
+            renderRoadNameLabels();
           }, 520);
         }
       }
@@ -4719,6 +4820,7 @@
         state.mode = "street";
         document.body.classList.add("street-mode");
         if (window.viewModeSelect) viewModeSelect.value = "street";
+        renderRoadNameLabels();
         modeLabel.textContent = "street view · accessibility features";
         earthSource.textContent =
           "loading active street-part photo, Earth satellite stays behind";
@@ -5842,6 +5944,7 @@
             renderWorld(world);
             const ext = routeLayer.getExtent();
             if (ext) map.fitExtent(ext, 0, { animation: false });
+            renderRoadNameLabels();
             clampSatelliteZoom();
             map.setPitch(0);
             map.setBearing(0);

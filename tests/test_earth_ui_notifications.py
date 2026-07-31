@@ -53,6 +53,32 @@ class EarthUiControlsNotificationTests(unittest.TestCase):
         ]:
             self.assertIn(required_css, css)
 
+    def test_earth_view_shows_harvard_road_name_labels_and_hides_green_route_lines(self):
+        text = self.html()
+        for snippet in [
+            'id="roadNameLabels" aria-hidden="true"',
+            'function coverageBoundsForRoadLabels',
+            'function roadLabelCandidates',
+            'class="road-label-inner"',
+            'roadNameLabels.classList.toggle("visible", state.mode === "earth"',
+            'Clementi Avenue 3',
+            'Commonwealth Avenue West',
+            'Clementi Bus Interchange',
+            'lineOpacity: 0',
+            'lineWidth: 0',
+            'lineDasharray',
+        ]:
+            self.assertIn(snippet, text)
+        css = text[text.index('#roadNameLabels'):text.index('.persona-card')]
+        for snippet in [
+            'background: rgba(243, 243, 241, 0.78)',
+            'border-bottom: 4px solid var(--harvard-crimson)',
+            'font-family: var(--harvard-serif)',
+            'backdrop-filter: blur(8px)',
+            'transform-origin: 50% 50%',
+        ]:
+            self.assertIn(snippet, css)
+
     def test_status_is_toast_notification_not_persistent_5m_segment_box(self):
         text = self.html()
         self.assertNotIn('5 m segments', text)
