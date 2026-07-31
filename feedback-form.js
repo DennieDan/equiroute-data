@@ -353,20 +353,30 @@
 
   async function likeThread(threadId, button) {
     const liked = localLikes();
-    if (liked.has(threadId)) return;
+    const wasLiked = liked.has(threadId);
+    const nextLiked = !wasLiked;
     const current = Number(button.dataset.count || 0);
+    const next = Math.max(0, current + (nextLiked ? 1 : -1));
     button.disabled = true;
-    button.dataset.count = String(current + 1);
-    button.classList.add("liked");
-    button.textContent = `♥ ${current + 1}`;
-    liked.add(threadId);
+    button.dataset.count = String(next);
+    button.classList.toggle("liked", nextLiked);
+    button.textContent = `${nextLiked ? "♥" : "♡"} ${next}`;
+    if (nextLiked) liked.add(threadId);
+    else liked.delete(threadId);
     saveLocalLikes(liked);
     try {
-      await fetch(`${supabaseUrl}/rest/v1/feedback_votes`, {
-        method: "POST",
-        headers: headers({ "Content-Type": "application/json", Prefer: "return=minimal" }),
-        body: JSON.stringify({ thread_id: threadId, user_id: voterId(), vote_type: "upvote" }),
-      });
+      if (nextLiked) {
+        await fetch(`${supabaseUrl}/rest/v1/feedback_votes`, {
+          method: "POST",
+          headers: headers({ "Content-Type": "application/json", Prefer: "return=minimal" }),
+          body: JSON.stringify({ thread_id: threadId, user_id: voterId(), vote_type: "upvote" }),
+        });
+      } else {
+        await fetch(`${supabaseUrl}/rest/v1/feedback_votes?thread_id=eq.${encodeURIComponent(threadId)}&user_id=eq.${encodeURIComponent(voterId())}`, {
+          method: "DELETE",
+          headers: headers({ Prefer: "return=minimal" }),
+        });
+      }
     } catch (e) {
       // Agent-feedback likes may not map to feedback_votes yet; keep local optimistic state.
     } finally {
