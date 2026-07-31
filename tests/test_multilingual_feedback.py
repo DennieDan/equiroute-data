@@ -20,12 +20,13 @@ class MultilingualFeedbackTests(unittest.TestCase):
     def test_feedback_ui_exposes_multilingual_translation_and_speech_controls(self):
         html = self.html()
         for snippet in [
-            'id="feedbackLanguageHint"',
+            'class="feedback-composer-line"',
             'id="feedbackSpeechBtn"',
+            'aria-label="Speech to text"',
             'id="feedbackTranslationBox"',
             'id="feedbackTranslationText"',
-            'Traditional Chinese, Simplified Chinese, Malay, Tamil, Bengali, and Gujarati',
             'class="mic-pulse"',
+            'Add feedback or response…',
         ]:
             self.assertIn(snippet, html)
         self.assertRegex(html, r"#feedbackTranslationBox\s*\{[^}]*background:\s*#fef3c7")

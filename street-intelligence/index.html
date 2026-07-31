@@ -1185,7 +1185,7 @@
         }
       }
     </style>
-    <link rel="stylesheet" href="../harvard.css?v=20260731q" />
+    <link rel="stylesheet" href="../harvard.css?v=20260731r" />
     <script src="https://unpkg.com/maptalks/dist/maptalks.min.js"></script>
     <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
     <script src="https://unpkg.com/mapillary-js@4.1.2/dist/mapillary.js"></script>
@@ -1348,38 +1348,29 @@
           </div>
           <div class="metrics" id="metricList"></div>
           <div id="streetAgentCounts" class="street-agent-counts"></div>
-          <div class="detail-actions">
-            <button type="button" id="feedbackBtn">Give feedback</button>
-            <div id="feedbackMeta"></div>
-          </div>
-          <div id="feedbackHistory" class="feedback-history"></div>
-          <form id="feedbackForm">
-            <label for="feedbackTitle">Title</label>
+          <form id="feedbackForm" class="feedback-composer">
             <input
               id="feedbackTitle"
               name="title"
+              type="hidden"
               required
               maxlength="120"
               placeholder="What should be fixed?"
             />
-            <label for="feedbackBody">Details</label>
-            <div id="feedbackLanguageHint" class="feedback-language-hint">
-              Supports English, Traditional Chinese, Simplified Chinese, Malay, Tamil, Bengali, and Gujarati. Non-English feedback is translated to English before saving.
-            </div>
-            <textarea
-              id="feedbackBody"
-              name="body"
-              required
-              maxlength="2000"
-              placeholder="Describe the accessibility issue or suggestion."
-            ></textarea>
-            <div class="feedback-speech-row">
-              <button type="button" id="feedbackSpeechBtn">
-                <span class="mic-pulse" aria-hidden="true"></span
-                ><span id="feedbackSpeechLabel">Start speech to text</span>
+            <div class="feedback-composer-line">
+              <textarea
+                id="feedbackBody"
+                name="body"
+                required
+                maxlength="2000"
+                rows="1"
+                placeholder="Add feedback or response…"
+              ></textarea>
+              <button type="button" id="feedbackSpeechBtn" aria-label="Speech to text" title="Speech to text">
+                <span class="mic-pulse" aria-hidden="true"></span><span id="feedbackSpeechLabel">🎙</span>
               </button>
-              <small id="feedbackSpeechStatus">Browser speech-to-text ready.</small>
             </div>
+            <small id="feedbackSpeechStatus">Browser speech-to-text ready.</small>
             <div id="feedbackTranslationBox" aria-live="polite">
               <b>English translation</b>
               <div id="feedbackTranslationText"></div>
@@ -1390,6 +1381,8 @@
             </div>
             <div id="feedbackStatus"></div>
           </form>
+          <div id="feedbackMeta"></div>
+          <div id="feedbackHistory" class="feedback-history"></div>
         </div>
         <div class="detail-face detail-back" aria-hidden="true">
           <div class="detail-head">
@@ -1419,7 +1412,7 @@
       </div>
     </section>
     <div class="status" id="status" aria-hidden="true"></div>
-    <script src="../feedback-form.js?v=social-thread-2"></script>
+    <script src="../feedback-form.js?v=social-thread-3"></script>
     <script>
       const COLORS = {
         green: "#22f36e",
@@ -2972,6 +2965,11 @@
         return liveAgentPosition(agent, nowMs).coord;
       }
       function syncLiveAgentMarkers() {
+        if (state.role !== "authority") {
+          state.agentLayer?.clear?.();
+          state.liveAgentMarkers.clear();
+          return;
+        }
         if (!state.agentLayer || !window.maptalks) return;
         const snapshot = state.liveAgentSnapshot;
         if (!snapshot?.agent_live_states?.length) {
@@ -3028,6 +3026,7 @@
         });
       }
       function animateLiveAgents() {
+        if (state.role !== "authority") return;
         const snapshot = state.liveAgentSnapshot;
         if (
           !snapshot?.agent_live_states?.length ||
@@ -3081,6 +3080,11 @@
       }
       function renderStreetAgentCounts() {
         if (!window.streetAgentCounts) return;
+        if (state.role !== "authority") {
+          streetAgentCounts.classList.remove("visible");
+          streetAgentCounts.innerHTML = "";
+          return;
+        }
         const part = currentStreetPart();
         const snapshot = state.liveAgentSnapshot;
         const row = currentLiveAgentCounts().get(part?.id);
@@ -3102,6 +3106,13 @@
       }
 
       async function loadLiveAgentSnapshot() {
+        if (state.role !== "authority") {
+          state.liveAgentSnapshot = null;
+          state.agentLayer?.clear?.();
+          state.liveAgentMarkers.clear();
+          renderStreetAgentCounts();
+          return;
+        }
         try {
           const r = await fetch(
             `../data/live_persona_simulation_snapshot.json?t=${Date.now()}`,
@@ -3134,9 +3145,9 @@
           cleanType && !baseName.toLowerCase().includes(cleanType.toLowerCase())
             ? `${baseName} · ${cleanType}`
             : baseName;
-        selectedDesc.textContent = p.metrics?.length_m
+        selectedDesc.textContent = state.role === "authority" && p.metrics?.length_m
           ? `${p.address ? p.address + " · " : ""}${Math.round(p.metrics.length_m * 10) / 10} m street part`
-          : `${kindLabel || cleanType}${extras.distanceM != null ? ` · ~${Math.round(extras.distanceM)}m from camera` : ""}`;
+          : `${kindLabel || cleanType || p.address || "Accessibility context"}${extras.distanceM != null && state.role === "authority" ? ` · ~${Math.round(extras.distanceM)}m from camera` : ""}`;
         const detailScore =
           p.overall_accessibility_score ?? extras.score ?? null;
         activeScore.textContent =
@@ -4368,8 +4379,12 @@
             map.setPitch(0);
             map.setBearing(0);
             renderSatelliteFallback();
-            await loadLiveAgentSnapshot();
-            setInterval(loadLiveAgentSnapshot, 10000);
+            if (state.role === "authority") {
+              await loadLiveAgentSnapshot();
+              setInterval(loadLiveAgentSnapshot, 10000);
+            } else {
+              renderStreetAgentCounts();
+            }
             const streetCount = registry?.streets?.length || 0,
               nodeCount = registry?.street_view_nodes?.length || 0,
               src =
