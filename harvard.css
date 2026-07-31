@@ -1215,6 +1215,52 @@ html[data-theme="dark"] body:has(#map) .feedback-item.agent b em {
 }
 
 /* Dark-display readability for feedback filters and live-agent status popups. */
+body:has(#map) #roleSwitchBtn,
+html[data-theme="light"] body:has(#map) #roleSwitchBtn,
+html[data-theme="dark"] body:has(#map) #roleSwitchBtn {
+  background: var(--control-bg) !important;
+  color: var(--control-fg) !important;
+  border-color: var(--line) !important;
+  text-shadow: none !important;
+  opacity: 1 !important;
+}
+body:has(#map) #roleSwitchBtn:hover,
+body:has(#map) #roleSwitchBtn:focus-visible,
+html[data-theme="dark"] body:has(#map) #roleSwitchBtn:hover,
+html[data-theme="dark"] body:has(#map) #roleSwitchBtn:focus-visible {
+  background: var(--control-fg) !important;
+  color: var(--control-bg) !important;
+  border-color: var(--control-fg) !important;
+}
+body:has(#map) #roleMenu,
+html[data-theme="light"] body:has(#map) #roleMenu,
+html[data-theme="dark"] body:has(#map) #roleMenu {
+  background: rgba(255, 255, 255, 0.96) !important;
+  color: #111111 !important;
+  border-color: rgba(30, 30, 30, 0.22) !important;
+  border-top-color: #a51c30 !important;
+  text-shadow: none !important;
+}
+body:has(#map) #roleMenu h3,
+body:has(#map) #roleMenu p,
+body:has(#map) #roleMenu b,
+body:has(#map) #roleMenu span,
+html[data-theme="light"] body:has(#map) #roleMenu h3,
+html[data-theme="light"] body:has(#map) #roleMenu p,
+html[data-theme="light"] body:has(#map) #roleMenu b,
+html[data-theme="light"] body:has(#map) #roleMenu span,
+html[data-theme="dark"] body:has(#map) #roleMenu h3,
+html[data-theme="dark"] body:has(#map) #roleMenu p,
+html[data-theme="dark"] body:has(#map) #roleMenu b,
+html[data-theme="dark"] body:has(#map) #roleMenu span {
+  color: #111111 !important;
+  text-shadow: none !important;
+}
+body:has(#map) #roleMenu #roleMenuStatus,
+html[data-theme="light"] body:has(#map) #roleMenu #roleMenuStatus,
+html[data-theme="dark"] body:has(#map) #roleMenu #roleMenuStatus {
+  color: #334155 !important;
+}
 body:has(#map) .feedback-filters label,
 html[data-theme="light"] body:has(#map) .feedback-filters label,
 html[data-theme="dark"] body:has(#map) .feedback-filters label {
