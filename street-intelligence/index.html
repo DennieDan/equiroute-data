@@ -1014,21 +1014,29 @@
           background-color 0.18s ease,
           color 0.18s ease;
       }
+      #settings .photo-crowd-heading-link,
+      #settings .photo-crowd-heading-link span {
+        color: inherit !important;
+      }
       .photo-crowd-heading-link .heading-arrow {
         display: inline-block;
-        opacity: 0;
-        transform: translateX(-3px);
-        transition: opacity 0.18s ease;
+        transform: none;
       }
-      .photo-crowd-heading-link:hover,
-      .photo-crowd-heading-link:focus-visible {
+      #settings .photo-crowd-heading-link:hover,
+      #settings .photo-crowd-heading-link:focus-visible,
+      #settings .photo-crowd-heading-link:hover span,
+      #settings .photo-crowd-heading-link:focus-visible span {
         background: #000;
-        color: #fff;
+        color: #ffffff !important;
         outline: none;
+      }
+      #settings .photo-crowd-heading-link:hover span,
+      #settings .photo-crowd-heading-link:focus-visible span {
+        background: transparent;
       }
       .photo-crowd-heading-link:hover .heading-arrow,
       .photo-crowd-heading-link:focus-visible .heading-arrow {
-        opacity: 1;
+        color: #ffffff;
         animation: photo-heading-arrow 0.75s ease-in-out infinite alternate;
       }
       @keyframes photo-heading-arrow {
