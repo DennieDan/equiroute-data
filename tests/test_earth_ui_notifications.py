@@ -155,9 +155,14 @@ class EarthUiControlsNotificationTests(unittest.TestCase):
 
     def test_notification_schema_exists(self):
         sql = SCHEMA.read_text()
+        html = self.html()
         self.assertIn('create table if not exists public.app_notifications', sql)
-        self.assertIn('clear notification history', self.html().lower())
+        self.assertIn('clear notification history', html.lower())
         self.assertIn('grant select, insert, update on public.app_notifications', sql)
+        self.assertIn('async function supabaseInsertIgnoreDuplicate', html)
+        self.assertIn('on_conflict=${encodeURIComponent(conflictColumn)}', html)
+        self.assertIn('Prefer: "resolution=ignore-duplicates,return=minimal"', html)
+        self.assertIn('await supabaseInsertIgnoreDuplicate("app_notifications"', html)
 
 
 if __name__ == "__main__":
