@@ -1,5 +1,5 @@
 /**
- * Feedback social thread for earth_accessibility.html.
+ * Feedback social thread for street-intelligence/.
  * Human public feedback stays in feedback_threads; synthetic agent feedback stays
  * in agent_feedback_threads. The UI merges both for review and filters.
  */
@@ -12,10 +12,33 @@
   let supabaseUrl = "";
   let supabaseKey = "";
   let capitalizeKind = (kind) => String(kind || "");
+  let onFeedbackRowsLoaded = () => {};
   let historyRequestId = 0;
   const VOTER_KEY = "jalanlens_feedback_voter_id";
   const LOCAL_LIKES_KEY = "jalanlens_feedback_local_likes";
   const filters = { source: "all", recency: "all", persona: "all" };
+  const AGNES_BASE_URL = "https://apihub.agnes-ai.com/v1";
+  const AGNES_TRANSLATION_MODEL = "agnes-2.5-flash";
+  const AGNES_TRANSCRIPTION_MODEL = "agnes-2.5-flash";
+  const AGNES_KEY_STORAGE = "jalanlens_agnes_api_key";
+  const SUPPORTED_FEEDBACK_LANGUAGES = ["en", "zh-Hant", "zh-Hans", "ms", "ta", "bn", "gu"];
+  const languageLabels = {
+    en: "English",
+    "zh-Hant": "Traditional Chinese",
+    "zh-Hans": "Simplified Chinese",
+    ms: "Malay",
+    ta: "Tamil",
+    bn: "Bengali",
+    gu: "Gujarati",
+    unknown: "Unknown",
+  };
+  let translationState = { language: "en", english: "", status: "not_required", provider: null, model: null };
+  let translationTimer = null;
+  let mediaRecorder = null;
+  let audioChunks = [];
+  let speechRecognition = null;
+  let speechTranscriptOriginal = "";
+  let inputModality = "typed";
 
   function $(id) { return document.getElementById(id); }
 
@@ -102,6 +125,10 @@
       els.status.className = "";
       fillTitleFromContext();
       els.body.value = "";
+      speechTranscriptOriginal = "";
+      inputModality = "typed";
+      translationState = { language: "en", english: "", status: "not_required", provider: null, model: null };
+      renderTranslationBox();
     }
     loadHistory();
   }
@@ -132,7 +159,7 @@
   async function fetchPublicFeedbackRows(streetPartId, featureId) {
     if (!streetPartId) return [];
     const filters = [
-      "select=id,title,body,status,priority_score,created_at,updated_at,feature_id,street_part_id,source,public_user_external_id,public_user_name,persona_type",
+      "select=id,title,body,status,priority_score,created_at,updated_at,feature_id,street_part_id,source,public_user_external_id,public_user_name,persona_type,original_language,english_translation,translation_provider,translation_model,input_modality",
       `street_part_id=eq.${encodeURIComponent(streetPartId)}`,
       "order=created_at.desc",
       "limit=80",
@@ -242,7 +269,10 @@
       const who = isAgent ? `${row.agent_name || "Agent"} · ${row.agent_external_id || "agent"}` : `${row.public_user_name || "Public user"}`;
       const persona = row.persona_type ? ` · ${row.persona_type.replaceAll("_", " ")}` : "";
       const badge = isAgent ? "agent" : "public";
-      return `<div class="feedback-item ${escapeHtml(badge)}" data-thread-id="${escapeHtml(row.id)}"><b><em>${escapeHtml(badge)}</em> ${escapeHtml(publicLabelText(row.title))}</b><span>${escapeHtml(publicLabelText(row.body))}</span><div class="feedback-social-row"><button type="button" class="feedback-like${isLiked ? " liked" : ""}" data-thread-id="${escapeHtml(row.id)}" data-count="${count}">${isLiked ? "♥" : "♡"} ${count}</button><small>${escapeHtml(who)}${escapeHtml(persona)} · ${escapeHtml(date)}</small></div></div>`;
+      const translation = row.english_translation && row.english_translation !== row.body
+        ? `<div class="feedback-row-translation"><b>English:</b> ${escapeHtml(publicLabelText(row.english_translation))}</div>`
+        : "";
+      return `<div class="feedback-item ${escapeHtml(badge)}" data-thread-id="${escapeHtml(row.id)}"><b><em>${escapeHtml(badge)}</em> ${escapeHtml(publicLabelText(row.title))}</b><span>${escapeHtml(publicLabelText(row.body))}</span>${translation}<div class="feedback-social-row"><button type="button" class="feedback-like${isLiked ? " liked" : ""}" data-thread-id="${escapeHtml(row.id)}" data-count="${count}">${isLiked ? "♥" : "♡"} ${count}</button><small>${escapeHtml(who)}${escapeHtml(persona)} · ${escapeHtml(row.input_modality || "typed")} · ${escapeHtml(row.original_language ? languageLabels[row.original_language] || row.original_language : "")}${row.original_language ? " · " : ""}${escapeHtml(date)}</small></div></div>`;
     }).join("");
     setHistory(`${header}${items}`, true);
     els.history.querySelectorAll(".feedback-like").forEach((button) => {
@@ -299,6 +329,7 @@
         .map((row, index) => ({ ...row, id: row.id || `local-agent-${ctx.streetPartExternalId}-${index}`, source: "agent_simulation" }));
       const agentRows = agentResult.status === "fulfilled" && agentResult.value.length ? agentResult.value : localAgentRows;
       lastRows = [...publicRows, ...agentRows].sort((a, b) => String(b.created_at || "").localeCompare(String(a.created_at || "")));
+      onFeedbackRowsLoaded(lastRows, ctx);
       if (!lastRows.length) {
         const errors = [publicResult, agentResult].filter((r) => r.status === "rejected").map((r) => r.reason?.message || String(r.reason));
         setHistory(`<div class="feedback-thread-head"><b>Feedback threads</b><small>0 posts</small></div><div class="feedback-item"><span>No reports yet.${errors.length ? " Some live tables may not be migrated yet." : " Be the first to post feedback for this footpath."}</span></div>`, true);
@@ -316,16 +347,203 @@
     return user.display_name || user.username || user.external_id || "Public user";
   }
 
+
+  function agnesApiKey() {
+    return global.JALANLENS_AGNES_API_KEY || localStorage.getItem(AGNES_KEY_STORAGE) || "";
+  }
+
+  function setFeedbackStatus(message, cls = "") {
+    if (!els?.status) return;
+    els.status.className = cls;
+    els.status.textContent = message;
+  }
+
+  function detectFeedbackLanguage(text) {
+    const value = String(text || "").trim();
+    if (!value) return "en";
+    if (/[஀-௿]/.test(value)) return "ta";
+    if (/[ঀ-৿]/.test(value)) return "bn";
+    if (/[઀-૿]/.test(value)) return "gu";
+    if (/[一-鿿]/.test(value)) {
+      return /[後這個門開關會讓無障礙臺灣繁體國裏]/.test(value) ? "zh-Hant" : "zh-Hans";
+    }
+    if (/[à-ž]/i.test(value) || /\b(saya|jalan|kerusi roda|terima kasih|tidak|boleh|laluan|bahaya|rosak)\b/i.test(value)) return "ms";
+    return "en";
+  }
+
+  function translationPrompt(text, lang) {
+    return `Translate this public accessibility feedback into clear English. Preserve place names and issue details. Return only the English translation. Source language: ${languageLabels[lang] || lang}. Text:\n${text}`;
+  }
+
+  async function translateFeedbackWithAgnes(text, lang) {
+    const key = agnesApiKey();
+    if (!key) throw new Error("Agnes API key unavailable in this browser. Add it to localStorage as jalanlens_agnes_api_key.");
+    const r = await fetch(`${AGNES_BASE_URL}/chat/completions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: "Bearer " + key },
+      body: JSON.stringify({
+        model: AGNES_TRANSLATION_MODEL,
+        temperature: 0,
+        messages: [
+          { role: "system", content: "You are a careful civic feedback translator. Translate to English only." },
+          { role: "user", content: translationPrompt(text, lang) },
+        ],
+      }),
+    });
+    if (!r.ok) throw new Error(`Agnes translation ${r.status}`);
+    const data = await r.json();
+    return String(data.choices?.[0]?.message?.content || "").trim();
+  }
+
+  function renderTranslationBox() {
+    if (!els?.translationBox || !els.translationText) return;
+    const lang = translationState.language || "en";
+    const needsTranslation = lang !== "en";
+    els.translationBox.classList.toggle("visible", needsTranslation || translationState.status === "translating" || translationState.status === "error");
+    if (!needsTranslation) {
+      els.translationText.textContent = "";
+      return;
+    }
+    const label = languageLabels[lang] || lang;
+    if (translationState.status === "translating") {
+      els.translationText.textContent = `Detected ${label}. Translating to English with Agnes AI…`;
+    } else if (translationState.status === "error") {
+      els.translationText.textContent = `Detected ${label}. English translation unavailable: ${translationState.error || "Agnes AI request failed."}`;
+    } else {
+      els.translationText.textContent = translationState.english || `Detected ${label}. English translation will appear here.`;
+    }
+  }
+
+  async function refreshTranslationNow() {
+    const body = els.body.value.trim();
+    const lang = detectFeedbackLanguage(body);
+    translationState = { language: lang, english: "", status: lang === "en" ? "not_required" : "translating", provider: null, model: null };
+    renderTranslationBox();
+    if (!body || lang === "en") return translationState;
+    try {
+      const english = await translateFeedbackWithAgnes(body, lang);
+      translationState = { language: lang, english, status: "translated", provider: "agnes", model: AGNES_TRANSLATION_MODEL };
+    } catch (err) {
+      translationState = { language: lang, english: "", status: "error", provider: "agnes", model: AGNES_TRANSLATION_MODEL, error: err.message || String(err) };
+    }
+    renderTranslationBox();
+    return translationState;
+  }
+
+  function scheduleTranslation() {
+    inputModality = inputModality === "speech" ? "speech" : "typed";
+    clearTimeout(translationTimer);
+    translationTimer = setTimeout(refreshTranslationNow, 650);
+  }
+
+  async function transcribeAudioWithAgnes(blob) {
+    const key = agnesApiKey();
+    if (!key) throw new Error("Agnes API key unavailable in this browser. Add it to localStorage as jalanlens_agnes_api_key.");
+    const data = new FormData();
+    data.append("model", AGNES_TRANSCRIPTION_MODEL);
+    data.append("file", blob, "feedback.webm");
+    const r = await fetch(`${AGNES_BASE_URL}/audio/transcriptions`, {
+      method: "POST",
+      headers: { Authorization: "Bearer " + key },
+      body: data,
+    });
+    if (!r.ok) throw new Error(`Agnes transcription ${r.status}`);
+    const result = await r.json();
+    return String(result.text || result.transcript || "").trim();
+  }
+
+  function startBrowserSpeechRecognition() {
+    const SpeechRecognition = global.SpeechRecognition || global.webkitSpeechRecognition;
+    if (!SpeechRecognition) return null;
+    const rec = new SpeechRecognition();
+    rec.continuous = true;
+    rec.interimResults = true;
+    rec.lang = "en-SG";
+    rec.onresult = (event) => {
+      let finalText = "";
+      let interim = "";
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const chunk = event.results[i][0]?.transcript || "";
+        if (event.results[i].isFinal) finalText += chunk;
+        else interim += chunk;
+      }
+      const text = (finalText || interim).trim();
+      if (text) {
+        speechTranscriptOriginal = `${speechTranscriptOriginal} ${text}`.trim();
+        els.body.value = speechTranscriptOriginal;
+        scheduleTranslation();
+      }
+    };
+    rec.onerror = () => {};
+    rec.start();
+    return rec;
+  }
+
+  async function startSpeechCapture() {
+    if (!els.speechBtn) return;
+    if (mediaRecorder && mediaRecorder.state === "recording") {
+      mediaRecorder.stop();
+      return;
+    }
+    inputModality = "speech";
+    audioChunks = [];
+    speechTranscriptOriginal = els.body.value.trim();
+    els.speechBtn.classList.add("recording");
+    els.speechLabel.textContent = "Stop transcribing";
+    els.speechStatus.textContent = "Listening… mic is active and pulsing.";
+    speechRecognition = startBrowserSpeechRecognition();
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder = new MediaRecorder(stream);
+      mediaRecorder.ondataavailable = (event) => { if (event.data?.size) audioChunks.push(event.data); };
+      mediaRecorder.onstop = async () => {
+        stream.getTracks().forEach((track) => track.stop());
+        if (speechRecognition) { try { speechRecognition.stop(); } catch (e) {} }
+        els.speechBtn.classList.remove("recording");
+        els.speechLabel.textContent = "Start speech to text";
+        els.speechStatus.textContent = "Transcribing with Agnes AI…";
+        try {
+          const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType || "audio/webm" });
+          const text = await transcribeAudioWithAgnes(blob);
+          if (text) {
+            speechTranscriptOriginal = text;
+            els.body.value = text;
+          }
+          els.speechStatus.textContent = "Transcription complete.";
+        } catch (err) {
+          els.speechStatus.textContent = speechTranscriptOriginal ? "Agnes transcription unavailable; using browser speech transcript." : (err.message || "Speech transcription failed.");
+        }
+        await refreshTranslationNow();
+      };
+      mediaRecorder.start();
+    } catch (err) {
+      els.speechBtn.classList.remove("recording");
+      els.speechLabel.textContent = "Start speech to text";
+      els.speechStatus.textContent = err.message || "Microphone permission denied.";
+      if (speechRecognition) { try { speechRecognition.stop(); } catch (e) {} }
+    }
+  }
+
   async function submit(title, body) {
     const ctx = getDetailContext() || {};
     const { streetPartId, featureId } = await resolveContextIds(ctx);
     if (!streetPartId) throw new Error("No street_part match yet. Open a seeded demo corridor segment first.");
     const user = getCurrentUser?.() || {};
+    const translation = await refreshTranslationNow();
+    const englishTranslation = translation.language !== "en" ? translation.english : "";
     const payload = {
       street_part_id: streetPartId,
       feature_id: featureId,
       title,
       body,
+      original_language: translation.language || "en",
+      original_text: body,
+      english_translation: englishTranslation || null,
+      translation_status: translation.status || (translation.language === "en" ? "not_required" : "error"),
+      translation_provider: "agnes",
+      translation_model: AGNES_TRANSLATION_MODEL,
+      speech_transcript_original: inputModality === "speech" ? (speechTranscriptOriginal || body) : null,
+      input_modality: inputModality,
       created_by: null,
       source: "public",
       public_user_external_id: user.external_id || null,
@@ -346,6 +564,8 @@
   function bindEvents() {
     els.openBtn.onclick = () => open();
     els.cancelBtn.onclick = () => close(true);
+    els.body.addEventListener("input", () => { inputModality = "typed"; speechTranscriptOriginal = ""; scheduleTranslation(); });
+    if (els.speechBtn) els.speechBtn.onclick = () => startSpeechCapture();
     els.form.onsubmit = async (e) => {
       e.preventDefault();
       const title = els.title.value.trim();
@@ -362,6 +582,10 @@
         els.status.textContent = row?.feature_id ? `Public feedback posted to feature thread.` : `Public feedback posted on footpath${ctx.featureExternalId ? " (feature not found in DB yet)" : ""}.`;
         els.title.value = "";
         els.body.value = "";
+        speechTranscriptOriginal = "";
+        inputModality = "typed";
+        translationState = { language: "en", english: "", status: "not_required", provider: null, model: null };
+        renderTranslationBox();
         await loadHistory();
         setTimeout(() => close(false), 900);
       } catch (err) {
@@ -379,6 +603,7 @@
     supabaseUrl = options.supabaseUrl || "";
     supabaseKey = options.supabaseKey || "";
     if (typeof options.capitalizeKind === "function") capitalizeKind = options.capitalizeKind;
+    if (typeof options.onFeedbackRowsLoaded === "function") onFeedbackRowsLoaded = options.onFeedbackRowsLoaded;
     const ids = {
       openBtn: "feedbackBtn",
       meta: "feedbackMeta",
@@ -389,6 +614,12 @@
       cancelBtn: "feedbackCancelBtn",
       status: "feedbackStatus",
       history: "feedbackHistory",
+      languageHint: "feedbackLanguageHint",
+      speechBtn: "feedbackSpeechBtn",
+      speechLabel: "feedbackSpeechLabel",
+      speechStatus: "feedbackSpeechStatus",
+      translationBox: "feedbackTranslationBox",
+      translationText: "feedbackTranslationText",
     };
     els = {};
     for (const [key, id] of Object.entries(ids)) {
@@ -401,6 +632,6 @@
     return api;
   }
 
-  const api = { init, open, close, onContextChange, updateMeta, loadHistory };
+  const api = { init, open, close, onContextChange, updateMeta, loadHistory, detectFeedbackLanguage, refreshTranslationNow };
   global.EquirouteFeedback = api;
 })(typeof window !== "undefined" ? window : globalThis);

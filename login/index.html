@@ -104,7 +104,7 @@
       #status.err { color: var(--red); }
       @media (max-width: 720px) { .roles { grid-template-columns: 1fr; } }
     </style>
-    <link rel="stylesheet" href="../harvard.css?v=20260731c" />
+    <link rel="stylesheet" href="../harvard.css?v=20260731d" />
   </head>
   <body>
     <header class="site-nav" aria-label="JalanLens site navigation">
@@ -199,13 +199,14 @@
       };
 
       function safeNext() {
-        const raw = params.get("next") || "../earth_accessibility.html";
+        const raw = params.get("next") || "../street-intelligence/";
         let target;
-        try { target = new URL(raw, location.href); } catch (e) { target = new URL("earth_accessibility.html", location.href); }
-        if (target.origin !== location.origin) target = new URL("earth_accessibility.html", location.href);
-        const file = target.pathname.split("/").pop() || "earth_accessibility.html";
-        if (!file.endsWith(".html") || file === "index.html") return "../earth_accessibility.html";
-        return "../" + file + target.search;
+        try { target = new URL(raw, location.href); } catch (e) { target = new URL("../street-intelligence/", location.href); }
+        if (target.origin !== location.origin) target = new URL("../street-intelligence/", location.href);
+        const path = target.pathname.replace(/\/index\.html$/, "/");
+        if (path.endsWith("/street-intelligence/") || path.endsWith("/profile/") || path.endsWith("/documentation/") || path.endsWith("/crowd-photos/")) return path.replace(location.origin, "") + target.search;
+        if (path.endsWith("earth_accessibility.html")) return "../street-intelligence/" + target.search;
+        return "../street-intelligence/";
       }
 
       function enter(user) {

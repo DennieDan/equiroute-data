@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Seed social-style feedback threads for every JalanLens street part.
 
-Uses the frontend publishable Supabase key from earth_accessibility.html without printing it.
+Uses the frontend publishable Supabase key from street-intelligence/index.html without printing it.
 Idempotent by checking existing seed title prefixes before inserting.
 """
 import json
@@ -13,7 +13,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-HTML = (ROOT / "earth_accessibility.html").read_text()
+HTML = (ROOT / "street-intelligence" / "index.html").read_text()
 url_match = re.search(r'const SUPABASE_URL = "([^"]+)"', HTML)
 key_match = re.search(r'const SUPABASE_PUBLISHABLE_KEY =\s*"([^"]+)"', HTML, re.S)
 if not url_match or not key_match:

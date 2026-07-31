@@ -23,15 +23,15 @@ http://127.0.0.1:8011/index.html
 Choose **Public user** for the reporting/feedback platform, or **Authority user** for the persona-agent dashboard. The main frontend is gated by the logged-in `jalanlens_user` record in local storage, so do not open direct `?role=` URLs for demos. After login, the app redirects to:
 
 ```text
-http://127.0.0.1:8011/earth_accessibility.html
+http://127.0.0.1:8011/street-intelligence/
 ```
 
-Direct access to `earth_accessibility.html` without a stored login redirects back to `index.html`.
+Direct access to `street-intelligence/` without a stored login redirects back to `index.html`.
 
 The page loads live Supabase street/photo data first and falls back to committed local JSON if Supabase is unavailable. For deterministic local-only testing, open the login page with a safe `next=` target, then log in:
 
 ```text
-http://127.0.0.1:8011/index.html?next=earth_accessibility.html%3FlocalRegistry%3D1
+http://127.0.0.1:8011/?next=street-intelligence/%3FlocalRegistry%3D1
 ```
 
 Expected current demo state:
@@ -48,7 +48,7 @@ Expected current demo state:
 | Path | Purpose |
 | --- | --- |
 | `index.html` | Role-selection/auth landing page for public vs authority platform |
-| `earth_accessibility.html` | Main role-aware JalanLens frontend: satellite Earth view, street-view mode, scorecards, persona agents, feedback form |
+| `street-intelligence/` | Main role-aware JalanLens frontend: satellite Earth view, street-view mode, scorecards, persona agents, feedback form |
 | `accessibility_world.geojson` | Hidden ~5 m measurement layer with proxy accessibility metrics, POIs, and persona segment scores |
 | `data/street_view_registry.json` | Public ~25 m street parts, street-view nodes, curated Mapillary active photos |
 | `data/photo_feature_instances_cv.json` | OWL-ViT/zero-shot photo feature detections matched to active street photos |
@@ -154,7 +154,7 @@ supabase/seed_photo_feature_instances.sql
 Verify live counts through REST or the browser status line. The current expected frontend status is roughly:
 
 ```text
-Loaded 220 5 m segments, 17 streets, 30 street-view nodes from Supabase
+Loaded 220 street parts, 17 streets, 30 street-view nodes from Supabase
 ```
 
 ## Testing / verification
@@ -165,7 +165,7 @@ python3 scripts/persona_accessibility_agents.py
 python3 -m http.server 8011 --bind 127.0.0.1
 ```
 
-Then open `earth_accessibility.html` and verify:
+Then open `street-intelligence/` and verify:
 
 - satellite imagery is visible
 - dropdown has ~30 footpaths

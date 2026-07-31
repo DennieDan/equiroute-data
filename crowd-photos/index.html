@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Photo Crowdsourcing | JalanLens</title>
+    <link rel="stylesheet" href="../harvard.css?v=20260731d" />
+    <style>
+      body { min-height:100vh; margin:0; padding:32px; background:#020617; color:#f8fafc; font-family:Inter,ui-sans-serif,system-ui,sans-serif; }
+      main { max-width:980px; margin:auto; background:rgba(15,23,42,.94); border:1px solid rgba(125,211,252,.38); border-radius:28px; padding:28px; }
+      h1 { margin:0 0 8px; font-size:clamp(34px,6vw,64px); }
+      p { color:#cbd5e1; line-height:1.55; }
+      .progress { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:22px 0; }
+      .progress span { position:relative; overflow:hidden; border:1px solid rgba(125,211,252,.34); border-radius:999px; padding:12px; text-align:center; font-weight:900; color:#e0f2fe; background:rgba(8,47,73,.5); }
+      .progress span:first-child::after { content:""; position:absolute; inset:0; background:linear-gradient(90deg,transparent,rgba(56,189,248,.35),transparent); animation:sweep 1.4s linear infinite; }
+      @keyframes sweep { from{transform:translateX(-100%)} to{transform:translateX(100%)} }
+      .card-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; }
+      .card { border:1px solid rgba(148,163,184,.26); border-radius:18px; padding:16px; background:rgba(2,6,23,.55); }
+      a { color:#7dd3fc; font-weight:900; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <a href="../street-intelligence/">← Back to Street Intelligence</a>
+      <h1>Photo crowdsourcing</h1>
+      <p>This page manages street-part photo submissions. A computer-vision model performs the first layer of approval, then a human-in-the-loop staff team from the relevant customer company reviews the photo before it becomes active evidence.</p>
+      <div class="progress" aria-label="Photo review progress">
+        <span>Upload</span><span>CV first review</span><span>Staff review</span><span>Approved</span>
+      </div>
+      <div class="card-grid">
+        <section class="card"><h2>1. Upload</h2><p>Users submit a clearer street-part photo from the platform settings or this page.</p></section>
+        <section class="card"><h2>2. CV first review</h2><p>The model checks resolution, exposure, blur, street-view aspect, and evidence usefulness.</p></section>
+        <section class="card"><h2>3. Staff review</h2><p>Selected admins from customer companies receive the photo for human review.</p></section>
+        <section class="card"><h2>4. Active evidence</h2><p>Approved photos become the active street-view evidence for JalanLens users.</p></section>
+      </div>
+    </main>
+  </body>
+</html>

@@ -77,3 +77,10 @@ __MACOSX/
 
 # Generated graph exports
 *.graphml
+
+# Android local/build artifacts
+android-app/.gradle/
+android-app/**/build/
+android-app/local.properties
+*.apk
+*.aab
