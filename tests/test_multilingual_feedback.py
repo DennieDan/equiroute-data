@@ -48,8 +48,33 @@ class MultilingualFeedbackTests(unittest.TestCase):
             'translation_provider: translation.provider || null',
             'translation_model: translation.model || null',
             'speech_transcript_original',
+            'dedupeTranscriptText',
+            'normalizeSpeechLanguage',
+            'Detect English, Mandarin Chinese, Malay, Tamil, or Gujarati automatically',
+            'speechRecognition = startBrowserSpeechRecognition(target);',
         ]:
             self.assertIn(snippet, js)
+        self.assertNotIn('speechRecognition = startBrowserSpeechRecognition();', js)
+
+    def test_reply_composer_has_speech_and_translation_preview(self):
+        js = self.js()
+        css = (ROOT / "harvard.css").read_text()
+        for snippet in [
+            'feedback-reply-speech',
+            'Speech to text for reply',
+            'feedback-reply-translation',
+            'speechTargetForReply',
+            'refreshReplyTranslationNow',
+            'textarea?.dataset.inputModality || "typed"',
+            'textarea?.dataset.detectedLanguage || ""',
+        ]:
+            self.assertIn(snippet, js)
+        for snippet in [
+            'feedback-reply-composer-line',
+            'feedback-reply-speech svg',
+            'feedback-reply-translation.visible',
+        ]:
+            self.assertIn(snippet, css)
 
     def test_feedback_schema_stores_original_language_translation_and_transcript(self):
         sql = self.sql()

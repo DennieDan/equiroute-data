@@ -1777,3 +1777,59 @@ html[data-theme="light"] body:has(#map) #notificationsPanel .notification-item s
 html[data-theme="dark"] body:has(#map) #notificationsPanel .notification-item small {
   color: #475569 !important;
 }
+
+/* Reply speech-to-text and multilingual translation preview. */
+body:has(#map) .feedback-reply-composer-line {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 40px !important;
+  gap: 8px !important;
+  align-items: end !important;
+}
+body:has(#map) .feedback-reply-composer-line textarea {
+  min-height: 42px !important;
+  resize: vertical !important;
+  font-family: var(--harvard-sans) !important;
+  background: #ffffff !important;
+  color: #111111 !important;
+  border: 1px solid rgba(30,30,30,0.24) !important;
+  border-bottom: 4px solid var(--harvard-crimson) !important;
+  border-radius: 0 !important;
+}
+body:has(#map) .feedback-reply-composer-line textarea::placeholder {
+  color: #64748b !important;
+  font-family: var(--harvard-serif) !important;
+  font-style: italic !important;
+  font-weight: 700 !important;
+}
+body:has(#map) .feedback-reply-speech {
+  width: 40px !important;
+  min-width: 40px !important;
+  height: 40px !important;
+  padding: 0 !important;
+  display: inline-grid !important;
+  place-items: center !important;
+  border-radius: 999px !important;
+  background: var(--harvard-black) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(30,30,30,0.3) !important;
+  border-bottom: 4px solid var(--harvard-crimson) !important;
+}
+body:has(#map) .feedback-reply-speech svg {
+  width: 21px !important;
+  height: 21px !important;
+  display: block !important;
+  fill: currentColor !important;
+}
+body:has(#map) .feedback-reply-translation {
+  display: none !important;
+  margin-top: 6px !important;
+  padding: 8px 10px !important;
+  background: #fef3c7 !important;
+  color: #1f2937 !important;
+  border-left: 4px solid var(--harvard-crimson) !important;
+  font-size: 12px !important;
+  line-height: 1.35 !important;
+}
+body:has(#map) .feedback-reply-translation.visible {
+  display: block !important;
+}
