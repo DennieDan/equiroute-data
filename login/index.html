@@ -105,6 +105,19 @@
       #status.ok { color: var(--green); }
       #status.err { color: var(--red); }
       @media (max-width: 720px) { .roles { grid-template-columns: 1fr; } }
+      body.mobile-apk .role-select-label,
+      body.mobile-apk #roleSelect { display: none; }
+      body.mobile-apk .login-card::after {
+        content: "Public mobile app";
+        display: block;
+        margin-top: 12px;
+        color: #bae6fd;
+        font-size: 12px;
+        font-weight: 900;
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
     </style>
     <link rel="stylesheet" href="../harvard.css?v=20260731g" />
   </head>
@@ -165,6 +178,8 @@
       const USER_STORAGE_KEY = "jalanlens_user";
       const params = new URLSearchParams(location.search);
       const supabase = createClient(SB_URL, SB_KEY);
+      const isMobileApk = params.get("mobile") === "apk";
+      if (isMobileApk) document.body.classList.add("mobile-apk");
       let activeRole = "public";
       let activeMode = "login";
       const authPanel = document.getElementById("authPanel");
@@ -181,6 +196,11 @@
       const openLoginBtn = document.getElementById("openLoginBtn");
       const openSignupBtn = document.getElementById("openSignupBtn");
       const statusEl = document.getElementById("status");
+      if (isMobileApk) {
+        roleSelect.value = "public";
+        activeRole = "public";
+        [...roleSelect.options].forEach((option) => { if (option.value !== "public") option.remove(); });
+      }
 
       const headers = (extra = {}) => ({ ...extra, ["api" + "key"]: SB_KEY, ["Author" + "ization"]: "Bearer " + SB_KEY });
       const setStatus = (msg, kind = "") => { statusEl.textContent = msg; statusEl.className = kind; };
@@ -206,9 +226,12 @@
         try { target = new URL(raw, location.href); } catch (e) { target = new URL("../street-intelligence/", location.href); }
         if (target.origin !== location.origin) target = new URL("../street-intelligence/", location.href);
         const path = target.pathname.replace(/\/index\.html$/, "/");
-        if (path.endsWith("/street-intelligence/") || path.endsWith("/profile/") || path.endsWith("/documentation/") || path.endsWith("/crowd-photos/")) return path.replace(location.origin, "") + target.search;
-        if (path.endsWith("earth_accessibility.html")) return "../street-intelligence/" + target.search;
-        return "../street-intelligence/";
+        if (path.endsWith("/street-intelligence/") || path.endsWith("/profile/") || path.endsWith("/documentation/") || path.endsWith("/crowd-photos/")) {
+          if (isMobileApk && path.endsWith("/street-intelligence/")) target.searchParams.set("mobile", "apk");
+          return path.replace(location.origin, "") + target.search;
+        }
+        if (path.endsWith("earth_accessibility.html")) return "../street-intelligence/" + (isMobileApk ? "?mobile=apk" : target.search);
+        return "../street-intelligence/" + (isMobileApk ? "?mobile=apk" : "");
       }
 
       function enter(user) {
@@ -222,8 +245,8 @@
 
       function showPanel(mode, role = roleSelect.value) {
         activeMode = mode;
-        activeRole = role;
-        roleSelect.value = role;
+        activeRole = isMobileApk ? "public" : role;
+        roleSelect.value = activeRole;
         authOverlay.classList.add("visible");
         authOverlay.setAttribute("aria-hidden", "false");
         authPanel.classList.add("visible");
@@ -419,7 +442,7 @@
 
       openLoginBtn.onclick = () => showPanel("login");
       openSignupBtn.onclick = () => showPanel("signup");
-      roleSelect.onchange = () => { activeRole = roleSelect.value; };
+      roleSelect.onchange = () => { activeRole = isMobileApk ? "public" : roleSelect.value; roleSelect.value = activeRole; };
       switchModeBtn.onclick = () => showPanel(activeMode === "login" ? "signup" : "login", activeRole);
       backBtn.onclick = () => { authOverlay.classList.remove("visible"); authOverlay.setAttribute("aria-hidden", "true"); authPanel.classList.remove("visible"); setStatus(""); };
       authOverlay.addEventListener("click", (event) => { if (event.target === authOverlay) backBtn.click(); });

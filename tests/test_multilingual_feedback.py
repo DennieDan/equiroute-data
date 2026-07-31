@@ -31,18 +31,21 @@ class MultilingualFeedbackTests(unittest.TestCase):
         self.assertRegex(html, r"#feedbackTranslationBox\s*\{[^}]*background:\s*#fef3c7")
         self.assertRegex(html, r"#feedbackTranslationBox\s*\{[^}]*color:\s*#1f2937")
 
-    def test_feedback_js_uses_agnes_for_translation_and_speech_to_text_payload(self):
+    def test_feedback_js_uses_translation_fallback_and_speech_to_text_payload(self):
         js = self.js()
         for snippet in [
             'AGNES_BASE_URL',
             'agnes-2.5-flash',
             'translateFeedbackWithAgnes',
+            'translateFeedbackWithPublicFallback',
+            'localTranslationFallback',
             'transcribeAudioWithAgnes',
+            'JALANLENS_USE_AGNES_SPEECH',
             'feedbackSpeechBtn',
             'english_translation',
             'original_language',
-            'translation_provider: "agnes"',
-            'translation_model: AGNES_TRANSLATION_MODEL',
+            'translation_provider: translation.provider || null',
+            'translation_model: translation.model || null',
             'speech_transcript_original',
         ]:
             self.assertIn(snippet, js)

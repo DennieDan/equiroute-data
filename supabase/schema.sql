@@ -333,6 +333,29 @@ create table if not exists public.agent_feedback_threads (
   unique(agent_external_id, street_part_external_id, event_type, persona_type, created_at)
 );
 
+create table if not exists public.feedback_replies (
+  id uuid primary key default gen_random_uuid(),
+  parent_source text not null check (parent_source in ('public','agent_simulation')),
+  parent_thread_id uuid null references public.feedback_threads(id) on delete cascade,
+  parent_agent_thread_id uuid null references public.agent_feedback_threads(id) on delete cascade,
+  author_role text not null check (author_role in ('public','authority','agent','system')),
+  author_external_id text null,
+  author_name text not null default 'JalanLens user',
+  body text not null,
+  original_language text null,
+  original_text text null,
+  english_translation text null,
+  translation_status text not null default 'not_required',
+  translation_provider text null,
+  translation_model text null,
+  input_modality text not null default 'typed',
+  created_at timestamptz not null default now(),
+  constraint feedback_replies_exactly_one_parent check (
+    (parent_source = 'public' and parent_thread_id is not null and parent_agent_thread_id is null)
+    or (parent_source = 'agent_simulation' and parent_agent_thread_id is not null and parent_thread_id is null)
+  )
+);
+
 create table if not exists public.street_part_agent_counts (
   street_part_id uuid null references public.street_parts(id) on delete cascade,
   street_part_external_id text not null,
@@ -413,6 +436,11 @@ create index if not exists agent_feedback_part_time_idx on public.agent_feedback
 create index if not exists agent_feedback_persona_idx on public.agent_feedback_threads (persona_type, created_at desc);
 create index if not exists public_feedback_source_idx on public.feedback_threads (source, persona_type, created_at desc);
 create index if not exists feedback_threads_translation_idx on public.feedback_threads (original_language, translation_status, created_at desc);
+create index if not exists feedback_replies_public_parent_idx on public.feedback_replies (parent_thread_id, created_at asc);
+create index if not exists feedback_replies_agent_parent_idx on public.feedback_replies (parent_agent_thread_id, created_at asc);
+create index if not exists feedback_replies_role_time_idx on public.feedback_replies (author_role, created_at desc);
+
+grant select, insert on public.feedback_replies to anon, authenticated;
 
 create table if not exists public.app_notifications (
   id uuid primary key default gen_random_uuid(),

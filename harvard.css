@@ -632,8 +632,36 @@ body:has(#map) .feedback-history {
 }
 body:has(#map) .feedback-thread-head b,
 body:has(#map) .feedback-item b,
-body:has(#map) .feedback-item span {
+body:has(#map) .feedback-item span,
+body:has(#map) .feedback-reply b,
+body:has(#map) .feedback-reply span {
   color: #111111 !important;
+}
+body:has(#map) .feedback-reply {
+  background: #f8fafc !important;
+  border-color: rgba(30,30,30,0.16) !important;
+  color: #111111 !important;
+}
+body:has(#map) .feedback-reply.authority {
+  background: #e0f2fe !important;
+  border-color: #38bdf8 !important;
+}
+body:has(#map) .feedback-reply.public {
+  background: #f0fdf4 !important;
+  border-color: #86efac !important;
+}
+body:has(#map) .feedback-reply b em {
+  background: #e0f2fe !important;
+  color: #075985 !important;
+  border-color: #7dd3fc !important;
+}
+body:has(#map) .feedback-reply-box textarea {
+  background: #ffffff !important;
+  color: #111111 !important;
+  border-color: rgba(30,30,30,0.26) !important;
+}
+body:has(#map) .feedback-reply-status {
+  color: #475569 !important;
 }
 body:has(#map) .feedback-item {
   border-bottom-color: rgba(30,30,30,0.16) !important;
