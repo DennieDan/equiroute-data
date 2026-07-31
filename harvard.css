@@ -1581,3 +1581,93 @@ body.public-role:has(#map) .maptalks-msgBox,
 body.public-role:has(#map) .maptalks-infowindow {
   display: none !important;
 }
+
+/* Scorecard drag, native topbar dropdowns, and feedback scroll/composer refinements. */
+body:has(#map) #detailCard.dragged {
+  position: fixed !important;
+  z-index: 90 !important;
+}
+body:has(#map) #detailCard.dragging {
+  user-select: none !important;
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.46) !important;
+}
+body:has(#map) #detailCard .detail-front > .detail-head {
+  cursor: move !important;
+}
+body:has(#map) #detailCard .detail-head button,
+body:has(#map) #detailCard .detail-head a {
+  cursor: pointer !important;
+}
+body:has(#map) .feedback-history,
+html[data-theme="light"] body:has(#map) .feedback-history,
+html[data-theme="dark"] body:has(#map) .feedback-history {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  touch-action: pan-y !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior: contain !important;
+  cursor: auto !important;
+}
+body:has(#map) .feedback-history:hover,
+html[data-theme="dark"] body:has(#map) .feedback-history:hover {
+  overflow-y: auto !important;
+}
+body:has(#map) #feedbackForm #feedbackBody {
+  font-family: var(--harvard-sans) !important;
+  font-size: 13px !important;
+  font-weight: 750 !important;
+  letter-spacing: 0.01em !important;
+  background: #ffffff !important;
+  color: #111111 !important;
+  border: 1px solid rgba(30,30,30,0.24) !important;
+  border-bottom: 4px solid var(--harvard-crimson) !important;
+  border-radius: 0 !important;
+}
+body:has(#map) #feedbackForm #feedbackBody::placeholder {
+  color: #64748b !important;
+  font-family: var(--harvard-serif) !important;
+  font-style: italic !important;
+  font-weight: 700 !important;
+}
+body:has(#map) #feedbackSpeechBtn svg {
+  width: 21px !important;
+  height: 21px !important;
+  display: block !important;
+  fill: currentColor !important;
+}
+body:has(#map) #feedbackSpeechBtn.recording #feedbackSpeechLabel {
+  font-size: 18px !important;
+}
+body:has(#map) #topbar select.topbar-hover-select {
+  height: 40px !important;
+  max-height: 40px !important;
+  overflow: hidden !important;
+  appearance: auto !important;
+}
+body:has(#map) #topbar select.topbar-hover-select:focus {
+  height: 40px !important;
+  max-height: 40px !important;
+}
+body:has(#map) #topbar button,
+body:has(#map) #topbar select,
+body:has(#map) #topbar .buttonlike,
+body:has(#map) #topbar .pill,
+html[data-theme="light"] body:has(#map) #topbar button,
+html[data-theme="light"] body:has(#map) #topbar select,
+html[data-theme="light"] body:has(#map) #topbar .buttonlike,
+html[data-theme="light"] body:has(#map) #topbar .pill,
+html[data-theme="dark"] body:has(#map) #topbar button,
+html[data-theme="dark"] body:has(#map) #topbar select,
+html[data-theme="dark"] body:has(#map) #topbar .buttonlike,
+html[data-theme="dark"] body:has(#map) #topbar .pill {
+  border-bottom: 4px solid var(--harvard-crimson) !important;
+  box-sizing: border-box !important;
+}
+body:has(#map) #topbar #directionBtn,
+body:has(#map) #topbar #docsBtn,
+body:has(#map) #topbar #themeToggleBtn,
+body:has(#map) #topbar #notificationBellBtn,
+body:has(#map) #topbar #settingsBtn,
+body:has(#map) #topbar #roleSwitchBtn {
+  border-bottom-color: var(--harvard-crimson) !important;
+}
