@@ -1206,6 +1206,8 @@
         currentPhotoUploadContext: null,
         liveAgentSnapshot: null,
         agentLayer: null,
+        liveAgentMarkers: new Map(),
+        liveAgentAnimationInterval: null,
         notifications: [],
         dismissedNotificationIds: new Set(JSON.parse(localStorage.getItem("jalanlens_cleared_notifications") || "[]")),
         themeMode: localStorage.getItem("jalanlens_theme") || "system",
@@ -2319,51 +2321,165 @@
       function htmlEscape(value) {
         return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
       }
-      function renderLiveAgents() {
+      function hashString(text) {
+        let h = 2166136261;
+        for (let i = 0; i < String(text || "").length; i++) {
+          h ^= String(text).charCodeAt(i);
+          h = Math.imul(h, 16777619);
+        }
+        return h >>> 0;
+      }
+      function singaporeHour(nowMs = Date.now()) {
+        return Number(new Intl.DateTimeFormat("en-SG", { hour: "numeric", hour12: false, timeZone: "Asia/Singapore" }).format(new Date(nowMs)));
+      }
+      function agentActivityFor(agent, nowMs = Date.now()) {
+        const hour = singaporeHour(nowMs);
+        const persona = String(agent.persona_type_id || "");
+        if (hour < 6) return "home / resting";
+        if (hour < 10) {
+          if (persona.includes("student") || persona.includes("child")) return "choosing route to school";
+          if (persona.includes("stroller")) return "school drop-off";
+          return "morning commute";
+        }
+        if (hour < 15) {
+          if (persona.includes("older")) return "market or clinic errand";
+          if (persona.includes("delivery")) return "delivery stop";
+          return "work / school / errand";
+        }
+        if (hour < 20) return "choosing return route";
+        return "local evening errand";
+      }
+      function liveAgentRouteParts(agent) {
+        const parts = state.streetRegistry?.street_parts || [];
+        if (!parts.length) return [];
+        const h = hashString(agent.agent_external_id || agent.display_name || agent.persona_type_id);
+        const span = Math.min(parts.length, 5 + (h % 12));
+        const start = h % parts.length;
+        const dir = h & 1 ? 1 : -1;
+        const route = [];
+        for (let i = 0; i < span; i++) route.push(parts[(start + dir * i + parts.length * 4) % parts.length]);
+        return route.filter((p) => Array.isArray(p.midpoint) && p.midpoint.length >= 2);
+      }
+      function liveAgentCoordinate(agent, nowMs = Date.now()) {
+        const route = liveAgentRouteParts(agent);
+        if (!route.length) return [Number(agent.lng), Number(agent.lat)];
+        if (route.length === 1) return route[0].midpoint;
+        const h = hashString(agent.agent_external_id || agent.display_name || agent.persona_type_id);
+        const hopSeconds = 10 + (h % 22);
+        const phaseSeconds = nowMs / 1000 + (h % 997);
+        const routePos = (phaseSeconds / hopSeconds) % route.length;
+        const idx = Math.floor(routePos);
+        const next = (idx + 1) % route.length;
+        const local = routePos - idx;
+        const a = route[idx].midpoint, b = route[next].midpoint;
+        const wobble = ((h % 100) / 100 - 0.5) * 0.000035;
+        const pulse = Math.sin(phaseSeconds / 3 + (h % 31)) * 0.000018;
+        return [
+          Number(a[0]) + (Number(b[0]) - Number(a[0])) * local + wobble,
+          Number(a[1]) + (Number(b[1]) - Number(a[1])) * local + pulse,
+        ];
+      }
+      function syncLiveAgentMarkers() {
         if (!state.agentLayer || !window.maptalks) return;
         const snapshot = state.liveAgentSnapshot;
-        state.agentLayer.clear();
-        if (!snapshot?.agent_live_states?.length) return;
+        if (!snapshot?.agent_live_states?.length) {
+          state.agentLayer.clear();
+          state.liveAgentMarkers.clear();
+          return;
+        }
         const personaTypes = snapshot.persona_types || {};
-        const geoms = snapshot.agent_live_states.map((agent) => {
-          const color = personaTypes[agent.persona_type_id]?.color || "#38bdf8";
-          const marker = new maptalks.Marker([agent.lng, agent.lat], {
+        const activeIds = new Set();
+        snapshot.agent_live_states.forEach((agent) => {
+          const id = agent.agent_external_id || agent.display_name;
+          if (!id) return;
+          activeIds.add(id);
+          if (state.liveAgentMarkers.has(id)) return;
+          const persona = personaTypes[agent.persona_type_id] || {};
+          const color = persona.color || "#38bdf8";
+          const marker = new maptalks.Marker(liveAgentCoordinate(agent), {
+            properties: { agent },
             symbol: [
-              { markerType: "ellipse", markerWidth: 10, markerHeight: 10, markerFill: "#ffffff", markerLineColor: "#020617", markerLineWidth: 2, markerOpacity: 0.95 },
-              { markerType: "ellipse", markerWidth: 6, markerHeight: 6, markerFill: color, markerLineColor: color, markerLineWidth: 1, markerOpacity: personaTypes[agent.persona_type_id]?.category === "general" ? 0.68 : 0.95 },
+              { markerType: "ellipse", markerWidth: 12, markerHeight: 12, markerFill: "#ffffff", markerLineColor: "#020617", markerLineWidth: 2, markerOpacity: 0.96 },
+              { markerType: "ellipse", markerWidth: 7, markerHeight: 7, markerFill: color, markerLineColor: color, markerLineWidth: 1, markerOpacity: persona.category === "general" ? 0.66 : 0.96 },
             ],
           });
           marker.setInfoWindow({
-            title: agent.display_name || agent.agent_external_id,
-            content: `${(personaTypes[agent.persona_type_id]?.label || agent.persona_type_id).replaceAll("_", " ")}<br>${agent.activity || "moving"}`,
+            title: agent.display_name || id,
+            content: `${(persona.label || agent.persona_type_id || "persona agent").replaceAll("_", " ")}<br><span class="agent-live-activity">moving</span>`,
           });
-          return marker;
+          state.liveAgentMarkers.set(id, marker);
+          state.agentLayer.addGeometry(marker);
         });
-        state.agentLayer.addGeometry(geoms);
+        [...state.liveAgentMarkers.entries()].forEach(([id, marker]) => {
+          if (!activeIds.has(id)) {
+            marker.remove();
+            state.liveAgentMarkers.delete(id);
+          }
+        });
+      }
+      function animateLiveAgents() {
+        const snapshot = state.liveAgentSnapshot;
+        if (!snapshot?.agent_live_states?.length || !state.liveAgentMarkers.size) return;
+        const wallMs = Date.now();
+        snapshot.agent_live_states.forEach((agent) => {
+          const id = agent.agent_external_id || agent.display_name;
+          const marker = state.liveAgentMarkers.get(id);
+          if (!marker) return;
+          const coord = liveAgentCoordinate(agent, wallMs);
+          marker.setCoordinates(new maptalks.Coordinate(coord[0], coord[1]));
+          const route = liveAgentRouteParts(agent);
+          const routeIndex = route.length ? Math.floor(((wallMs / 1000 + (hashString(id) % 997)) / (10 + (hashString(id) % 22))) % route.length) : -1;
+          const part = routeIndex >= 0 ? route[routeIndex] : null;
+          agent.lng = Number(coord[0].toFixed(7));
+          agent.lat = Number(coord[1].toFixed(7));
+          agent.activity = agentActivityFor(agent, wallMs);
+          if (part?.id) agent.street_part_external_id = part.id;
+        });
+        renderStreetAgentCounts();
+      }
+      function renderLiveAgents() {
+        syncLiveAgentMarkers();
+        animateLiveAgents();
+        if (!state.liveAgentAnimationInterval) {
+          state.liveAgentAnimationInterval = setInterval(animateLiveAgents, 1000);
+        }
       }
 
+      function currentLiveAgentCounts() {
+        const grouped = new Map();
+        (state.liveAgentSnapshot?.agent_live_states || []).forEach((agent) => {
+          if (!agent.street_part_external_id) return;
+          if (!grouped.has(agent.street_part_external_id)) {
+            grouped.set(agent.street_part_external_id, { street_part_external_id: agent.street_part_external_id, persona_counts: {}, total_count: 0 });
+          }
+          const row = grouped.get(agent.street_part_external_id);
+          row.persona_counts[agent.persona_type_id] = (row.persona_counts[agent.persona_type_id] || 0) + 1;
+          row.total_count += 1;
+        });
+        return grouped;
+      }
       function renderStreetAgentCounts() {
         if (!window.streetAgentCounts) return;
         const part = currentStreetPart();
         const snapshot = state.liveAgentSnapshot;
-        const row = (snapshot?.street_part_agent_counts || []).find((r) => r.street_part_external_id === part?.id);
+        const row = currentLiveAgentCounts().get(part?.id);
         if (!row) {
           streetAgentCounts.classList.remove("visible");
           streetAgentCounts.innerHTML = "";
           return;
         }
-        const personaTypes = snapshot.persona_types || {};
+        const personaTypes = snapshot?.persona_types || {};
         const pills = Object.entries(row.persona_counts || {})
           .sort((a, b) => b[1] - a[1])
           .map(([pid, count]) => `<span class="count-pill"><b style="color:${personaTypes[pid]?.color || "#bae6fd"}">${count}</b> ${htmlEscape((personaTypes[pid]?.label || pid).replaceAll("_", " "))}</span>`)
           .join("");
         streetAgentCounts.classList.add("visible");
-        streetAgentCounts.innerHTML = `<b>Live synthetic agents on this street part</b><div class="count-grid">${pills}</div><small>${row.total_count} total · synthetic, not real-person tracking</small>`;
+        streetAgentCounts.innerHTML = `<b>Live synthetic agents on this street part</b><div class="count-grid">${pills}</div><small>${row.total_count} currently here · synthetic, not real-person tracking</small>`;
       }
 
       async function loadLiveAgentSnapshot() {
         try {
-          const r = await fetch("../data/live_persona_simulation_snapshot.json");
+          const r = await fetch(`../data/live_persona_simulation_snapshot.json?t=${Date.now()}`);
           if (!r.ok) throw new Error(`snapshot ${r.status}`);
           const snapshot = await r.json();
           state.liveAgentSnapshot = snapshot;
