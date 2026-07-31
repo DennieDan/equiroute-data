@@ -117,9 +117,15 @@ drop policy if exists "auth insert feedback votes" on public.feedback_votes;
 create policy "auth insert feedback votes" on public.feedback_votes
   for insert with check (auth.uid() = user_id);
 
+drop policy if exists "public delete own feedback votes" on public.feedback_votes;
+create policy "public delete own feedback votes" on public.feedback_votes
+  for delete using (true);
+
 drop policy if exists "auth delete own feedback votes" on public.feedback_votes;
 create policy "auth delete own feedback votes" on public.feedback_votes
   for delete using (auth.uid() = user_id);
+
+grant select, insert, delete on public.feedback_votes to anon, authenticated;
 
 drop policy if exists "auth insert comments" on public.feedback_comments;
 create policy "auth insert comments" on public.feedback_comments
