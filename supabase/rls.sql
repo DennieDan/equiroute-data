@@ -24,6 +24,7 @@ alter table public.environment_observations enable row level security;
 alter table public.transit_stops enable row level security;
 alter table public.transit_arrivals enable row level security;
 alter table public.app_notifications enable row level security;
+alter table public.photo_review_jobs enable row level security;
 
 -- Public read for map/demo data.
 drop policy if exists "public read streets" on public.streets;
@@ -166,3 +167,14 @@ create policy "public insert app notifications" on public.app_notifications
   for insert with check (source in ('system','public','agent_simulation'));
 
 grant select, insert, update on public.app_notifications to anon, authenticated;
+
+drop policy if exists "public read photo review jobs" on public.photo_review_jobs;
+create policy "public read photo review jobs" on public.photo_review_jobs for select using (true);
+
+drop policy if exists "public insert photo review jobs" on public.photo_review_jobs;
+create policy "public insert photo review jobs" on public.photo_review_jobs for insert with check (true);
+
+drop policy if exists "public update photo review jobs" on public.photo_review_jobs;
+create policy "public update photo review jobs" on public.photo_review_jobs for update using (true);
+
+grant select, insert, update on public.photo_review_jobs to anon, authenticated;

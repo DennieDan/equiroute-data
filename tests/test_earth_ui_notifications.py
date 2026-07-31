@@ -3,7 +3,7 @@ from pathlib import Path
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
-HTML = ROOT / "earth_accessibility.html"
+HTML = ROOT / "street-intelligence" / "index.html"
 SCHEMA = ROOT / "supabase" / "schema.sql"
 
 

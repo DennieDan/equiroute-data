@@ -1,0 +1,3519 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JalanLens Street Intelligence</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/maptalks/dist/maptalks.css"
+    />
+    <link
+      href="https://unpkg.com/mapillary-js@4.1.2/dist/mapillary.css"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: rgba(2, 6, 23, 0.86);
+        --line: rgba(125, 211, 252, 0.34);
+        --txt: #eef9ff;
+        --muted: #a7c7d8;
+        --green: #22f36e;
+        --amber: #ffd166;
+        --red: #ff3b52;
+        --blue: #38bdf8;
+        --orange: #fb923c;
+        --control-bg: rgba(15, 23, 42, 0.92);
+        --control-fg: #eef9ff;
+        --option-bg: #020617;
+        --option-fg: #eef9ff;
+      }
+      body[data-theme="light"] {
+        --bg: rgba(255, 255, 255, 0.92);
+        --line: rgba(15, 23, 42, 0.22);
+        --txt: #0f172a;
+        --muted: #475569;
+        --control-bg: #ffffff;
+        --control-fg: #0f172a;
+        --option-bg: #ffffff;
+        --option-fg: #0f172a;
+      }
+      body[data-theme="dark"] {
+        --bg: rgba(2, 6, 23, 0.86);
+        --line: rgba(125, 211, 252, 0.34);
+        --txt: #eef9ff;
+        --muted: #a7c7d8;
+        --control-bg: rgba(15, 23, 42, 0.92);
+        --control-fg: #eef9ff;
+        --option-bg: #020617;
+        --option-fg: #eef9ff;
+      }
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        background: #06101d;
+        color: var(--txt);
+        font-family:
+          Inter,
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+      }
+      #satelliteFallback,
+      #map,
+      #mapillaryView,
+      #threeOverlay {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      #satelliteFallback {
+        z-index: 0;
+        overflow: hidden;
+        background: #06101d;
+        filter: brightness(1.45) saturate(1.25) contrast(1.08);
+      }
+      #satelliteFallback img {
+        position: absolute;
+        width: 256px;
+        height: 256px;
+        object-fit: cover;
+      }
+      #map {
+        z-index: 1;
+        background: transparent;
+      }
+      #mapillaryView,
+      #threeOverlay {
+        background: transparent;
+      }
+      #map {
+        z-index: 1;
+        filter: brightness(1.18) saturate(1.25) contrast(1.08);
+      }
+      #threeOverlay {
+        z-index: 10;
+        pointer-events: none;
+        background: transparent;
+      }
+      .street-mode #threeOverlay {
+        display: none;
+      }
+      #mapillaryView {
+        z-index: 5;
+        display: none;
+      }
+      .street-mode #mapillaryView {
+        display: block;
+      }
+      .street-mode #map {
+        opacity: 1;
+        pointer-events: auto;
+        filter: brightness(1.18) saturate(1.25) contrast(1.08);
+      }
+      #mapillaryView .mapillary-interactive,
+      #mapillaryView .mapillary-dom,
+      #mapillaryView canvas {
+        position: absolute !important;
+        inset: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+      }
+      #streetPhoto {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 1;
+        filter: saturate(1.08) contrast(1.04);
+      }
+      .street-note {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 3;
+        padding: 12px 16px;
+        border-radius: 16px;
+        background: rgba(2, 6, 23, 0.75);
+        border: 1px solid rgba(125, 211, 252, 0.34);
+        color: #e0f2fe;
+      }
+      .seg-btn.feature {
+        width: 34px;
+        height: 34px;
+        background: #38bdf8;
+        color: #00111d;
+      }
+      .seg-btn.feature::after {
+        font-size: 10px;
+        top: -20px;
+        left: 24px;
+      }
+      .seg-btn.feature.ramp {
+        background: #22f36e;
+      }
+      .seg-btn.feature.bus {
+        background: #fb923c;
+      }
+      .seg-btn.feature.shelter {
+        background: #facc15;
+      }
+      .seg-btn.feature.tactile {
+        background: #a78bfa;
+      }
+      .hud {
+        position: absolute;
+        z-index: 20;
+        border: 1px solid var(--line);
+        background: var(--bg);
+        box-shadow: 0 18px 60px rgba(0, 0, 0, 0.38);
+        backdrop-filter: blur(14px);
+        border-radius: 18px;
+        color: var(--txt);
+      }
+      #topbar {
+        top: 14px;
+        left: 14px;
+        right: 14px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        padding: 10px 12px;
+        z-index: 30;
+      }
+      .brand {
+        font-weight: 900;
+        letter-spacing: 0.01em;
+      }
+      .pill {
+        border: 1px solid rgba(148, 163, 184, 0.26);
+        background: rgba(15, 23, 42, 0.78);
+        border-radius: 999px;
+        padding: 7px 10px;
+        font-size: 12px;
+      }
+      .spacer {
+        flex: 1;
+      }
+      button,
+      select,
+      input,
+      .buttonlike {
+        border: 1px solid rgba(125, 211, 252, 0.35);
+        background: var(--control-bg);
+        color: var(--control-fg);
+        border-radius: 12px;
+        padding: 8px 10px;
+        font-weight: 750;
+      }
+      button {
+        cursor: pointer;
+      }
+      button:hover,
+      button.active {
+        background: linear-gradient(135deg, #075985, #0e7490);
+        border-color: #bae6fd;
+      }
+      select {
+        max-width: 360px;
+        background: var(--control-bg);
+        color: var(--control-fg);
+      }
+      select option {
+        background: var(--option-bg);
+        color: var(--option-fg);
+      }
+      .topbar-hover-select {
+        opacity: 0.78;
+        transition: opacity 0.15s ease, transform 0.15s ease;
+      }
+      .topbar-hover-select:hover,
+      .topbar-hover-select:focus {
+        opacity: 1;
+        transform: translateY(-1px);
+      }
+      .street-only-control {
+        display: none;
+      }
+      .street-mode .street-only-control {
+        display: inline-block;
+      }
+      #notificationBellBtn {
+        min-width: 40px;
+        position: relative;
+      }
+      #notificationBellBtn.has-unread::after {
+        content: "";
+        position: absolute;
+        right: 6px;
+        top: 6px;
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: var(--red);
+      }
+      #toastStack {
+        position: absolute;
+        right: 14px;
+        top: 72px;
+        z-index: 60;
+        display: grid;
+        gap: 8px;
+        width: min(380px, calc(100vw - 28px));
+        pointer-events: none;
+      }
+      .toast {
+        padding: 10px 12px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--bg);
+        color: var(--txt);
+        box-shadow: 0 14px 44px rgba(0,0,0,.34);
+        animation: toastIn .18s ease-out;
+        opacity: 1;
+      }
+      .toast.fade-out {
+        animation: toastOut .55s ease-in forwards;
+      }
+      @keyframes toastIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+      @keyframes toastOut { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(-8px); } }
+      #notificationsPanel {
+        right: 14px;
+        top: 72px;
+        width: min(420px, calc(100vw - 28px));
+        max-height: min(70vh, 620px);
+        overflow: auto;
+        padding: 12px;
+        z-index: 61;
+        display: none;
+      }
+      #notificationsPanel.visible { display: block; }
+      .notification-head { display: flex; align-items: center; gap: 8px; justify-content: space-between; }
+      .notification-list { display: grid; gap: 8px; margin-top: 10px; }
+      .notification-item { text-align: left; border-radius: 14px; border: 1px solid rgba(148,163,184,.24); padding: 9px; background: rgba(15,23,42,.62); width: 100%; }
+      .notification-item b { display: block; }
+      .notification-item small { display: block; color: var(--muted); margin-top: 3px; }
+      .status { display: none; }
+      #miniMap {
+        position: absolute;
+        right: 14px;
+        bottom: 14px;
+        width: 240px;
+        height: 150px;
+        border-radius: 18px;
+        overflow: hidden;
+        z-index: 22;
+        border: 1px solid rgba(125, 211, 252, 0.38);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+        display: none;
+      }
+      .street-mode #miniMap {
+        display: block;
+      }
+      #miniMap .label {
+        position: absolute;
+        left: 8px;
+        top: 8px;
+        background: rgba(2, 6, 23, 0.78);
+        border-radius: 999px;
+        padding: 4px 8px;
+        font-size: 11px;
+        color: #bae6fd;
+        z-index: 2;
+      }
+      #detailCard {
+        left: 50%;
+        bottom: 16px;
+        transform: translateX(-50%);
+        width: min(760px, calc(100vw - 32px));
+        padding: 12px 14px;
+        z-index: 26;
+        display: none;
+      }
+      #detailCard.visible {
+        display: block;
+      }
+      .street-mode #detailCard {
+        bottom: 18px;
+      }
+      .detail-head {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .score {
+        font-size: 28px;
+        font-weight: 950;
+      }
+      .title {
+        font-weight: 900;
+      }
+      .kindTitle {
+        font-size: 14px;
+        font-weight: 900;
+        color: var(--muted);
+      }
+      .sub {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        margin-top: 10px;
+      }
+      .detail-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-top: 10px;
+        flex-wrap: wrap;
+      }
+      .detail-actions #feedbackMeta {
+        flex: 1 1 180px;
+        margin-top: 0;
+      }
+      .detail-actions button {
+        font-size: 12px;
+        padding: 7px 12px;
+      }
+      #personaPanel {
+        left: 14px;
+        bottom: 16px;
+        width: min(370px, calc(100vw - 32px));
+        padding: 12px;
+        z-index: 24;
+        display: none;
+      }
+      #personaPanel.visible {
+        display: block;
+      }
+      .persona-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 8px;
+      }
+      .persona-head b {
+        font-size: 13px;
+      }
+      .persona-note {
+        color: var(--muted);
+        font-size: 11px;
+      }
+      .persona-selector {
+        display: grid;
+        gap: 6px;
+        margin: 8px 0;
+      }
+      .persona-selector label {
+        color: var(--muted);
+        font-size: 11px;
+      }
+      .persona-selector select {
+        width: 100%;
+        font-size: 12px;
+        padding: 8px 10px;
+      }
+      .persona-route-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+      .persona-route-summary {
+        margin-top: 8px;
+        padding: 8px;
+        border: 1px solid rgba(56, 189, 248, 0.25);
+        border-radius: 12px;
+        background: rgba(8, 47, 73, 0.36);
+      }
+      #roadNameLabels {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 23;
+        display: none;
+      }
+      #roadNameLabels.visible {
+        display: block;
+      }
+      .road-label {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        padding: 2px 7px;
+        border-radius: 999px;
+        color: #e0f2fe;
+        background: rgba(2, 6, 23, 0.58);
+        border: 1px solid rgba(186, 230, 253, 0.24);
+        text-shadow: 0 1px 2px #020617;
+        font-size: 11px;
+        font-weight: 800;
+        white-space: nowrap;
+        box-shadow: 0 6px 18px rgba(2, 6, 23, 0.28);
+      }
+      .persona-card {
+        text-align: left;
+        border-radius: 14px;
+        padding: 9px;
+        background: rgba(15, 23, 42, 0.74);
+        border-color: rgba(148, 163, 184, 0.28);
+      }
+      .persona-card.active {
+        background: linear-gradient(135deg, rgba(14, 116, 144, 0.92), rgba(30, 64, 175, 0.86));
+        border-color: #bae6fd;
+      }
+      .persona-card small,
+      #personaRecommendation {
+        display: block;
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.35;
+        margin-top: 4px;
+      }
+      #personaRecommendation {
+        margin-top: 8px;
+      }
+      #feedbackForm {
+        display: none;
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid rgba(148, 163, 184, 0.22);
+      }
+      #feedbackForm.open {
+        display: block;
+      }
+      #feedbackForm label {
+        display: block;
+        font-size: 11px;
+        color: var(--muted);
+        margin: 6px 0 4px;
+      }
+      #feedbackForm input,
+      #feedbackForm textarea {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.28);
+        background: rgba(15, 23, 42, 0.72);
+        color: white;
+        padding: 8px 10px;
+        font: inherit;
+      }
+      #feedbackForm textarea {
+        min-height: 72px;
+        resize: vertical;
+      }
+      .feedback-language-hint {
+        margin: 6px 0 8px;
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.35;
+      }
+      .feedback-speech-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 8px 0;
+      }
+      #feedbackSpeechBtn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .mic-pulse {
+        width: 11px;
+        height: 11px;
+        border-radius: 999px;
+        background: #38bdf8;
+        box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.72);
+      }
+      #feedbackSpeechBtn.recording .mic-pulse {
+        animation: micPulse 1s ease-out infinite;
+        background: #ef4444;
+      }
+      @keyframes micPulse {
+        0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.72); transform: scale(1); }
+        70% { box-shadow: 0 0 0 12px rgba(239, 68, 68, 0); transform: scale(1.18); }
+        100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); transform: scale(1); }
+      }
+      #feedbackTranslationBox {
+        display: none;
+        margin: 8px 0;
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 2px solid #f59e0b;
+        background: #fef3c7;
+        color: #1f2937;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.22);
+      }
+      #feedbackTranslationBox.visible {
+        display: block;
+      }
+      #feedbackTranslationBox b {
+        display: block;
+        margin-bottom: 4px;
+        color: #92400e;
+      }
+      #feedbackTranslationText {
+        white-space: pre-wrap;
+        line-height: 1.4;
+      }
+      #feedbackMeta,
+      #feedbackStatus,
+      .feedback-history {
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 6px;
+      }
+      .feedback-history {
+        display: none;
+        max-height: 210px;
+        overflow-y: auto;
+        border: 1px solid rgba(148, 163, 184, 0.22);
+        border-radius: 14px;
+        padding: 8px;
+        background: rgba(15, 23, 42, 0.52);
+      }
+      .feedback-filters {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 6px;
+        margin-top: 8px;
+      }
+      .feedback-filters label {
+        display: grid;
+        gap: 3px;
+        color: var(--muted);
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .feedback-filters select {
+        width: 100%;
+        font-size: 11px;
+        padding: 6px 8px;
+      }
+      .feedback-history.visible {
+        display: block;
+      }
+      .feedback-thread-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 6px;
+      }
+      .feedback-thread-head b {
+        color: #e0f2fe;
+      }
+      .feedback-item {
+        padding: 8px 0;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+      }
+      .feedback-item:last-child {
+        border-bottom: 0;
+      }
+      .feedback-item b {
+        display: block;
+        color: #e0f2fe;
+      }
+      .feedback-item b em {
+        display: inline-block;
+        margin-right: 5px;
+        padding: 1px 6px;
+        border-radius: 999px;
+        font-style: normal;
+        font-size: 9px;
+        text-transform: uppercase;
+        background: rgba(56, 189, 248, 0.18);
+        color: #bae6fd;
+        border: 1px solid rgba(56, 189, 248, 0.32);
+      }
+      .feedback-item.agent b em {
+        background: rgba(187, 107, 217, 0.18);
+        color: #f0abfc;
+        border-color: rgba(187, 107, 217, 0.36);
+      }
+      .feedback-item span {
+        display: block;
+        margin-top: 3px;
+        line-height: 1.35;
+      }
+      .feedback-item small {
+        color: var(--muted);
+      }
+      .feedback-social-row {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        margin-top: 6px;
+      }
+      .feedback-like {
+        min-height: 24px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+      }
+      .feedback-like.liked {
+        border-color: rgba(56, 189, 248, 0.75);
+        color: #bae6fd;
+      }
+      #feedbackStatus.ok {
+        color: var(--green);
+      }
+      #feedbackStatus.err {
+        color: var(--red);
+      }
+      .feedback-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+      }
+      .metric {
+        background: rgba(15, 23, 42, 0.72);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 12px;
+        padding: 8px;
+      }
+      .metric b {
+        display: block;
+      }
+      .metric span {
+        font-size: 10px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .street-agent-counts {
+        display: none;
+        margin-top: 9px;
+        padding: 8px;
+        border: 1px solid rgba(125, 211, 252, 0.24);
+        border-radius: 12px;
+        background: rgba(2, 6, 23, 0.42);
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .street-agent-counts.visible {
+        display: block;
+      }
+      .street-agent-counts b {
+        color: #e0f2fe;
+      }
+      .street-agent-counts .count-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 5px;
+      }
+      .street-agent-counts .count-pill {
+        border: 1px solid rgba(148, 163, 184, 0.22);
+        border-radius: 999px;
+        padding: 2px 7px;
+        background: rgba(15, 23, 42, 0.72);
+      }
+      .close {
+        margin-left: auto;
+        border-radius: 999px;
+        width: 30px;
+        height: 30px;
+        padding: 0;
+      }
+      #segmentButtons {
+        position: absolute;
+        inset: 0;
+        z-index: 25;
+        pointer-events: none;
+      }
+      .seg-btn {
+        position: absolute;
+        pointer-events: auto;
+        width: 24px;
+        height: 24px;
+        border-radius: 999px;
+        border: 2px solid white;
+        background: var(--blue);
+        box-shadow:
+          0 0 0 5px rgba(56, 189, 248, 0.24),
+          0 8px 22px rgba(0, 0, 0, 0.45);
+        color: #00111d;
+        font-size: 10px;
+        font-weight: 950;
+        padding: 0;
+      }
+      .seg-btn.bad {
+        background: var(--red);
+      }
+      .seg-btn.warn {
+        background: var(--amber);
+      }
+      .seg-btn::after {
+        content: attr(data-label);
+        position: absolute;
+        left: 18px;
+        top: -18px;
+        display: none;
+        max-width: 260px;
+        background: rgba(2, 6, 23, 0.9);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.24);
+        border-radius: 999px;
+        padding: 3px 7px;
+        font-size: 10px;
+        white-space: nowrap;
+        pointer-events: none;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.36);
+      }
+      .seg-btn:hover::after,
+      .seg-btn:focus-visible::after {
+        display: block;
+      }
+      .seg-btn:not([data-label])::after,
+      .seg-btn[data-label=""]::after {
+        display: none !important;
+      }
+      #settings {
+        right: 74px;
+        top: 78px;
+        width: min(360px, calc(100vw - 96px));
+        padding: 14px;
+        z-index: 35;
+        display: none;
+      }
+      #settings.visible {
+        display: block;
+      }
+      #roleMenu {
+        right: 14px;
+        top: 70px;
+        width: min(310px, calc(100vw - 28px));
+        padding: 14px;
+        z-index: 36;
+        display: none;
+      }
+      #roleMenu.visible {
+        display: block;
+      }
+      #roleMenu p {
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.4;
+      }
+      .role-menu-actions {
+        display: grid;
+        gap: 8px;
+        margin-top: 12px;
+      }
+      .role-menu-actions a,
+      .role-menu-actions button {
+        box-sizing: border-box;
+        width: 100%;
+        text-align: center;
+        text-decoration: none;
+        font: inherit;
+        font-size: 13px;
+      }
+      .role-menu-actions a {
+        display: block;
+      }
+      .topbar-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        white-space: nowrap;
+        font-size: 13px;
+      }
+      #settings textarea {
+        width: 100%;
+        height: 70px;
+        border-radius: 12px;
+        background: #020617;
+        color: #e0f2fe;
+        border: 1px solid rgba(125, 211, 252, 0.28);
+      }
+      #settings p {
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.35;
+      }
+      .settings-grid {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+      }
+      .settings-section {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid rgba(148, 163, 184, 0.24);
+      }
+      .settings-section h4 {
+        margin: 0 0 5px;
+        font-size: 13px;
+      }
+      .settings-section p {
+        margin: 4px 0 8px;
+      }
+      .photo-progress-rail {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+        margin: 9px 0;
+      }
+      .photo-progress-rail span {
+        position: relative;
+        padding: 7px 6px;
+        border-radius: 999px;
+        border: 1px solid rgba(125, 211, 252, 0.28);
+        background: rgba(15, 23, 42, 0.88);
+        color: #f8fafc;
+        text-align: center;
+        font-size: 10px;
+        font-weight: 850;
+        overflow: hidden;
+      }
+      .photo-progress-rail span.active::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, transparent, rgba(56,189,248,.35), transparent);
+        animation: progressSweep 1.4s linear infinite;
+      }
+      @keyframes progressSweep { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+      .managed-user-form {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 7px;
+      }
+      #managedUsersTable {
+        margin-top: 8px;
+        max-height: 150px;
+        overflow: auto;
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .status {
+        position: absolute;
+        left: 14px;
+        bottom: 14px;
+        z-index: 21;
+        background: rgba(2, 6, 23, 0.82);
+        border: 1px solid rgba(125, 211, 252, 0.28);
+        border-radius: 999px;
+        padding: 8px 12px;
+        font-size: 12px;
+        color: #dff7ff;
+      }
+      .street-mode .status {
+        display: none;
+      }
+      .public-role .authority-only {
+        display: none !important;
+      }
+      .role-pill {
+        border-color: rgba(125, 211, 252, 0.45);
+      }
+      #roleLabel,
+      #modeLabel,
+      #earthSource {
+        display: none !important;
+      }
+
+      #photoUploadPanel {
+        position: absolute;
+        right: 18px;
+        top: 86px;
+        z-index: 28;
+        display: none;
+        width: min(340px, calc(100vw - 36px));
+        padding: 12px;
+      }
+      #photoUploadPanel.visible {
+        display: block;
+      }
+      #photoUploadPanel.compact {
+        width: auto;
+        min-width: 240px;
+        background: rgba(2, 6, 23, 0.68);
+      }
+      #photoUploadTitle {
+        font-weight: 900;
+        font-size: 13px;
+      }
+      #photoUploadPrompt,
+      #photoUploadStatus {
+        margin-top: 5px;
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.35;
+      }
+      #photoUploadStatus.ok {
+        color: var(--green);
+      }
+      #photoUploadStatus.err {
+        color: var(--red);
+      }
+      .photo-upload-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-top: 9px;
+        flex-wrap: wrap;
+      }
+      #photoUploadInput {
+        display: none;
+      }
+      .photo-upload-secondary {
+        border-color: rgba(148, 163, 184, 0.28);
+        color: var(--muted);
+      }
+
+      @media (max-width: 800px) {
+        #topbar {
+          flex-wrap: wrap;
+        }
+        select {
+          max-width: 100%;
+          width: 100%;
+        }
+        .metrics {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        #miniMap {
+          display: none !important;
+        }
+      }
+    </style>
+    <link rel="stylesheet" href="harvard.css?v=20260731d" />
+    <script src="https://unpkg.com/maptalks/dist/maptalks.min.js"></script>
+    <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+    <script src="https://unpkg.com/mapillary-js@4.1.2/dist/mapillary.js"></script>
+  </head>
+  <body>
+    <div id="satelliteFallback" aria-hidden="true"></div>
+    <div id="map"></div>
+    <div id="threeOverlay"></div>
+    <div id="mapillaryView"></div>
+    <div id="segmentButtons"></div>
+    <div id="roadNameLabels" aria-hidden="true"></div>
+    <div id="topbar" class="hud">
+      <div class="brand">JalanLens</div>
+      <span class="pill role-pill" id="roleLabel">Role</span>
+      <span class="pill" id="modeLabel" hidden></span>
+      <span class="pill" id="earthSource" hidden></span>
+      <select id="viewModeSelect" class="topbar-hover-select" title="Choose view mode">
+        <option value="earth">Earth View</option>
+        <option value="street">Street View</option>
+      </select>
+      <select id="segmentSelect" class="topbar-hover-select street-only-control" title="Choose a footpath street part"></select>
+      <button id="directionBtn" class="street-only-control" title="Swap pavement-side direction" disabled>Swap direction</button>
+      <button id="prevBtn" class="street-only-control">←</button><button id="nextBtn" class="street-only-control">→</button>
+      <div class="spacer"></div>
+      <span class="pill" hidden><b id="segCount">–</b> segments</span>
+      <span class="pill" hidden><b id="buildingCount">–</b> buildings</span>
+      <a id="docsBtn" class="buttonlike topbar-link" href="../documentation">Documentation</a>
+      <button id="themeToggleBtn" title="Display theme: system">◐</button>
+      <button id="notificationBellBtn" title="Notifications">🔔</button>
+      <button id="settingsBtn" class="authority-only">⚙</button>
+      <button id="roleSwitchBtn" class="role-pill" type="button">Role</button>
+    </div>
+    <div id="settings" class="hud">
+      <button class="close" id="closeSettings">×</button>
+      <h3>Settings</h3>
+      <p>Account and authority controls for this demo.</p>
+      <p id="tokenStatus" hidden></p>
+      <p id="currentUserStatus"></p>
+      <div class="settings-grid authority-only">
+        <button id="togglePersonaPanelBtn" type="button">Show persona agents</button>
+      </div>
+      <section class="settings-section" id="photoCrowdSection">
+        <h4>Photo crowdsourcing</h4>
+        <p>Upload better street-part photos here. The review flow is CV first review, then human-in-the-loop approval by selected staff teams before a photo becomes active evidence.</p>
+        <div id="photoProgressRail" class="photo-progress-rail" aria-label="Photo review progress">
+          <span class="active">Upload</span><span>CV first review</span><span>Staff review</span><span>Approved</span>
+        </div>
+        <div class="photo-upload-actions">
+          <button type="button" id="photoUploadBtn">Upload better photo</button>
+          <a class="buttonlike" href="../crowd-photos/">Open dedicated page</a>
+          <input id="photoUploadInput" type="file" accept="image/*" />
+        </div>
+        <div id="photoUploadStatus"></div>
+      </section>
+      <section class="settings-section authority-only" id="accountManagementSection">
+        <h4>Account management</h4>
+        <p>Company admins manage users in their own company: username/password access first, then users can edit profile details after login.</p>
+        <div class="managed-user-form">
+          <input id="managedEmployeeId" placeholder="employee_id" />
+          <input id="managedFullName" placeholder="full_name" />
+          <input id="managedDepartment" placeholder="department" />
+          <input id="managedPosition" placeholder="position_title" />
+          <input id="managedSalutation" placeholder="salutation" />
+          <input id="managedPurpose" placeholder="platform_purpose" />
+        </div>
+        <button type="button" id="createManagedUserBtn">Create managed user</button>
+        <div id="managedUsersTable">Loading managed users…</div>
+      </section>
+    </div>
+    <div id="roleMenu" class="hud">
+      <button class="close" id="closeRoleMenu">×</button>
+      <h3>Account</h3>
+      <p id="roleMenuStatus">Loading current role…</p>
+      <div class="role-menu-actions">
+        <a id="profilePageBtn" class="buttonlike" href="../profile/">Open profile</a>
+        <button id="logoutBtn" type="button">Log out</button>
+      </div>
+    </div>
+    <div id="miniMap"><div class="label">Earth context</div></div>
+    <section id="personaPanel" class="hud authority-only">
+      <div class="persona-head">
+        <b>Persona agents</b>
+        <span class="persona-note">updates when footpath changes</span>
+      </div>
+      <div class="persona-selector">
+        <label for="personaSelect">User type</label>
+        <select id="personaSelect" title="Choose user type"></select>
+        <div class="persona-route-grid">
+          <label>Start street part
+            <select id="personaStartSelect" title="Choose route start street part"></select>
+          </label>
+          <label>End street part
+            <select id="personaEndSelect" title="Choose route end street part"></select>
+          </label>
+        </div>
+      </div>
+      <div id="personaRecommendation">Loading persona travel simulation…</div>
+    </section>
+    <section id="detailCard" class="hud">
+      <div class="detail-head">
+        <div>
+          <div class="title" id="selectedName">Select a segment</div>
+          <div class="kindTitle" id="selectedKind"></div>
+          <div class="sub" id="selectedDesc"></div>
+        </div>
+        <div class="spacer"></div>
+        <div class="score" id="activeScore">–</div>
+        <button class="close" id="closeDetail">×</button>
+      </div>
+      <div class="metrics" id="metricList"></div>
+      <div id="streetAgentCounts" class="street-agent-counts"></div>
+      <div class="detail-actions">
+        <button type="button" id="feedbackBtn">Give feedback</button>
+        <div id="feedbackMeta"></div>
+      </div>
+      <div id="feedbackHistory" class="feedback-history"></div>
+      <form id="feedbackForm">
+        <label for="feedbackTitle">Title</label>
+        <input
+          id="feedbackTitle"
+          name="title"
+          required
+          maxlength="120"
+          placeholder="What should be fixed?"
+        />
+        <label for="feedbackBody">Details</label>
+        <div id="feedbackLanguageHint" class="feedback-language-hint">
+          Supports English, Traditional Chinese, Simplified Chinese, Malay, Tamil, Bengali, and Gujarati. Non-English feedback is translated to English with Agnes AI before saving.
+        </div>
+        <textarea
+          id="feedbackBody"
+          name="body"
+          required
+          maxlength="2000"
+          placeholder="Describe the accessibility issue or suggestion."
+        ></textarea>
+        <div class="feedback-speech-row">
+          <button type="button" id="feedbackSpeechBtn"><span class="mic-pulse" aria-hidden="true"></span><span id="feedbackSpeechLabel">Start speech to text</span></button>
+          <small id="feedbackSpeechStatus">Agnes AI speech-to-text ready.</small>
+        </div>
+        <div id="feedbackTranslationBox" aria-live="polite">
+          <b>English translation</b>
+          <div id="feedbackTranslationText"></div>
+        </div>
+        <div class="feedback-actions">
+          <button type="submit" id="feedbackSubmitBtn">Submit</button>
+          <button type="button" id="feedbackCancelBtn">Cancel</button>
+        </div>
+        <div id="feedbackStatus"></div>
+      </form>
+    </section>
+    <div id="toastStack" aria-live="polite" aria-atomic="false"></div>
+    <section id="notificationsPanel" class="hud" aria-live="polite">
+      <div class="notification-head">
+        <h3>Notifications</h3>
+        <button id="clearNotificationsBtn" type="button">Clear notification history</button>
+      </div>
+      <div id="notificationsList" class="notification-list">No notifications yet.</div>
+    </section>
+    <div class="status" id="status" aria-hidden="true"></div>
+    <script src="../feedback-form.js?v=social-thread-2"></script>
+    <script>
+      const COLORS = {
+        green: "#22f36e",
+        amber: "#ffd166",
+        red: "#ff3b52",
+        blue: "#38bdf8",
+        orange: "#fb923c",
+      };
+      const state = {
+        world: null,
+        buildings: null,
+        segments: [],
+        features: [],
+        selectedIndex: 0,
+        mode: "earth",
+        mapillaryViewer: null,
+        miniMap: null,
+        layers: {},
+        photoFeatureInstances: [],
+        token: null,
+        three: {},
+        streetImages: [],
+        streetImageIndex: 0,
+        currentStreetSegment: null,
+        streetRegistry: null,
+        streetNodeIndex: 0,
+        nodePhotoCache: {},
+        detailContext: null,
+        personaSimulation: null,
+        activePersonaId: "wheelchair_user",
+        activeRouteStartPartId: null,
+        activeRouteEndPartId: null,
+        roadNameData: null,
+        currentPhotoUploadContext: null,
+        liveAgentSnapshot: null,
+        agentLayer: null,
+        notifications: [],
+        dismissedNotificationIds: new Set(JSON.parse(localStorage.getItem("jalanlens_cleared_notifications") || "[]")),
+        themeMode: localStorage.getItem("jalanlens_theme") || "system",
+      };
+      window.__EARTH_ACCESSIBILITY_STATE = state;
+      const SATELLITE_TILE =
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
+      // Esri World Imagery stops adding native detail beyond this level in the
+      // Clementi demo area. Clamp the MapTalks camera here too, so the vector
+      // accessibility/OSM lines do not keep separating while the satellite
+      // raster is only being over-zoomed.
+      const SATELLITE_MAX_NATIVE_ZOOM = 18;
+      const ROLE_STORAGE_KEY = "jalanlens_role";
+      const USER_STORAGE_KEY = "jalanlens_user";
+      const LEGACY_ROLE_STORAGE_KEY = "access" + "twin_role";
+      const LEGACY_USER_STORAGE_KEY = "access" + "twin_user";
+      const TOKEN_STORAGE_KEY = "jalanlens_mapillary_token";
+      const LEGACY_TOKEN_STORAGE_KEY = "equi" + "route_mapillary_token";
+      const VALID_ROLES = new Set(["public", "authority"]);
+      const params = new URLSearchParams(location.search);
+      const storedRole = localStorage.getItem(ROLE_STORAGE_KEY) || localStorage.getItem(LEGACY_ROLE_STORAGE_KEY);
+      let storedUser = null;
+      try {
+        storedUser = JSON.parse(localStorage.getItem(USER_STORAGE_KEY) || localStorage.getItem(LEGACY_USER_STORAGE_KEY) || "null");
+      } catch (e) {
+        storedUser = null;
+      }
+      const activeRole = VALID_ROLES.has(storedUser?.role)
+        ? storedUser.role
+        : VALID_ROLES.has(storedRole)
+          ? storedRole
+          : "";
+      if (!storedUser || !storedUser.external_id || !activeRole) {
+        localStorage.removeItem(ROLE_STORAGE_KEY);
+        localStorage.removeItem(USER_STORAGE_KEY);
+        location.replace(`../?next=${encodeURIComponent("street-intelligence/" + location.search)}`);
+        throw new Error("JalanLens login required");
+      }
+      state.role = activeRole;
+      state.appUser = storedUser;
+      localStorage.setItem(ROLE_STORAGE_KEY, activeRole);
+      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(state.appUser));
+      document.body.classList.add(`${activeRole}-role`);
+      const SUPABASE_URL = "https://khddsjemkdcgumfvkraa.supabase.co";
+      const SUPABASE_PUBLISHABLE_KEY =
+        "sb_publishable_lqGtwkNAOMV7qsYPKVZr8w_GytZx3Qm";
+      const map = new maptalks.Map("map", {
+        center: [103.7716, 1.3062],
+        zoom: 17,
+        minZoom: 12,
+        maxZoom: SATELLITE_MAX_NATIVE_ZOOM,
+        pitch: 0,
+        bearing: 0,
+        baseLayer: new maptalks.TileLayer("satellite-daylight", {
+          urlTemplate: SATELLITE_TILE,
+          renderer: "canvas",
+          maxAvailableZoom: SATELLITE_MAX_NATIVE_ZOOM,
+          maxZoom: SATELLITE_MAX_NATIVE_ZOOM,
+          attribution: "Tiles © Esri, Maxar, Earthstar Geographics",
+        }),
+      });
+      try {
+        map.getBaseLayer()?.hide?.();
+      } catch (e) {
+        console.warn("base layer hide fallback failed", e);
+      }
+      const routeLayer = new maptalks.VectorLayer(
+          "5m-accessibility-segments",
+        ).addTo(map),
+        poiLayer = new maptalks.VectorLayer("features").addTo(map),
+        buildingLayer = new maptalks.VectorLayer("buildings").addTo(map),
+        selectedLayer = new maptalks.VectorLayer("selected").addTo(map),
+        agentLayer = new maptalks.VectorLayer("live-persona-agents").addTo(map);
+      state.layers = { routeLayer, poiLayer, buildingLayer, selectedLayer, agentLayer };
+      state.agentLayer = agentLayer;
+      function getToken() {
+        return localStorage.getItem(TOKEN_STORAGE_KEY) || localStorage.getItem(LEGACY_TOKEN_STORAGE_KEY) || "";
+      }
+      function setToken(t) {
+        if ((t || "").trim())
+          localStorage.setItem(TOKEN_STORAGE_KEY, t.trim());
+        updateSettings();
+      }
+      function escapeHtml(value) {
+        return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+      }
+      function applyTheme() {
+        const mode = state.themeMode || "system";
+        const dark = mode === "dark" || (mode === "system" && matchMedia?.("(prefers-color-scheme: dark)").matches);
+        document.body.dataset.theme = dark ? "dark" : "light";
+        if (window.themeToggleBtn) {
+          themeToggleBtn.textContent = mode === "light" ? "☀" : mode === "dark" ? "☾" : "◐";
+          themeToggleBtn.title = `Display theme: ${mode}`;
+        }
+      }
+      function cycleTheme() {
+        const order = ["system", "light", "dark"];
+        state.themeMode = order[(order.indexOf(state.themeMode) + 1) % order.length];
+        localStorage.setItem("jalanlens_theme", state.themeMode);
+        applyTheme();
+      }
+      function renderNotifications() {
+        const list = window.notificationsList;
+        if (!list) return;
+        const visible = state.notifications.filter((n) => !state.dismissedNotificationIds.has(n.id));
+        notificationBellBtn?.classList.toggle("has-unread", visible.length > 0);
+        if (!visible.length) {
+          list.textContent = "No notifications yet.";
+          return;
+        }
+        list.innerHTML = visible.map((n) => `<button class="notification-item" data-id="${escapeHtml(n.id)}"><b>${escapeHtml(n.title)}</b><small>${escapeHtml(n.body || "")}</small></button>`).join("");
+        list.querySelectorAll(".notification-item").forEach((button) => {
+          button.onclick = () => {
+            const n = visible.find((x) => x.id === button.dataset.id);
+            if (n?.street_part_external_id) openNotificationTarget(n);
+          };
+        });
+      }
+      function showToast(n) {
+        if (!window.toastStack) return;
+        const el = document.createElement("div");
+        el.className = "toast";
+        el.innerHTML = `<b>${escapeHtml(n.title)}</b><div>${escapeHtml(n.body || "")}</div>`;
+        toastStack.appendChild(el);
+        setTimeout(() => el.classList.add("fade-out"), 3600);
+        setTimeout(() => el.remove(), 4200);
+      }
+      async function saveNotification(n) {
+        try {
+          await supabaseInsert("app_notifications", {
+            external_id: n.id,
+            source: n.source || "system",
+            title: n.title,
+            body: n.body || "",
+            street_part_external_id: n.street_part_external_id || null,
+            payload: n.payload || {},
+          });
+        } catch (e) {
+          console.warn("notification save failed", e);
+        }
+      }
+      function createNotification(partial, { toast = true, persist = false } = {}) {
+        const n = {
+          id: partial.id || `local_${Date.now()}_${Math.random().toString(16).slice(2)}`,
+          source: partial.source || "system",
+          title: partial.title || "Notification",
+          body: partial.body || "",
+          street_part_external_id: partial.street_part_external_id || null,
+          payload: partial.payload || {},
+          created_at: partial.created_at || new Date().toISOString(),
+        };
+        if (!state.notifications.some((x) => x.id === n.id)) state.notifications.unshift(n);
+        state.notifications = state.notifications.slice(0, 80);
+        renderNotifications();
+        if (toast) showToast(n);
+        if (persist) saveNotification(n);
+        return n;
+      }
+      async function loadNotifications() {
+        try {
+          const rows = await supabaseRest("app_notifications", "select=external_id,source,title,body,street_part_external_id,payload,created_at&order=created_at.desc&limit=80");
+          rows.forEach((r) => createNotification({ id: r.external_id, ...r }, { toast: false, persist: false }));
+        } catch (e) {
+          console.warn("notification load failed", e);
+        }
+      }
+      function clearNotificationHistory() {
+        state.notifications.forEach((n) => state.dismissedNotificationIds.add(n.id));
+        localStorage.setItem("jalanlens_cleared_notifications", JSON.stringify([...state.dismissedNotificationIds].slice(-200)));
+        renderNotifications();
+      }
+      function openNotificationTarget(n) {
+        const part = (state.streetRegistry?.street_parts || []).find((p) => p.id === n.street_part_external_id || p.external_id === n.street_part_external_id);
+        const idx = segmentIndexForStreetPart(part);
+        if (idx >= 0) selectSegment(idx, true);
+        notificationsPanel?.classList.remove("visible");
+      }
+      function setStatus(t) {
+        const statusEl = document.getElementById("status");
+        if (statusEl) statusEl.textContent = t || "";
+        createNotification({ source: "system", title: "JalanLens data loaded", body: t || "" }, { toast: true, persist: true });
+      }
+      applyTheme();
+      function updateRoleMenu() {
+        if (!window.roleMenuStatus) return;
+        const user = state.appUser || {};
+        const roleLabel = state.role === "authority" ? "Authority" : "Public";
+        const name = user.display_name || user.username || user.external_id || `${state.role} user`;
+        const username = user.username || user.external_id || "demo-user";
+        roleMenuStatus.innerHTML = `<b>Role:</b> ${roleLabel}<br><b>User:</b> ${name}<br><b>Username:</b> ${username}`;
+        if (window.profilePageBtn) {
+          profilePageBtn.href = "../profile/";
+        }
+      }
+      function logoutToAuth() {
+        localStorage.removeItem(ROLE_STORAGE_KEY);
+        localStorage.removeItem(USER_STORAGE_KEY);
+        localStorage.removeItem(LEGACY_ROLE_STORAGE_KEY);
+        localStorage.removeItem(LEGACY_USER_STORAGE_KEY);
+        location.href = "../";
+      }
+      function applyRoleUi() {
+        if (window.roleSwitchBtn) {
+          roleSwitchBtn.textContent = "Role";
+          roleSwitchBtn.title = "Current role and account";
+          roleSwitchBtn.onclick = () => {
+            settings?.classList.remove("visible");
+            roleMenu?.classList.toggle("visible");
+            updateRoleMenu();
+          };
+        }
+        if (window.roleLabel) {
+          roleLabel.textContent = state.role === "authority" ? "Authority dashboard" : "Public feedback";
+        }
+        if (window.modeLabel) {
+          modeLabel.hidden = false;
+        }
+        if (state.role !== "authority") {
+          settings?.classList.remove("visible");
+          personaPanel?.classList.remove("visible");
+        }
+        updatePersonaToggleButton();
+      }
+
+      function setUploadStatus(message, kind = "") {
+        if (!window.photoUploadStatus) return;
+        photoUploadStatus.className = kind || "";
+        photoUploadStatus.textContent = message || "";
+      }
+      function supabaseHeaders(extra = {}) {
+        return {
+          apikey: SUPABASE_PUBLISHABLE_KEY,
+          Authorization: "Bearer " + SUPABASE_PUBLISHABLE_KEY,
+          ...extra,
+        };
+      }
+      async function supabaseInsert(table, payload) {
+        const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+          method: "POST",
+          headers: supabaseHeaders({
+            "Content-Type": "application/json",
+            Prefer: "return=representation",
+          }),
+          body: JSON.stringify(payload),
+        });
+        if (!r.ok) throw new Error(`Supabase insert ${table} ${r.status}: ${await r.text()}`);
+        const rows = await r.json();
+        return rows[0] || null;
+      }
+      async function uploadStreetPhotoFile(file, storagePath) {
+        const r = await fetch(`${SUPABASE_URL}/storage/v1/object/street-photos/${storagePath}`, {
+          method: "POST",
+          headers: supabaseHeaders({
+            "Content-Type": file.type || "image/jpeg",
+            "x-upsert": "true",
+          }),
+          body: file,
+        });
+        if (!r.ok) throw new Error(`Supabase Storage upload ${r.status}: ${await r.text()}`);
+        return `${SUPABASE_URL}/storage/v1/object/public/street-photos/${storagePath}`;
+      }
+      function currentActivePhoto() {
+        return (state.streetImages || [])[state.streetImageIndex] || null;
+      }
+      function photoUploadContext(kindOverride = null) {
+        const part = currentStreetPart();
+        const node = currentStreetNode();
+        const existing = currentActivePhoto();
+        const kind = kindOverride || (existing ? "replace" : "missing");
+        return { part, node, existing, kind };
+      }
+      function showPhotoUploadToast(ctx) {
+        if (!ctx?.part) return;
+        const hasPhoto = !!ctx.existing;
+        state.currentPhotoUploadContext = ctx;
+        createNotification({
+          source: "system",
+          title: hasPhoto ? "Have a better photo?" : "No photo available here",
+          body: `${hasPhoto ? "Upload a clearer photo" : "Upload a photo"} for ${streetPartDisplayName(ctx.part)} from Settings → Photo crowdsourcing. Photos go through CV first review, then human-in-the-loop approval by selected company staff.`,
+          street_part_external_id: ctx.part.id,
+        }, { toast: true, persist: false });
+      }
+      function renderPhotoUploadPanel(kindOverride = null) {
+        if (state.mode !== "street") return;
+        const ctx = photoUploadContext(kindOverride);
+        state.currentPhotoUploadContext = ctx;
+        showPhotoUploadToast(ctx);
+      }
+      function loadImageForCv(file) {
+        return new Promise((resolve, reject) => {
+          const url = URL.createObjectURL(file);
+          const img = new Image();
+          img.onload = () => {
+            URL.revokeObjectURL(url);
+            resolve(img);
+          };
+          img.onerror = () => {
+            URL.revokeObjectURL(url);
+            reject(new Error("Could not read image file"));
+          };
+          img.src = url;
+        });
+      }
+      async function analyzeUploadedStreetPhoto(file) {
+        if (!file?.type?.startsWith("image/")) {
+          return { ok: false, score: 0, message: "Please upload an image file." };
+        }
+        if (file.size > 8 * 1024 * 1024) {
+          return { ok: false, score: 0, message: "Photo is too large. Please keep uploads below 8 MB." };
+        }
+        const img = await loadImageForCv(file);
+        const minDimensionOk = img.naturalWidth >= 900 && img.naturalHeight >= 500;
+        const aspect = img.naturalWidth / Math.max(1, img.naturalHeight);
+        const aspectOk = aspect >= 1.05 && aspect <= 2.4;
+        const canvas = document.createElement("canvas");
+        const w = 256, h = 144;
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        ctx.drawImage(img, 0, 0, w, h);
+        const data = ctx.getImageData(0, 0, w, h).data;
+        let sum = 0, sumSq = 0, edge = 0, saturated = 0;
+        const lum = new Float32Array(w * h);
+        for (let i = 0, j = 0; i < data.length; i += 4, j++) {
+          const y = 0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2];
+          lum[j] = y;
+          sum += y;
+          sumSq += y * y;
+          if (y < 8 || y > 247) saturated++;
+        }
+        for (let y = 1; y < h; y++) {
+          for (let x = 1; x < w; x++) {
+            const idx = y * w + x;
+            edge += Math.abs(lum[idx] - lum[idx - 1]) + Math.abs(lum[idx] - lum[idx - w]);
+          }
+        }
+        const n = w * h;
+        const brightness = sum / n;
+        const contrast = Math.sqrt(Math.max(0, sumSq / n - brightness * brightness));
+        const edgeScore = edge / n;
+        const exposureOk = brightness >= 42 && brightness <= 220 && saturated / n < 0.28;
+        const contrastOk = contrast >= 18;
+        const detailOk = edgeScore >= 12;
+        let score = 0;
+        if (minDimensionOk) score += 25;
+        if (aspectOk) score += 15;
+        if (exposureOk) score += 20;
+        if (contrastOk) score += 20;
+        if (detailOk) score += 20;
+        const checks = [
+          minDimensionOk ? "resolution ok" : "resolution too low",
+          aspectOk ? "street-view aspect ok" : "unusual crop/aspect",
+          exposureOk ? "exposure ok" : "too dark/bright or blown out",
+          contrastOk ? "contrast ok" : "too flat/blank",
+          detailOk ? "detail/edge evidence ok" : "too blurry or lacks street detail",
+        ];
+        const ok = score >= 75;
+        return {
+          ok,
+          score,
+          width: img.naturalWidth,
+          height: img.naturalHeight,
+          checks,
+          message: ok
+            ? `CV passed (${score}/100): ${checks.join(" · ")}`
+            : `CV rejected (${score}/100): ${checks.join(" · ")}`,
+        };
+      }
+      function localPhotoFromDbRow(row, ctx, publicUrl, cv) {
+        const partExternalId = ctx.part?.id;
+        const nodeExternalId = ctx.node?.id;
+        return {
+          id: row?.external_id || `crowd_${Date.now()}`,
+          db_id: row?.id || null,
+          external_id: row?.external_id || `crowd_${partExternalId}_${Date.now()}`,
+          street_part_id: partExternalId,
+          street_view_node_id: nodeExternalId,
+          source: "crowd",
+          image_url: row?.image_url || publicUrl,
+          thumb_2048_url: row?.image_url || publicUrl,
+          lng: row?.lng ?? ctx.node?.lng ?? ctx.part?.midpoint?.[0],
+          lat: row?.lat ?? ctx.node?.lat ?? ctx.part?.midpoint?.[1],
+          compass_angle_deg: row?.compass_angle_deg ?? ctx.node?.canonical_heading_deg ?? 0,
+          heading_role: row?.heading_role || ctx.existing?.heading_role || "canonical",
+          desired_orientation: row?.desired_orientation || ctx.part?.desired_orientation || "road_right",
+          direction_valid: true,
+          direction_confidence: row?.direction_confidence ?? Math.min(1, cv.score / 100),
+          is_pano: false,
+          is_active: false,
+          validation_status: "pending_human_review",
+          metadata: row?.metadata || { cv_validation: cv },
+          registry_photo_id: row?.id || row?.external_id || null,
+        };
+      }
+      async function handlePhotoUploadFile(file) {
+        const ctx = state.currentPhotoUploadContext || photoUploadContext();
+        if (!ctx.part?.db_id) {
+          setUploadStatus("Upload needs the live Supabase registry. Switch off localRegistry fallback and reload.", "err");
+          return;
+        }
+        setUploadStatus("Running computer-vision quality check…");
+        const cv = await analyzeUploadedStreetPhoto(file);
+        if (!cv.ok) {
+          setUploadStatus(cv.message, "err");
+          return;
+        }
+        setUploadStatus(`${cv.message}. Uploading to database…`, "ok");
+        const safeName = file.name.replace(/[^a-z0-9._-]+/gi, "_").slice(-80) || "photo.jpg";
+        const externalId = `crowd_${ctx.part.id}_${Date.now()}`;
+        const storagePath = `${ctx.part.id}/${externalId}_${safeName}`;
+        const publicUrl = await uploadStreetPhotoFile(file, storagePath);
+        const row = await supabaseInsert("street_photos", {
+          external_id: externalId,
+          street_part_id: ctx.part.db_id,
+          street_view_node_id: ctx.node?.db_id || null,
+          source: "crowd",
+          source_image_id: externalId,
+          image_url: publicUrl,
+          storage_path: storagePath,
+          lng: ctx.node?.lng ?? ctx.part.midpoint?.[0],
+          lat: ctx.node?.lat ?? ctx.part.midpoint?.[1],
+          compass_angle_deg: ctx.node?.canonical_heading_deg ?? null,
+          matched_heading_deg: ctx.node?.canonical_heading_deg ?? null,
+          heading_role: ctx.existing?.heading_role || "canonical",
+          desired_orientation: ctx.part.desired_orientation || "road_right",
+          direction_valid: true,
+          direction_confidence: Math.min(1, cv.score / 100),
+          quality_score: cv.score,
+          is_pano: false,
+          is_active: false,
+          validation_status: "pending_human_review",
+          selected_reason: ctx.kind === "replace" ? "crowd_upload_better_photo_cv_passed" : "crowd_upload_missing_photo_cv_passed",
+          replaces_photo_id: ctx.existing?.db_id || null,
+          metadata: {
+            cv_validation: cv,
+            upload_context: ctx.kind,
+            original_filename: file.name,
+            file_size: file.size,
+          },
+        });
+        await supabaseInsert("photo_review_jobs", {
+          photo_id: row?.id || null,
+          submitted_by_user_external_id: state.appUser.external_id || null,
+          company_external_id: state.appUser.company_external_id || state.appUser.organization || "jalanlens_demo_company",
+          street_part_external_id: ctx.part.id,
+          review_stage: "staff_review",
+          cv_review_status: "passed",
+          human_review_status: "pending",
+          assigned_staff_external_ids: [],
+          progress_payload: { cv, upload_context: ctx.kind, status_steps: ["Upload", "CV first review", "Staff review", "Approved"] },
+        }).catch((e) => console.warn("photo review job unavailable", e));
+        const normalized = localPhotoFromDbRow(row, ctx, publicUrl, cv);
+        state.streetRegistry.street_photos = [
+          normalized,
+          ...(state.streetRegistry.street_photos || []),
+        ];
+        state.streetImages = [normalized, ...(state.streetImages || [])];
+        state.streetImageIndex = 0;
+        setUploadStatus("Photo passed CV review and is now waiting for human staff approval.", "ok");
+        renderStreetPhoto(0);
+      }
+      function clampSatelliteZoom() {
+        const z = map.getZoom?.();
+        if (Number.isFinite(z) && z > SATELLITE_MAX_NATIVE_ZOOM) {
+          map.setZoom(SATELLITE_MAX_NATIVE_ZOOM, { animation: false });
+          return true;
+        }
+        return false;
+      }
+      ["zooming", "zoomend", "moveend"].forEach((eventName) =>
+        map.on(eventName, () => {
+          if (clampSatelliteZoom()) renderSatelliteFallback();
+        }),
+      );
+      function scoreColor(s) {
+        return s >= 67 ? COLORS.green : s >= 45 ? COLORS.amber : COLORS.red;
+      }
+      function middle(f) {
+        const c = f.geometry.coordinates;
+        return [
+          (c[0][0] + c[c.length - 1][0]) / 2,
+          (c[0][1] + c[c.length - 1][1]) / 2,
+        ];
+      }
+      function bearing(a, b) {
+        const y =
+          Math.sin(((b[0] - a[0]) * Math.PI) / 180) *
+          Math.cos((b[1] * Math.PI) / 180);
+        const x =
+          Math.cos((a[1] * Math.PI) / 180) * Math.sin((b[1] * Math.PI) / 180) -
+          Math.sin((a[1] * Math.PI) / 180) *
+            Math.cos((b[1] * Math.PI) / 180) *
+            Math.cos(((b[0] - a[0]) * Math.PI) / 180);
+        return (Math.atan2(y, x) * 180) / Math.PI;
+      }
+      function centroid(r) {
+        let x = 0,
+          y = 0,
+          n = r.length || 1;
+        r.forEach((c) => {
+          x += c[0];
+          y += c[1];
+        });
+        return [x / n, y / n];
+      }
+
+      function lonLatToTile(lon, lat, z) {
+        const n = 2 ** z;
+        const x = ((lon + 180) / 360) * n;
+        const rad = (lat * Math.PI) / 180;
+        const y =
+          ((1 - Math.log(Math.tan(rad) + 1 / Math.cos(rad)) / Math.PI) / 2) * n;
+        return { x, y };
+      }
+      function tileToLonLat(x, y, z) {
+        const n = 2 ** z;
+        const lon = (x / n) * 360 - 180;
+        const lat =
+          (Math.atan(Math.sinh(Math.PI * (1 - (2 * y) / n))) * 180) / Math.PI;
+        return [lon, lat];
+      }
+      function renderSatelliteFallback() {
+        const box = document.getElementById("satelliteFallback");
+        if (!box) return;
+        const center = map.getCenter(),
+          z = Math.max(15, Math.min(SATELLITE_MAX_NATIVE_ZOOM, Math.round(map.getZoom() || 17)));
+        const w = innerWidth,
+          h = innerHeight,
+          tile = 256;
+        const c = lonLatToTile(center.x, center.y, z);
+        const cols = Math.ceil(w / tile) + 3,
+          rows = Math.ceil(h / tile) + 3;
+        const startX = Math.floor(c.x - cols / 2),
+          startY = Math.floor(c.y - rows / 2);
+        const frag = document.createDocumentFragment();
+        box.innerHTML = "";
+        for (let dx = 0; dx < cols; dx++) {
+          for (let dy = 0; dy < rows; dy++) {
+            const x = startX + dx,
+              y = startY + dy;
+            if (y < 0 || y >= 2 ** z) continue;
+            const img = document.createElement("img");
+            img.loading = "eager";
+            img.decoding = "async";
+            img.src = SATELLITE_TILE.replace("{z}", z)
+              .replace("{y}", y)
+              .replace("{x}", x);
+            img.style.left = Math.round(w / 2 + (x - c.x) * tile) + "px";
+            img.style.top = Math.round(h / 2 + (y - c.y) * tile) + "px";
+            frag.appendChild(img);
+          }
+        }
+        box.appendChild(frag);
+      }
+      async function loadRoadNameData() {
+        if (state.roadNameData) return state.roadNameData;
+        try {
+          const data = await fetch("../threejs_3d_roads.json").then((r) => r.json());
+          const anchor = data.anchor_center || data.anchor || [103.7716, 1.3062];
+          const latScale = 111320;
+          const lonScale = 111320 * Math.cos((anchor[1] * Math.PI) / 180);
+          const roads = (data.mesh_roads || [])
+            .filter((r) => r.name && r.name !== "Unnamed Road" && r.coordinates?.length)
+            .map((r) => {
+              const coords = r.coordinates.map((c) => [anchor[0] + Number(c[0] || 0) / lonScale, anchor[1] - Number(c[2] || 0) / latScale]);
+              const mid = coords[Math.floor(coords.length / 2)] || coords[0];
+              return { name: r.name, fclass: r.fclass, coords, mid };
+            });
+          state.roadNameData = { anchor, roads };
+        } catch (e) {
+          console.warn("road name labels unavailable", e);
+          state.roadNameData = { roads: [] };
+        }
+        return state.roadNameData;
+      }
+      function nearestRoadName(coord) {
+        const roads = state.roadNameData?.roads || [];
+        if (!coord || !roads.length) return "Clementi, Singapore";
+        let best = null;
+        for (const road of roads) {
+          for (const c of road.coords) {
+            const d = distM(coord, c);
+            if (!best || d < best.d) best = { name: road.name, d };
+          }
+        }
+        return best?.name && best.d < 220 ? best.name : "Clementi";
+      }
+      function streetPartAddress(part, f = null) {
+        const coord = part?.midpoint || (f ? middle(f) : null);
+        const road = nearestRoadName(coord);
+        const suffix = coord ? ` · ${coord[1].toFixed(5)}, ${coord[0].toFixed(5)}` : "";
+        return `Near ${road}, Singapore${suffix}`;
+      }
+      function renderRoadNameLabels() {
+        // Keep Earth view uncluttered: place/road names are shown only as
+        // hover tooltips on the blue street-part buttons, not as floating labels.
+        if (!window.roadNameLabels) return;
+        roadNameLabels.classList.remove("visible");
+        roadNameLabels.innerHTML = "";
+      }
+
+      function addonFor(p) {
+        const m = p.metrics || {};
+        if (m.near_bus_stop_m != null && m.near_bus_stop_m < 18)
+          return "bus stop";
+        if (m.obstruction_count > 0) return "obstruction";
+        if (m.kerb_ramp_present) return "ramp";
+        if (m.covered) return "shelter";
+        if (m.tactile_guidance) return "tactile";
+        return "";
+      }
+      function renderBuildings(g) {
+        const geoms = g.features
+          .map((f) =>
+            f.geometry?.type === "Polygon"
+              ? new maptalks.Polygon(f.geometry.coordinates, {
+                  symbol: {
+                    polygonFill: "#ffffff",
+                    polygonOpacity: 0.015,
+                    lineColor: "rgba(255,255,255,.13)",
+                    lineWidth: 0.25,
+                  },
+                })
+              : null,
+          )
+          .filter(Boolean);
+        buildingLayer.addGeometry(geoms);
+        document.getElementById("buildingCount").textContent =
+          geoms.length.toLocaleString();
+      }
+      function initThreeOverlay() {
+        const box = document.getElementById("threeOverlay");
+        const w = box.clientWidth || innerWidth,
+          h = box.clientHeight || innerHeight;
+        try {
+          const scene = new THREE.Scene();
+          const camera = new THREE.OrthographicCamera(0, w, h, 0, -1000, 1000);
+          const renderer = new THREE.WebGLRenderer({
+            alpha: true,
+            antialias: true,
+          });
+          renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+          renderer.setSize(w, h);
+          box.innerHTML = "";
+          box.appendChild(renderer.domElement);
+          state.three = {
+            scene,
+            camera,
+            renderer,
+            agents: [],
+            route: null,
+            ramps: [],
+            clock: new THREE.Clock(),
+            pathPoints: [],
+            webgl: true,
+          };
+          animateThreeOverlay();
+        } catch (err) {
+          console.warn(
+            "Three.js WebGL overlay unavailable in this browser; using DOM segment controls only",
+            err,
+          );
+          state.three = { webgl: false, error: err.message };
+        }
+      }
+      function makeAgent(color, type) {
+        const g = new THREE.Group();
+        const mat = new THREE.MeshBasicMaterial({ color });
+        const dark = new THREE.MeshBasicMaterial({ color: 0x07111f });
+        if (type === "wheelchair") {
+          g.add(new THREE.Mesh(new THREE.SphereGeometry(6, 18, 18), mat));
+          const a = new THREE.Mesh(new THREE.BoxGeometry(16, 7, 10), mat);
+          a.position.set(0, -8, 0);
+          g.add(a);
+          const w1 = new THREE.Mesh(
+            new THREE.TorusGeometry(7, 1.4, 8, 24),
+            dark,
+          );
+          w1.position.set(-7, 0, 0);
+          const w2 = w1.clone();
+          w2.position.set(7, 0, 0);
+          g.add(w1, w2);
+        } else {
+          g.add(new THREE.Mesh(new THREE.BoxGeometry(24, 9, 10), mat));
+          const head = new THREE.Mesh(new THREE.SphereGeometry(5, 16, 16), mat);
+          head.position.set(-5, -10, 0);
+          g.add(head);
+          const w1 = new THREE.Mesh(
+            new THREE.TorusGeometry(5, 1.1, 8, 18),
+            dark,
+          );
+          w1.position.set(-8, 7, 0);
+          const w2 = w1.clone();
+          w2.position.set(9, 7, 0);
+          g.add(w1, w2);
+        }
+        g.scale.setScalar(1.15);
+        return g;
+      }
+      function screenPoint(coord) {
+        const p = map.coordinateToContainerPoint(
+          new maptalks.Coordinate(coord[0], coord[1]),
+        );
+        return new THREE.Vector3(p.x, p.y, 0);
+      }
+      function updateThreeOverlay() {
+        if (
+          !state.three.renderer ||
+          state.mode !== "earth" ||
+          !state.segments.length
+        )
+          return;
+        const t = state.three,
+          scene = t.scene;
+        [t.route, ...t.agents, ...t.ramps]
+          .filter(Boolean)
+          .forEach((o) => scene.remove(o));
+        t.agents = [];
+        t.ramps = [];
+        const f = state.segments[state.selectedIndex],
+          near = nearbySegments(f, 7);
+        const pts = [];
+        near
+          .slice(0, 5)
+          .forEach((seg) =>
+            seg.geometry.coordinates.forEach((c) => pts.push(screenPoint(c))),
+          );
+        t.pathPoints =
+          pts.length > 1
+            ? pts
+            : [
+                screenPoint(f.geometry.coordinates[0]),
+                screenPoint(f.geometry.coordinates.at(-1)),
+              ];
+        const curve = new THREE.CatmullRomCurve3(t.pathPoints);
+        t.route = new THREE.Mesh(
+          new THREE.TubeGeometry(curve, 96, 5, 12, false),
+          new THREE.MeshBasicMaterial({
+            color: 0x38bdf8,
+            transparent: true,
+            opacity: 0.8,
+          }),
+        );
+        scene.add(t.route);
+        const glow = new THREE.PointLight(0x38bdf8, 1, 90);
+        glow.position.copy(t.pathPoints[0]);
+        scene.add(glow);
+        t.ramps.push(glow);
+        near.forEach((seg) => {
+          const p = seg.properties,
+            add = addonFor(p);
+          if (!add) return;
+          const mid = screenPoint(middle(seg));
+          const ramp = new THREE.Mesh(
+            new THREE.BoxGeometry(30, 12, 10),
+            new THREE.MeshBasicMaterial({
+              color:
+                add === "ramp"
+                  ? 0x22f36e
+                  : add === "bus stop"
+                    ? 0xfb923c
+                    : 0xfacc15,
+              transparent: true,
+              opacity: 0.88,
+            }),
+          );
+          ramp.position.copy(mid);
+          ramp.rotation.z = 0.35;
+          scene.add(ramp);
+          t.ramps.push(ramp);
+        });
+        const a1 = makeAgent(0x22f36e, "wheelchair"),
+          a2 = makeAgent(0x60a5fa, "pma");
+        scene.add(a1, a2);
+        t.agents.push(a1, a2);
+      }
+      function animateThreeOverlay() {
+        const t = state.three;
+        if (!t.renderer) return;
+        requestAnimationFrame(animateThreeOverlay);
+        const w = threeOverlay.clientWidth || innerWidth,
+          h = threeOverlay.clientHeight || innerHeight;
+        if (
+          t.renderer.domElement.width !== Math.round(w * devicePixelRatio) ||
+          t.renderer.domElement.height !== Math.round(h * devicePixelRatio)
+        ) {
+          t.renderer.setSize(w, h, false);
+          t.camera.right = w;
+          t.camera.bottom = h;
+          t.camera.updateProjectionMatrix();
+        }
+        if (state.mode === "earth" && t.pathPoints?.length > 1) {
+          const elapsed = performance.now() / 1000;
+          t.agents.forEach((a, i) => {
+            const phase = (elapsed * 0.18 + i * 0.42) % 1;
+            const idx = Math.floor(phase * (t.pathPoints.length - 1));
+            const next = Math.min(idx + 1, t.pathPoints.length - 1);
+            const local = phase * (t.pathPoints.length - 1) - idx;
+            const p = t.pathPoints[idx].clone().lerp(t.pathPoints[next], local);
+            a.position.copy(p);
+            a.position.z = 40 + i * 8;
+            a.rotation.z = Math.sin(elapsed * 2 + i) * 0.12;
+          });
+        }
+        t.renderer.render(t.scene, t.camera);
+      }
+      function registryRouteSegmentIds() {
+        const ids = new Set();
+        (state.streetRegistry?.street_parts || []).forEach((p) =>
+          (p.route_segment_ids || []).forEach((id) => ids.add(id)),
+        );
+        return ids;
+      }
+      function renderWorld(world) {
+        const registryIds = registryRouteSegmentIds();
+        const hasRegistryParts = registryIds.size > 0;
+        state.segments = world.features.filter(
+          (f) =>
+            f.properties.kind === "route_segment" &&
+            f.properties.feature_type !== "kerb_line" &&
+            (!hasRegistryParts || registryIds.has(f.properties.id)),
+        );
+        state.features = world.features.filter(
+          (f) => f.properties.kind !== "route_segment",
+        );
+        state.features.forEach((f, i) => {
+          f.properties.external_id = poiExternalId(f.properties, i);
+        });
+        const allRoutes = world.features.filter(
+          (f) => f.properties.kind === "route_segment",
+        );
+        const routeGeoms = allRoutes.map((f, i) => {
+          const selectable = f.properties.feature_type !== "kerb_line" && (!hasRegistryParts || registryIds.has(f.properties.id));
+          const selectableIndex = selectable ? state.segments.indexOf(f) : -1;
+          return new maptalks.LineString(f.geometry.coordinates, {
+            properties: { ...f.properties, index: selectableIndex },
+            symbol: {
+              lineColor: selectable
+                ? scoreColor(f.properties.overall_accessibility_score)
+                : "#94a3b8",
+              lineWidth: f.properties.feature_type === "kerb_line" ? 1.4 : 4,
+              lineOpacity:
+                f.properties.feature_type === "kerb_line" ? 0.28 : 0.88,
+            },
+          }).on("click", () => {
+            if (selectable) {
+              state.mode = "street";
+              selectSegment(selectableIndex, true);
+            }
+          });
+        });
+        routeLayer.addGeometry(routeGeoms);
+        // Keep Earth view focused on selectable street parts only. Feature-level
+        // items such as bollards, shelters and tactile cues are shown in Street
+        // View for their associated street part, not as noisy map markers.
+        poiLayer.clear();
+        document.getElementById("segCount").textContent =
+          state.segments.length.toLocaleString();
+        initThreeOverlay();
+        populateSelect();
+        populatePersonaSelector();
+        renderRoadNameLabels();
+        selectSegment(0, false);
+        detailCard.classList.remove("visible");
+      }
+      function streetPartNumber(part) {
+        const m = String(part?.id || "").match(/(\d+)$/);
+        return m ? String(Number(m[1]) + 1) : "–";
+      }
+      function streetPartDisplayName(part) {
+        return `Footpath ${streetPartNumber(part)}`;
+      }
+      function populateSelect() {
+        const parts = state.streetRegistry?.street_parts || [];
+        if (parts.length) {
+          segmentSelect.innerHTML = parts
+            .map((part) => {
+              const idx = segmentIndexForStreetPart(part);
+              const score = part.metrics?.overall_accessibility_score ?? "–";
+              const len = Math.round(part.length_m || part.metrics?.length_m || 0);
+              return `<option value="${idx >= 0 ? idx : 0}">${streetPartDisplayName(part)} · ${len}m · ${score}</option>`;
+            })
+            .join("");
+          return;
+        }
+        segmentSelect.innerHTML = state.segments
+          .filter((f) => f.properties?.kind === "route_segment")
+          .map((f) => {
+            const i = state.segments.indexOf(f);
+            return `<option value="${i}">${f.properties.name} · ${Math.round(f.properties.metrics.length_m)}m · ${f.properties.overall_accessibility_score}</option>`;
+          })
+          .join("");
+      }
+      function capitalizeKind(kind) {
+        return String(kind || "")
+          .split(" ")
+          .filter(Boolean)
+          .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+          .join(" ");
+      }
+      function slugify(text) {
+        return (
+          String(text || "")
+            .trim()
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "_")
+            .replace(/^_+|_+$/g, "") || "unnamed"
+        );
+      }
+      function poiExternalId(props, index) {
+        const kind = props.kind,
+          src = props.source_properties || {};
+        if (kind === "bus_stop" && src.BUS_STOP_N != null)
+          return `bus_stop_${src.BUS_STOP_N}`;
+        if (kind === "mrt_station" && src.STN_NAM_DE)
+          return `mrt_${slugify(src.STN_NAM_DE)}`;
+        if (src.OBJECTID != null) return `${kind}_${src.OBJECTID}`;
+        if (src.SHAPE_LEN != null)
+          return `${kind}_${index}_${slugify(src.TYP_CD_DES || kind)}`;
+        return `${kind}_${index}`;
+      }
+      function featureExternalIdForKind(kind, segmentId, poiExternalIdValue) {
+        if (poiExternalIdValue) return poiExternalIdValue;
+        if (kind === "ramp" && segmentId) return `kerb_ramp_${segmentId}`;
+        if (kind === "tactile" && segmentId)
+          return `tactile_guidance_${segmentId}`;
+        return null;
+      }
+      function streetPartForSegmentId(segId) {
+        const parts = state.streetRegistry?.street_parts || [];
+        if (!segId) return null;
+        return (
+          parts.find((p) => (p.route_segment_ids || []).includes(segId)) || null
+        );
+      }
+      function currentStreetPart() {
+        const selectedSeg = state.segments[state.selectedIndex];
+        if (state.mode !== "street") {
+          return streetPartForSegmentId(selectedSeg?.properties?.id);
+        }
+        const node = currentStreetNode();
+        if (node?.street_part_id) {
+          const parts = state.streetRegistry?.street_parts || [];
+          const byId = parts.find((p) => p.id === node.street_part_id);
+          if (byId) return byId;
+        }
+        const seg = state.currentStreetSegment || selectedSeg;
+        return streetPartForSegmentId(seg?.properties?.id);
+      }
+      function setDetailContext({
+        kind = "",
+        segmentId = null,
+        featureExternalId = null,
+        name = "",
+      } = {}) {
+        const part = streetPartForSegmentId(segmentId) || currentStreetPart();
+        const resolvedFeatureId = featureExternalIdForKind(
+          kind,
+          segmentId,
+          featureExternalId,
+        );
+        const next = {
+          kind: kind || "",
+          segmentId: segmentId || null,
+          streetPartExternalId: part?.id || null,
+          streetPartDbId: part?.db_id || null,
+          featureExternalId: resolvedFeatureId,
+          name: name || "",
+        };
+        const prev = state.detailContext;
+        const changed =
+          !prev ||
+          prev.kind !== next.kind ||
+          prev.segmentId !== next.segmentId ||
+          prev.featureExternalId !== next.featureExternalId ||
+          prev.streetPartExternalId !== next.streetPartExternalId ||
+          prev.name !== next.name;
+        state.detailContext = next;
+        EquirouteFeedback.onContextChange(changed);
+      }
+      function personaPartFor(partId) {
+        return (state.personaSimulation?.street_parts || []).find(
+          (p) => p.street_part_id === partId,
+        );
+      }
+      function personaSummary(personaId = state.activePersonaId) {
+        return state.personaSimulation?.personas?.[personaId] || null;
+      }
+      function personaPartOptionLabel(part) {
+        const score = part.metrics?.overall_accessibility_score ?? "–";
+        const street = (state.streetRegistry?.streets || []).find((s) => s.id === part.street_id);
+        return `${streetPartDisplayName(part)} · ${Math.round(part.length_m || 0)}m · ${score}/100${street?.name ? " · " + street.name : ""}`;
+      }
+      function populatePersonaSelector() {
+        const sim = state.personaSimulation;
+        if (sim?.personas) {
+          const options = Object.entries(sim.personas)
+            .map(([pid, p]) => `<option value="${pid}">${p.label}</option>`)
+            .join("");
+          if (personaSelect.innerHTML !== options) personaSelect.innerHTML = options;
+          if (!state.activePersonaId || !sim.personas[state.activePersonaId]) {
+            state.activePersonaId = Object.keys(sim.personas)[0] || null;
+          }
+          personaSelect.value = state.activePersonaId;
+          personaSelect.onchange = () => {
+            state.activePersonaId = personaSelect.value;
+            renderPersonaForCurrentPart();
+          };
+        }
+        const parts = state.streetRegistry?.street_parts || [];
+        if (window.personaStartSelect && window.personaEndSelect && parts.length) {
+          const options = parts.map((part) => `<option value="${part.id}">${personaPartOptionLabel(part)}</option>`).join("");
+          if (personaStartSelect.innerHTML !== options) personaStartSelect.innerHTML = options;
+          if (personaEndSelect.innerHTML !== options) personaEndSelect.innerHTML = options;
+          const current = currentStreetPart() || parts[0];
+          state.activeRouteStartPartId ||= current?.id || parts[0]?.id;
+          const startIndex = Math.max(0, parts.findIndex((p) => p.id === state.activeRouteStartPartId));
+          state.activeRouteEndPartId ||= parts[Math.min(parts.length - 1, Math.max(4, startIndex + 4))]?.id || parts.at(-1)?.id;
+          personaStartSelect.value = state.activeRouteStartPartId;
+          personaEndSelect.value = state.activeRouteEndPartId;
+          personaStartSelect.onchange = () => {
+            state.activeRouteStartPartId = personaStartSelect.value;
+            renderPersonaRouteSummary();
+          };
+          personaEndSelect.onchange = () => {
+            state.activeRouteEndPartId = personaEndSelect.value;
+            renderPersonaRouteSummary();
+          };
+        }
+      }
+      function renderPersonaPanel() {
+        if (!window.personaRecommendation) return;
+        const sim = state.personaSimulation;
+        if (!sim?.personas) {
+          personaRecommendation.textContent = "Persona simulation unavailable.";
+          return;
+        }
+        populatePersonaSelector();
+        renderPersonaForCurrentPart();
+      }
+      function routePartsBetween(startId, endId) {
+        const parts = state.streetRegistry?.street_parts || [];
+        const a = parts.findIndex((p) => p.id === startId);
+        const b = parts.findIndex((p) => p.id === endId);
+        if (a < 0 || b < 0) return [];
+        const lo = Math.min(a, b), hi = Math.max(a, b);
+        return parts.slice(lo, hi + 1);
+      }
+      function personaForPart(part, personaId = state.activePersonaId) {
+        return personaPartFor(part.id)?.personas?.[personaId] || null;
+      }
+      function renderPersonaRouteSummary() {
+        const parts = routePartsBetween(state.activeRouteStartPartId, state.activeRouteEndPartId);
+        if (!parts.length) return renderPersonaForCurrentPart();
+        const personaLabel = personaSummary()?.label || "Persona";
+        const scored = parts.map((part) => ({ part, persona: personaForPart(part) })).filter((x) => x.persona);
+        const avg = scored.length ? Math.round(scored.reduce((sum, x) => sum + Number(x.persona.score || 0), 0) / scored.length) : "–";
+        const worst = scored.slice().sort((a, b) => Number(a.persona.score || 999) - Number(b.persona.score || 999))[0];
+        const start = parts[0], end = parts.at(-1);
+        const selectedIdx = segmentIndexForStreetPart(start);
+        if (selectedIdx >= 0 && state.selectedIndex !== selectedIdx) selectSegment(selectedIdx, false);
+        personaRecommendation.innerHTML = `<div class="persona-route-summary"><b>${personaLabel} route</b><br>${streetPartDisplayName(start)} → ${streetPartDisplayName(end)}: ${avg}/100 across ${parts.length} street parts<br>${worst ? `Worst: ${streetPartDisplayName(worst.part)} · ${worst.persona.score}/100 · ${(worst.persona.blocker_labels || []).join(", ") || "no major blocker"}<br>${worst.persona.recommended_improvement}` : "No persona scores for this route yet."}</div>`;
+      }
+      function renderPersonaForCurrentPart() {
+        if (!window.personaRecommendation) return;
+        const sim = state.personaSimulation;
+        if (!sim?.personas) {
+          personaRecommendation.textContent = "Persona simulation unavailable.";
+          return;
+        }
+        populatePersonaSelector();
+        const part = currentStreetPart();
+        const simPart = part ? personaPartFor(part.id) : null;
+        const persona = simPart?.personas?.[state.activePersonaId];
+        if (!persona) {
+          const summary = personaSummary();
+          const first = summary?.priority_street_parts?.[0];
+          const firstPart = first
+            ? (state.streetRegistry?.street_parts || []).find((p) => p.id === first.street_part_id)
+            : null;
+          personaRecommendation.innerHTML = first
+            ? `<b>Priority:</b> ${summary.label} · ${firstPart ? streetPartDisplayName(firstPart) : first.street_part_id} · ${first.score}/100<br>${first.recommended_improvement}`
+            : "Persona agents ready. Choose start/end street parts to update the route summary.";
+          return;
+        }
+        const label = persona.label || personaSummary()?.label || "Persona";
+        const blockers = persona.blocker_labels?.length
+          ? ` · ${persona.blocker_labels.join(", ")}`
+          : "";
+        personaRecommendation.innerHTML = `<b>${label}</b> on ${streetPartDisplayName(part)}: ${persona.score}/100${blockers}<br>${persona.recommended_improvement}<br><small>Choose start/end above to update the corridor route summary.</small>`;
+      }
+      function displayPropsForSegmentFeature(f) {
+        const raw = f?.properties || {};
+        const part = streetPartForSegmentId(raw.id);
+        if (!part) return raw;
+        return {
+          id: raw.id,
+          name: streetPartDisplayName(part),
+          kind: "street_part",
+          feature_type: "footpath",
+          overall_accessibility_score:
+            part.metrics?.overall_accessibility_score ?? raw.overall_accessibility_score,
+          metrics: {
+            length_m: part.length_m,
+            source_segment_count: part.metrics?.source_segment_count,
+          },
+          address: streetPartAddress(part, f),
+          street_part_external_id: part.id,
+        };
+      }
+      function htmlEscape(value) {
+        return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+      }
+      function renderLiveAgents() {
+        if (!state.agentLayer || !window.maptalks) return;
+        const snapshot = state.liveAgentSnapshot;
+        state.agentLayer.clear();
+        if (!snapshot?.agent_live_states?.length) return;
+        const personaTypes = snapshot.persona_types || {};
+        const geoms = snapshot.agent_live_states.map((agent) => {
+          const color = personaTypes[agent.persona_type_id]?.color || "#38bdf8";
+          const marker = new maptalks.Marker([agent.lng, agent.lat], {
+            symbol: [
+              { markerType: "ellipse", markerWidth: 10, markerHeight: 10, markerFill: "#ffffff", markerLineColor: "#020617", markerLineWidth: 2, markerOpacity: 0.95 },
+              { markerType: "ellipse", markerWidth: 6, markerHeight: 6, markerFill: color, markerLineColor: color, markerLineWidth: 1, markerOpacity: personaTypes[agent.persona_type_id]?.category === "general" ? 0.68 : 0.95 },
+            ],
+          });
+          marker.setInfoWindow({
+            title: agent.display_name || agent.agent_external_id,
+            content: `${(personaTypes[agent.persona_type_id]?.label || agent.persona_type_id).replaceAll("_", " ")}<br>${agent.activity || "moving"}`,
+          });
+          return marker;
+        });
+        state.agentLayer.addGeometry(geoms);
+      }
+
+      function renderStreetAgentCounts() {
+        if (!window.streetAgentCounts) return;
+        const part = currentStreetPart();
+        const snapshot = state.liveAgentSnapshot;
+        const row = (snapshot?.street_part_agent_counts || []).find((r) => r.street_part_external_id === part?.id);
+        if (!row) {
+          streetAgentCounts.classList.remove("visible");
+          streetAgentCounts.innerHTML = "";
+          return;
+        }
+        const personaTypes = snapshot.persona_types || {};
+        const pills = Object.entries(row.persona_counts || {})
+          .sort((a, b) => b[1] - a[1])
+          .map(([pid, count]) => `<span class="count-pill"><b style="color:${personaTypes[pid]?.color || "#bae6fd"}">${count}</b> ${htmlEscape((personaTypes[pid]?.label || pid).replaceAll("_", " "))}</span>`)
+          .join("");
+        streetAgentCounts.classList.add("visible");
+        streetAgentCounts.innerHTML = `<b>Live synthetic agents on this street part</b><div class="count-grid">${pills}</div><small>${row.total_count} total · synthetic, not real-person tracking</small>`;
+      }
+
+      async function loadLiveAgentSnapshot() {
+        try {
+          const r = await fetch("../data/live_persona_simulation_snapshot.json");
+          if (!r.ok) throw new Error(`snapshot ${r.status}`);
+          const snapshot = await r.json();
+          state.liveAgentSnapshot = snapshot;
+          renderLiveAgents();
+          renderStreetAgentCounts();
+        } catch (e) {
+          console.warn("live persona snapshot unavailable", e);
+        }
+      }
+
+      function showDetail(p, kind = "", extras = {}) {
+        detailCard.classList.add("visible");
+        const typeLabel = (p.feature_type || p.kind || "feature").replaceAll(
+          "_",
+          " ",
+        );
+        const baseName = p.name || "Feature";
+        const cleanType = typeLabel && typeLabel !== "street part" ? typeLabel : "";
+        const kindLabel = capitalizeKind(kind || "");
+        // Keep the scorecard clean: the title/description already name the
+        // feature type, so do not repeat "Shelter" / "Ramp" as a second line.
+        selectedKind.textContent = "";
+        selectedName.textContent = cleanType && !baseName.toLowerCase().includes(cleanType.toLowerCase())
+          ? `${baseName} · ${cleanType}`
+          : baseName;
+        selectedDesc.textContent = p.metrics?.length_m
+          ? `${p.address ? p.address + " · " : ""}${Math.round(p.metrics.length_m * 10) / 10} m street part`
+          : `${kindLabel || cleanType}${extras.distanceM != null ? ` · ~${Math.round(extras.distanceM)}m from camera` : ""}`;
+        const detailScore = p.overall_accessibility_score ?? extras.score ?? null;
+        activeScore.textContent = detailScore == null ? "–" : `${detailScore}/100`;
+        const m = p.metrics,
+          c = p.component_scores;
+        if (m && c) {
+          metricList.innerHTML = [
+            ["Width", m.clear_width_m + " m", c.clear_width],
+            ["Slope", m.running_slope_pct + "%", c.running_slope],
+            ["Cross slope", m.cross_slope_pct + "%", c.cross_slope],
+            ["Roughness", m.roughness_mm + " mm", c.surface_roughness],
+            ["Level change", m.vertical_change_mm + " mm", c.vertical_change],
+            ["Obstructions", m.obstruction_count, c.obstructions],
+            ["Shelter", m.covered ? "yes" : "no", c.shelter],
+            [
+              "Tactile",
+              m.tactile_guidance ? "yes" : "unknown",
+              c.tactile_guidance,
+            ],
+          ]
+            .map(
+              (x) =>
+                `<div class="metric"><span>${x[0]}</span><b style="color:${scoreColor(x[2])}">${x[1]}</b><small>${x[2]}/100</small></div>`,
+            )
+            .join("");
+        } else if (m?.length_m) {
+          metricList.innerHTML = [
+            ["Length", `${Math.round(m.length_m * 10) / 10} m`, "street-part distance"],
+          ]
+            .map(
+              (x) =>
+                `<div class="metric"><span>${x[0]}</span><b>${x[1]}</b><small>${x[2]}</small></div>`,
+            )
+            .join("");
+        } else {
+          metricList.innerHTML = "";
+        }
+        setDetailContext({
+          kind: kind || "",
+          segmentId: p.id || null,
+          featureExternalId: extras.featureExternalId || p.external_id || null,
+          name: p.name || "",
+        });
+        renderStreetAgentCounts();
+      }
+      function selectSegment(index, street = false) {
+        if (!state.segments.length) return;
+        state.selectedIndex =
+          (index + state.segments.length) % state.segments.length;
+        const f = state.segments[state.selectedIndex],
+          p = f.properties,
+          coords = f.geometry.coordinates;
+        segmentSelect.value = state.selectedIndex;
+        selectedLayer.clear();
+        selectedLayer.addGeometry(
+          new maptalks.LineString(coords, {
+            symbol: {
+              lineColor: COLORS.blue,
+              lineWidth: 10,
+              lineOpacity: 0.98,
+            },
+          }),
+        );
+        const partDisplay = displayPropsForSegmentFeature(f);
+        showDetail(partDisplay, "");
+        renderPersonaForCurrentPart();
+        const mid = middle(f),
+          brg = bearing(coords[0], coords[coords.length - 1]);
+        if (street) {
+          enterStreet(f, mid, brg);
+        } else {
+          enterEarth();
+          map.animateTo(
+            { center: mid, zoom: SATELLITE_MAX_NATIVE_ZOOM, pitch: 0, bearing: 0 },
+            { duration: 500 },
+          );
+          renderSegmentButtons();
+          setTimeout(() => {
+            renderSatelliteFallback();
+            updateThreeOverlay();
+          }, 520);
+        }
+      }
+      async function findMapillaryImages(coord, limit = 6) {
+        const token = getToken();
+        if (!token) throw new Error("no token");
+        const url = `https://graph.mapillary.com/images?fields=id,is_pano,thumb_2048_url,thumb_1024_url,thumb_256_url,geometry,computed_geometry,compass_angle,computed_compass_angle&lat=${coord[1]}&lng=${coord[0]}&radius=50&limit=${limit}&access_token=${encodeURIComponent(token)}`;
+        const data = await fetch(url).then((r) => {
+          if (!r.ok) throw new Error("Mapillary " + r.status);
+          return r.json();
+        });
+        return data.data || [];
+      }
+      async function findStreetImagesForSegment(f, desiredHeading = null) {
+        const origin = middle(f);
+        const nearby = nearbySegments(f, 36).map(middle);
+        const points = [origin, ...nearby].filter(
+          (pt, i, a) =>
+            a.findIndex(
+              (x) =>
+                Math.abs(x[0] - pt[0]) < 1e-7 && Math.abs(x[1] - pt[1]) < 1e-7,
+            ) === i,
+        );
+        const seen = new Set(),
+          out = [];
+        for (const pt of points) {
+          try {
+            for (const img of await findMapillaryImages(pt, 8)) {
+              if (img?.id && !seen.has(img.id)) {
+                seen.add(img.id);
+                out.push(img);
+              }
+            }
+          } catch (e) {
+            console.warn("Mapillary point failed", e);
+          }
+          if (out.length >= 18) break;
+        }
+        if (desiredHeading != null) {
+          out.sort((a, b) => {
+            const ah = Number(
+                a.computed_compass_angle ?? a.compass_angle ?? desiredHeading,
+              ),
+              bh = Number(
+                b.computed_compass_angle ?? b.compass_angle ?? desiredHeading,
+              );
+            const ad = Math.abs(normAngle(ah - desiredHeading)),
+              bd = Math.abs(normAngle(bh - desiredHeading));
+            const ap = a.is_pano ? -8 : 0,
+              bp = b.is_pano ? -8 : 0;
+            return ad + ap - (bd + bp);
+          });
+        }
+        return out;
+      }
+      function photoDirectionLabel(img) {
+        const role = img?.heading_role || img?.metadata?.selected_heading_option?.heading_role;
+        const orientation = img?.desired_orientation || img?.metadata?.selected_heading_option?.orientation;
+        if (role === "opposite" || orientation === "road_left_pavement_right") return "opposite view · pavement right";
+        if (role === "canonical" || orientation === "road_right") return "canonical view · road right";
+        return "direction view";
+      }
+      function renderStreetPhoto(index = 0) {
+        const imgs = state.streetImages || [];
+        state.streetImageIndex =
+          (index + imgs.length) % Math.max(1, imgs.length);
+        const img = imgs[state.streetImageIndex];
+        if (!img) {
+          mapillaryView.innerHTML =
+            '<div class="street-note">No curated street photo is available here yet. Would you like to upload one for this street part?</div>';
+          earthSource.textContent =
+            "street fallback: Esri/Maxar satellite underlay · upload invited";
+          if (window.directionBtn) {
+            directionBtn.disabled = true;
+            directionBtn.textContent = "Swap direction";
+          }
+          renderPhotoUploadPanel("missing");
+          return;
+        }
+        const thumb =
+          img.image_url ||
+          img.thumb_2048_url ||
+          img.thumb_1024_url ||
+          img.thumb_256_url;
+        if (!thumb) {
+          mapillaryView.innerHTML =
+            '<div class="street-note">Mapillary image has no usable thumbnail, showing Earth satellite underlay.</div>';
+          return;
+        }
+        mapillaryView.innerHTML = `<img id="streetPhoto" src="${thumb}" alt="Mapillary street-level image"/>`;
+        state.mapillaryImageId = img.id;
+        const cvCount = cvInstancesForCurrentPhoto().length;
+        const direction = photoDirectionLabel(img);
+        earthSource.textContent = `Mapillary ${state.streetImageIndex + 1}/${imgs.length} · ${direction} · ${cvCount ? cvCount + " CV-localized feature pins" : "map-projected feature pins"}`;
+        if (window.directionBtn) {
+          directionBtn.disabled = imgs.length < 2;
+          directionBtn.textContent = imgs.length > 1 ? `Swap direction (${imgs.length})` : direction;
+        }
+        renderPhotoUploadPanel("replace");
+        setTimeout(() => renderSegmentButtons(true), 120);
+      }
+      function cycleStreetPhoto(delta) {
+        if (state.mode === "street" && (state.streetImages || []).length > 1) {
+          renderStreetPhoto(state.streetImageIndex + delta);
+          return true;
+        }
+        return false;
+      }
+      async function enterStreet(f, coord, brg) {
+        state.currentStreetSegment = f;
+        syncStreetNodeToSegment(f);
+        const node = currentStreetNode();
+        const desiredHeading = node?.canonical_heading_deg ?? brg;
+        state.mode = "street";
+        document.body.classList.add("street-mode");
+        if (window.viewModeSelect) viewModeSelect.value = "street";
+        modeLabel.textContent = "street view · accessibility features";
+        earthSource.textContent =
+          "loading active street-part photo, Earth satellite stays behind";
+        map.animateTo(
+          { center: coord, zoom: SATELLITE_MAX_NATIVE_ZOOM, pitch: 78, bearing: brg },
+          { duration: 350 },
+        );
+        setupMiniMap();
+        mapillaryView.innerHTML =
+          '<div class="street-note">Loading active street-part photo, Earth satellite remains visible behind this layer…</div>';
+        try {
+          const active = node ? activePhotosForNode(node) : [];
+          if (active.length) {
+            state.streetImages = active;
+            earthSource.textContent =
+              "active street-part photo from Supabase registry";
+          } else if (node && state.nodePhotoCache[node.id]) {
+            state.streetImages = state.nodePhotoCache[node.id];
+          } else {
+            state.streetImages = await findStreetImagesForSegment(
+              f,
+              desiredHeading,
+            );
+            if (node) state.nodePhotoCache[node.id] = state.streetImages;
+          }
+          state.streetImageIndex = 0;
+          renderStreetPhoto(0);
+        } catch (e) {
+          console.warn("street photo unavailable", e);
+          state.streetImages = [];
+          renderStreetPhoto(0);
+        }
+        renderSegmentButtons(true);
+      }
+      function enterEarth() {
+        state.mode = "earth";
+        document.body.classList.remove("street-mode");
+        if (window.viewModeSelect) viewModeSelect.value = "earth";
+        modeLabel.textContent = "Earth View";
+        earthSource.textContent = "real daylight aerial tiles, not grey blocks";
+        if (window.directionBtn) {
+          directionBtn.disabled = true;
+          directionBtn.textContent = "Swap direction";
+        }
+        if (state.mapillaryViewer) {
+          try {
+            state.mapillaryViewer.remove();
+          } catch (e) {}
+          state.mapillaryViewer = null;
+        }
+        map.setPitch(0);
+        map.setBearing(0);
+        renderSegmentButtons(false);
+        if (window.photoUploadPanel) photoUploadPanel.classList.remove("visible");
+        renderSatelliteFallback();
+        renderRoadNameLabels();
+        setTimeout(() => { updateThreeOverlay(); renderRoadNameLabels(); }, 80);
+      }
+      function setupMiniMap() {
+        if (state.miniMap) return;
+        state.miniMap = new maptalks.Map("miniMap", {
+          center: map.getCenter(),
+          zoom: SATELLITE_MAX_NATIVE_ZOOM,
+          minZoom: 12,
+          maxZoom: SATELLITE_MAX_NATIVE_ZOOM,
+          pitch: 0,
+          bearing: 0,
+          baseLayer: new maptalks.TileLayer("miniBase", {
+            urlTemplate: SATELLITE_TILE,
+            renderer: "canvas",
+            maxAvailableZoom: SATELLITE_MAX_NATIVE_ZOOM,
+            maxZoom: SATELLITE_MAX_NATIVE_ZOOM,
+          }),
+        });
+        new maptalks.VectorLayer(
+          "mini-segments",
+          routeLayer.getGeometries().map((g) => g.copy()),
+        ).addTo(state.miniMap);
+        state.miniMap.on("click", (e) => {
+          const c = [e.coordinate.x, e.coordinate.y];
+          let best = 0,
+            bd = Infinity;
+          state.segments.forEach((f, i) => {
+            const m = middle(f),
+              d = Math.hypot((m[0] - c[0]) * 111320, (m[1] - c[1]) * 111320);
+            if (d < bd) {
+              bd = d;
+              best = i;
+            }
+          });
+          selectSegment(best, true);
+        });
+      }
+      function featureComment(p, kind) {
+        const score = p.overall_accessibility_score;
+        const m = p.metrics || {};
+        if (kind === "bus stop")
+          return `Bus stop access: ${score}/100. Check boarding gap, shelter, obstruction and waiting-area width.`;
+        if (kind === "ramp")
+          return `Ramp/kerb transition: ${score}/100. Key risks are level change ${m.vertical_change_mm}mm and slope ${m.running_slope_pct}%.`;
+        if (kind === "shelter")
+          return `Sheltered section: ${score}/100. Comfort improves, still check clear width ${m.clear_width_m}m.`;
+        if (kind === "tactile")
+          return `Tactile/wayfinding cue: ${score}/100. Helps visually impaired users; verify continuity and crossing safety.`;
+        return `Accessibility feature: ${score}/100.`;
+      }
+      function showFeatureForSegment(idx, kind) {
+        const f = state.segments[idx],
+          p = f.properties;
+        showDetail(p, kind);
+        selectedDesc.textContent = featureComment(p, kind);
+        activeScore.textContent = p.overall_accessibility_score == null ? "–" : `${p.overall_accessibility_score}/100`;
+        detailCard.classList.add("visible");
+      }
+      function normAngle(a) {
+        return ((a + 540) % 360) - 180;
+      }
+      function distM(a, b) {
+        return Math.hypot(
+          (a[0] - b[0]) *
+            111320 *
+            Math.cos((((a[1] + b[1]) / 2) * Math.PI) / 180),
+          (a[1] - b[1]) * 111320,
+        );
+      }
+      function imageCoord(img) {
+        const g = img?.computed_geometry || img?.geometry;
+        return g?.coordinates?.length >= 2 ? g.coordinates : null;
+      }
+      function pointForFeature(f) {
+        if (f?.geometry?.type === "Point") return f.geometry.coordinates;
+        if (f?.geometry?.type === "LineString") return middle(f);
+        if (f?.geometry?.type === "Polygon")
+          return centroid(f.geometry.coordinates[0]);
+        return null;
+      }
+      function projectToStreetPhoto(coord, kind, ordinal = 0) {
+        const img = (state.streetImages || [])[state.streetImageIndex] || {},
+          origin =
+            imageCoord(img) ||
+            middle(
+              state.currentStreetSegment || state.segments[state.selectedIndex],
+            );
+        const heading = Number(
+          img.computed_compass_angle ??
+            img.compass_angle ??
+            bearing(
+              (
+                state.currentStreetSegment ||
+                state.segments[state.selectedIndex]
+              ).geometry.coordinates[0],
+              (
+                state.currentStreetSegment ||
+                state.segments[state.selectedIndex]
+              ).geometry.coordinates.at(-1),
+            ),
+        );
+        const d = distM(origin, coord),
+          brg = bearing(origin, coord),
+          delta = normAngle(brg - heading),
+          fov = 105;
+        let x = 0.5 + delta / fov;
+        x = Math.max(0.07, Math.min(0.93, x));
+        let y = 0.8 - Math.min(d, 95) / 190;
+        if (Math.abs(delta) > 82) y = 0.62;
+        if (kind === "bus stop" || kind === "mrt") y -= 0.04;
+        if (kind === "shelter") y -= 0.01;
+        if (kind === "walkway") y = 0.76;
+        if (kind === "ramp" || kind === "tactile") y += 0.04;
+        y = Math.max(0.38, Math.min(0.84, y));
+        return {
+          x: x * innerWidth,
+          y: y * innerHeight,
+          d,
+          delta,
+          visible: Math.abs(delta) <= 82,
+        };
+      }
+      function kindFromFeatureKind(kind) {
+        return kind === "bus_stop"
+          ? "bus stop"
+          : kind === "mrt_station"
+            ? "mrt"
+            : kind === "covered_linkway"
+              ? "shelter"
+              : kind === "pedestrian_overhead_bridge"
+                ? "walkway"
+                : kind === "bollard"
+                  ? "obstruction"
+                  : kind === "kerb_ramp"
+                    ? "ramp"
+                    : kind === "tactile_guidance"
+                      ? "tactile"
+                      : kind || "feature";
+      }
+      function cvInstancesForCurrentPhoto() {
+        const img = (state.streetImages || [])[state.streetImageIndex] || {};
+        const photoId = img.external_id || img.id || img.source_image_id;
+        return (state.photoFeatureInstances || []).filter(
+          (x) => x.photo_external_id === photoId,
+        );
+      }
+      function streetFeatureCandidates(selected) {
+        const img = (state.streetImages || [])[state.streetImageIndex] || {},
+          origin = imageCoord(img) || middle(selected),
+          items = [],
+          seen = new Set();
+        function add(it) {
+          const clusterableKinds = new Set([
+            "shelter",
+            "obstruction",
+            "tactile",
+            "ramp",
+            "walkway",
+          ]);
+          const nearIdx = clusterableKinds.has(it.kind)
+            ? items.findIndex((existing) => {
+                if (existing.kind !== it.kind) return false;
+                if (existing.pt && it.pt) {
+                  const dx = Number(existing.pt.x || 0) - Number(it.pt.x || 0),
+                    dy = Number(existing.pt.y || 0) - Number(it.pt.y || 0);
+                  if (Math.hypot(dx, dy) < 90) return true;
+                }
+                if (
+                  existing.name &&
+                  it.name &&
+                  String(existing.name).toLowerCase() === String(it.name).toLowerCase() &&
+                  Math.abs(Number(existing.distanceM || 0) - Number(it.distanceM || 0)) < 75
+                ) {
+                  return true;
+                }
+                if (existing.coord && it.coord) {
+                  return distM(existing.coord, it.coord) < 12;
+                }
+                return false;
+              })
+            : -1;
+          if (nearIdx >= 0) {
+            const prev = items[nearIdx];
+            const prevQuality = Number(prev.score || 0) - Number(prev.distanceM || 0) / 20;
+            const nextQuality = Number(it.score || 0) - Number(it.distanceM || 0) / 20;
+            if (nextQuality > prevQuality) items[nearIdx] = { ...prev, ...it };
+            return;
+          }
+          const key =
+            it.featureExternalId ||
+            it.kind + ":" + it.coord.map((v) => v.toFixed(5)).join(",");
+          if (!seen.has(key)) {
+            seen.add(key);
+            items.push(it);
+          }
+        }
+        cvInstancesForCurrentPhoto().forEach((inst) => {
+          const w = Number(inst.image_width || 1),
+            h = Number(inst.image_height || 1),
+            px = Number(inst.pixel_x || inst.bbox?.x1 || 0),
+            py = Number(inst.pixel_y || inst.bbox?.y1 || 0);
+          add({
+            kind: kindFromFeatureKind(inst.feature_kind),
+            f: null,
+            poi: null,
+            coord: origin,
+            score: Math.round((inst.confidence || 0) * 100),
+            label: inst.label || kindFromFeatureKind(inst.feature_kind),
+            name: capitalizeKind(kindFromFeatureKind(inst.feature_kind)),
+            featureExternalId: inst.feature_external_id,
+            distanceM: inst.feature_distance_to_photo_m,
+            cv: inst,
+            pt: {
+              x: (px / w) * innerWidth,
+              y: (py / h) * innerHeight,
+              d: inst.feature_distance_to_photo_m || 0,
+              delta: 0,
+              visible: true,
+            },
+          });
+        });
+        // Do not add raw 5 m measurement-segment pseudo-features in street view.
+        // They caused confusing labels like "crossing" plus "ramp/shelter" for
+        // the same scorecard. Street mode should show CV-localized photo
+        // evidence and real POIs only, with the current 25 m street part as the
+        // walkway context.
+        state.features.forEach((f) => {
+          const p = f.properties || {},
+            kind =
+              p.kind === "bus_stop"
+                ? "bus stop"
+                : p.kind === "mrt_station"
+                  ? "mrt"
+                  : p.kind === "covered_linkway"
+                    ? "shelter"
+                    : p.kind === "pedestrian_overhead_bridge"
+                      ? "walkway"
+                      : p.kind === "bollard"
+                        ? "obstruction"
+                        : "";
+          if (!kind) return;
+          const coord = pointForFeature(f),
+            d = coord ? distM(coord, origin) : 999;
+          if (coord && d < 150)
+            add({
+              kind,
+              f: null,
+              poi: f,
+              coord,
+              score: kind === "obstruction" ? 45 : kind === "mrt" ? 88 : 82,
+              label: kind,
+              name: p.name || kind,
+              featureExternalId: p.external_id || null,
+              distanceM: d,
+            });
+        });
+        add({
+          kind: "walkway",
+          f: selected,
+          coord: middle(selected),
+          score: selected.properties.overall_accessibility_score,
+          label: "walkway",
+        });
+        const placed = [];
+        return items
+          .map((it, i) => ({
+            ...it,
+            pt: it.cv ? it.pt : projectToStreetPhoto(it.coord, it.kind, i),
+          }))
+          .filter((it) => it.pt)
+          .sort((a, b) => b.pt.visible - a.pt.visible || a.pt.d - b.pt.d)
+          .filter((it) => {
+            const limit =
+              {
+                "bus stop": 4,
+                mrt: 2,
+                walkway: 2,
+                shelter: 3,
+                ramp: 2,
+                tactile: 2,
+                obstruction: 1,
+              }[it.kind] || 2;
+            const c = placed.filter((p) => p.kind === it.kind).length;
+            if (c >= limit) return false;
+            placed.push({ kind: it.kind, x: -999, y: -999 });
+            return true;
+          })
+          .slice(0, 10)
+          .map((it, i) => {
+            for (const p of placed) {
+              if (p.x > -100 && Math.hypot(it.pt.x - p.x, it.pt.y - p.y) < 54) {
+                it.pt.y += ((i % 3) - 1) * 38;
+                it.pt.x += (i % 2 ? 1 : -1) * 28;
+              }
+            }
+            it.pt.x = Math.max(48, Math.min(innerWidth - 48, it.pt.x));
+            it.pt.y = Math.max(150, Math.min(innerHeight - 115, it.pt.y));
+            placed.push({ kind: it.kind, x: it.pt.x, y: it.pt.y });
+            return it;
+          });
+      }
+      function renderSegmentButtons(street = false) {
+        segmentButtons.innerHTML = "";
+        const selected = state.segments[state.selectedIndex];
+        if (!selected) return;
+        if (street) {
+          streetFeatureCandidates(selected).forEach((x, n) => {
+            const idx = x.f ? state.segments.indexOf(x.f) : state.selectedIndex,
+              kind = x.kind,
+              pt = x.pt;
+            const b = document.createElement("button");
+            b.className = `seg-btn feature ${kind.includes("bus") ? "bus" : kind}`;
+            b.dataset.addon = kind;
+            b.dataset.label = x.name || capitalizeKind(kind);
+            b.style.left = pt.x - 17 + "px";
+            b.style.top = pt.y - 17 + "px";
+            b.textContent =
+              kind === "bus stop"
+                ? "B"
+                : kind === "mrt"
+                  ? "M"
+                  : kind === "walkway"
+                    ? "W"
+                    : kind === "ramp"
+                      ? "R"
+                      : kind === "shelter"
+                        ? "S"
+                        : kind === "obstruction"
+                          ? "!"
+                          : "T";
+            b.title = x.f
+              ? featureComment(x.f.properties, kind)
+              : `${kind} near this photo · ${Math.round(pt.d)}m away`;
+            b.onclick = () => {
+              if (x.f) {
+                showDetail(displayPropsForSegmentFeature(x.f), x.kind === "walkway" ? "" : kind);
+                if (x.kind !== "walkway") selectedDesc.textContent = featureComment(x.f.properties, kind);
+                return;
+              }
+              showDetail(
+                {
+                  name: x.name || kind,
+                  kind: x.poi?.properties?.kind || kind,
+                  external_id: x.featureExternalId || null,
+                  source_properties: x.poi?.properties?.source_properties,
+                },
+                kind,
+                {
+                  featureExternalId: x.featureExternalId || null,
+                  score: x.score,
+                  distanceM: x.distanceM ?? pt.d,
+                },
+              );
+            };
+            segmentButtons.appendChild(b);
+          });
+          return;
+        }
+        let candidates = state.streetRegistry?.street_parts?.length
+          ? state.streetRegistry.street_parts
+              .map((part) => {
+                const idx = segmentIndexForStreetPart(part);
+                return idx >= 0 ? state.segments[idx] : null;
+              })
+              .filter(Boolean)
+          : state.segments.filter((_, i) => i % 12 === 0).slice(0, 180);
+        candidates.forEach((f) => {
+          const idx = state.segments.indexOf(f),
+            p = f.properties,
+            pt = map.coordinateToContainerPoint(
+              new maptalks.Coordinate(...middle(f)),
+            );
+          const b = document.createElement("button");
+          b.className =
+            "seg-btn " +
+            (p.overall_accessibility_score < 45
+              ? "bad"
+              : p.overall_accessibility_score < 67
+                ? "warn"
+                : "");
+          const add = addonFor(p);
+          if (add) {
+            b.classList.add("addon");
+            b.dataset.addon = add;
+          }
+          const part = streetPartForSegmentId(p.id);
+          b.dataset.label = part
+            ? `${streetPartDisplayName(part)} · ${streetPartAddress(part, f)} · ${p.overall_accessibility_score}/100`
+            : `${p.name} · ${p.overall_accessibility_score}/100`;
+          b.style.left = pt.x - 12 + "px";
+          b.style.top = pt.y - 12 + "px";
+          b.textContent = idx === state.selectedIndex ? "●" : "";
+          b.title = `${p.name} ${p.overall_accessibility_score}/100`;
+          b.onclick = () => selectSegment(idx, false);
+          segmentButtons.appendChild(b);
+        });
+      }
+      function nearbySegments(base, n) {
+        const c = middle(base);
+        return state.segments
+          .map((f) => ({
+            f,
+            d: Math.hypot(
+              (middle(f)[0] - c[0]) * 111320,
+              (middle(f)[1] - c[1]) * 111320,
+            ),
+          }))
+          .sort((a, b) => a.d - b.d)
+          .slice(0, n)
+          .map((x) => x.f);
+      }
+
+      function segmentIndexForStreetPart(part) {
+        if (!part) return -1;
+        const ids = new Set(part.route_segment_ids || []);
+        let idx = state.segments.findIndex((f) => ids.has(f.properties.id));
+        if (idx < 0 && part.midpoint) {
+          idx =
+            state.segments
+              .map((f, i) => ({ i, d: distM(middle(f), part.midpoint) }))
+              .sort((a, b) => a.d - b.d)[0]?.i ?? -1;
+        }
+        return idx;
+      }
+      function activePhotosForNode(node) {
+        const photos = state.streetRegistry?.street_photos || [];
+        if (!node) return [];
+        return photos
+          .filter(
+            (p) =>
+              p.is_active &&
+              (p.street_part_id === node.street_part_id ||
+                p.street_view_node_id === node.id ||
+                p.node_id === node.id),
+          )
+          .sort((a, b) => {
+            const order = { canonical: 0, opposite: 1 };
+            return (order[a.heading_role] ?? 9) - (order[b.heading_role] ?? 9);
+          })
+          .map((p) => ({
+            id: p.source_image_id || p.external_id || p.id,
+            image_url: p.image_url,
+            thumb_2048_url: p.image_url,
+            computed_geometry: { coordinates: [p.lng, p.lat] },
+            computed_compass_angle: p.compass_angle_deg,
+            is_pano: !!p.is_pano,
+            captured_at: p.captured_at,
+            source: p.source,
+            external_id: p.external_id || p.id,
+            heading_role: p.heading_role,
+            desired_orientation: p.desired_orientation,
+            matched_heading_deg: p.matched_heading_deg,
+            db_id: p.db_id || p.id || null,
+            registry_photo_id: p.db_id || p.id || p.external_id,
+            validation_status: p.validation_status,
+          }));
+      }
+      function currentStreetNode() {
+        return (
+          state.streetRegistry?.street_view_nodes?.[state.streetNodeIndex] ||
+          null
+        );
+      }
+      function syncStreetNodeToSegment(f) {
+        const segId = f?.properties?.id,
+          parts = state.streetRegistry?.street_parts || [],
+          nodes = state.streetRegistry?.street_view_nodes || [];
+        if (!segId || !parts.length) return;
+        const part = parts.find((p) =>
+          (p.route_segment_ids || []).includes(segId),
+        );
+        if (!part) return;
+        const nodeIdx = nodes.findIndex((n) => n.street_part_id === part.id);
+        if (nodeIdx >= 0) state.streetNodeIndex = nodeIdx;
+      }
+      function selectStreetNode(nodeIndex) {
+        const nodes = state.streetRegistry?.street_view_nodes || [],
+          parts = state.streetRegistry?.street_parts || [];
+        if (!nodes.length) return false;
+        state.streetNodeIndex = Math.max(
+          0,
+          Math.min(nodes.length - 1, nodeIndex),
+        );
+        const node = nodes[state.streetNodeIndex],
+          part = parts.find((p) => p.id === node.street_part_id);
+        const idx = segmentIndexForStreetPart(part);
+        if (idx >= 0) {
+          selectSegment(idx, true);
+          return true;
+        }
+        return false;
+      }
+      function moveStreetNode(delta) {
+        const node = currentStreetNode(),
+          nodes = state.streetRegistry?.street_view_nodes || [];
+        if (!node || !nodes.length) return false;
+        const targetId = delta > 0 ? node.next_node_id : node.prev_node_id;
+        if (targetId) {
+          const targetIdx = nodes.findIndex((n) => n.id === targetId);
+          if (targetIdx >= 0) return selectStreetNode(targetIdx);
+        }
+        const adjacentIdx = state.streetNodeIndex + delta;
+        return adjacentIdx >= 0 && adjacentIdx < nodes.length
+          ? selectStreetNode(adjacentIdx)
+          : false;
+      }
+      function moveStreetPart(delta, street = state.mode === "street") {
+        const parts = state.streetRegistry?.street_parts || [];
+        if (!parts.length) return false;
+        const current = currentStreetPart();
+        const currentIdx = Math.max(0, parts.findIndex((p) => p.id === current?.id));
+        const nextIdx = Math.max(0, Math.min(parts.length - 1, currentIdx + delta));
+        const idx = segmentIndexForStreetPart(parts[nextIdx]);
+        if (idx < 0) return false;
+        const nodeIdx = (state.streetRegistry?.street_view_nodes || []).findIndex((n) => n.street_part_id === parts[nextIdx].id);
+        if (nodeIdx >= 0) state.streetNodeIndex = nodeIdx;
+        selectSegment(idx, street);
+        return true;
+      }
+      function updatePersonaToggleButton() {
+        if (!window.togglePersonaPanelBtn || !window.personaPanel) return;
+        togglePersonaPanelBtn.textContent = personaPanel.classList.contains("visible")
+          ? "Hide persona agents"
+          : "Show persona agents";
+      }
+      function togglePersonaPanel(force) {
+        if (!window.personaPanel) return;
+        const show = typeof force === "boolean" ? force : !personaPanel.classList.contains("visible");
+        personaPanel.classList.toggle("visible", show && state.role === "authority");
+        if (show) renderPersonaPanel();
+        updatePersonaToggleButton();
+        renderManagedUsers();
+      }
+      async function renderManagedUsers() {
+        if (!window.managedUsersTable || state.role !== "authority") return;
+        try {
+          const company = state.appUser.company_external_id || state.appUser.organization || "";
+          const filter = company ? `&company_external_id=eq.${encodeURIComponent(company)}` : "";
+          const rows = await supabaseRest("app_users", `select=external_id,username,full_name,display_name,department,position_title,employee_id,role,organization,platform_purpose,company_external_id&role=eq.authority${filter}&order=display_name.asc&limit=30`);
+          managedUsersTable.innerHTML = rows.length ? rows.map((u) => `<div class="managed-user-row"><b>${escapeHtml(u.full_name || u.display_name || u.username || u.external_id)}</b><small>${escapeHtml(u.employee_id || "no employee id")} · ${escapeHtml(u.department || "department pending")} · ${escapeHtml(u.position_title || "position pending")}</small></div>`).join("") : "No managed company users yet.";
+        } catch (e) {
+          managedUsersTable.textContent = "Account list unavailable until the admin schema is migrated.";
+        }
+      }
+      async function createManagedUser() {
+        if (!window.managedFullName || state.role !== "authority") return;
+        const fullName = managedFullName.value.trim();
+        if (!fullName) return;
+        const slug = fullName.toLowerCase().replace(/[^a-z0-9]+/g, ".").replace(/^\.|\.$/g, "") || `user.${Date.now()}`;
+        const row = {
+          external_id: `managed_${slug}_${Date.now()}`,
+          username: slug,
+          display_name: fullName,
+          full_name: fullName,
+          role: "authority",
+          organization: state.appUser.organization || "",
+          company_external_id: state.appUser.company_external_id || state.appUser.organization || "jalanlens_demo_company",
+          managed_by_user_external_id: state.appUser.external_id || null,
+          employee_id: managedEmployeeId.value.trim() || null,
+          department: managedDepartment.value.trim() || null,
+          position_title: managedPosition.value.trim() || null,
+          salutation: managedSalutation.value.trim() || null,
+          platform_purpose: managedPurpose.value.trim() || null,
+          is_company_admin: false,
+          is_active: true,
+          metadata: { managed_from_settings: true },
+        };
+        try {
+          await supabaseInsert("app_users", row);
+          createNotification({ source: "system", title: "Managed user created", body: `${fullName} can now receive a username/password from the company admin.` }, { toast: true, persist: false });
+          [managedEmployeeId, managedFullName, managedDepartment, managedPosition, managedSalutation, managedPurpose].forEach((el) => { el.value = ""; });
+          renderManagedUsers();
+        } catch (e) {
+          createNotification({ source: "system", title: "Account management unavailable", body: "Run the admin account schema migration in Supabase first." }, { toast: true, persist: false });
+        }
+      }
+      if (window.createManagedUserBtn) createManagedUserBtn.onclick = createManagedUser;
+      function bindHoverDropdown(select, maxSize = 8) {
+        if (!select) return;
+        const close = () => { select.size = 0; };
+        select.addEventListener("mouseenter", () => {
+          if (select.offsetParent === null) return;
+          select.size = Math.min(maxSize, Math.max(2, select.options.length));
+        });
+        select.addEventListener("mouseleave", close);
+        select.addEventListener("change", close);
+        select.addEventListener("blur", close);
+      }
+      function updateSettings() {
+        tokenStatus.textContent = getToken()
+          ? "Mapillary token saved in this browser."
+          : "No Mapillary token saved; street view may be unavailable.";
+        if (window.currentUserStatus) {
+          const user = state.appUser;
+          currentUserStatus.textContent = user
+            ? `Signed in as ${user.display_name || user.external_id}${user.organization ? ` · ${user.organization}` : ""}`
+            : `Signed in as ${state.role} demo user`;
+        }
+        updatePersonaToggleButton();
+      }
+      segmentSelect.onchange = (e) =>
+        selectSegment(Number(e.target.value), state.mode === "street");
+      directionBtn.onclick = () => {
+        if (state.mode === "street") cycleStreetPhoto(1);
+      };
+      prevBtn.onclick = () => {
+        if (!moveStreetPart(-1, state.mode === "street"))
+          selectSegment(state.selectedIndex - 1, state.mode === "street");
+      };
+      nextBtn.onclick = () => {
+        if (!moveStreetPart(1, state.mode === "street"))
+          selectSegment(state.selectedIndex + 1, state.mode === "street");
+      };
+      if (window.viewModeSelect) {
+        viewModeSelect.onchange = () => selectSegment(state.selectedIndex, viewModeSelect.value === "street");
+        bindHoverDropdown(viewModeSelect, 2);
+      }
+      bindHoverDropdown(segmentSelect, 10);
+      if (window.themeToggleBtn) themeToggleBtn.onclick = cycleTheme;
+      if (window.notificationBellBtn) notificationBellBtn.onclick = () => notificationsPanel?.classList.toggle("visible");
+      if (window.clearNotificationsBtn) clearNotificationsBtn.onclick = clearNotificationHistory;
+      settingsBtn.onclick = () => {
+        roleMenu?.classList.remove("visible");
+        if (state.role === "authority") {
+          settings.classList.toggle("visible");
+          if (settings.classList.contains("visible")) renderManagedUsers();
+        }
+      };
+      closeSettings.onclick = () => settings.classList.remove("visible");
+      if (window.closeRoleMenu) closeRoleMenu.onclick = () => roleMenu.classList.remove("visible");
+      if (window.logoutBtn) logoutBtn.onclick = logoutToAuth;
+      if (window.togglePersonaPanelBtn) {
+        togglePersonaPanelBtn.onclick = () => togglePersonaPanel();
+      }
+      if (window.photoUploadBtn && window.photoUploadInput) {
+        photoUploadBtn.onclick = () => photoUploadInput.click();
+        photoUploadInput.onchange = async () => {
+          const file = photoUploadInput.files?.[0];
+          photoUploadInput.value = "";
+          if (!file) return;
+          try {
+            await handlePhotoUploadFile(file);
+          } catch (e) {
+            console.error("photo upload failed", e);
+            setUploadStatus(e.message || "Photo upload failed.", "err");
+          }
+        };
+      }
+      closeDetail.onclick = () => {
+        detailCard.classList.remove("visible");
+        EquirouteFeedback.close(true);
+      };
+      EquirouteFeedback.init({
+        getDetailContext: () => state.detailContext,
+        getCurrentUser: () => state.appUser,
+        supabaseUrl: SUPABASE_URL,
+        supabaseKey: SUPABASE_PUBLISHABLE_KEY,
+        capitalizeKind,
+        onFeedbackRowsLoaded: (rows, ctx) => {
+          rows.slice(0, 8).forEach((row) => {
+            const id = `feedback_${row.source || "public"}_${row.id || row.agent_external_id || row.created_at}`;
+            createNotification({
+              id,
+              source: row.source || "public",
+              title: `${row.source === "agent_simulation" ? "Agent" : "Public"} feedback: ${row.title || "New report"}`,
+              body: row.body || "New feedback received.",
+              street_part_external_id: ctx.streetPartExternalId || row.street_part_external_id || null,
+              payload: { feedback_id: row.id || null, persona_type: row.persona_type || null },
+            }, { toast: false, persist: true });
+          });
+        },
+      });
+      applyRoleUi();
+      if (window.saveMapillaryTokenBtn && window.mapillaryTokenInput) {
+        saveMapillaryTokenBtn.onclick = () => setToken(mapillaryTokenInput.value);
+      }
+      map.on("moving zooming resize viewchange", () => {
+        renderSatelliteFallback();
+        if (state.mode === "earth") {
+          renderSegmentButtons(false);
+          updateThreeOverlay();
+          renderRoadNameLabels();
+        }
+      });
+      window.addEventListener("resize", () => {
+        renderSatelliteFallback();
+        renderSegmentButtons(state.mode === "street");
+        renderRoadNameLabels();
+      });
+      async function supabaseRest(table, query = "select=*") {
+        const url = `${SUPABASE_URL}/rest/v1/${table}?${query}`;
+        const r = await fetch(url, {
+          headers: {
+            apikey: SUPABASE_PUBLISHABLE_KEY,
+            Authorization: "Bearer " + SUPABASE_PUBLISHABLE_KEY,
+          },
+        });
+        if (!r.ok) throw new Error(`Supabase ${table} ${r.status}`);
+        return r.json();
+      }
+      async function loadStreetRegistry() {
+        if (new URLSearchParams(location.search).has("localRegistry")) {
+          const r = await fetch("../data/street_view_registry.json");
+          return r.ok ? r.json() : null;
+        }
+        try {
+          const [streetsRaw, partsRaw, nodesRaw, photosRaw] = await Promise.all(
+            [
+              supabaseRest("streets", "select=*&order=external_id.asc"),
+              supabaseRest("street_parts", "select=*&order=external_id.asc"),
+              supabaseRest(
+                "street_view_nodes",
+                "select=*&order=sequence_index.asc",
+              ),
+              supabaseRest(
+                "street_photos",
+                "select=*&is_active=eq.true&order=submitted_at.desc",
+              ).catch(() => []),
+            ],
+          );
+          if (!partsRaw.length || !nodesRaw.length)
+            throw new Error("empty Supabase street registry");
+          const streetByUuid = new Map(
+              streetsRaw.map((s) => [s.id, s.external_id]),
+            ),
+            partByUuid = new Map(partsRaw.map((p) => [p.id, p.external_id]));
+          const streets = streetsRaw.map((s) => ({
+            id: s.external_id,
+            db_id: s.id,
+            name: s.name,
+            geometry: s.geometry,
+            midpoint: [s.midpoint_lng, s.midpoint_lat],
+            direction_bearing_deg: s.direction_bearing_deg,
+            desired_orientation: s.desired_orientation,
+            length_m: s.length_m,
+            metrics: s.metrics || {},
+            street_part_ids: partsRaw
+              .filter((p) => p.street_id === s.id)
+              .map((p) => p.external_id),
+          }));
+          const streetParts = partsRaw.map((p) => ({
+            id: p.external_id,
+            db_id: p.id,
+            street_id: streetByUuid.get(p.street_id) || null,
+            route_segment_ids: p.route_segment_ids || [],
+            geometry: p.geometry,
+            midpoint: [p.midpoint_lng, p.midpoint_lat],
+            length_m: p.length_m,
+            direction_bearing_deg: p.direction_bearing_deg,
+            desired_orientation: p.desired_orientation,
+            metrics: p.metrics || {},
+            active_photo_id: p.active_photo_id,
+          }));
+          const nodeByUuid = new Map(
+            nodesRaw.map((n) => [n.id, n.external_id]),
+          );
+          let localPhotos = [];
+          if (!photosRaw.length) {
+            try {
+              const localRegistry = await fetch("../data/street_view_registry.json").then((r) =>
+                r.ok ? r.json() : null,
+              );
+              localPhotos = localRegistry?.street_photos || [];
+            } catch (localErr) {
+              console.warn("local active-photo fallback unavailable", localErr);
+            }
+          }
+          const photos = photosRaw.length
+            ? photosRaw.map((p) => ({
+                id: p.external_id || p.id,
+                db_id: p.id,
+                external_id: p.external_id,
+                street_part_id:
+                  partByUuid.get(p.street_part_id) || p.street_part_id,
+                street_view_node_id:
+                  nodeByUuid.get(p.street_view_node_id) || p.street_view_node_id,
+                source: p.source,
+                source_image_id: p.source_image_id,
+                image_url: p.image_url,
+                storage_path: p.storage_path,
+                quality_score: p.quality_score,
+                captured_at: p.captured_at,
+                lng: p.lng,
+                lat: p.lat,
+                compass_angle_deg: p.compass_angle_deg,
+                matched_heading_deg: p.matched_heading_deg,
+                heading_role: p.heading_role,
+                desired_orientation: p.desired_orientation,
+                direction_valid: p.direction_valid,
+                direction_confidence: p.direction_confidence,
+                is_pano: p.is_pano,
+                is_active: p.is_active,
+                validation_status: p.validation_status,
+                metadata: p.metadata || {},
+              }))
+            : localPhotos;
+          const activePhotoPartIds = new Set(
+            photos.filter((p) => p.is_active).map((p) => p.street_part_id),
+          );
+          const nodes = nodesRaw.map((n) => ({
+            id: n.external_id,
+            db_id: n.id,
+            street_part_id:
+              partByUuid.get(n.street_part_id) || n.street_part_id,
+            street_id: streetByUuid.get(n.street_id) || null,
+            active_photo_id: n.active_photo_id,
+            sequence_id: n.sequence_id,
+            sequence_index: n.sequence_index,
+            lng: n.lng,
+            lat: n.lat,
+            canonical_heading_deg: n.canonical_heading_deg,
+            desired_orientation: n.desired_orientation,
+            prev_node_id: n.prev_node_external_id,
+            next_node_id: n.next_node_external_id,
+            left_node_id: n.left_node_external_id,
+            right_node_id: n.right_node_external_id,
+            coverage_status: activePhotoPartIds.has(
+              partByUuid.get(n.street_part_id) || n.street_part_id,
+            )
+              ? "active"
+              : n.coverage_status,
+          }));
+          return {
+            schema_version: 2,
+            source: photosRaw.length ? "supabase" : "supabase+local_active_photos",
+            streets,
+            street_parts: streetParts,
+            street_view_nodes: nodes,
+            street_photos: photos,
+          };
+        } catch (e) {
+          console.warn(
+            "Supabase registry unavailable, falling back to local JSON",
+            e,
+          );
+          const r = await fetch("../data/street_view_registry.json");
+          return r.ok ? r.json() : null;
+        }
+      }
+      Promise.all([
+        fetch("../accessibility_world.geojson").then((r) => r.json()),
+        fetch("../buildings_clementi.geojson").then((r) => r.json()),
+        loadStreetRegistry(),
+        fetch("../data/photo_feature_instances_cv.json")
+          .then((r) => (r.ok ? r.json() : { instances: [] }))
+          .catch(() => ({ instances: [] })),
+        fetch("../data/persona_agent_travel_simulation.json")
+          .then((r) => (r.ok ? r.json() : null))
+          .catch(() => null),
+      ])
+        .then(async ([world, buildings, registry, cvInstances, personaSimulation]) => {
+          state.world = world;
+          state.buildings = buildings;
+          state.streetRegistry = registry;
+          state.photoFeatureInstances = cvInstances?.instances || [];
+          state.personaSimulation = personaSimulation;
+          renderPersonaPanel();
+          await loadRoadNameData();
+          renderBuildings(buildings);
+          renderWorld(world);
+          const ext = routeLayer.getExtent();
+          if (ext) map.fitExtent(ext, 0, { animation: false });
+          clampSatelliteZoom();
+          map.setPitch(0);
+          map.setBearing(0);
+          renderSatelliteFallback();
+          await loadLiveAgentSnapshot();
+          setInterval(loadLiveAgentSnapshot, 10000);
+          const streetCount = registry?.streets?.length || 0,
+            nodeCount = registry?.street_view_nodes?.length || 0,
+            src = registry?.source === "supabase"
+              ? "Supabase"
+              : registry?.source === "supabase+local_active_photos"
+                ? "Supabase + local active photos"
+                : "local JSON";
+          setStatus(
+            `Loaded ${(registry?.street_parts?.length || 0).toLocaleString()} street parts, ${streetCount} streets, ${nodeCount} street-view nodes from ${src}`,
+          );
+          await loadNotifications();
+          updateSettings();
+        })
+        .catch((e) => setStatus("Failed to load: " + e.message));
+    </script>
+  </body>
+</html>

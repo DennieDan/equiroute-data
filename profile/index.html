@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JalanLens Profile</title>
+    <style>
+      :root { --bg:#020617; --profile-card:rgba(15,23,42,.94); --card:var(--profile-card); --line:rgba(125,211,252,.42); --txt:#f8fafc; --muted:#cbd5e1; --blue:#7dd3fc; --green:#4ade80; --red:#fb7185; }
+      * { box-sizing: border-box; }
+      body { min-height:100vh; margin:0; display:grid; place-items:center; padding:28px; background:radial-gradient(circle at 20% 10%,rgba(56,189,248,.2),transparent 30%),radial-gradient(circle at 80% 90%,rgba(34,197,94,.14),transparent 34%),var(--bg); color:var(--txt); font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+      main { width:min(560px,100%); border:1px solid var(--line); border-radius:28px; padding:24px; background:var(--card); box-shadow:0 24px 80px rgba(0,0,0,.35); }
+      .eyebrow { color:var(--blue); font-weight:900; letter-spacing:.08em; text-transform:uppercase; font-size:12px; }
+      h1 { margin:8px 0 6px; font-size:clamp(30px,6vw,52px); line-height:.98; }
+      p { color:var(--muted); line-height:1.5; }
+      label { display:block; margin-top:14px; color:#e0f2fe; font-size:12px; font-weight:900; text-transform:uppercase; letter-spacing:.04em; }
+      input,select { width:100%; margin-top:6px; padding:12px; border-radius:14px; border:1px solid var(--line); background:rgba(2,6,23,.75); color:#f8fafc; font-weight:750; }
+      .actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
+      button,a { border:1px solid rgba(125,211,252,.35); border-radius:14px; padding:10px 12px; background:rgba(15,23,42,.9); color:var(--txt); font-weight:850; text-decoration:none; cursor:pointer; }
+      button.primary { background:linear-gradient(135deg,#075985,#0e7490); border-color:#e0f2fe; }
+      #status { margin-top:14px; font-size:13px; color:var(--muted); }
+      #status.ok { color:var(--green); }
+      #status.err { color:var(--red); }
+    </style>
+    <link rel="stylesheet" href="../harvard.css?v=20260731d" />
+  </head>
+  <body class="profile-page">
+    <main>
+      <div class="eyebrow">JalanLens account</div>
+      <h1>profile</h1>
+      <p id="summary">Loading current database user…</p>
+      <form id="profileForm">
+        <label for="displayName">Display name</label>
+        <input id="displayName" name="displayName" required maxlength="120" />
+        <label for="username">Username</label>
+        <input id="username" name="username" required maxlength="80" autocomplete="username" />
+        <label for="password">New password</label>
+        <input id="password" name="password" type="password" minlength="4" autocomplete="new-password" placeholder="leave blank to keep current password" />
+        <label for="personaType">Accessibility persona / demographic profile</label>
+        <select id="personaType" name="personaType">
+          <option value="working_adult_commuter">Working adult commuter</option>
+          <option value="older_resident_cane">Older resident with cane</option>
+          <option value="older_resident_walker">Older resident with walker</option>
+          <option value="wheelchair_user_commuter">Wheelchair user commuter</option>
+          <option value="visually_impaired_commuter">Visually impaired commuter</option>
+          <option value="pma_pmd_user">PMA / PMD user</option>
+          <option value="caregiver_with_disabled_person">Caregiver with disabled person</option>
+          <option value="parent_with_stroller">Parent with stroller</option>
+          <option value="primary_school_child">Primary school child</option>
+          <option value="secondary_student">Secondary student</option>
+          <option value="poly_uni_student">Poly / university student</option>
+          <option value="delivery_rider_worker">Delivery / service worker</option>
+        </select>
+        <label for="ageBand">Age band</label>
+        <input id="ageBand" name="ageBand" maxlength="40" placeholder="e.g. 25-64" />
+        <label for="mobilityNeeds">Mobility/accessibility notes</label>
+        <input id="mobilityNeeds" name="mobilityNeeds" maxlength="180" placeholder="e.g. wheelchair, stroller, low vision, prefers sheltered routes" />
+        <div class="actions">
+          <button class="primary" type="submit">Save profile</button>
+          <a id="backLink" href="../street-intelligence/">Back to Street Intelligence</a>
+          <button id="logoutBtn" type="button">Log out</button>
+        </div>
+      </form>
+      <div id="status"></div>
+    </main>
+    <script type="module">
+      import { sha256 } from "../sha256.js";
+
+      const SUPABASE_URL = "https://khddsjemkdcgumfvkraa.supabase.co";
+      const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_lqGtwkNAOMV7qsYPKVZr8w_GytZx3Qm";
+      const ROLE_STORAGE_KEY = "jalanlens_role";
+      const USER_STORAGE_KEY = "jalanlens_user";
+      const LEGACY_ROLE_STORAGE_KEY = "access" + "twin_role";
+      const LEGACY_USER_STORAGE_KEY = "access" + "twin_user";
+      const params = new URLSearchParams(location.search);
+      let stored = null;
+      try {
+        stored = JSON.parse(localStorage.getItem(USER_STORAGE_KEY) || localStorage.getItem(LEGACY_USER_STORAGE_KEY) || "null");
+      } catch (e) {
+        stored = null;
+      }
+      const role = stored?.role || localStorage.getItem(ROLE_STORAGE_KEY) || localStorage.getItem(LEGACY_ROLE_STORAGE_KEY) || "";
+      const externalId = stored?.external_id || "";
+      const headers = (extra = {}) => ({ apikey: SUPABASE_PUBLISHABLE_KEY, Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`, ...extra });
+      const setStatus = (msg, kind = "") => { status.textContent = msg; status.className = kind; };
+      async function loadUser() {
+        if (!stored || !externalId || !role) {
+          localStorage.removeItem(ROLE_STORAGE_KEY);
+          localStorage.removeItem(USER_STORAGE_KEY);
+          location.replace("../?next=profile/");
+          throw new Error("JalanLens login required");
+        }
+        let user = stored;
+        try {
+          let r = await fetch(`${SUPABASE_URL}/rest/v1/app_users?select=external_id,username,display_name,role,organization,persona_hint,public_persona_type,demographic_profile,metadata,is_active&external_id=eq.${encodeURIComponent(externalId)}&limit=1`, { headers: headers() });
+          if (!r.ok) {
+            r = await fetch(`${SUPABASE_URL}/rest/v1/app_users?select=external_id,display_name,role,organization,persona_hint,metadata,is_active&external_id=eq.${encodeURIComponent(externalId)}&limit=1`, { headers: headers() });
+          }
+          if (r.ok) user = (await r.json())[0] || user;
+        } catch (e) {}
+        user.role ||= role;
+        user.username ||= user.external_id || "demo_user";
+        user.display_name ||= user.username;
+        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+        localStorage.setItem(ROLE_STORAGE_KEY, user.role);
+        displayName.value = user.display_name;
+        username.value = user.username;
+        const demoProfile = user.demographic_profile || user.metadata?.demographic_profile || {};
+        personaType.value = user.public_persona_type || user.persona_hint || user.metadata?.persona_type || demoProfile.persona_type || "working_adult_commuter";
+        ageBand.value = demoProfile.age_band || "";
+        mobilityNeeds.value = Array.isArray(demoProfile.mobility_needs) ? demoProfile.mobility_needs.join(", ") : (demoProfile.mobility_needs || "");
+        summary.textContent = `${user.role === "authority" ? "Authority" : "Public"} account · ${user.organization || "JalanLens demo"}`;
+        backLink.href = "../street-intelligence/";
+        return user;
+      }
+      let currentUser = null;
+      loadUser().then((u) => { currentUser = u; });
+      profileForm.onsubmit = async (event) => {
+        event.preventDefault();
+        if (!currentUser?.external_id) return setStatus("No current database user selected. Log in again first.", "err");
+        setStatus("Saving profile…");
+        const profile = {
+          persona_type: personaType.value,
+          age_band: ageBand.value.trim(),
+          mobility_needs: mobilityNeeds.value.split(",").map((x) => x.trim()).filter(Boolean),
+          updated_from_profile: true,
+        };
+        const next = {
+          display_name: displayName.value.trim(),
+          username: username.value.trim(),
+          persona_hint: personaType.value,
+          public_persona_type: currentUser.role === "public" ? personaType.value : null,
+          demographic_profile: profile,
+          metadata: { ...(currentUser.metadata || {}), persona_type: personaType.value, demographic_profile: profile },
+          updated_at: new Date().toISOString(),
+        };
+        if (password.value) next.password_hash = await sha256(password.value);
+        try {
+          const r = await fetch(`${SUPABASE_URL}/rest/v1/app_users?external_id=eq.${encodeURIComponent(currentUser.external_id)}`, {
+            method: "PATCH",
+            headers: headers({ "Content-Type": "application/json", Prefer: "return=representation" }),
+            body: JSON.stringify(next),
+          });
+          if (!r.ok) throw new Error(await r.text());
+          const rows = await r.json();
+          currentUser = { ...currentUser, ...(rows[0] || next) };
+          localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(currentUser));
+          password.value = "";
+          setStatus("Profile saved to Supabase app_users.", "ok");
+        } catch (e) {
+          currentUser = { ...currentUser, ...next };
+          localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(currentUser));
+          setStatus(`Saved locally, but Supabase update failed: ${e.message || e}`, "err");
+        }
+      };
+      logoutBtn.onclick = () => {
+        localStorage.removeItem(ROLE_STORAGE_KEY);
+        localStorage.removeItem(USER_STORAGE_KEY);
+        localStorage.removeItem(LEGACY_ROLE_STORAGE_KEY);
+        localStorage.removeItem(LEGACY_USER_STORAGE_KEY);
+        location.href = "../";
+      };
+    </script>
+  </body>
+</html>

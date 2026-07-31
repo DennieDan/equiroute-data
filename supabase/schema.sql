@@ -381,13 +381,30 @@ create table if not exists public.transit_arrivals (
 
 alter table public.app_users
   add column if not exists public_persona_type text null,
-  add column if not exists demographic_profile jsonb not null default '{}';
+  add column if not exists demographic_profile jsonb not null default '{}',
+  add column if not exists company_external_id text null,
+  add column if not exists managed_by_user_external_id text null,
+  add column if not exists employee_id text null,
+  add column if not exists full_name text null,
+  add column if not exists department text null,
+  add column if not exists position_title text null,
+  add column if not exists salutation text null,
+  add column if not exists platform_purpose text null,
+  add column if not exists is_company_admin boolean not null default false;
 
 alter table public.feedback_threads
   add column if not exists source text not null default 'public',
   add column if not exists public_user_external_id text null,
   add column if not exists public_user_name text null,
-  add column if not exists persona_type text null;
+  add column if not exists persona_type text null,
+  add column if not exists original_language text null,
+  add column if not exists original_text text null,
+  add column if not exists english_translation text null,
+  add column if not exists translation_status text not null default 'not_required',
+  add column if not exists translation_provider text null,
+  add column if not exists translation_model text null,
+  add column if not exists speech_transcript_original text null,
+  add column if not exists input_modality text not null default 'typed';
 
 create index if not exists persona_agents_type_idx on public.persona_agents (persona_type_external_id, is_active);
 create index if not exists agent_live_states_part_idx on public.agent_live_states (street_part_external_id, updated_at desc);
@@ -395,6 +412,7 @@ create index if not exists agent_events_part_time_idx on public.agent_events (st
 create index if not exists agent_feedback_part_time_idx on public.agent_feedback_threads (street_part_external_id, created_at desc);
 create index if not exists agent_feedback_persona_idx on public.agent_feedback_threads (persona_type, created_at desc);
 create index if not exists public_feedback_source_idx on public.feedback_threads (source, persona_type, created_at desc);
+create index if not exists feedback_threads_translation_idx on public.feedback_threads (original_language, translation_status, created_at desc);
 
 create table if not exists public.app_notifications (
   id uuid primary key default gen_random_uuid(),
@@ -412,3 +430,23 @@ create index if not exists app_notifications_created_idx on public.app_notificat
 create index if not exists app_notifications_part_idx on public.app_notifications (street_part_external_id, created_at desc);
 
 grant select, insert, update on public.app_notifications to anon, authenticated;
+
+create table if not exists public.photo_review_jobs (
+  id uuid primary key default gen_random_uuid(),
+  photo_id uuid null references public.street_photos(id) on delete cascade,
+  submitted_by_user_external_id text null,
+  company_external_id text null,
+  street_part_external_id text null,
+  review_stage text not null default 'cv_first_review' check (review_stage in ('uploaded','cv_first_review','staff_review','approved','rejected')),
+  cv_review_status text not null default 'pending',
+  human_review_status text not null default 'pending',
+  assigned_staff_external_ids text[] not null default '{}',
+  progress_payload jsonb not null default '{}',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists app_users_company_idx on public.app_users (company_external_id, role, is_active);
+create index if not exists photo_review_jobs_company_stage_idx on public.photo_review_jobs (company_external_id, review_stage, created_at desc);
+
+grant select, insert, update on public.photo_review_jobs to anon, authenticated;
