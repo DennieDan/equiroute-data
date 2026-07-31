@@ -40,7 +40,9 @@ class FeedbackRepliesTests(unittest.TestCase):
             'feedback_replies',
             'author_role',
             'parent_agent_thread_id',
-            'setInterval(() =>',
+            'feedback-refresh',
+            'function bindHistoryControls',
+            'loadHistory({ manual: true })',
         ]:
             self.assertIn(snippet, js + html)
 

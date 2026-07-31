@@ -132,6 +132,28 @@ class EarthUiControlsNotificationTests(unittest.TestCase):
         for font in forbidden:
             self.assertNotIn(font, joined)
 
+    def test_dark_display_uses_true_black_for_topbar_and_scorecards(self):
+        css = (ROOT / "harvard.css").read_text()
+        for snippet in [
+            'Dark display setting: Abel wants top menu bars and score cards to be pure black',
+            'html[data-theme="dark"] body:has(#map) #topbar',
+            'html[data-theme="dark"] body:has(#map) #detailCard',
+            'html[data-theme="dark"] body:has(#map) #detailCard .metric',
+            'html[data-theme="dark"] body:has(#map) .score-card',
+            'background: #000000 !important;',
+            'background-color: #000000 !important;',
+            'color: #ffffff !important;',
+        ]:
+            self.assertIn(snippet, css)
+        dark_black_css = css[css.index('/* Dark display setting: Abel wants top menu bars and score cards to be pure black'):css.index('body:has(#map) .street-screen-nav')]
+        for forbidden in [
+            'background: var(--bg) !important;',
+            'background: var(--panel-strong-bg) !important;',
+            'background: rgba(15, 23, 42',
+            'background-color: var(--control-bg)',
+        ]:
+            self.assertNotIn(forbidden, dark_black_css)
+
     def test_authority_score_card_flips_to_component_breakdown(self):
         text = self.html()
         for snippet in [
