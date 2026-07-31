@@ -28,7 +28,7 @@ jobs:
           cp accessibility_world.geojson buildings_clementi.geojson _site/
           cp -R data/. _site/data/
           cp -R assets _site/assets
-          cp -R about login _site/
+          cp -R about login documentation profile street-intelligence crowd-photos _site/ 2>/dev/null || true
           # shared / optional root scripts
           cp -f feedback-form.js sha256.js _site/ 2>/dev/null || true
 

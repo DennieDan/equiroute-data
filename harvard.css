@@ -482,10 +482,12 @@ body:has(.login-card) main.login-shell {
   padding: clamp(28px, 5vw, 44px);
   text-align: left;
 }
-.login-card h1 {
-  margin: 0 0 24px !important;
+body:has(.login-card) .login-card h1 {
+  margin: 0 0 20px !important;
   text-align: left !important;
-  font-size: clamp(42px, 7vw, 72px) !important;
+  font-size: clamp(30px, 4vw, 44px) !important;
+  line-height: 1.06 !important;
+  letter-spacing: -0.045em !important;
 }
 .role-select-label { margin-top: 0 !important; }
 .role-select { width: 100%; margin: 6px 0 6px; padding: 12px; font-weight: 800; }

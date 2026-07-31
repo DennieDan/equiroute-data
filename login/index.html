@@ -104,7 +104,7 @@
       #status.err { color: var(--red); }
       @media (max-width: 720px) { .roles { grid-template-columns: 1fr; } }
     </style>
-    <link rel="stylesheet" href="../harvard.css?v=20260731d" />
+    <link rel="stylesheet" href="../harvard.css?v=20260731e" />
   </head>
   <body>
     <header class="site-nav" aria-label="JalanLens site navigation">
@@ -321,7 +321,21 @@
       }
 
       async function publicGoogleLogin() {
-        setStatus("Google OAuth is not enabled in this Supabase project yet; continuing with a Google demo public account…");
+        roleSelect.value = "public";
+        activeRole = "public";
+        setStatus("Opening Google sign in…");
+        const redirectTo = new URL("../login/", location.href);
+        redirectTo.searchParams.set("oauth", "public");
+        redirectTo.searchParams.set("next", safeNext());
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: "google",
+          options: {
+            redirectTo: redirectTo.href,
+            queryParams: { access_type: "offline", prompt: "select_account" },
+          },
+        });
+        if (!error) return;
+        setStatus("Google OAuth is not enabled yet; using the temporary demo public account…");
         const user = {
           external_id: "google_public_demo",
           username: "google.public.demo",
