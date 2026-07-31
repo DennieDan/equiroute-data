@@ -17,7 +17,8 @@
 
 * { box-sizing: border-box; }
 
-html, body {
+body,
+body * {
   font-family: var(--harvard-sans) !important;
 }
 
@@ -25,13 +26,24 @@ body {
   color: var(--harvard-ink) !important;
 }
 
-h1, h2, .brand, .hero-title, .section-title, #panelTitle {
+h1, h1 *,
+h2, h2 *,
+h3, h3 *,
+.brand, .brand *,
+.site-logo, .site-logo *,
+.homepage-title, .homepage-title *,
+.hero-title, .hero-title *,
+.section-title, .section-title *,
+#panelTitle, #panelTitle *,
+#profileTitle, #profileTitle *,
+#selectedName, #selectedName *,
+.title, .title * {
   font-family: var(--harvard-serif) !important;
   font-weight: 400 !important;
   letter-spacing: -0.035em !important;
 }
 
-h3, h4, h5, h6, button, select, input, label, .pill, .metric, .eyebrow, .button, .buttonlike {
+button, select, input, label, textarea, .pill, .metric, .eyebrow, .button, .buttonlike {
   font-family: var(--harvard-sans) !important;
 }
 
@@ -320,7 +332,7 @@ body:not(:has(.login-bg-video)) {
 
 .score, .metric b, .stat strong, .value {
   color: var(--harvard-black) !important;
-  font-family: var(--harvard-serif) !important;
+  font-family: var(--harvard-sans) !important;
 }
 
 .card, .score-card, .feature-card, .thread, .metric, .photo-card, .person-card, .doc-card, section.card {
@@ -730,11 +742,9 @@ body:has(#map) #detailCard .kindTitle {
   color: var(--muted) !important;
 }
 body:has(#map) #detailCard #activeScore {
-  min-width: 92px !important;
-  padding: 8px 12px !important;
-  border: 1px solid var(--line) !important;
-  border-left: 5px solid var(--harvard-crimson) !important;
-  background: var(--panel-soft-bg) !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
   color: var(--txt) !important;
   font-family: var(--harvard-sans) !important;
   font-size: 22px !important;

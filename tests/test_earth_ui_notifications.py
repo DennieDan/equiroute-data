@@ -80,7 +80,6 @@ class EarthUiControlsNotificationTests(unittest.TestCase):
             'body:has(#map) #detailCard .metric span',
             'color: var(--muted)',
             'body:has(#map) #detailCard .score-flip',
-            'border-left: 5px solid var(--harvard-crimson)',
             'body:has(#map) #detailCard .score-breakdown',
             'border-top: 4px solid var(--harvard-crimson)',
             'background: color-mix(in srgb, var(--harvard-crimson) 10%',
@@ -99,6 +98,39 @@ class EarthUiControlsNotificationTests(unittest.TestCase):
         ]
         for literal in forbidden_scorecard_literals:
             self.assertNotIn(literal, scorecard_css)
+
+    def test_score_number_has_no_inner_red_rule(self):
+        css = (ROOT / "harvard.css").read_text()
+        scorecard_css = css[css.index('/* JalanLens score-card redesign */'):css.index('/* Mobile/APK Street View')]
+        self.assertIn('body:has(#map) #detailCard .score-flip', scorecard_css)
+        self.assertIn('border-left: 5px solid var(--harvard-crimson)', scorecard_css)
+        active_score_block = re.search(r'body:has\(#map\) #detailCard #activeScore \{(?P<body>.*?)\n\}', scorecard_css, re.S)
+        self.assertIsNotNone(active_score_block)
+        self.assertNotIn('border-left', active_score_block.group('body'))
+        self.assertNotIn('background:', active_score_block.group('body'))
+
+    def test_project_font_families_use_only_jalanlens_serif_and_sans(self):
+        css = (ROOT / "harvard.css").read_text()
+        self.assertIn('--harvard-serif', css)
+        self.assertIn('--harvard-sans', css)
+        self.assertIn('body,\nbody *', css)
+        self.assertIn('font-family: var(--harvard-sans)', css)
+        self.assertIn('h1, h1 *,', css)
+        self.assertIn('.brand, .brand *', css)
+        self.assertIn('font-family: var(--harvard-serif)', css)
+        visible_pages = [
+            ROOT / 'index.html',
+            ROOT / 'about' / 'index.html',
+            ROOT / 'login' / 'index.html',
+            ROOT / 'profile' / 'index.html',
+            ROOT / 'documentation' / 'index.html',
+            ROOT / 'crowd-photos' / 'index.html',
+            ROOT / 'street-intelligence' / 'index.html',
+        ]
+        joined = '\n'.join(p.read_text() for p in visible_pages) + '\n' + css
+        forbidden = ['Inter,', 'Google Sans', 'Roboto', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI']
+        for font in forbidden:
+            self.assertNotIn(font, joined)
 
     def test_authority_score_card_flips_to_component_breakdown(self):
         text = self.html()
