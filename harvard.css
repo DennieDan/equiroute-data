@@ -1213,3 +1213,75 @@ html[data-theme="dark"] body:has(#map) .feedback-item.agent b em {
   color: #6b21a8 !important;
   border-color: #d8b4fe !important;
 }
+
+/* Dark-display readability for feedback filters and live-agent status popups. */
+body:has(#map) .feedback-filters label,
+html[data-theme="light"] body:has(#map) .feedback-filters label,
+html[data-theme="dark"] body:has(#map) .feedback-filters label {
+  color: #334155 !important;
+  text-shadow: none !important;
+}
+body:has(#map) .feedback-filters select,
+html[data-theme="light"] body:has(#map) .feedback-filters select,
+html[data-theme="dark"] body:has(#map) .feedback-filters select {
+  background: #ffffff !important;
+  color: #111111 !important;
+  border-color: rgba(30, 30, 30, 0.28) !important;
+}
+body:has(#map) .feedback-history .feedback-thread-head,
+body:has(#map) .feedback-history .feedback-thread-head *,
+body:has(#map) .feedback-history .feedback-item,
+body:has(#map) .feedback-history .feedback-item *,
+html[data-theme="dark"] body:has(#map) .feedback-history .feedback-thread-head,
+html[data-theme="dark"] body:has(#map) .feedback-history .feedback-thread-head *,
+html[data-theme="dark"] body:has(#map) .feedback-history .feedback-item,
+html[data-theme="dark"] body:has(#map) .feedback-history .feedback-item * {
+  text-shadow: none !important;
+}
+body:has(#map) .agent-info-card,
+body:has(#map) .maptalks-msgBox,
+body:has(#map) .maptalks-msgBoxContent,
+body:has(#map) .maptalks-infowindow,
+body:has(#map) .maptalks-infowindow-content {
+  background: #ffffff !important;
+  color: #111111 !important;
+  border: 1px solid rgba(30, 30, 30, 0.22) !important;
+  border-top: 4px solid #a51c30 !important;
+  border-radius: 0 !important;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.35) !important;
+  text-shadow: none !important;
+}
+body:has(#map) .agent-info-card {
+  display: grid !important;
+  gap: 4px !important;
+  width: 230px !important;
+  padding: 10px 12px !important;
+  box-sizing: border-box !important;
+}
+body:has(#map) .agent-info-card,
+body:has(#map) .agent-info-card *,
+body:has(#map) .maptalks-msgBox *,
+body:has(#map) .maptalks-msgBoxContent *,
+body:has(#map) .maptalks-infowindow *,
+body:has(#map) .maptalks-infowindow-content * {
+  color: #111111 !important;
+  text-shadow: none !important;
+}
+body:has(#map) .agent-info-card b {
+  font-family: var(--harvard-serif) !important;
+  font-size: 14px !important;
+  line-height: 1.2 !important;
+}
+body:has(#map) .agent-info-card span,
+body:has(#map) .agent-info-card small {
+  display: block !important;
+  color: #475569 !important;
+  font-size: 12px !important;
+  line-height: 1.3 !important;
+}
+body:has(#map) .agent-info-card .agent-live-activity {
+  color: #166534 !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}

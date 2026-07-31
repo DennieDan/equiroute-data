@@ -1146,7 +1146,7 @@
         }
       }
     </style>
-    <link rel="stylesheet" href="../harvard.css?v=20260731m" />
+    <link rel="stylesheet" href="../harvard.css?v=20260731n" />
     <script src="https://unpkg.com/maptalks/dist/maptalks.min.js"></script>
     <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
     <script src="https://unpkg.com/mapillary-js@4.1.2/dist/mapillary.js"></script>
@@ -2956,8 +2956,10 @@
             ],
           });
           marker.setInfoWindow({
-            title: agent.display_name || id,
-            content: `${(persona.label || agent.persona_type_id || "persona agent").replaceAll("_", " ")}<br><span class="agent-live-activity">moving</span>`,
+            custom: true,
+            width: 230,
+            minHeight: 72,
+            content: `<div class="agent-info-card"><b>${escapeHtml(agent.display_name || id)}</b><span>${escapeHtml((persona.label || agent.persona_type_id || "persona agent").replaceAll("_", " "))}</span><small class="agent-live-activity">moving</small></div>`,
           });
           state.liveAgentMarkers.set(id, marker);
           state.agentLayer.addGeometry(marker);
