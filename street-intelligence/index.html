@@ -254,6 +254,45 @@
       .street-mode .street-only-control {
         display: inline-block;
       }
+      .street-screen-nav {
+        position: fixed;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 46;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        width: 58px;
+        height: 88px;
+        padding: 0;
+        border-radius: 0;
+        border: 1px solid rgba(255, 255, 255, 0.32);
+        border-bottom: 6px solid var(--harvard-crimson, #a51c30);
+        background: var(--harvard-black, #1e1e1e);
+        color: #fff;
+        font-size: 34px;
+        font-family: var(--harvard-serif, Georgia, serif);
+        line-height: 1;
+        box-shadow: 0 18px 44px rgba(0, 0, 0, 0.38);
+        opacity: 0.94;
+      }
+      .street-screen-nav.prev {
+        left: 18px;
+      }
+      .street-screen-nav.next {
+        right: 18px;
+      }
+      .street-mode .street-screen-nav {
+        display: flex;
+      }
+      .street-screen-nav:hover,
+      .street-screen-nav:focus-visible {
+        background: #fff;
+        color: var(--harvard-black, #1e1e1e);
+        border-color: #fff;
+        border-bottom-color: var(--harvard-crimson, #a51c30);
+        outline: 0;
+      }
       #notificationBellBtn {
         min-width: 40px;
         position: relative;
@@ -1146,7 +1185,7 @@
         }
       }
     </style>
-    <link rel="stylesheet" href="../harvard.css?v=20260731o" />
+    <link rel="stylesheet" href="../harvard.css?v=20260731p" />
     <script src="https://unpkg.com/maptalks/dist/maptalks.min.js"></script>
     <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
     <script src="https://unpkg.com/mapillary-js@4.1.2/dist/mapillary.js"></script>
@@ -1186,8 +1225,6 @@
       >
         Swap direction
       </button>
-      <button id="prevBtn" class="street-only-control">←</button
-      ><button id="nextBtn" class="street-only-control">→</button>
       <div class="spacer"></div>
       <span class="pill" hidden><b id="segCount">–</b> segments</span>
       <span class="pill" hidden><b id="buildingCount">–</b> buildings</span>
@@ -1197,6 +1234,24 @@
       <button id="settingsBtn" title="Settings">⚙</button>
       <button id="roleSwitchBtn" class="role-pill" type="button">Role</button>
     </div>
+    <button
+      id="prevBtn"
+      class="street-only-control street-screen-nav prev"
+      type="button"
+      aria-label="Previous street part"
+      title="Previous street part"
+    >
+      ←
+    </button>
+    <button
+      id="nextBtn"
+      class="street-only-control street-screen-nav next"
+      type="button"
+      aria-label="Next street part"
+      title="Next street part"
+    >
+      →
+    </button>
     <div id="settings" class="hud">
       <button class="close" id="closeSettings">×</button>
       <h3>Settings</h3>
