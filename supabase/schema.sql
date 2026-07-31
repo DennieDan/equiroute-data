@@ -395,3 +395,20 @@ create index if not exists agent_events_part_time_idx on public.agent_events (st
 create index if not exists agent_feedback_part_time_idx on public.agent_feedback_threads (street_part_external_id, created_at desc);
 create index if not exists agent_feedback_persona_idx on public.agent_feedback_threads (persona_type, created_at desc);
 create index if not exists public_feedback_source_idx on public.feedback_threads (source, persona_type, created_at desc);
+
+create table if not exists public.app_notifications (
+  id uuid primary key default gen_random_uuid(),
+  external_id text unique not null,
+  source text not null default 'system' check (source in ('system','public','agent_simulation')),
+  title text not null,
+  body text not null default '',
+  street_part_id uuid null references public.street_parts(id) on delete set null,
+  street_part_external_id text null,
+  payload jsonb not null default '{}',
+  created_at timestamptz not null default now()
+);
+
+create index if not exists app_notifications_created_idx on public.app_notifications (created_at desc);
+create index if not exists app_notifications_part_idx on public.app_notifications (street_part_external_id, created_at desc);
+
+grant select, insert, update on public.app_notifications to anon, authenticated;

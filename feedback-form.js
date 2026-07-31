@@ -12,6 +12,7 @@
   let supabaseUrl = "";
   let supabaseKey = "";
   let capitalizeKind = (kind) => String(kind || "");
+  let onFeedbackRowsLoaded = () => {};
   let historyRequestId = 0;
   const VOTER_KEY = "jalanlens_feedback_voter_id";
   const LOCAL_LIKES_KEY = "jalanlens_feedback_local_likes";
@@ -299,6 +300,7 @@
         .map((row, index) => ({ ...row, id: row.id || `local-agent-${ctx.streetPartExternalId}-${index}`, source: "agent_simulation" }));
       const agentRows = agentResult.status === "fulfilled" && agentResult.value.length ? agentResult.value : localAgentRows;
       lastRows = [...publicRows, ...agentRows].sort((a, b) => String(b.created_at || "").localeCompare(String(a.created_at || "")));
+      onFeedbackRowsLoaded(lastRows, ctx);
       if (!lastRows.length) {
         const errors = [publicResult, agentResult].filter((r) => r.status === "rejected").map((r) => r.reason?.message || String(r.reason));
         setHistory(`<div class="feedback-thread-head"><b>Feedback threads</b><small>0 posts</small></div><div class="feedback-item"><span>No reports yet.${errors.length ? " Some live tables may not be migrated yet." : " Be the first to post feedback for this footpath."}</span></div>`, true);
@@ -379,6 +381,7 @@
     supabaseUrl = options.supabaseUrl || "";
     supabaseKey = options.supabaseKey || "";
     if (typeof options.capitalizeKind === "function") capitalizeKind = options.capitalizeKind;
+    if (typeof options.onFeedbackRowsLoaded === "function") onFeedbackRowsLoaded = options.onFeedbackRowsLoaded;
     const ids = {
       openBtn: "feedbackBtn",
       meta: "feedbackMeta",

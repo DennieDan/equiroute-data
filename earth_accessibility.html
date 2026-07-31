@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>JalanLens Earth Accessibility</title>
+    <title>JalanLens Accessibility</title>
     <link
       rel="stylesheet"
       href="https://unpkg.com/maptalks/dist/maptalks.css"
@@ -23,6 +23,30 @@
         --red: #ff3b52;
         --blue: #38bdf8;
         --orange: #fb923c;
+        --control-bg: rgba(15, 23, 42, 0.92);
+        --control-fg: #eef9ff;
+        --option-bg: #020617;
+        --option-fg: #eef9ff;
+      }
+      body[data-theme="light"] {
+        --bg: rgba(255, 255, 255, 0.92);
+        --line: rgba(15, 23, 42, 0.22);
+        --txt: #0f172a;
+        --muted: #475569;
+        --control-bg: #ffffff;
+        --control-fg: #0f172a;
+        --option-bg: #ffffff;
+        --option-fg: #0f172a;
+      }
+      body[data-theme="dark"] {
+        --bg: rgba(2, 6, 23, 0.86);
+        --line: rgba(125, 211, 252, 0.34);
+        --txt: #eef9ff;
+        --muted: #a7c7d8;
+        --control-bg: rgba(15, 23, 42, 0.92);
+        --control-fg: #eef9ff;
+        --option-bg: #020617;
+        --option-fg: #eef9ff;
       }
       html,
       body {
@@ -185,8 +209,8 @@
       input,
       .buttonlike {
         border: 1px solid rgba(125, 211, 252, 0.35);
-        background: rgba(15, 23, 42, 0.88);
-        color: var(--txt);
+        background: var(--control-bg);
+        color: var(--control-fg);
         border-radius: 12px;
         padding: 8px 10px;
         font-weight: 750;
@@ -201,7 +225,79 @@
       }
       select {
         max-width: 360px;
+        background: var(--control-bg);
+        color: var(--control-fg);
       }
+      select option {
+        background: var(--option-bg);
+        color: var(--option-fg);
+      }
+      .topbar-hover-select {
+        opacity: 0.78;
+        transition: opacity 0.15s ease, transform 0.15s ease;
+      }
+      .topbar-hover-select:hover,
+      .topbar-hover-select:focus {
+        opacity: 1;
+        transform: translateY(-1px);
+      }
+      .street-only-control {
+        display: none;
+      }
+      .street-mode .street-only-control {
+        display: inline-block;
+      }
+      #notificationBellBtn {
+        min-width: 40px;
+        position: relative;
+      }
+      #notificationBellBtn.has-unread::after {
+        content: "";
+        position: absolute;
+        right: 6px;
+        top: 6px;
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: var(--red);
+      }
+      #toastStack {
+        position: absolute;
+        right: 14px;
+        top: 72px;
+        z-index: 60;
+        display: grid;
+        gap: 8px;
+        width: min(380px, calc(100vw - 28px));
+        pointer-events: none;
+      }
+      .toast {
+        padding: 10px 12px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--bg);
+        color: var(--txt);
+        box-shadow: 0 14px 44px rgba(0,0,0,.34);
+        animation: toastIn .18s ease-out;
+      }
+      @keyframes toastIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+      #notificationsPanel {
+        right: 14px;
+        top: 72px;
+        width: min(420px, calc(100vw - 28px));
+        max-height: min(70vh, 620px);
+        overflow: auto;
+        padding: 12px;
+        z-index: 61;
+        display: none;
+      }
+      #notificationsPanel.visible { display: block; }
+      .notification-head { display: flex; align-items: center; gap: 8px; justify-content: space-between; }
+      .notification-list { display: grid; gap: 8px; margin-top: 10px; }
+      .notification-item { text-align: left; border-radius: 14px; border: 1px solid rgba(148,163,184,.24); padding: 9px; background: rgba(15,23,42,.62); width: 100%; }
+      .notification-item b { display: block; }
+      .notification-item small { display: block; color: var(--muted); margin-top: 3px; }
+      .status { display: none; }
       #miniMap {
         position: absolute;
         right: 14px;
@@ -814,19 +910,23 @@
     <div id="segmentButtons"></div>
     <div id="roadNameLabels" aria-hidden="true"></div>
     <div id="topbar" class="hud">
-      <div class="brand">JalanLens Earth</div>
+      <div class="brand">JalanLens</div>
       <span class="pill role-pill" id="roleLabel">Role</span>
       <span class="pill" id="modeLabel" hidden></span>
       <span class="pill" id="earthSource" hidden></span>
-      <select id="segmentSelect" title="Choose a footpath street part"></select>
-      <button id="earthBtn" class="active">Earth Satellite</button>
-      <button id="streetBtn">Street View</button>
-      <button id="directionBtn" title="Swap pavement-side direction" disabled>Swap direction</button>
-      <button id="prevBtn">←</button><button id="nextBtn">→</button>
+      <select id="viewModeSelect" class="topbar-hover-select" title="Choose view mode">
+        <option value="earth">Earth View</option>
+        <option value="street">Street View</option>
+      </select>
+      <select id="segmentSelect" class="topbar-hover-select street-only-control" title="Choose a footpath street part"></select>
+      <button id="directionBtn" class="street-only-control" title="Swap pavement-side direction" disabled>Swap direction</button>
+      <button id="prevBtn" class="street-only-control">←</button><button id="nextBtn" class="street-only-control">→</button>
       <div class="spacer"></div>
       <span class="pill" hidden><b id="segCount">–</b> segments</span>
       <span class="pill" hidden><b id="buildingCount">–</b> buildings</span>
       <a id="docsBtn" class="buttonlike topbar-link" href="documentation.html">Documentation</a>
+      <button id="themeToggleBtn" title="Display theme: system">◐</button>
+      <button id="notificationBellBtn" title="Notifications">🔔</button>
       <button id="settingsBtn" class="authority-only">⚙</button>
       <button id="roleSwitchBtn" class="role-pill" type="button">Role</button>
     </div>
@@ -911,7 +1011,15 @@
         <div id="feedbackStatus"></div>
       </form>
     </section>
-    <div class="status" id="status">Loading Clementi digital twin…</div>
+    <div id="toastStack" aria-live="polite" aria-atomic="false"></div>
+    <section id="notificationsPanel" class="hud" aria-live="polite">
+      <div class="notification-head">
+        <h3>Notifications</h3>
+        <button id="clearNotificationsBtn" type="button">Clear notification history</button>
+      </div>
+      <div id="notificationsList" class="notification-list">No notifications yet.</div>
+    </section>
+    <div class="status" id="status" aria-hidden="true"></div>
     <script src="feedback-form.js?v=social-thread-1"></script>
     <script>
       const COLORS = {
@@ -949,6 +1057,9 @@
         currentPhotoUploadContext: null,
         liveAgentSnapshot: null,
         agentLayer: null,
+        notifications: [],
+        dismissedNotificationIds: new Set(JSON.parse(localStorage.getItem("jalanlens_cleared_notifications") || "[]")),
+        themeMode: localStorage.getItem("jalanlens_theme") || "system",
       };
       window.__EARTH_ACCESSIBILITY_STATE = state;
       const SATELLITE_TILE =
@@ -1029,9 +1140,105 @@
           localStorage.setItem(TOKEN_STORAGE_KEY, t.trim());
         updateSettings();
       }
-      function setStatus(t) {
-        document.getElementById("status").textContent = t;
+      function escapeHtml(value) {
+        return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
       }
+      function applyTheme() {
+        const mode = state.themeMode || "system";
+        const dark = mode === "dark" || (mode === "system" && matchMedia?.("(prefers-color-scheme: dark)").matches);
+        document.body.dataset.theme = dark ? "dark" : "light";
+        if (window.themeToggleBtn) {
+          themeToggleBtn.textContent = mode === "light" ? "☀" : mode === "dark" ? "☾" : "◐";
+          themeToggleBtn.title = `Display theme: ${mode}`;
+        }
+      }
+      function cycleTheme() {
+        const order = ["system", "light", "dark"];
+        state.themeMode = order[(order.indexOf(state.themeMode) + 1) % order.length];
+        localStorage.setItem("jalanlens_theme", state.themeMode);
+        applyTheme();
+      }
+      function renderNotifications() {
+        const list = window.notificationsList;
+        if (!list) return;
+        const visible = state.notifications.filter((n) => !state.dismissedNotificationIds.has(n.id));
+        notificationBellBtn?.classList.toggle("has-unread", visible.length > 0);
+        if (!visible.length) {
+          list.textContent = "No notifications yet.";
+          return;
+        }
+        list.innerHTML = visible.map((n) => `<button class="notification-item" data-id="${escapeHtml(n.id)}"><b>${escapeHtml(n.title)}</b><small>${escapeHtml(n.body || "")}</small></button>`).join("");
+        list.querySelectorAll(".notification-item").forEach((button) => {
+          button.onclick = () => {
+            const n = visible.find((x) => x.id === button.dataset.id);
+            if (n?.street_part_external_id) openNotificationTarget(n);
+          };
+        });
+      }
+      function showToast(n) {
+        if (!window.toastStack) return;
+        const el = document.createElement("div");
+        el.className = "toast";
+        el.innerHTML = `<b>${escapeHtml(n.title)}</b><div>${escapeHtml(n.body || "")}</div>`;
+        toastStack.appendChild(el);
+        setTimeout(() => el.remove(), 4200);
+      }
+      async function saveNotification(n) {
+        try {
+          await supabaseInsert("app_notifications", {
+            external_id: n.id,
+            source: n.source || "system",
+            title: n.title,
+            body: n.body || "",
+            street_part_external_id: n.street_part_external_id || null,
+            payload: n.payload || {},
+          });
+        } catch (e) {
+          console.warn("notification save failed", e);
+        }
+      }
+      function createNotification(partial, { toast = true, persist = false } = {}) {
+        const n = {
+          id: partial.id || `local_${Date.now()}_${Math.random().toString(16).slice(2)}`,
+          source: partial.source || "system",
+          title: partial.title || "Notification",
+          body: partial.body || "",
+          street_part_external_id: partial.street_part_external_id || null,
+          payload: partial.payload || {},
+          created_at: partial.created_at || new Date().toISOString(),
+        };
+        if (!state.notifications.some((x) => x.id === n.id)) state.notifications.unshift(n);
+        state.notifications = state.notifications.slice(0, 80);
+        renderNotifications();
+        if (toast) showToast(n);
+        if (persist) saveNotification(n);
+        return n;
+      }
+      async function loadNotifications() {
+        try {
+          const rows = await supabaseRest("app_notifications", "select=external_id,source,title,body,street_part_external_id,payload,created_at&order=created_at.desc&limit=80");
+          rows.forEach((r) => createNotification({ id: r.external_id, ...r }, { toast: false, persist: false }));
+        } catch (e) {
+          console.warn("notification load failed", e);
+        }
+      }
+      function clearNotificationHistory() {
+        state.notifications.forEach((n) => state.dismissedNotificationIds.add(n.id));
+        localStorage.setItem("jalanlens_cleared_notifications", JSON.stringify([...state.dismissedNotificationIds].slice(-200)));
+        renderNotifications();
+      }
+      function openNotificationTarget(n) {
+        const part = (state.streetRegistry?.street_parts || []).find((p) => p.id === n.street_part_external_id || p.external_id === n.street_part_external_id);
+        const idx = segmentIndexForStreetPart(part);
+        if (idx >= 0) selectSegment(idx, true);
+        notificationsPanel?.classList.remove("visible");
+      }
+      function setStatus(t) {
+        const statusEl = document.getElementById("status");
+        if (statusEl) statusEl.textContent = t || "";
+        createNotification({ source: "system", title: "JalanLens data loaded", body: t || "" }, { toast: true, persist: true });
+      }
+      applyTheme();
       function updateRoleMenu() {
         if (!window.roleMenuStatus) return;
         const user = state.appUser || {};
@@ -2225,8 +2432,7 @@
         const desiredHeading = node?.canonical_heading_deg ?? brg;
         state.mode = "street";
         document.body.classList.add("street-mode");
-        earthBtn.classList.remove("active");
-        streetBtn.classList.add("active");
+        if (window.viewModeSelect) viewModeSelect.value = "street";
         modeLabel.textContent = "street view · accessibility features";
         earthSource.textContent =
           "loading active street-part photo, Earth satellite stays behind";
@@ -2264,9 +2470,8 @@
       function enterEarth() {
         state.mode = "earth";
         document.body.classList.remove("street-mode");
-        earthBtn.classList.add("active");
-        streetBtn.classList.remove("active");
-        modeLabel.textContent = "Esri/Maxar Earth satellite · Three.js overlay";
+        if (window.viewModeSelect) viewModeSelect.value = "earth";
+        modeLabel.textContent = "Earth View";
         earthSource.textContent = "real daylight aerial tiles, not grey blocks";
         if (window.directionBtn) {
           directionBtn.disabled = true;
@@ -2816,6 +3021,17 @@
         if (show) renderPersonaPanel();
         updatePersonaToggleButton();
       }
+      function bindHoverDropdown(select, maxSize = 8) {
+        if (!select) return;
+        const close = () => { select.size = 0; };
+        select.addEventListener("mouseenter", () => {
+          if (select.offsetParent === null) return;
+          select.size = Math.min(maxSize, Math.max(2, select.options.length));
+        });
+        select.addEventListener("mouseleave", close);
+        select.addEventListener("change", close);
+        select.addEventListener("blur", close);
+      }
       function updateSettings() {
         tokenStatus.textContent = getToken()
           ? "Mapillary token saved in this browser."
@@ -2841,8 +3057,14 @@
         if (!moveStreetPart(1, state.mode === "street"))
           selectSegment(state.selectedIndex + 1, state.mode === "street");
       };
-      earthBtn.onclick = () => selectSegment(state.selectedIndex, false);
-      streetBtn.onclick = () => selectSegment(state.selectedIndex, true);
+      if (window.viewModeSelect) {
+        viewModeSelect.onchange = () => selectSegment(state.selectedIndex, viewModeSelect.value === "street");
+        bindHoverDropdown(viewModeSelect, 2);
+      }
+      bindHoverDropdown(segmentSelect, 10);
+      if (window.themeToggleBtn) themeToggleBtn.onclick = cycleTheme;
+      if (window.notificationBellBtn) notificationBellBtn.onclick = () => notificationsPanel?.classList.toggle("visible");
+      if (window.clearNotificationsBtn) clearNotificationsBtn.onclick = clearNotificationHistory;
       settingsBtn.onclick = () => {
         roleMenu?.classList.remove("visible");
         if (state.role === "authority") settings.classList.toggle("visible");
@@ -2880,6 +3102,19 @@
         supabaseUrl: SUPABASE_URL,
         supabaseKey: SUPABASE_PUBLISHABLE_KEY,
         capitalizeKind,
+        onFeedbackRowsLoaded: (rows, ctx) => {
+          rows.slice(0, 8).forEach((row) => {
+            const id = `feedback_${row.source || "public"}_${row.id || row.agent_external_id || row.created_at}`;
+            createNotification({
+              id,
+              source: row.source || "public",
+              title: `${row.source === "agent_simulation" ? "Agent" : "Public"} feedback: ${row.title || "New report"}`,
+              body: row.body || "New feedback received.",
+              street_part_external_id: ctx.streetPartExternalId || row.street_part_external_id || null,
+              payload: { feedback_id: row.id || null, persona_type: row.persona_type || null },
+            }, { toast: false, persist: true });
+          });
+        },
       });
       applyRoleUi();
       if (window.saveMapillaryTokenBtn && window.mapillaryTokenInput) {
@@ -3085,8 +3320,9 @@
                 ? "Supabase + local active photos"
                 : "local JSON";
           setStatus(
-            `Loaded ${state.segments.length.toLocaleString()} 5 m segments, ${streetCount} streets, ${nodeCount} street-view nodes from ${src}`,
+            `Loaded ${(registry?.street_parts?.length || 0).toLocaleString()} street parts, ${streetCount} streets, ${nodeCount} street-view nodes from ${src}`,
           );
+          await loadNotifications();
           updateSettings();
         })
         .catch((e) => setStatus("Failed to load: " + e.message));

@@ -154,7 +154,7 @@ supabase/seed_photo_feature_instances.sql
 Verify live counts through REST or the browser status line. The current expected frontend status is roughly:
 
 ```text
-Loaded 220 5 m segments, 17 streets, 30 street-view nodes from Supabase
+Loaded 220 street parts, 17 streets, 30 street-view nodes from Supabase
 ```
 
 ## Testing / verification

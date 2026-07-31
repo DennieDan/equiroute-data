@@ -161,7 +161,7 @@
         </p>
         <div class="metric-grid" id="summaryMetrics">
           <div class="metric"><b>—</b><span>street features loaded</span></div>
-          <div class="metric"><b>—</b><span>route segments</span></div>
+          <div class="metric"><b>—</b><span>street parts</span></div>
           <div class="metric"><b>—</b><span>building footprints</span></div>
           <div class="metric"><b>—</b><span>reference standard set</span></div>
         </div>
@@ -259,7 +259,7 @@
           const buildingCount = buildings.features?.length || 0;
           summaryMetrics.innerHTML = `
             <div class="metric"><b>${featureCount.toLocaleString()}</b><span>street features loaded</span></div>
-            <div class="metric"><b>${segmentCount.toLocaleString()}</b><span>route segments</span></div>
+            <div class="metric"><b>${segmentCount.toLocaleString()}</b><span>street parts</span></div>
             <div class="metric"><b>${buildingCount.toLocaleString()}</b><span>building footprints</span></div>
             <div class="metric"><b>${standards.name ? "1" : "—"}</b><span>reference standard set</span></div>
           `;
